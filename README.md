@@ -5,4 +5,4 @@ associated with the IETF.
 
 - [WG Charter](/CHARTER.md)
 - [Drafts](/drafts)
-- Mailing list: <mailto:privacy-pass@ietf.org>
+- Mailing list: <privacy-pass@ietf.org>
