@@ -1,7 +1,7 @@
 # Privacy Pass protocol I-D
 
-This is the working area for the Privacy Pass protocol internet-draft (I-D). The
-draft details the specification, extensions, integration and applications of the
+This is the working area for drafts associated with the Privacy Pass protocol. The
+drafts detail the specification, extensions, integration and applications of the
 [Privacy Pass protocol](https://privacypass.github.io) in the browser setting.
 
 ## Building the Draft
