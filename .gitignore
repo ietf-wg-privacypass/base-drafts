@@ -1,0 +1,8 @@
+.refcache
+.targets.mk
+lib
+draft-privacy-pass.txt
+draft-privacy-pass.html
+metadata.min.js
+*.txt
+*.html
