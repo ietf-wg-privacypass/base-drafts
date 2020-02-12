@@ -195,7 +195,19 @@ curve point).
 
 ## Layout
 
-TODO: layout
+- {{pp-api}}: Describes the internal functions and data structures that
+  are used by the Privacy Pass protocol.
+- {{overview}}: Describes the generic protocol structure, based on the
+  API provided in {{pp-api}}.
+- {{sec-requirements}}: Describes the security requirements of the
+  generic protocol description.
+- {{voprf-protocol}}: Describes an instantiation of the API in
+  {{pp-api}} based on the VOPRF protocol described in
+  {{I-D.irtf-cfrg-voprf}}.
+- {{ciphersuites}}: Describes ciphersuites for use with the Privacy Pass
+  protocol based on the instantiation in {{voprf-protocol}}.
+- {{extensions}}: Describes the policy for implementing extensions to
+  the Privacy Pass protocol.
 
 ## Requirements
 
@@ -573,19 +585,19 @@ If a panic occurs during the server's operations for one of the
 documented errors, then the server returns an error response indicating
 the error that occurred.
 
-# Security considerations {#security}
+# Security requirments {#sec-requirements}
 
 We discuss the security requirements that are necessary to uphold when
-instantiating the Privacy Pass protocol.
-
-## Requirements {#sec-requirements}
-
-We first discuss the security requirements of "unlinkability", and
+instantiating the Privacy Pass protocol. In particular, we focus on the
+security requirements of "unlinkability", and
 "unforgeability". Since these are cryptographic security requirements we
 discuss them with respect to a polynomial-time algorithm known as the
 adversary that is looking to subvert the security guarantee. More
 details on both security requirements can be found in {{DGSTV18}} and
 {{KLOR20}}.
+
+Note that the privacy requirements of the protocol are covered in the
+architectural framework document (TODO: link).
 
 ### Unlinkability {#unlinkability}
 
@@ -876,3 +888,34 @@ the effective keylength of the ciphersuite, as specified in {{NIST}}.
 Note than any extension to the Privacy Pass protocol that modifies
 either VOPRF instantiation, or the way that the Privacy Pass API is
 implemented, MUST specify its own ciphersuites.
+
+# Extensions framework policy {#extensions}
+
+The intention with providing the Privacy Pass API in {{pp-api}} is to
+allow new instantiations of the Privacy Pass protocol. These
+instantiations may provide either modified VOPRF constructions, or
+simply implement the API in a completely different way.
+
+Extensions to this initial draft SHOULD be specified as separate
+documents taking one of two possible routes:
+
+- Produce new VOPRF-like primitives that use the same public API
+  provided in {{I-D.irtf-cfrg-voprf}} to implement the Privacy Pass API,
+  but with different internal operations.
+- Implement the Privacy Pass API in a different way to the proposed
+  implementation in {{voprf-protocol}}.
+
+If an extension requires changing the generic protocol description as
+described in {{overview}}, then the change may have to result in changes
+to the draft specification here also.
+
+Each new extension that modifies the internals of the protocol in either
+of the two ways MUST re-justify that the extended protocol
+still satisfies the security requirements in {{sec-requirements}}.
+Protocol extensions MAY put forward new security guarantees if they
+are applicable.
+
+The extensions MUST also conform with the extension framework policy as
+set out in the architectural framework document. For example, this may
+concern any potential impact on client privacy that the extension may
+introduce.
