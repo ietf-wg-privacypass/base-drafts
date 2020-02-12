@@ -46,6 +46,22 @@ normative:
       -
         ins: S. J. Lewis
         org: OpenPrivacy, Canada
+  KLOR20:
+    title: Anonymous Tokens with Private Metadata Bit
+    target: https://eprint.iacr.org/2020/072
+    authors:
+      -
+        ins: B. Kreuter
+        org: Google
+      -
+        ins: T. Lepoint
+        org: Google
+      -
+        ins: M. Orrú
+        org: ENS/INRIA, Paris, France; Recurse Center, NYC, USA
+      -
+        ins: M. Raykova
+        org: Google
   DGSTV18:
     title: Privacy Pass, Bypassing Internet Challenges Anonymously
     target: https://www.degruyter.com/view/j/popets.2018.2018.issue-3/popets-2018-0026/popets-2018-0026.xml
@@ -535,14 +551,75 @@ returns an error response indicating the error that occurred.
 
 # Security considerations {#security}
 
-We present a number of security considerations that prevent a malicious
-actors from abusing the protocol.
+We discuss the security requirements that are necessary to uphold when
+instantiating the Privacy Pass protocol.
 
 ## Requirements {#sec-requirements}
 
-TODO: write security requirements for protocol in {{overview}}.
+We first discuss the security requirements of `unlinkability`, and
+`unforgeability`. Since these are cryptographic security requirements we
+discuss them with respect to a polynomial-time algorithm known as the
+adversary that is looking to subvert the security guarantee. More
+details on both security requirements can be found in {{DGSTV18}} and
+{{KLOR20}}.
 
-## Double-spend protection
+### Unlinkability {#unlink}
+
+Informally, the `unlinkability` requirement states that it is impossible
+for an adversarial server to link the client's message in a redemption
+session, to any previous issuance session that it has encountered.
+
+Formally speaking the security model is the following:
+
+- The adversary runs PP_Server_Setup and generates a key-pair `(k, pk)`.
+- The adversary specifies a number `Q` of issuance phases to initiate,
+  where each phase `i in 1..Q` consists of `m_i` server evaluations.
+- The adversary runs PP_Eval using the key-pair that it generated on
+  each of the client messages in the issuance phase.
+- When the adversary wants it stops the issuance phase, and a random
+  number `l` is picked from `1..Q`.
+- A redemption phase is initiated with a single token with index `i`
+  randomly sampled from `1..m_i`.
+- The adversary guesses an index `l_guess` corresponding to the index of
+  the issuance phase that it believes the redemption token was received
+  in.
+- The adversary succeeds if `l == l_guess`.
+
+The security requirement is that the adversary has only a negligible
+probability of success greater than `1/Q`.
+
+### One-more unforgeability {#unforgeability}
+
+The one-more unforgeability requirement states that it is hard for any
+adversarial client that has received `m` valid tokens from a server to
+redeem `m+1` of them. In essence, this requirement prevents a malicious
+client from being able to forge valid tokens based on the server
+responses that it sees.
+
+The security model takes the following form:
+
+- A server is created that runs PP_Server_Setup and broadcasts `pk`.
+- The adversary runs PP_Client_Setup on the server public key `pk`.
+- The adversary specifies a number `Q` of issuance phases to initiate
+  with the server, where each phase `i in 1..Q` consists of `m_i` server
+  evaluations. Let `m = sum(m_i)` where `i in 1..Q`.
+- The client receives Q responses, where the ith response contains `m_i`
+  individual tokens.
+- The adversary initiates `m_adv` redemption sessions with the server
+  and the server verifies that the sessions are successful (return
+  true). The adversary succeeds in `m_succ =< m_adv` redemption
+  sessions.
+- The adversary succeeds if `m_succ > m`.
+
+The security requirement is that the adversarial client has only a
+negligible probability of succeeding.
+
+Note that {{KLOR20}} strengthens the capabilities of the adversary, in
+comparison to the original work of {{DGSTV18}}. In {{KLOR20}}, the
+adversary is provided with oracle access that allows it to verify that
+the server responses in the issuance phase are valid.
+
+### Double-spend protection
 
 All issuing server should implement a robust storage-query mechanism for
 checking that tokens sent by clients have not been spent before. Such
@@ -650,8 +727,9 @@ TODO: explain utility functions for converting data.
 
 ~~~
 1. ciph = recover_ciphersuite_from_id(id)
-2. cfg = ClientConfig { ciphersuite: ciph, pub_key: pub_key }
-3. Output cfg
+2. if ciph == null: panic(ERR_UNSUPPORTED_CONFIG)
+3. cfg = ClientConfig { ciphersuite: ciph, pub_key: pub_key }
+4. Output cfg
 ~~~
 
 ### PP_Generate
