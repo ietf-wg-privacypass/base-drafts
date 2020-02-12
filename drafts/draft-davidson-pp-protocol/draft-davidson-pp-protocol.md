@@ -561,25 +561,80 @@ Moreover, we show that this protocol satisfies the security requirements
 laid out in {{sec-requirements}}, based on the security proofs provided
 in {{DGSTV18}}.
 
-## VOPRF utility functions
+## VOPRF conventions
 
-### recover_ciphersuite_from_id
+The VOPRF ciphersuite ({{I-D.irtf-cfrg-voprf}}; section TODO) that is
+used determines the member functions and prime-order group used by the
+protocol. We detail a number of specific conventions here that we use
+for interacting with the specific ciphersuite.
 
-### as_bytes
+### Ciphersuites
+
+Let VOPRF_* denote a generic VOPRF API function as detailed in
+{{I-D.irtf-cfrg-voprf}} (Section TODO), and let `ciph` denote the
+ciphersuite that is used for instantiating the VOPRF. In this
+document, we explicitly write `ciph.VOPRF_*` to show that VOPRF_* is
+explicitly evaluated with respect to `ciph`.
+
+In addition, we define the following member functions associated with
+the ciphersuite.
+
+- `recover_ciphersuite_from_id(id)`: Takes a string identifier `id` as
+  input, and outputs a VOPRF ciphersuite.
+- `group()`: Returns the prime-order group associated with the
+  ciphersuite.
+- `H1()`: The function `H1()` defined in {{I-D.irtf-cfrg-voprf}}
+  (Section TODO). This function allows deterministically mapping
+  arbitrary bytes to a random element of the group. In the elliptic
+  curve setting, this is achieved using the functions defined in
+  {{I-D.irtf-cfrg-hash-to-curve}}.
+
+### Prime-order group conventions
+
+We detail a few functions that are required of the prime-order group
+`GG` used by the VOPRF in {{I-D.irtf-cfrg-voprf}}.
+
+Let `p` be the order of the Galois field `GF(p)` associated with the
+group `GG`. We expose the following functions associated with `GG`. We
+
+- `GG.generator()`: Returns the fixed generator associated with the
+  group `GG`.
+- `GG.scalar_field()`: Provides access to the field `GF(p)`.
+- `GG.scalar_field().random()`: Samples a scalar uniformly at random
+  from GF(p). This can be done by sampling a random sequence of bytes
+  that produce a scalar `r`, where `r < p` is satisfied (via
+  rejection-sampling).
+
+We also use the following functions for transitioning between different
+data types.
+
+- `as_bytes()`: For a scalar element of `GG.scalar_field()`, or an
+  element of `GG`; the `as_bytes()` functions serializes the element
+  into bytes and returns this array as output.
+- `as_scalar()`: Interprets a sequence of bytes as a scalar value in
+  `GG.scalar_field()`. For an array of byte arrays, we define the
+  function `as_scalars()` to individually deserialize each of the
+  individual byte arrays into a scalar and output a new array containing
+  each scalar value.
+- `as_element()`: Interprets a sequence of bytes as a group element in
+  `GG`. For an array of byte arrays, we define the function
+  `as_elements()` to individually deserialize each of the individual
+  byte arrays into a group element and output a new array containing
+  each scalar value.
 
 ## API instantiation
 
-For the inputs and outputs of each of the functions, refer to
+For the explicit signatures of each of the functions, refer to
 {{pp-functions}}.
 
-TODO: explain about GG.VOPRF_*
+TODO: explain utility functions for converting data.
 
 ### PP_Server_Setup
 
 ~~~
 1. ciph = recover_ciphersuite_from_id(id)
 2. if ciph == null: panic(ERR_UNSUPPORTED_CONFIG)
-3. (k,Y,GG) = GG.VOPRF_Setup(ciph)
+3. (k,Y,GG) = ciph.VOPRF_Setup()
 4. key = k.as_bytes()
 5. pub_key = Y.as_bytes()
 6. cfg = ServerConfig {
@@ -609,7 +664,7 @@ TODO: explain about GG.VOPRF_*
 5. g_data = []
 6. for i in 0..m:
        1. c_data[i] = GG.scalar_field().random().as_bytes()
-7. (blinds,groupElems) = GG.VOPRF_Blind(i_data)
+7. (blinds,groupElems) = ciph.VOPRF_Blind(i_data)
 8. for i in 0..m:
        1. i_data[i] = groupElems[i].as_bytes()
        2. g_data[i] = blinds[i].as_bytes()
@@ -625,7 +680,7 @@ TODO: explain about GG.VOPRF_*
 4. if m > max_evals: panic(ERR_MAX_EVALS)
 5. G = GG.generator()
 6. elts = i_data.as_elements();
-7. Z, D = GG.VOPRF_Eval(key.as_scalar(), G, pub_key.as_element(), elts)
+7. Z, D = ciph.VOPRF_Eval(key.as_scalar(), G, pub_key.as_element(), elts)
 8. evals = []
 9. for i in 0..m: evals[i] = Z[i].as_bytes();
 10. proof = D.as_bytes()
@@ -642,7 +697,7 @@ TODO: explain about GG.VOPRF_*
 5. M = i_data.as_elements()
 6. Z = evals.as_elements()
 7. r = g_data.as_scalars()
-8. N = GG.VOPRF_Unblind(G, pk, M, Z, r, proof)
+8. N = ciph.VOPRF_Unblind(G, pk, M, Z, r, proof)
 9. if N == "error": panic(ERR_PROOF_VALIDATION)
 10. tokens = []
 11. for i in 0..m:
@@ -657,7 +712,7 @@ TODO: explain about GG.VOPRF_*
 ~~~
 1. ciph = cli_cfg.ciphersuite
 2. GG = ciph.group()
-3. tag = GG.VOPRF_Finalize(token.data, token.issued.as_element(), aux)
+3. tag = ciph.VOPRF_Finalize(token.data, token.issued.as_element(), aux)
 4. Output tag
 ~~~
 
@@ -667,11 +722,15 @@ TODO: explain about GG.VOPRF_*
 1. ciph = cli_cfg.ciphersuite
 2. GG = ciph.group()
 3. key = srv_cfg.key
-4. T = GG.encode(x)
+4. T = ciph.H1(x)
 5. N' = GG.OPRF_Eval(key, T)
 6. tag' = GG.OPRF_Finalize(x,N',aux)
 7. Output (tag == tag')
 ~~~
+
+Note: we use the OPRF_* API functions rather than VOPRF_*, as we do not
+need to recompute the data that is used for producing verifiable outputs
+at this stage.
 
 # Ciphersuites & security settings {#ciphersuites}
 
