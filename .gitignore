@@ -6,3 +6,4 @@ draft-privacy-pass.html
 metadata.min.js
 *.txt
 *.html
+.DS_STORE

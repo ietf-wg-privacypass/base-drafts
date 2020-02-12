@@ -1,7 +1,7 @@
 ---
-title: "Privacy Pass: the protocol"
+title: "Privacy Pass: The Protocol"
 abbrev: PP protocol
-docname: draft-pp-protocol-00
+docname: draft-pp-protocol-latest
 date:
 category: info
 
@@ -97,9 +97,12 @@ normative:
 
 --- abstract
 
-This document specifies the Privacy Pass protocol for providing
-client-authorization without providing the ability to link client
-interactions together.
+This document specifies the Privacy Pass protocol for
+privacy-preserving methods for authorization of clients to servers.
+In this context, privacy-preserving ensures that client re-authorization
+events cannot be linked to any previous initial authorization. Privacy
+Pass is intended to be used as a performant protocol for usage in the
+Internet setting.
 
 --- middle
 
@@ -109,20 +112,25 @@ A common problem on the internet is providing an effective mechanism for
 servers to derive trust from the clients that it interacts with, without
 hampering the accessibility of honest clients. Typically, this can be
 done by providing some sort of authorization challenge to the client. A
-client providing a correct solution can be provided with a cookie that
-it can present the next time it interacts with the server. Resurfacing
-the cookie allows the server to see that the client passed the
-authorization check in the past. This allows the server to authorize the
-client again immediately.
+client providing a correct solution to the challenge can be provided
+with a cookie. This cookie can be presented the next time it interacts
+with the server. The resurfacing of this cookie allows the server to see that the client passed the
+authorization check in the past. Consequently, the server can
+re-authorize the client again immediately, without the need for
+completing a new challenge.
 
 In scenarios where clients need to identify themselves, the
 authorization challenge usually takes the form of some sort of login
-procedure. In other scenarios, the server may just want to verify that
+procedure. Otherwise, the server may just want to verify that
 the client demonstrates some particular facet of behavior (such as being
 human). Such cases may only require a lightweight form of challenge
-(such as completing a CAPTCHA). Moreover, providing a re-authentication
-token like a cookie provides the server with the ability to link all of
-the client's browsing sessions that it witnesses. In these situations,
+(such as completing a CAPTCHA).
+
+In both cases, if a server issues cookies on successful completion of
+challenges, then the client can use this cookie to bypass future
+challenges for the lifetime of the cookie. The downside of this approach
+is that this provides the server with the ability to link all of the
+client's interactions that it witnesses. In these situations,
 the client's online privacy is dramatically reduced.
 
 The Privacy Pass protocol was initially introduced as a mechanism for
@@ -137,33 +145,33 @@ The Internet performance company Cloudflare has already implemented
 server-side support for an initial version of the Privacy Pass protocol
 {{PPSRV}}, and client-side implementations also exist {{PPEXT}}. More
 recently, a number of applications have been built upon the protocol, or
-slight variants of it, see: {{TRUST}}, {{OpenPrivacy}},
-{{PrivateStorage}}.
+slight variants of it; see: {{TRUST}}, {{OpenPrivacy}},
+{{PrivateStorage}}. The protocol can be instantiated using a cryptographic primitive known
+as a verifiable oblivious pseudorandom function (VOPRF) for implementing the
+authorization mechanism. Such VOPRF protocols can be implemented already
+in prime-order groups, and such constructions are currently being
+drafted in separate standardization processes {{I-D.irtf-cfrg-voprf}}.
 
-The protocol uses a cryptographic primitive known as a verifiable
-oblivious pseudorandom function (VOPRF) for implementing the
-authorization mechanism. The VOPRF is implemented using elliptic curves
-and is currently in a separate standardization process
-{{I-D.irtf-cfrg-voprf}}. The protocol is split into three stages. The
-first two stages, initialisation and evaluation, are essentially
-equivalent to the VOPRF setup and evaluation phases from
-{{I-D.irtf-cfrg-voprf}}. The final stage, redemption, essentially
-amounts to revealing the client's secret inputs in the VOPRF protocol.
-The security (pseudorandomness) of the VOPRF protocol means that the
-client retains their privacy even after revealing this data.
+The Privacy Pass protocol is split into three stages. The
+first stage, initialisation, produces the global server configuration
+that is broadcast to (and stored by) all clients. The "issuance" phase
+provides the client with unlinkable tokens that can be used to initiate
+re-authorization with the server in the future. The redemption phase
+allow the client to redeem a given re-authorization token with the
+server that it interacted with the issuance phase. In addition, the
+protocol must satisfy two cryptographic security requirements known as
+"unlinkability" and "unforgeability".
 
-This document will lay out the generic description of the protocol based
-on the VOPRF primitive. It will provide a number of parametrizations of
-the security parameters associated with the protocol for establishing a
-secure VOPRF instantiation, along with ciphersuites that match these
-instantiations. It will also describe the structure of protocol
-messages, and the framework for characterizing possible extensions to
-the protocol description.
+This document will lay out the generic description of the protocol,
+along with a secure implementation based on the VOPRF primitive. It will
+also describe the structure of protocol messages, and the framework for
+characterizing possible extensions to the protocol description.
 
 This document DOES NOT cover the architectural framework required for
-running and maintaining the Privacy Pass protocol. In addition, it DOES
-NOT cover the choices that are necessary for ensuring that client
-privacy leaks do not occur.
+running and maintaining the Privacy Pass protocol in the Internet
+setting. In addition, it DOES NOT cover the choices that are necessary
+for ensuring that client privacy leaks do not occur. Both of these
+considerations will be covered in a separate follow-up document.
 
 ## Preliminaries
 
@@ -203,6 +211,9 @@ itself. Instantiating this set of functions, along with meeting the
 security requirements highlighted in {{sec-requirements}}, provides an
 instantiation of the wider protocol.
 
+We provide an explicit instantiation of the Privacy PAss API, based on
+the public API provided in {{I-D.irtf-cfrg-voprf}} in Section TODO.
+
 ## Data structures {#pp-structs}
 
 ### ServerConfig {#pp-srv-cfg-struct}
@@ -213,13 +224,13 @@ Pass functional API ({{pp-functions}}).
 
 Fields:
 
-- ciphersuite: Internal ciphersuite that is used for instantiating the
-               Privacy Pass functionality.
-- key:         The private key used by the server (in byte format).
-- pub_key:     The public key used by the server (in byte format).
-- max_evals:   An integer value corresponding to the the maximum number
-               of valid redemption tokens that the server will sanction
-               in any given issuance session.
+- `ciphersuite`: Internal ciphersuite that is used for instantiating the
+                 Privacy Pass functionality.
+- `key`:         The private key used by the server (in byte format).
+- `pub_key`:     The public key used by the server (in byte format).
+- `max_evals`:   An integer value corresponding to the the maximum number
+                 of valid redemption tokens that the server will sanction
+                 in any given issuance session.
 
 ### ClientConfig {#pp-cli-cfg-struct}
 
@@ -229,9 +240,9 @@ Pass functional API ({{pp-functions}}).
 
 Fields:
 
-- ciphersuite: Internal ciphersuite that is used for instantiating the
-               Privacy Pass functionality.
-- pub_key:     The public key used by the server (in byte format).
+- `ciphersuite`: Internal ciphersuite that is used for instantiating the
+                 Privacy Pass functionality.
+- `pub_key`:     The public key used by the server (in byte format).
 
 ### RedemptionToken {#pp-storage-struct}
 
@@ -241,10 +252,10 @@ protocol. This data is generated in the issuance phase of the protocol.
 
 Fields:
 
-- data:   A byte array corresponding to the initial client input in
-  PP_Generate.
-- issued: A byte array corresponding to the server response after
-          running PP_Issue.
+- `data`:   A byte array corresponding to the initial client input in
+            PP_Generate.
+- `issued`: A byte array corresponding to the server response after
+            running PP_Issue.
 
 ## API functions {#pp-functions}
 
@@ -255,43 +266,42 @@ provided by specific instantiations or extensions.
 
 ### PP_Server_Setup
 
-Run by the Privacy Pass server to generate its configuration for use in
-the Privacy Pass protocol. Th key-pair used in the server configuration
-are generated fresh on each invocation.
+Run by the Privacy Pass server to generate its configuration. The
+key-pair used in the server configuration are generated fresh on each
+invocation.
 
 Inputs:
 
-- id:  A string identifier corresponding to a valid Privacy Pass server
-       configuration.
+- `id`:  A string identifier corresponding to a valid Privacy Pass server
+         configuration.
 
 Outputs:
 
-- cfg: A `ServerConfig` struct ({{pp-srv-cfg-struct}}).
+- `cfg`: A `ServerConfig` struct ({{pp-srv-cfg-struct}}).
 
-Possible errors:
+Throws:
 
-- ERR_UNSUPPORTED_CONFIG ({{errors}})
+- `ERR_UNSUPPORTED_CONFIG` ({{errors}})
 
 ### PP_Client_Setup
 
-Run by the Privacy Pass client to generate its configuration for use in
-the Privacy Pass protocol. The public key in the client configuration is
-set to be the server public key that is used as an input.
+Run by the Privacy Pass client to generate its configuration. The input
+public key `pub_key` in the client configuration MUST correspond to a valid server public key.
 
 Inputs:
 
-- id:      A string identifier corresponding to a valid Privacy Pass
-           server configuration.
-- pub_key: A byte array corresponding to the public key of a Privacy
-           Pass server.
+- `id`:      A string identifier corresponding to a valid Privacy Pass
+             server configuration.
+- `pub_key`: A byte array corresponding to the public key of a Privacy
+             Pass server.
 
 Outputs:
 
-- cfg:     A `ClientConfig` struct ({{pp-cli-cfg-struct}}).
+- `cfg`:     A `ClientConfig` struct ({{pp-cli-cfg-struct}}).
 
-Possible errors:
+Throws:
 
-- ERR_UNSUPPORTED_CONFIG ({{errors}})
+- `ERR_UNSUPPORTED_CONFIG` ({{errors}})
 
 ### PP_Generate
 
@@ -300,56 +310,61 @@ as its input in the Privacy Pass protocol.
 
 Inputs:
 
-- cli_cfg:     A `ClientConfig` struct.
-- m:           An integer value corresponding to the number of Privacy
-               Pass tokens to generate.
+- `cli_cfg`:     A `ClientConfig` struct.
+- `m`:           An integer value corresponding to the number of Privacy
+                 Pass tokens to generate.
 
 Outputs:
 
-- client_data: An array of byte arrays. This data is kept private until
-               the redemption phase of the protocol.
-- issue_data:  An array of byte arrays, sent in the client's message
-               during the issuance phase.
-- gen_data:    An byte array of arbitrary length that corresponds to
-               private data stored by the client, following on from the
-               generation process.
+- `client_data`: An array of byte arrays. This data is kept private until
+                 the redemption phase of the protocol.
+- `issue_data`:  An array of byte arrays, sent in the client's message
+                 during the issuance phase.
+- `gen_data`:    A byte array of arbitrary length that corresponds to
+                 private data stored by the client, following on from the
+                 generation process.
 
 ### PP_Issue
 
+A function run by the server to issue valid redemption tokens to the
+client.
+
 Inputs:
 
-- srv_cfg:      A `ServerConfig` struct.
-- client_data:  An array of byte arrays.
+- `srv_cfg`:      A `ServerConfig` struct.
+- `client_data`:  An array of byte arrays.
 
 Outputs:
 
-- evals: An array of byte arrays.
-- proof: A byte array.
+- `evals`:        An array of byte arrays.
+- `proof`:        A byte array.
 
-Possible errors:
+Throws:
 
-- ERR_MAX_EVALS ({{errors}})
+- `ERR_MAX_EVALS` ({{errors}})
 
 ### PP_Process
 
 Run by the client when processing the server response in the issuance
-phase of the protocol.
+phase of the protocol. The output of this function is an array of
+`RedemptionToken` objects that are unlinkable from the server's
+computation in `PP_Issue`.
 
 Inputs:
 
-- cli_cfg:  A `ClientConfig` struct.
-- evals:    An array of byte arrays, received from the server.
-- proof:    A byte array, also received from the server.
-- gen_data: A byte array of arbitrary length, corresponding to the
-            client's secret data output by PP_Generate.
+- `cli_cfg`:  A `ClientConfig` struct.
+- `evals`:    An array of byte arrays, received from the server.
+- `proof`:    A byte array, also received from the server.
+- `gen_data`: A byte array of arbitrary length, corresponding to the
+              client's secret data output by `PP_Generate`.
 
 Outputs:
 
-- tokens:   An array of byte-encoded `RedemptionToken` structs.
+- `tokens`:   An array of byte-encoded `RedemptionToken` structs.
 
-Possible errors:
+Throws:
 
-- ERR_PROOF_VALIDATION ({{errors}})
+- `ERR_PROOF_VALIDATION` ({{errors}})
 
 ### PP_Redeem
 
@@ -358,14 +373,14 @@ the client's message.
 
 Inputs:
 
-- cli_cfg: A `ClientConfig` struct.
-- token:   A byte-encoded `RedemptionToken` struct.
-- aux:     A byte array corresponding to arbitrary auxiliary data.
+- `cli_cfg`: A `ClientConfig` struct.
+- `token`:   A byte-encoded `RedemptionToken` struct.
+- `aux`:     A byte array corresponding to arbitrary auxiliary data.
 
 Outputs:
 
-- tag:     A byte array that is used as part of the client's message in
-           the redemption phase of the protocol.
+- `tag`:     A byte array that is used as part of the client's message in
+             the redemption phase of the protocol.
 
 ### PP_Verify
 
@@ -374,26 +389,26 @@ whether the data sent by the client is valid.
 
 Inputs:
 
-- srv_cfg:     A `ServerConfig` struct.
-- client_data: A byte array corresponding to the client-generated input
-               data output by PP_Issue.
-- tag:         A byte array corresponding to the client-generated tag
-               from the output of PP_Redeem.
+- `srv_cfg`:     A `ServerConfig` struct.
+- `client_data`: A byte array corresponding to the client-generated input
+                 data output by `PP_Generate`.
+- `tag`:         A byte array corresponding to the client-generated tag
+                 from the output of PP_Redeem.
 
 Outputs:
 
-- b:           A boolean value corresponding to whether the data
-               verifies correctly, or not.
+- `b`:           A boolean value corresponding to whether the data
+                 verifies correctly, or not.
 
 ## Error types {#errors}
 
-- ERR_UNSUPPORTED_CONFIG: Error occurred when trying to recover
+- `ERR_UNSUPPORTED_CONFIG`: Error occurred when trying to recover
   configuration with unknown identifier
-- ERR_MAX_EVALS: Client attempted to invoke server issuance with number
+- `ERR_MAX_EVALS`: Client attempted to invoke server issuance with number
   of inputs that is larger than server-specified max_evals value.
-- ERR_PROOF_VALIDATION: Client unable to verify proof that is part of
+- `ERR_PROOF_VALIDATION`: Client unable to verify proof that is part of
   the server response.
-- ERR_DOUBLE_SPEND: Indicates that a client has attempted to redeem a
+- `ERR_DOUBLE_SPEND`: Indicates that a client has attempted to redeem a
   token that has already been used for authorization.
 
 # Generalized protocol overview {#overview}
@@ -402,14 +417,14 @@ In this document, we will be assuming that a client (C) is attempting to
 authenticate itself in a lightweight manner to a server (S). The
 authorization mechanism should not reveal to the server anything about
 the client; in addition, the client should not be able to forge valid
-credentials in situations where it does not possess any.
+credentials in situations where it does not possess any. These
+requirements are covered in {{sec-requirements}}.
 
 In this section, we will give a broad overview of how the Privacy Pass
 protocol functions in achieving these goals. The generic protocol can be
-split into three phases: initialisation, issuance and redemption. To
-construct these protocol phases, we develop a new API that is tied to
-the Privacy Pass functionality. We show later ({{voprf-protocol}}) that
-this API can be facilitated using an underlying VOPRF protocol. We
+split into three phases: initialisation, issuance and redemption. These
+three phases are built upon the Privacy Pass API in {{pp-api}}. We show later ({{voprf-protocol}}) that
+this API can be implemented using an underlying VOPRF protocol. We
 provide this extra layer of abstraction to allow building extensions
 into the Privacy Pass protocol that go beyond what is specified in
 {{I-D.irtf-cfrg-voprf}}.
@@ -417,14 +432,17 @@ into the Privacy Pass protocol that go beyond what is specified in
 ## Key initialisation phase
 
 In the initialisation phase, the server generates the configuration that
-it will use for future instantiations of the protocol. It MUST also use
-this phase to broadcast the configuration that it uses, along with the
-public key that it generates.
+it will use for future instantiations of the protocol. It MUST broadcast the configuration that it generates, along with the
+public key, so that clients are aware of which configuration to use when
+interacting with the server.
 
 In situations where the number of clients are small, it could do this by
 sending the data to the client directly. But in situations where there
 is a large number of clients, the best way of doing is likely to be via
-posting this information to a public bulletin board.
+posting this information to a public bulletin board. We assume that the
+server only has a single configuration in place at any one time. There
+are privacy restrictions related to this that are described in more
+detail in the architectural document (TODO: link).
 
 We give a diagrammatic representation of the initialisation phase below.
 
@@ -446,7 +464,7 @@ uniquely identifiable by an internal attribute `id`. We assume the same
 internal attribute exists for the public key `s_cfg.pub_key`. This can
 be obtained, for example, by hashing the contents of the object --
 either the name or underlying contained bytes -- using a
-collision-resistant hash function that SHA256.
+collision-resistant hash function, such as SHA256.
 
 Note that the client stores their own configuration in the map `cfgs`
 for future Privacy Pass interactions with `S`.
@@ -454,8 +472,9 @@ for future Privacy Pass interactions with `S`.
 ## Issuance phase
 
 The issuance phase allows the client to construct `RedemptionToken`
-resulting from an interaction with a server `S` that it has previously
-interacted with. We give a diagrammatic overview of the protocol below.
+object resulting from an interaction with a server `S` that it has
+previously interacted with. We give a diagrammatic overview of the
+protocol below.
 
 ~~~
   C(cfgs,store,m)                                            S(s_cfg)
@@ -478,10 +497,10 @@ interacted with. We give a diagrammatic overview of the protocol below.
   store[S.id].push(tokens)
 ~~~
 
-In the diagram above, the client knows the VOPRF group configuration
-supported by the server when it retrieves in the first step. It uses
-this information to correctly perform group operations before sending
-the first message.
+In the diagram above, the client MUST know the supported server
+configuration before it interacts with the Privacy Pass API. The client
+input `store` is used for appending redemption tokens that are linked to
+the server id `S.id`.
 
 ## Redemption phase
 
@@ -517,9 +536,23 @@ session.
   Output b
 ~~~
 
+The client input `aux` is arbitrary byte data that is used for linking
+the redemption request to the specific session. We RECOMMEND that `aux`
+is constructed as the following byte-encoded data:
+
+~~~
+${C.id} .. ${S.id} .. ${current_time()} .. ${requested_resource()}
+~~~
+
+The usage of `current_time()` allows the server to check that the
+redemption request has happened in an appropriate time window. The
+function `requested_resource()` is an optional suffix that relates to
+any specific resources that the client has requested from the server, in
+order to trigger the authorization request.
+
 ### Double-spend protection
 
-To protect against clients that attempt to spend a value x more than
+To protect against clients that attempt to spend a value `data` more than
 once, the server uses an index, `ds_idx`, to collect valid inputs and
 then check against in future protocols. Since this store needs to only
 be optimized for storage and querying, a structure such as a Bloom
@@ -531,11 +564,12 @@ rendered obsolete after such an event.
 
 It is possible for the API functions from {{pp-functions}} to return one
 of the errors indicated in {{errors}} rather than their expected value.
-In these cases, we assume that the protocol execution panics with the
-value of the error.
+In these cases, we assume that the entire protocol execution panics with
+the value of the error.
 
-If the panic occurs during the server's operations, then the server
-returns an error response indicating the error that occurred.
+If a panic occurs during the server's operations for one of the
+documented errors, then the server returns an error response indicating
+the error that occurred.
 
 # Security considerations {#security}
 
@@ -544,8 +578,8 @@ instantiating the Privacy Pass protocol.
 
 ## Requirements {#sec-requirements}
 
-We first discuss the security requirements of `unlinkability`, and
-`unforgeability`. Since these are cryptographic security requirements we
+We first discuss the security requirements of "unlinkability", and
+"unforgeability". Since these are cryptographic security requirements we
 discuss them with respect to a polynomial-time algorithm known as the
 adversary that is looking to subvert the security guarantee. More
 details on both security requirements can be found in {{DGSTV18}} and
@@ -553,21 +587,21 @@ details on both security requirements can be found in {{DGSTV18}} and
 
 ### Unlinkability {#unlinkability}
 
-Informally, the `unlinkability` requirement states that it is impossible
+Informally, the "unlinkability" requirement states that it is impossible
 for an adversarial server to link the client's message in a redemption
 session, to any previous issuance session that it has encountered.
 
 Formally speaking the security model is the following:
 
-- The adversary runs PP_Server_Setup and generates a key-pair `(k, pk)`.
+- The adversary runs `PP_Server_Setup` and generates a key-pair `(k, pk)`.
 - The adversary specifies a number `Q` of issuance phases to initiate,
   where each phase `i in 1..Q` consists of `m_i` server evaluations.
-- The adversary runs PP_Eval using the key-pair that it generated on
+- The adversary runs `PP_Eval` using the key-pair that it generated on
   each of the client messages in the issuance phase.
 - When the adversary wants it stops the issuance phase, and a random
   number `l` is picked from `1..Q`.
 - A redemption phase is initiated with a single token with index `i`
-  randomly sampled from `1..m_i`.
+  randomly sampled from `1..m_l`.
 - The adversary guesses an index `l_guess` corresponding to the index of
   the issuance phase that it believes the redemption token was received
   in.
@@ -586,17 +620,17 @@ responses that it sees.
 
 The security model takes the following form:
 
-- A server is created that runs PP_Server_Setup and broadcasts `pk`.
-- The adversary runs PP_Client_Setup on the server public key `pk`.
+- A server is created that runs `PP_Server_Setup` and broadcasts `pk`.
+- The adversary runs `PP_Client_Setup` on the server public key `pk`.
 - The adversary specifies a number `Q` of issuance phases to initiate
   with the server, where each phase `i in 1..Q` consists of `m_i` server
   evaluations. Let `m = sum(m_i)` where `i in 1..Q`.
-- The client receives Q responses, where the ith response contains `m_i`
-  individual tokens.
+- The client receives Q responses, where the response with index `i`
+  contains `m_i` individual tokens.
 - The adversary initiates `m_adv` redemption sessions with the server
   and the server verifies that the sessions are successful (return
-  true). The adversary succeeds in `m_succ =< m_adv` redemption
-  sessions.
+  true), and that each request includes a unique token. The adversary
+  succeeds in `m_succ =< m_adv` redemption sessions.
 - The adversary succeeds if `m_succ > m`.
 
 The security requirement is that the adversarial client has only a
@@ -609,14 +643,11 @@ the server responses in the issuance phase are valid.
 
 ### Double-spend protection
 
-All issuing server should implement a robust storage-query mechanism for
+All issuing servers should implement a robust, global storage-query mechanism for
 checking that tokens sent by clients have not been spent before. Such
-tokens only need to be checked for each issuer individually. But all
-issuers must perform global double-spend checks to avoid clients from
-exploiting the possibility of spending tokens more than once against
-distributed token checking systems. For the same reason, the global data
-storage must have quick update times. While an update is occurring it
-may be possible for a malicious client to spend a token more than once.
+tokens only need to be checked for each issuer individually. This
+prevents clients from "replaying" previous requests, and is necessary
+for achieving the unforgeability requirement.
 
 # VOPRF instantiation {#voprf-protocol}
 
@@ -624,7 +655,7 @@ In this section, we show how to instantiate the functional API in
 {{pp-api}} with the VOPRF protocol described in {{I-D.irtf-cfrg-voprf}}.
 Moreover, we show that this protocol satisfies the security requirements
 laid out in {{sec-requirements}}, based on the security proofs provided
-in {{DGSTV18}}.
+in {{DGSTV18}} and {{KLOR20}}.
 
 ## VOPRF conventions
 
@@ -635,17 +666,18 @@ for interacting with the specific ciphersuite.
 
 ### Ciphersuites
 
-Let VOPRF_* denote a generic VOPRF API function as detailed in
+Let `VOPRF_*` denote a generic VOPRF API function as detailed in
 {{I-D.irtf-cfrg-voprf}} (Section TODO), and let `ciph` denote the
 ciphersuite that is used for instantiating the VOPRF. In this
-document, we explicitly write `ciph.VOPRF_*` to show that VOPRF_* is
+document, we explicitly write `ciph.VOPRF_*` to show that `VOPRF_*` is
 explicitly evaluated with respect to `ciph`.
 
 In addition, we define the following member functions associated with
 the ciphersuite.
 
 - `recover_ciphersuite_from_id(id)`: Takes a string identifier `id` as
-  input, and outputs a VOPRF ciphersuite.
+  input, and outputs a VOPRF ciphersuite. Returns `null` if `id` is not
+  recognized.
 - `group()`: Returns the prime-order group associated with the
   ciphersuite.
 - `H1()`: The function `H1()` defined in {{I-D.irtf-cfrg-voprf}}
@@ -684,8 +716,8 @@ data types.
 - `as_element()`: Interprets a sequence of bytes as a group element in
   `GG`. For an array of byte arrays, we define the function
   `as_elements()` to individually deserialize each of the individual
-  byte arrays into a group element and output a new array containing
-  each scalar value.
+  byte arrays into a single group element and output a new array
+  containing each of these elements.
 
 ## API instantiation {#voprf-api}
 
@@ -728,7 +760,7 @@ For the explicit signatures of each of the functions, refer to
 5. g_data = []
 6. for i in 0..m:
        1. c_data[i] = GG.scalar_field().random().as_bytes()
-7. (blinds,groupElems) = ciph.VOPRF_Blind(i_data)
+7. (blinds,groupElems) = ciph.VOPRF_Blind(c_data)
 8. for i in 0..m:
        1. i_data[i] = groupElems[i].as_bytes()
        2. g_data[i] = blinds[i].as_bytes()
@@ -761,7 +793,7 @@ For the explicit signatures of each of the functions, refer to
 5. M = i_data.as_elements()
 6. Z = evals.as_elements()
 7. r = g_data.as_scalars()
-8. N = ciph.VOPRF_Unblind(G, pk, M, Z, r, proof)
+8. N = ciph.VOPRF_Unblind(G,pk,M,Z,r,proof)
 9. if N == "error": panic(ERR_PROOF_VALIDATION)
 10. tokens = []
 11. for i in 0..m:
@@ -787,13 +819,13 @@ For the explicit signatures of each of the functions, refer to
 2. GG = ciph.group()
 3. key = srv_cfg.key
 4. T = ciph.H1(x)
-5. N' = GG.OPRF_Eval(key, T)
+5. N' = GG.OPRF_Eval(key,T)
 6. tag' = GG.OPRF_Finalize(x,N',aux)
 7. Output (tag == tag')
 ~~~
 
-Note: we use the OPRF_* API functions rather than VOPRF_*, as we do not
-need to recompute the data that is used for producing verifiable outputs
+Note: we use the `OPRF_*` API functions rather than `VOPRF_*`, as we do not
+need to recompute the proof data that is used for producing verifiable outputs
 at this stage.
 
 ## Security justification
@@ -813,7 +845,7 @@ notion of unforgeability, where the adversary is granted a verification
 oracle, under the chosen-target Diffie-Hellman assumption.
 
 Note that the existing security proofs do not leverage the VOPRF
-primitive as a black-box in the security reductions, instead relying on
+primitive as a black-box in the security reductions. Instead it relies on
 the underlying operations in a non-black-box manner. Hence, an explicit
 reduction from the generic VOPRF primitive to the Privacy Pass protocol
 would strengthen these security guarantees.
@@ -827,11 +859,11 @@ the VOPRF protocol. Therefore, the ciphersuites that we support are
 the transitively exposed from the underlying VOPRF functionality, we
 detail these below.
 
-- VOPRF-p384-HKDF-SHA512-SSWU-RO {{I-D.irtf-cfrg-voprf}} (Section TODO)
+- VOPRF-P384-HKDF-SHA512-SSWU-RO {{I-D.irtf-cfrg-voprf}} (Section TODO)
   - security parameter: 192 bits
 - VOPRF-curve448-HKDF-SHA512-ELL2-RO {{I-D.irtf-cfrg-voprf}} (Section TODO)
   - security parameter: 224 bits
-- VOPRF-p521-HKDF-SHA512-SSWU-RO {{I-D.irtf-cfrg-voprf}} (Section TODO)
+- VOPRF-P521-HKDF-SHA512-SSWU-RO {{I-D.irtf-cfrg-voprf}} (Section TODO)
   - security parameter: 256 bits
 
 When referring to the security parameter size above, we are referring to
