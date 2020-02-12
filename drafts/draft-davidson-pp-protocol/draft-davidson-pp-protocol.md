@@ -64,7 +64,7 @@ normative:
         org: Google
   DGSTV18:
     title: Privacy Pass, Bypassing Internet Challenges Anonymously
-    target: https://www.degruyter.com/view/j/popets.2018.2018.issue-3/popets-2018-0026/popets-2018-0026.xml
+    target: https://petsymposium.org/2018/files/papers/issue3/popets-2018-0026.pdf
     authors:
       -
         ins: A. Davidson
@@ -699,12 +699,10 @@ data types.
   byte arrays into a group element and output a new array containing
   each scalar value.
 
-## API instantiation
+## API instantiation {#voprf-api}
 
 For the explicit signatures of each of the functions, refer to
 {{pp-functions}}.
-
-TODO: explain utility functions for converting data.
 
 ### PP_Server_Setup
 
@@ -758,7 +756,7 @@ TODO: explain utility functions for converting data.
 4. if m > max_evals: panic(ERR_MAX_EVALS)
 5. G = GG.generator()
 6. elts = i_data.as_elements();
-7. Z, D = ciph.VOPRF_Eval(key.as_scalar(), G, pub_key.as_element(), elts)
+7. Z,D = ciph.VOPRF_Eval(key.as_scalar(), G, pub_key.as_element(), elts)
 8. evals = []
 9. for i in 0..m: evals[i] = Z[i].as_bytes();
 10. proof = D.as_bytes()
@@ -809,6 +807,28 @@ TODO: explain utility functions for converting data.
 Note: we use the OPRF_* API functions rather than VOPRF_*, as we do not
 need to recompute the data that is used for producing verifiable outputs
 at this stage.
+
+## Security justification
+
+The protocol that we devise in {{overview}}, coupled with the API
+instantiation in {{voprf-api}}, are equivalent to the protocol
+description in {{DGSTV18}}. In {{DGSTV18}}, it is proven that this
+protocol satisfies the security requirements of unlinkability
+({{unlinkability}}) and unforgeability ({{unforgeability}}).
+
+The unlinkability property follows unconditionally as the view of the
+adversary in the redemption phase is distributed independently of the
+issuance phase. The unforgeability property follows from the one-more
+decryption security of the ElGamal cryptosystem {{DGSTV18}}. In
+{{KLOS20}} it is also proven that this protocol satisfies the stronger
+notion of unforgeability, where the adversary is granted a verification
+oracle, under the chosen-target Diffie-Hellman assumption.
+
+Note that the existing security proofs do not leverage the VOPRF
+primitive as a black-box in the security reductions, instead relying on
+the underlying operations in a non-black-box manner. Hence, an explicit
+reduction from the generic VOPRF primitive to the Privacy Pass protocol
+would strengthen these security guarantees.
 
 # Ciphersuites & security settings {#ciphersuites}
 
