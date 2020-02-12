@@ -672,7 +672,7 @@ We detail a few functions that are required of the prime-order group
 `GG` used by the VOPRF in {{I-D.irtf-cfrg-voprf}}.
 
 Let `p` be the order of the Galois field `GF(p)` associated with the
-group `GG`. We expose the following functions associated with `GG`. We
+group `GG`. We expose the following functions associated with `GG`.
 
 - `GG.generator()`: Returns the fixed generator associated with the
   group `GG`.
