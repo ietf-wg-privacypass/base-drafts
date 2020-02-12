@@ -599,7 +599,7 @@ details on both security requirements can be found in {{DGSTV18}} and
 Note that the privacy requirements of the protocol are covered in the
 architectural framework document (TODO: link).
 
-### Unlinkability {#unlinkability}
+## Unlinkability {#unlinkability}
 
 Informally, the "unlinkability" requirement states that it is impossible
 for an adversarial server to link the client's message in a redemption
@@ -625,7 +625,7 @@ Formally speaking the security model is the following:
 The security requirement is that the adversary has only a negligible
 probability of success greater than `1/Q`.
 
-### One-more unforgeability {#unforgeability}
+## One-more unforgeability {#unforgeability}
 
 The one-more unforgeability requirement states that it is hard for any
 adversarial client that has received `m` valid tokens from a server to
@@ -656,7 +656,7 @@ comparison to the original work of {{DGSTV18}}. In {{KLOR20}}, the
 adversary is provided with oracle access that allows it to verify that
 the server responses in the issuance phase are valid.
 
-### Double-spend protection
+## Double-spend protection
 
 All issuing servers should implement a robust, global storage-query
 mechanism for checking that tokens sent by clients have not been spent
