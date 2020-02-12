@@ -25,6 +25,9 @@ normative:
   RFC2119:
   I-D.irtf-cfrg-voprf:
   I-D.irtf-cfrg-hash-to-curve:
+  NIST:
+    title: Keylength - NIST Report on Cryptographic Key Length and Cryptoperiod (2016)
+    target: https://www.keylength.com/en/4/
   TRUST:
     title: Trust Token API
     target: https://github.com/WICG/trust-token-api
@@ -124,7 +127,7 @@ the client's online privacy is dramatically reduced.
 
 The Privacy Pass protocol was initially introduced as a mechanism for
 authorizing clients that had already been authorized in the past,
-without compromizing their privacy {{DGSTV18}}. The protocol works by
+without compromising their privacy {{DGSTV18}}. The protocol works by
 providing client's with privacy-preserving re-authentication tokens for
 a particular server. The tokens are "privacy-preserving" in the sense
 that they cannot be linked back to the previous session where they were
@@ -815,14 +818,25 @@ the underlying operations in a non-black-box manner. Hence, an explicit
 reduction from the generic VOPRF primitive to the Privacy Pass protocol
 would strengthen these security guarantees.
 
-# Ciphersuites & security settings {#pp-ciphersuites}
+# Ciphersuites {#pp-ciphersuites}
 
-We provide a summary of the parameters that we use in the Privacy Pass
-protocol. These parameters are informed by both privacy and security
-considerations that are highlighted in {{security}}, respectively. These
-parameters are intended as a single reference point for implementers
-when implementing the protocol for ensuring cryptographic security.
+The Privacy Pass protocol essentially operates as a wrapper around the
+instantiation of the VOPRF that is used in {{voprf-protocol}}. There is
+no extra cryptographic machinery used on top of what is established in
+the VOPRF protocol. Therefore, the ciphersuites that we support are
+the transitively exposed from the underlying VOPRF functionality, we
+detail these below.
 
-| parameter | value |
-|---|---|
-| Minimum security parameter | 196 bits |
+- VOPRF-p384-HKDF-SHA512-SSWU-RO {{I-D.irtf-cfrg-voprf}} (Section TODO)
+  - security parameter: 192 bits
+- VOPRF-curve448-HKDF-SHA512-ELL2-RO {{I-D.irtf-cfrg-voprf}} (Section TODO)
+  - security parameter: 224 bits
+- VOPRF-p521-HKDF-SHA512-SSWU-RO {{I-D.irtf-cfrg-voprf}} (Section TODO)
+  - security parameter: 256 bits
+
+When referring to the security parameter size above, we are referring to
+the effective keylength of the ciphersuite, as specified in {{NIST}}.
+
+Note than any extension to the Privacy Pass protocol that modifies
+either VOPRF instantiation, or the way that the Privacy Pass API is
+implemented, MUST specify its own ciphersuites.
