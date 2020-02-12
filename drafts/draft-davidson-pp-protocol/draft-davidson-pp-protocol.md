@@ -24,6 +24,7 @@ author:
 normative:
   RFC2119:
   I-D.irtf-cfrg-voprf:
+  I-D.irtf-cfrg-hash-to-curve:
   TRUST:
     title: Trust Token API
     target: https://github.com/WICG/trust-token-api
@@ -90,22 +91,6 @@ normative:
     author:
       ins: N. Sullivan
       org: Cloudflare
-  DSS:
-    title: "FIPS PUB 186-4: Digital Signature Standard (DSS)"
-    target: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
-    author:
-      -
-        ins: Federal Information Processing Standards Publication
-  keytrans:
-    title: "Security Through Transparency"
-    target: https://security.googleblog.com/2017/01/security-through-transparency.html
-    authors:
-      -
-        ins: R. Hurst
-        org: Google
-      -
-        ins: G. Belvin
-        org: Google
 
 --- abstract
 
@@ -258,7 +243,7 @@ Fields:
 - issued: A byte array corresponding to the server response after
           running PP_Issue.
 
-## Functions {#pp-functions}
+## API functions {#pp-functions}
 
 The following functions wrap the core of the functionality required in
 the Privacy Pass protocol. For each of the descriptions, we essentially
@@ -563,7 +548,7 @@ adversary that is looking to subvert the security guarantee. More
 details on both security requirements can be found in {{DGSTV18}} and
 {{KLOR20}}.
 
-### Unlinkability {#unlink}
+### Unlinkability {#unlinkability}
 
 Informally, the `unlinkability` requirement states that it is impossible
 for an adversarial server to link the client's message in a redemption
@@ -756,7 +741,7 @@ For the explicit signatures of each of the functions, refer to
 4. if m > max_evals: panic(ERR_MAX_EVALS)
 5. G = GG.generator()
 6. elts = i_data.as_elements();
-7. Z,D = ciph.VOPRF_Eval(key.as_scalar(), G, pub_key.as_element(), elts)
+7. Z,D = ciph.VOPRF_Eval(key.as_scalar(),G,pub_key.as_element(),elts)
 8. evals = []
 9. for i in 0..m: evals[i] = Z[i].as_bytes();
 10. proof = D.as_bytes()
@@ -788,8 +773,8 @@ For the explicit signatures of each of the functions, refer to
 ~~~
 1. ciph = cli_cfg.ciphersuite
 2. GG = ciph.group()
-3. tag = ciph.VOPRF_Finalize(token.data, token.issued.as_element(), aux)
-4. Output tag
+3. t = ciph.VOPRF_Finalize(token.data,token.issued.as_element(),aux)
+4. Output t
 ~~~
 
 ### PP_Verify
@@ -820,7 +805,7 @@ The unlinkability property follows unconditionally as the view of the
 adversary in the redemption phase is distributed independently of the
 issuance phase. The unforgeability property follows from the one-more
 decryption security of the ElGamal cryptosystem {{DGSTV18}}. In
-{{KLOS20}} it is also proven that this protocol satisfies the stronger
+{{KLOR20}} it is also proven that this protocol satisfies the stronger
 notion of unforgeability, where the adversary is granted a verification
 oracle, under the chosen-target Diffie-Hellman assumption.
 
@@ -830,7 +815,7 @@ the underlying operations in a non-black-box manner. Hence, an explicit
 reduction from the generic VOPRF primitive to the Privacy Pass protocol
 would strengthen these security guarantees.
 
-# Ciphersuites & security settings {#ciphersuites}
+# Ciphersuites & security settings {#pp-ciphersuites}
 
 We provide a summary of the parameters that we use in the Privacy Pass
 protocol. These parameters are informed by both privacy and security
