@@ -25,6 +25,12 @@ normative:
   RFC2119:
   I-D.irtf-cfrg-voprf:
   I-D.irtf-cfrg-hash-to-curve:
+  draft-davidson-pp-architecture:
+    title: "Privacy Pass: Architectural Framework"
+    target: https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-davidson-pp-architecture
+    author:
+      ins: A. Davidson
+      org: Cloudflare Portugal
   NIST:
     title: Keylength - NIST Report on Cryptographic Key Length and Cryptoperiod (2016)
     target: https://www.keylength.com/en/4/
@@ -456,7 +462,7 @@ is a large number of clients, the best way of doing is likely to be via
 posting this information to a public bulletin board. We assume that the
 server only has a single configuration in place at any one time. There
 are privacy restrictions related to this that are described in more
-detail in the architectural document (TODO: link).
+detail in the architectural document {{draft-davidson-pp-architecture}}.
 
 We give a diagrammatic representation of the initialisation phase below.
 
@@ -589,15 +595,19 @@ the error that occurred.
 
 We discuss the security requirements that are necessary to uphold when
 instantiating the Privacy Pass protocol. In particular, we focus on the
-security requirements of "unlinkability", and
-"unforgeability". Since these are cryptographic security requirements we
-discuss them with respect to a polynomial-time algorithm known as the
-adversary that is looking to subvert the security guarantee. More
-details on both security requirements can be found in {{DGSTV18}} and
-{{KLOR20}}.
+security requirements of "unlinkability", and "unforgeability".
+Informally, the notion of unlinkability is required to preserve the
+privacy of the client in the redemption phase of the protocol. The
+notion of unforgeability is to protect against adversarial clients that
+look to subvert the security of the protocol.
+
+Since these are cryptographic security requirements we discuss them with
+respect to a polynomial-time algorithm known as the adversary that is
+looking to subvert the security guarantee. More details on both security
+requirements can be found in {{DGSTV18}} and {{KLOR20}}.
 
 Note that the privacy requirements of the protocol are covered in the
-architectural framework document (TODO: link).
+architectural framework document {{draft-davidson-pp-architecture}}.
 
 ## Unlinkability {#unlinkability}
 
