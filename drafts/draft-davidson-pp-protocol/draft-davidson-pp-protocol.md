@@ -413,6 +413,7 @@ Inputs:
                  input data output by `PP_Generate`.
 - `tag`:         A byte array corresponding to the client-generated tag
                  from the output of PP_Redeem.
+- `aux`:         A byte array corresponding to arbitrary auxiliary data.
 
 Outputs:
 
@@ -541,16 +542,17 @@ session.
   tag = PP_Redeem(c_cfg,token,aux)
   data = token.data
 
-                             (data,tag)
+                          (data,tag,aux)
                         ------------------>
 
-                                      if (ds_idx.includes(data)) {
-                                        panic(ERR_DOUBLE_SPEND)
-                                      }
-                                      b = PP_Verify(srv_cfg,data,tag)
-                                      if (b) {
-                                        ds_idx.push(data)
-                                      }
+                                 if (ds_idx.includes(data)) {
+                                   panic(ERR_DOUBLE_SPEND)
+                                 }
+                                 b = PP_Verify(srv_cfg,data,tag,aux)
+                                 if (b) {
+                                   ds_idx.push(data)
+                                 }
+
                                  b
                         <------------------
   Output b
