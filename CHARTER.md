@@ -43,7 +43,7 @@ describe below.
 3. Develop document for Privacy Pass in HTTP?
    - Specify a common understanding of how Privacy Pass data is integrated with
      HTTP requests and responses for web-based applications.
-   - Specify where key material stored, how it’s accessed, and associated
+   - Specify where key material is stored, how it’s accessed, and the associated
      security considerations
 
 Each goal listed above will be fulfilled with an individual document that
