@@ -362,9 +362,9 @@ detailed.
        `k_sign`. This can be computed by running:
 
        ~~~
-       data = <server_id> .. <config_id> .. <comm_id> .. <public_key>
-                .. <expiry> .. <supports>
-       <signature> = sig_alg.sign(k_sign, data)
+          data = <server_id> .. <config_id> .. <comm_id>
+                    .. <public_key> .. <expiry> .. <supports>
+          <signature> = sig_alg.sign(k_sign, data)
        ~~~
 
   3. Send the `config_update` message to the `GLOBAL_CONFIG_UPDATE`
@@ -443,7 +443,7 @@ detailed.
   2. Run the following:
 
      ~~~
-     (evals, proof) = PP_Issue(srv_cfg, msg.issue_data)
+        (evals, proof) = PP_Issue(srv_cfg, msg.issue_data)
      ~~~
 
   3. The server sends an `server_issue_resp` message to the
@@ -464,9 +464,9 @@ detailed.
   2. Run the following:
 
      ~~~
-     b = false
-     for i in 0..1:
-      b = PP_Verify(configs[i],msg.data,msg.tag,msg.aux)
+        b = false
+        for i in 0..1:
+          b = PP_Verify(configs[i],msg.data,msg.tag,msg.aux)
      ~~~
 
   3. The Server returns a `server_redeem_resp` message back to the
@@ -496,34 +496,50 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   3. If `success` is set to `false`, return `false`.
   4. Parse `resp.supports` and check that each entry is included in
      `msg.supports`, otherwise return false.
-  5. If a method in `resp.supports` is contained in `resp.revoked`,
-     return false.
-  6. The value `<signature>` is verified over the bytes of the rest of
+  5. The value `<signature>` is verified over the bytes of the rest of
      message contents, using the Server long-term verification key
      `k_vrfy`. This can be computed by running the function below and
      checking that `ret==true`, otherwise returning false.
 
      ~~~
-     data = <server_id> .. <config_id> .. <comm_id> .. <public_key>
-             .. <expiry> .. <supports>
-     ret = sig_alg.verify(k_vrfy, data, <signature>)
+        data = <server_id> .. <config_id> .. <comm_id>
+                .. <public_key> .. <expiry> .. <supports>
+        ret = sig_alg.verify(k_vrfy, data, <signature>)
      ~~~
 
-  7. Construct a `client_token_retrieval` message and send it to
+  6. Construct a `client_token_retrieval` message and send it to
      `CLIENT_TOKEN_RETRIEVAL` interface. Receive back `token` in a
      `client_token_retrieval_resp` message.
-  8. If `(token == null) && resp.supports.includes("issue")`, construct
-     an `client_issue_generation` message and send it to the
+  7. If:
+
+     ~~~
+        token == null
+          && resp.active == "issue"
+          && resp.supports.includes("issue")
+     ~~~
+
+     construct a `client_issue_generation` message and send it to the
      `CLIENT_ISSUE_GEN` interface, with:
+
       1. `<server_id> = msg.server_id`;
       2. `<public_key> = resp.public_key`;
-  9. If `(token != null) && resp.supports.includes("redeem")`, construct
-     a `redemption_generation` message and send it to the
+
+  8. If:
+
+     ~~~
+        token != null
+          && resp.active != "inactive"
+          && resp.supports.includes("redeem")
+     ~~~
+
+     construct a `redemption_generation` message and send it to the
      `CLIENT_REDEEM_GEN` interface. with:
+
       1. `<server_id> = msg.server_id`;
       2. `<token> = token`;
-  10. If neither condition in (7) or (8) is satisfied, return false.
-  11. Return true.
+
+  9.  If neither condition in (7) or (8) is satisfied, return false.
+  10. Return true.
 
 ### CLIENT_ISSUE_GEN {#interface-cli-issue-gen}
 
@@ -536,13 +552,13 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. The client runs:
 
      ~~~
-     cli_cfg = PP_Client_Setup(msg.config_id, msg.public_key)
+        cli_cfg = PP_Client_Setup(msg.config_id, msg.public_key)
      ~~~
 
   2. The client runs:
 
      ~~~
-     (c_data, i_data, g_data) = PP_Generate(cli_cfg, m)
+        (c_data, i_data, g_data) = PP_Generate(cli_cfg, m)
      ~~~
 
      where `m` is an integer corresponding to the number of tokens that
@@ -561,13 +577,13 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Returns: `null`
 - Steps:
   1. The client sends an empty message to the `CLIENT_ISSUE_RETRIEVAL`
-     interface and receives a `client_issue_retrieval` message `temp` in
+     interface and receives a `client_issue_retrieval` message `tmp` in
      response.
-  2. The client sets `cli_cfg=temp.config`.
+  2. The client sets `cli_cfg=tmp.config`.
   3. The client runs:
 
      ~~~
-     tokens = PP_Process(cli_cfg, msg.evals, msg.proof, temp.g_data)
+      tokens = PP_Process(cli_cfg, msg.evals, msg.proof, tmp.g_data)
      ~~~
 
   4. The client constructs a `client_token_storage` message and sends it
@@ -585,13 +601,13 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. The client runs:
 
      ~~~
-     cli_cfg = PP_Client_Setup(msg.config_id, msg.public_key)
+        cli_cfg = PP_Client_Setup(msg.config_id, msg.public_key)
      ~~~
 
   2. The client generates arbitrary auxiliary data `aux` and runs:
 
      ~~~
-     tag = PP_Redeem(cli_cfg, msg.token, aux)
+        tag = PP_Redeem(cli_cfg, msg.token, aux)
      ~~~
 
   3. The client constructs a `client_redeem` message and sends it to the
@@ -613,11 +629,11 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. Stores a data structure of the following form in local storage:
 
      ~~~
-     server_id: msg.server_id
-       config_id: msg.config_id
-         comm_id: msg.comm_id
-           c_data: msg.c_data
-           g_data: msg.g_data
+        server_id: msg.server_id
+          config_id: msg.config_id
+            comm_id: msg.comm_id
+              c_data: msg.c_data
+              g_data: msg.g_data
      ~~~
 
      i.e. the structure is keyed by `server_id`, `config_id` and
@@ -648,10 +664,10 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. Stores a data structure of the following form in local storage:
 
      ~~~
-     server_id: msg.server_id
-       config_id: msg.config_id
-         comm_id: msg.comm_id
-           tokens: msg.tokens
+        server_id: msg.server_id
+          config_id: msg.config_id
+            comm_id: msg.comm_id
+              tokens: msg.tokens
      ~~~
 
      i.e. the structure is keyed by `server_id`, `config_id` and
@@ -685,10 +701,10 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. Creates a data structure of the following form:
 
      ~~~
-     public_key: msg.public_key
-     expiry: msg.expiry
-     signature: msg.signature
-     supports: ['issue','redeem']
+        public_key: msg.public_key
+        expiry: msg.expiry
+        signature: msg.signature
+        supports: ['issue','redeem']
      ~~~
 
      and stores it in the global config registry, keyed by
@@ -696,59 +712,31 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      registry data block takes the form:
 
      ~~~
-     server_id: msg.server_id
-       config_id: msg.config_id
-         comm_id: msg.comm_id
-           public_key: msg.public_key
-           expiry: msg.expiry
-           signature: msg.signature
-           supports: ['issue','redeem']
+        server_id: msg.server_id
+          config_id: msg.config_id
+            comm_id: msg.comm_id
+              public_key: msg.public_key
+              expiry: msg.expiry
+              signature: msg.signature
+              supports: ['issue','redeem']
      ~~~
 
-  2. Appends `revoked: ['issue']` to the `comm_id` entry keyed by
-     `<server_id>.<latest>`. This entry should now take the form:
-
-     ~~~
-     server_id: msg.server_id
-       config_id: latest.config_id
-         comm_id: latest.comm_id
-           public_key: msg.public_key
-           expiry: msg.expiry
-           signature: msg.signature
-           supports: ['issue','redeem']
-           revoked: ['issue']
-     ~~~
-
-  3. Appends `revoked: ['issue']` to the `comm_id` entry keyed by
-     `<server_id>.<previous>`. This entry should now take the form:
-
-     ~~~
-     server_id: msg.server_id
-       config_id: previous.config_id
-         comm_id: previous.comm_id
-           public_key: msg.public_key
-           expiry: msg.expiry
-           signature: msg.signature
-           supports: ['issue','redeem']
-           revoked: ['issue','redeem']
-     ~~~
-
-  4. Updates `server_id.previous` to be equal to a structure of the
+  2. Updates `server_id.previous` to be equal to a structure of the
      form:
 
      ~~~
-     config_id: latest.config_id
-     comm_id: latest.comm_id
+        config_id: current.config_id
+        comm_id: current.comm_id
      ~~~
 
-  5. Updates `server_id.latest` to be equal to a structure of the form:
+  3. Updates `server_id.current` to be equal to a structure of the form:
 
      ~~~
-     config_id: msg.config_id
-     comm_id: msg.comm_id
+        config_id: msg.config_id
+        comm_id: msg.comm_id
      ~~~
 
-  6. Updates `server_id.modified` to be equal to the current time.
+  4. Updates `server_id.modified` to be equal to the current time.
 
 ### GLOBAL_CONFIG_RETRIEVAL {#interface-cfg-retrieval}
 
@@ -758,19 +746,36 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Returns: a `config_retrieval_resp` message
   ({{msg-config-retrieval-resp}}).
 - Steps:
-  1. Retrieve the data structure `ds` from the global config registry,
-     keyed by `msg.server_id`, `msg.config_id` and `msg.comm_id`.
-  2. Return a `config_retrieval_resp` message of the form below, to the
+  1. Retrieve the data structure `server_ds` from the global config
+     registry, keyed by `msg.server_id`.
+  2. Let `active = 'issue'` if:
+
+     ~~~
+         server_ds.current.config_id == msg.config_id
+         server_ds.current.comm_id == msg.comm_id
+     ~~~
+
+     Else, let `active = 'redeem'` if:
+
+     ~~~
+         server_ds.previous.config_id == msg.config_id
+         server_ds.previous.comm_id == msg.comm_id
+     ~~~
+
+     Else, let `active = 'inactive'`.
+
+  3. Let `config_ds = server_ds[msg.config_id][msg.comm_id]`
+  4. Return a `config_retrieval_resp` message of the form below, to the
      querying interface.
 
      ~~~
-     method: "config_retrieval_resp"
-     contents:
-       public_key: ds.public_key
-       expiry: ds.expiry
-       signature: ds.signature
-       supports: ds.supports
-       revoked: ds.revoked
+        method: "config_retrieval_resp"
+        contents:
+          active: active
+          public_key: config_ds.public_key
+          expiry: config_ds.expiry
+          signature: config_ds.signature
+          supports: config_ds.supports
      ~~~
 
 # Key management framework {#key-mgmt}
@@ -819,7 +824,7 @@ structure of the configuration takes the form below.
 ~~~
 server_id: <server_id_1>
   verification_key: <verification_key>
-  latest: <latest>
+  current: <current>
   previous: <previous>
   modified: <modified>
   config_id: <config_id_1>
@@ -827,7 +832,6 @@ server_id: <server_id_1>
       public_key: <public_key>
       expiry: <expiry>
       supports: <supports>
-      revoked: <revoked>
       signature: <signature>
 
     .
@@ -838,7 +842,6 @@ server_id: <server_id_1>
       public_key: <public_key>
       expiry: <expiry>
       supports: <supports>
-      revoked: <revoked>
       signature: <signature>
   .
   .
@@ -859,8 +862,8 @@ a single `verification_key` field corresponding to the long-term signing
 key that is used for signing each of the individual configurations and
 `comm_id` values that it possesses.
 
-The `latest`, `previous` and `modified` fields are the only fields that
-change during configuration updates. The `latest` field refers to the
+The `current`, `previous` and `modified` fields are the only fields that
+change during configuration updates. The `current` field refers to the
 latest configuration to support token issuance. The `previous` field is
 used for a single configuration that still permits redemption of tokens,
 this is used for ensuring that key rotations are smooth for clients. The
@@ -869,25 +872,22 @@ modified.
 
 ## Configuration updates #{config-update}
 
-Whenever a server wats to rotate their current configuration, they must
+Whenever a server wants to rotate their current configuration, they must
 create a request to append their new configuration to the trusted
 registry. This request is handled by the global registry to update the
 configuration, see the `GLOBAL_CONFIG_UPDATE` interface.
 
 Each update results in adding a new config underneath an existing
 `<config_id>` with a new `<comm_id>` parameter, or a new `<config_id>`
-entry. The global config registry also updates, the `latest`, `previous`
+entry. The global config registry also updates, the `current`, `previous`
 and `modified` fields to indicate that the change has occurred.
 
 For reasons that are addressed more closely in {{privacy}}, the global
-configuration registry must ensure that all configurations that are not
-referred to in `latest` and `previous` are revoked (e.g.
-`<revoked>=['issue',redeem']`). The configuration referred to in
-`previous` must have `<revoked>=['redeem']`. This is handled in
-`GLOBAL_CONFIG_UPDATE` ({{interface-cfg-update}}). This is done to
-ensure that the server is not able to serve tokens to clients from
-multiple different configurations (which could be used to decrease the
-size of client anonymity sets).
+configuration registry must ensure that the only configurations that
+are used at any given time, are those referred to in `current` and
+`previous`. This is done to ensure that the server is not able to serve
+tokens to clients from multiple different configurations (which could be
+used to decrease the size of client anonymity sets).
 
 All fields apart from the three referenced above MUST never be modified.
 If a server wants to rotate the long-term `verification_key` it must
@@ -1568,5 +1568,4 @@ contents:
   expiry: <expiry>
   signature: <signature>
   supports: <supports>
-  revoked: <revoked>
 ~~~
