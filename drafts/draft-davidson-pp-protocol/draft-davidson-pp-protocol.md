@@ -35,6 +35,7 @@ normative:
   NIST:
     title: Keylength - NIST Report on Cryptographic Key Length and Cryptoperiod (2016)
     target: https://www.keylength.com/en/4/
+informative:
   TRUST:
     title: Trust Token API
     target: https://github.com/WICG/trust-token-api
@@ -639,7 +640,7 @@ If a panic occurs during the server's operations for one of the
 documented errors, then the server returns an error response indicating
 the error that occurred.
 
-# Security requirments {#sec-requirements}
+# Security requirements {#sec-requirements}
 
 We discuss the security requirements that are necessary to uphold when
 instantiating the Privacy Pass protocol. In particular, we focus on the
