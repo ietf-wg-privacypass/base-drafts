@@ -351,7 +351,7 @@ detailed.
     1. The value `<server_id>` is the unique identifier for the Server.
     2. The value of `<expiry_time>` should be a point in the future
        within the window of allowed key rotation lengths (TODO: ref).
-    3. The value `<version>` is a string used to distinguish between
+    3. The value `<comm_id>` is a string used to distinguish between
        config entries corresponding to the same config, but where the
        key material has changed (e.g. after a key rotation).
     4. The value of `<supports>` should be set to the the list of
@@ -362,7 +362,7 @@ detailed.
        `k_sign`. This can be computed by running:
 
        ~~~
-       data = <server_id> .. <config_id> .. <version> .. <public_key>
+       data = <server_id> .. <config_id> .. <comm_id> .. <public_key>
                 .. <expiry> .. <supports>
        <signature> = sig_alg.sign(k_sign, data)
        ~~~
@@ -422,9 +422,9 @@ detailed.
         the Server.
      2. The value of `<config_id>=config_id` refers to the Privacy Pass
         config currently used by the Server.
-     3. The value of `<version>` is the version of the current config
-        version being used by the server. This can be an arbitrary
-        string.
+     3. The value of `<comm_id>` is a unique identifier for the current
+        config version being used by the server. This can be an
+        arbitrary string.
      4. The value of `supports` MUST be set to a subset of the array
         `["issue","redeem"]`, depending on which Privacy Pass methods
         are supported.
@@ -489,7 +489,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. Construct a `config_retrieval` message using:
      1. `<server_id> = msg.server_id`;
      2. `<config_id> = msg.config_id`;
-     3. `<version> = msg.version`;
+     3. `<comm_id> = msg.comm_id`;
   2. Send the `config_retrieval` message to the
      `GLOBAL_CONFIG_RETRIEVAL` interface, and receive a reply `resp` of
      type `config_retrieval_resp`.
@@ -504,7 +504,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      checking that `ret==true`, otherwise returning false.
 
      ~~~
-     data = <server_id> .. <config_id> .. <version> .. <public_key>
+     data = <server_id> .. <config_id> .. <comm_id> .. <public_key>
              .. <expiry> .. <supports>
      ret = sig_alg.verify(k_vrfy, data, <signature>)
      ~~~
@@ -615,13 +615,13 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      ~~~
      server_id: msg.server_id
        config_id: msg.config_id
-         version: msg.version
+         comm_id: msg.comm_id
            c_data: msg.c_data
            g_data: msg.g_data
      ~~~
 
      i.e. the structure is keyed by `server_id`, `config_id` and
-     `version`.
+     `comm_id`.
 
 ### CLIENT_ISSUE_RETRIEVAL {#interface-cli-issue-retrieval}
 
@@ -633,7 +633,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   ({{msg-client-issue-retrieval-resp}}).
 - Steps:
   1. Retrieve the pair `(c_data,g_data)` keyed by `msg.server_id`,
-     `msg.config_id` and `msg.version`.
+     `msg.config_id` and `msg.comm_id`.
   2. Return a `client_issue_retrieval` message containing the values
      above to the `CLIENT_ISSUE_GEN` interface.
 
@@ -650,12 +650,12 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      ~~~
      server_id: msg.server_id
        config_id: msg.config_id
-         version: msg.version
+         comm_id: msg.comm_id
            tokens: msg.tokens
      ~~~
 
      i.e. the structure is keyed by `server_id`, `config_id` and
-     `version`.
+     `comm_id`.
 
 ### CLIENT_TOKEN_RETRIEVAL {#interface-cli-token-retrieval}
 
@@ -666,7 +666,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Returns: a `client_token_retrieval_resp` message.
 - Steps:
   1. Retrieve all the available token `tokens` keyed by `msg.server_id`,
-     `msg.config_id` and `msg.version`.
+     `msg.config_id` and `msg.comm_id`.
   2. If `tokens != null`, let `token = tokens.pop()`.
   3. Store the modified `tokens` object back in local storage.
   4. Return a `client_token_retrieval` message containing the token
@@ -692,26 +692,26 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      ~~~
 
      and stores it in the global config registry, keyed by
-     `msg.server_id`, `msg.config_id` and `msg.version`. Therefore, the
+     `msg.server_id`, `msg.config_id` and `msg.comm_id`. Therefore, the
      registry data block takes the form:
 
      ~~~
      server_id: msg.server_id
        config_id: msg.config_id
-         version: msg.version
+         comm_id: msg.comm_id
            public_key: msg.public_key
            expiry: msg.expiry
            signature: msg.signature
            supports: ['issue','redeem']
      ~~~
 
-  2. Appends `revoked: ['issue']` to the version entry keyed by
+  2. Appends `revoked: ['issue']` to the `comm_id` entry keyed by
      `<server_id>.<latest>`. This entry should now take the form:
 
      ~~~
      server_id: msg.server_id
        config_id: latest.config_id
-         version: latest.version
+         comm_id: latest.comm_id
            public_key: msg.public_key
            expiry: msg.expiry
            signature: msg.signature
@@ -719,13 +719,13 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
            revoked: ['issue']
      ~~~
 
-  3. Appends `revoked: ['issue']` to the version entry keyed by
+  3. Appends `revoked: ['issue']` to the `comm_id` entry keyed by
      `<server_id>.<previous>`. This entry should now take the form:
 
      ~~~
      server_id: msg.server_id
        config_id: previous.config_id
-         version: previous.version
+         comm_id: previous.comm_id
            public_key: msg.public_key
            expiry: msg.expiry
            signature: msg.signature
@@ -738,14 +738,14 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 
      ~~~
      config_id: latest.config_id
-     version: latest.version
+     comm_id: latest.comm_id
      ~~~
 
   5. Updates `server_id.latest` to be equal to a structure of the form:
 
      ~~~
      config_id: msg.config_id
-     version: msg.version
+     comm_id: msg.comm_id
      ~~~
 
   6. Updates `server_id.modified` to be equal to the current time.
@@ -759,7 +759,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   ({{msg-config-retrieval-resp}}).
 - Steps:
   1. Retrieve the data structure `ds` from the global config registry,
-     keyed by `msg.server_id`, `msg.config_id` and `msg.version`.
+     keyed by `msg.server_id`, `msg.config_id` and `msg.comm_id`.
   2. Return a `config_retrieval_resp` message of the form below, to the
      querying interface.
 
@@ -823,7 +823,7 @@ server_id: <server_id_1>
   previous: <previous>
   modified: <modified>
   config_id: <config_id_1>
-    version: <version_1>
+    comm_id: <comm_id_1>
       public_key: <public_key>
       expiry: <expiry>
       supports: <supports>
@@ -834,7 +834,7 @@ server_id: <server_id_1>
     .
     .
 
-    version: <version_z>
+    comm_id: <comm_id_z>
       public_key: <public_key>
       expiry: <expiry>
       supports: <supports>
@@ -857,7 +857,7 @@ server_id: <server_id_x>
 Essentially, each server corresponds to a single `server_id` and defines
 a single `verification_key` field corresponding to the long-term signing
 key that is used for signing each of the individual configurations and
-versions that it possesses.
+`comm_id` values that it possesses.
 
 The `latest`, `previous` and `modified` fields are the only fields that
 change during configuration updates. The `latest` field refers to the
@@ -875,7 +875,7 @@ registry. This request is handled by the global registry to update the
 configuration, see the `GLOBAL_CONFIG_UPDATE` interface.
 
 Each update results in adding a new config underneath an existing
-`<config_id>` with a new version parameter, or a new `<config_id>`
+`<config_id>` with a new `<comm_id>` parameter, or a new `<config_id>`
 entry. The global config registry also updates, the `latest`, `previous`
 and `modified` fields to indicate that the change has occurred.
 
@@ -1409,7 +1409,7 @@ method: "server_hello"
 contents:
   server_id: <server_id>
   config_id: <config_id>
-  version: <version>
+  comm_id: <comm_id>
   supports: ['issue','redeem']
 ~~~
 
@@ -1461,7 +1461,7 @@ method: "client_issue_storage"
 contents:
   server_id: <server_id>
   config_id: <config_id>
-  version: <version>
+  comm_id: <comm_id>
   c_data: <c_data>
   g_data: <g_data>
 ~~~
@@ -1482,7 +1482,7 @@ method: "client_issue_retrieval"
 contents:
   server_id: <server_id>
   config_id: <config_id>
-  version: <version>
+  comm_id: <comm_id>
 ~~~
 
 ### client_issue_retrieval_resp {#msg-client-issue-retrieval-resp}
@@ -1501,7 +1501,7 @@ method: "client_token_storage"
 contents:
   server_id: <server_id>
   config_id: <config_id>
-  version: <version>
+  comm_id: <comm_id>
   tokens: <tokens>
 ~~~
 
@@ -1512,7 +1512,7 @@ method: "client_token_retrieval"
 contents:
   server_id: <server_id>
   config_id: <config_id>
-  version: <version>
+  comm_id: <comm_id>
 ~~~
 
 ### client_token_retrieval_resp {#msg-client-token-retrieval-resp}
@@ -1543,7 +1543,7 @@ method: "config_update"
 contents:
   server_id: <server_id>
   config_id: <config_id>
-  version: <version>
+  comm_id: <comm_id>
   public_key: <public_key>
   expiry: <expiry_time>
   signature: <signature>
@@ -1556,7 +1556,7 @@ method: "config_retrieval"
 contents:
   server_id: <server_id>
   config_id: <config_id>
-  version: <version>
+  comm_id: <comm_id>
 ~~~
 
 ### config_retrieval_resp {#msg-config-retrieval-resp}
