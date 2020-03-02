@@ -23,6 +23,7 @@ author:
 
 normative:
   RFC2119:
+  RFC8446:
   I-D.irtf-cfrg-voprf:
   I-D.irtf-cfrg-hash-to-curve:
   draft-davidson-pp-architecture:
@@ -179,28 +180,10 @@ setting. In addition, it DOES NOT cover the choices that are necessary
 for ensuring that client privacy leaks do not occur. Both of these
 considerations will be covered in a separate follow-up document.
 
-## Preliminaries
-
-### Terminology
-
-The following terms are used throughout this document.
-
-- Server: A service that provides access to a certain resource
-  (typically denoted S)
-- Client: An entity that seeks authorization from a server (typically
-  denoted C)
-- Key: Server VOPRF key
-- Commitment: Alternative name for Server's public key.
-
-### Protocol messages
-
-We assume that all protocol messages in raw byte format before being
-sent. The actual format of the messages before encoding will be
-determined by context (e.g. as a JSON structure, or as a single elliptic
-curve point).
-
 ## Layout
 
+- {{prelim}}: Describes the terminology and assumptions adopted
+  throughout this document.
 - {{pp-api}}: Describes the internal functions and data structures that
   are used by the Privacy Pass protocol.
 - {{overview}}: Describes the generic protocol structure, based on the
@@ -215,11 +198,37 @@ curve point).
 - {{extensions}}: Describes the policy for implementing extensions to
   the Privacy Pass protocol.
 
-## Requirements
+# Preliminaries {#prelim}
+
+## Terminology
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in {{RFC2119}}.
+
+The following terms are used throughout this document.
+
+- Server: A service that provides the server-side functionality required
+  by the protocol documented here (typically denoted S).
+- Client: An entity that seeks authorization from a server that supports
+  interactions in the Privacy Pass protocol (typically denoted C).
+- Key: The secret key used by the Server for authorizing client data.
+- Commitment: Alternative name for Server's public key corresponding to
+  the secret key that they hold.
+
+We assume that all protocol messages are encoded into raw byte format
+before being sent. We use the TLS presentation language {{RFC8446}} to
+describe the structure of protocol messages.
+
+## Basic assumptions
+
+We make only a few minimal assumptions about the environment that the
+clients and servers that support the Privacy Pass protocol.
+
+- At any one time, we assume that the Server uses only one configuration
+  containing their ciphersuite choice along with their secret key data.
+- We assume that the client has access to a global directory of the
+  current configurations used by all Privacy Pass servers.
 
 # Privacy Pass functional API {#pp-api}
 
@@ -234,21 +243,44 @@ the public API provided in {{I-D.irtf-cfrg-voprf}} in Section TODO.
 
 ## Data structures {#pp-structs}
 
+### Ciphersuite {#pp-ciphersuite-struct}
+
+The `Ciphersuite` enum describes the ciphersuite that is used for
+instantiating the Privacy Pass protocol. The values that we provide here
+are described further in {{ciphersuites}}.
+
+~~~
+enum {
+  p384_hkdf_sha512_sswu_ro(0)
+  p521_hkdf_sha512_sswu_ro(1)
+  curve448_hkdf_sha512_ell2_ro(2)
+  (255)
+} Ciphersuite;
+~~~
+
 ### ServerConfig {#pp-srv-cfg-struct}
 
 The `ServerConfig` struct describes and maintains the underlying
 functionality that is used by the server for instantiating the Privacy
 Pass functional API ({{pp-functions}}).
 
-Fields:
+~~~
+struct {
+  opaque id<0..2^16-1>
+  Ciphersuite ciphersuite;
+  SecretKey key;
+  PublicKey pub_key;
+  uint8 max_evals;
+} ServerConfig;
+~~~
 
-- `ciphersuite`: Internal ciphersuite that is used for instantiating the
-                 Privacy Pass functionality.
-- `key`:         The private key used by the server (in byte format).
-- `pub_key`:     The public key used by the server (in byte format).
-- `max_evals`:   An integer value corresponding to the the maximum
-                 number of valid redemption tokens that the server will
-                 sanction in any given issuance session.
+The `SecretKey` and `PublicKey` types are just wrappers around byte
+arrays.
+
+~~~
+opaque SecretKey<1..2^32-1>;
+opaque PublicKey<1..2^32-1>;
+~~~
 
 ### ClientConfig {#pp-cli-cfg-struct}
 
@@ -256,11 +288,13 @@ The `ClientConfig` struct describes and maintains the underlying
 functionality that is used by the client for instantiating the Privacy
 Pass functional API ({{pp-functions}}).
 
-Fields:
-
-- `ciphersuite`: Internal ciphersuite that is used for instantiating the
-                 Privacy Pass functionality.
-- `pub_key`:     The public key used by the server (in byte format).
+~~~
+struct {
+  opaque id<0..2^16-1>
+  Ciphersuite ciphersuite;
+  PublicKey pub_key;
+} ClientConfig;
+~~~
 
 ### RedemptionToken {#pp-storage-struct}
 
@@ -270,10 +304,17 @@ protocol. This data is generated in the issuance phase of the protocol.
 
 Fields:
 
-- `data`:   A byte array corresponding to the initial client input in
-            PP_Generate.
-- `issued`: A byte array corresponding to the server response after
-            running PP_Issue.
+- `data`:   An `opaque<1..2^32-1>` type corresponding to the initial
+            client input in PP_Generate.
+- `issued`: An `opaque<1..2^32-1>` type corresponding to the server
+            response after running PP_Issue.
+
+~~~
+struct {
+  opaque data<1..2^32-1>;
+  opaque issued<1..2^32-1>;
+} RedemptionToken;
+~~~
 
 ## API functions {#pp-functions}
 
@@ -290,8 +331,8 @@ invocation.
 
 Inputs:
 
-- `id`:  A string identifier corresponding to a valid Privacy Pass
-         server configuration.
+- `id`:  A unique identifier corresponding to the setting of
+  `ServerConfig.id`.
 
 Outputs:
 
@@ -309,10 +350,10 @@ valid server public key.
 
 Inputs:
 
-- `id`:      A string identifier corresponding to a valid Privacy Pass
-             server configuration.
-- `pub_key`: A byte array corresponding to the public key of a Privacy
-             Pass server.
+- `id`:      A unique identifier corresponding to the setting of
+            `ServerConfig.id`.
+- `pub_key`: An `opaque<1..2^32-1>` type corresponding to the public key
+             of a Privacy Pass server.
 
 Outputs:
 
@@ -330,18 +371,19 @@ as its input in the Privacy Pass protocol.
 Inputs:
 
 - `cli_cfg`:     A `ClientConfig` struct.
-- `m`:           An integer value corresponding to the number of Privacy
+- `m`:           A uint8 value corresponding to the number of Privacy
                  Pass tokens to generate.
 
 Outputs:
 
-- `client_data`: An array of byte arrays. This data is kept private
-                 until the redemption phase of the protocol.
-- `issue_data`:  An array of byte arrays, sent in the client's message
-                 during the issuance phase.
-- `gen_data`:    A byte array of arbitrary length that corresponds to
-                 private data stored by the client, following on from
-                 the generation process.
+- `client_data`: An array of `opaque<1..2^32-1>` types. This data is
+                 kept private until the redemption phase of the
+                 protocol.
+- `issue_data`:  An array of `opaque<1..2^32-1>` types, sent in the
+                 client's message during the issuance phase.
+- `gen_data`:    An `opaque<1..2^32-1>` type that corresponds to private
+                 data stored by the client, following on from the
+                 generation process.
 
 ### PP_Issue
 
@@ -351,12 +393,12 @@ client.
 Inputs:
 
 - `srv_cfg`:      A `ServerConfig` struct.
-- `client_data`:  An array of byte arrays.
+- `client_data`:  An array of `opaque<1..2^32-1>` types.
 
 Outputs:
 
-- `evals`:        An array of byte arrays.
-- `proof`:        A byte array.
+- `evals`:        An array of `opaque<1..2^32-1>` types.
+- `proof`:        An `opaque<1..2^32-1>` type.
 
 Throws:
 
@@ -372,14 +414,16 @@ computation in `PP_Issue`.
 Inputs:
 
 - `cli_cfg`:  A `ClientConfig` struct.
-- `evals`:    An array of byte arrays, received from the server.
-- `proof`:    A byte array, also received from the server.
-- `gen_data`: A byte array of arbitrary length, corresponding to the
-              client's secret data output by `PP_Generate`.
+- `evals`:    An array of `opaque<1..2^32-1>` types, received from the
+              server.
+- `proof`:    An `opaque<1..2^32-1>` type, also received from the
+              server.
+- `gen_data`: An `opaque<1..2^32-1>` type corresponding to the client's
+              secret data output by `PP_Generate`.
 
 Outputs:
 
-- `tokens`:   An array of byte-encoded `RedemptionToken` structs.
+- `tokens`:   An array of `RedemptionToken` structs.
 
 Throws:
 
@@ -393,13 +437,14 @@ the client's message.
 Inputs:
 
 - `cli_cfg`: A `ClientConfig` struct.
-- `token`:   A byte-encoded `RedemptionToken` struct.
-- `aux`:     A byte array corresponding to arbitrary auxiliary data.
+- `token`:   A `RedemptionToken` struct.
+- `aux`:     An `opaque<1..2^32-1>` type corresponding to arbitrary
+             auxiliary data.
 
 Outputs:
 
-- `tag`:     A byte array that is used as part of the client's message
-             in the redemption phase of the protocol.
+- `tag`:     An `opaque<1..2^32-1>` type that is used as part of the
+             client's message in the redemption phase of the protocol.
 
 ### PP_Verify
 
@@ -409,11 +454,12 @@ whether the data sent by the client is valid.
 Inputs:
 
 - `srv_cfg`:     A `ServerConfig` struct.
-- `client_data`: A byte array corresponding to the client-generated
-                 input data output by `PP_Generate`.
-- `tag`:         A byte array corresponding to the client-generated tag
-                 from the output of PP_Redeem.
-- `aux`:         A byte array corresponding to arbitrary auxiliary data.
+- `client_data`: An `opaque<1..2^32-1>` type corresponding to the
+                 client-generated input data output by `PP_Generate`.
+- `tag`:         An `opaque<1..2^32-1>` type corresponding to the
+                 client-generated tag from the output of PP_Redeem.
+- `aux`:         An `opaque<1..2^32-1>` type corresponding to arbitrary
+                 auxiliary data.
 
 Outputs:
 
@@ -433,7 +479,7 @@ Outputs:
 
 # Generalized protocol overview {#overview}
 
-In this document, we will be assuming that a client (C) is attempting to
+In this document, we wan to provide a client (C) with the capability to
 authenticate itself in a lightweight manner to a server (S). The
 authorization mechanism should not reveal to the server anything about
 the client; in addition, the client should not be able to forge valid
