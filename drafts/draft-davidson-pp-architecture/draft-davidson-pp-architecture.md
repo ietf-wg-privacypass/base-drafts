@@ -42,6 +42,12 @@ normative:
     author:
       ins: A. Davidson
       org: Cloudflare Portugal
+  draft-svaldez-pp-http-api:
+    title: "Privacy Pass: HTTP API"
+    target: https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-svaldez-pp-http-api
+    author:
+      ins: S. Valdez
+      org: Google LLC
   NIST:
     title: Keylength - NIST Report on Cryptographic Key Length and Cryptoperiod (2016)
     target: https://www.keylength.com/en/4/
@@ -279,8 +285,8 @@ Clients in the Privacy Pass ecosystem are entities whose primary
 function is to undertake the role of the `Client` in
 {{draft-davidson-pp-protocol}}. The clients are assumed to only store
 data related to the tokens that it has been issued by the server. This
-storage is used for constructing redemption requests (TODO: section
-link).
+storage is used for constructing redemption requests, see the
+`CLIENT_REDEEM` interface ({{interface-cli-redeem}}) for more details.
 
 The clients must also have access to the global config store
 {{ecosystem-config}}. This is so that the client can retrieve data
@@ -383,7 +389,8 @@ detailed.
   2. Construct a `config_update` message.
     1. The value `<server_id>` is the unique identifier for the Server.
     2. The value of `<expiry_time>` should be a point in the future
-       within the window of allowed key rotation lengths (TODO: ref).
+       within the window of allowed key rotation lengths (for example,
+       those specified in {{parametrization}}).
     3. The value `<comm_id>` is a string used to distinguish between
        config entries corresponding to the same config, but where the
        key material has changed (e.g. after a key rotation).
@@ -569,7 +576,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      ~~~
 
      construct a `redemption_generation` message and send it to the
-     `CLIENT_REDEEM_GEN` interface. with:
+     `CLIENT_REDEEM` interface. with:
 
       1. `<server_id> = msg.server_id`;
       2. `<token> = token`;
@@ -1199,7 +1206,7 @@ In SIAV, cached SRRs and their associated issuer public keys have a
 similar tracking potential to first party cookies in the browser
 setting. These considerations will be covered in a separate document
 detailing Privacy Pass protocol integration into the wider web
-architecture (TODO: cite).
+architecture {{draft-svaldez-pp-http-api}}.
 
 ## Client incentives for anonymity reduction
 
