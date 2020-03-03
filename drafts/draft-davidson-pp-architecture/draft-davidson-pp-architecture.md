@@ -182,7 +182,35 @@ The following terms are used throughout this document.
 
 ## Layout
 
-TODO
+- {{ecosystem}}: Describes the basic assumptions that we make in this
+  document on the shape and topology of the Privacy Pass ecosystem: the
+  environment in which Privacy Pass supporting clients and servers
+  interact with each other.
+- {{integration}}: Describes the policy and framework for building
+  interoperable client and server implementations. Also provides the
+  necessary foundations for interacting with the global configuration
+  registry.
+- {{key-mgmt}}: Describes the structure of server key configurations and
+  how this configuration is retrieved and updated.
+- {{running-modes}}: Describes the different running modes that are
+  currently expected from Privacy Pass servers.
+- {{privacy}}: A detailed analysis of the characteristics of the Privacy
+  Pass architecture that have an impact on the privacy of clients
+  participating in the ecosystem.
+- {{security}}: A detailed analysis of the security characteristics of
+  the protocol when viewed as a part of the wider architecture of the
+  protocol ecosystem. Includes discussions of the cases for both servers
+  and clients.
+- {{parametrization}}: Provides an example parametrization of the
+  privacy and security parameters that are associated with the protocol,
+  based on the previous discussions.
+- {{recs-srvr}}: Recommendations for identifying and highlighting
+  potential malicious behavior by a server.
+- {{extensions}}: Describes the policy for writing extensions to the
+  Privacy Pass protocol, and how they may be incorporated into the wider
+  architecture.
+- {{applications}}: A non-exhaustive list of the applications that make
+  use of the Privacy Pass protocol, or some variant of it.
 
 ## Requirements
 
@@ -1343,11 +1371,6 @@ to misbehave by a client. Could we have a separate consensus where
 clients can upload misbehavior references for servers that they deem to
 be malicious?
 
-# Existing applications {#applications}
-
-TODO: list existing applications that fit into the scope of the current
-architecture.
-
 # Extension integration policy {#extensions}
 
 The Privacy Pass protocol and ecosystem are both intended to be
@@ -1385,6 +1408,65 @@ configuration registry, other than specifying the data format of each of
 the fields that are used. If en extension requires a modified
 configuration registry, then such a change is interpreted to lie outside
 of the Privacy Pass ecosystem, and is thus not supported.
+
+# Existing applications {#applications}
+
+The following is a non-exhaustive list of applications that currently
+make use of the Privacy Pass protocol, or some variant of the underlying
+functionality.
+
+## Cloudflare challenge pages
+
+Cloudflare uses an implementation of the Privacy Pass protocol for
+allowing clients that have previously interacted with their Internet
+challenge protection system to bypass future challenges {{PPSRV}}. These
+challenges can be expensive for clients, and there have been cases where
+bugs in the implementations can severely degrade client accessibility.
+
+Client's must install a browser extension {{PPEXT}} that acts as the
+Privacy Pass client in an exchange with Cloudflare's Privacy Pass
+server, when an initial challenge solution is provided. The client
+extension stores the issued tokens and presents a valid redemption token
+when it sees future Cloudflare challenges. If the redemption token is
+verified by the server, the client passes through the security mechanism
+without completing a challenge.
+
+## Trust Token API
+
+The Trust Token API {{TRUST}} has been devised as a generic API for
+providing Privacy Pass functionality in the browser setting. The API is
+intended to be implemented directly into browsers so that server's can
+directly trigger the Privacy Pass workflow.
+
+## Zero-knowledge Access Passes
+
+The PrivateStorage API developed by Least Authority is a solution for
+uploading and storing end-to-end encrypted data in the cloud. A recent
+addition to the API {{PrivateStorage}} allows clients to generate
+Zero-knowledge Access Passes (ZKAPs) attesting to the fact that the
+client has paid for the storage space that it is using. The ZKAP
+protocol is based heavily on the Privacy Pass redemption mechanism. The
+client receives ZKAPs when it pays for storage space, and redeems the
+passes when it interacts with the PrivateStorage API.
+
+## Basic Attention Tokens
+
+The browser Brave uses Basic Attention Tokens (BATs) to provide the
+basis for a privacy-preserving rewards scheme {{Brave}}. The BATs are
+essentially Privacy Pass redemption tokens that are provided by a
+central Brave server when a client performs some action that triggers a
+reward event (such as watching an advertisement). When the client
+amasses BATs, it can redeem them with the Brave central server for
+rewards.
+
+## Token Based Services
+
+Similarly to BATs, a more generic approach for providing anonymous peers
+to purchase resources from anonymous servers has been proposed
+{{OpenPrivacy}}. The protocol is based on a variant of Privacy Pass and
+is intended to allow clients purchase (or pre-purchase) services such as
+message hosting, by using Privacy Pass redemption tokens as a form of
+currency. This is also similar to how ZKAPs are used.
 
 --- back
 
