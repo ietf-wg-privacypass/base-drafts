@@ -57,22 +57,21 @@ In this document, we will provide an API to use for integrating Privacy
 Pass with an HTTP framework. Providing the format of HTTP requests and
 responses needed to implement the Privacy Pass protocol.
 
-### Terminology
+## Terminology
 
 The following terms are used throughout this document.
 
-- Server: A service that provides access to a certain resource
-  (typically denoted S)
-- Client: An entity that seeks authorization from a server (typically
-  denoted C)
-- Key: Server VOPRF key
-- Commitment: Alternative name for Server's public key.
+- Server: A service that provides the server-side functionality required
+  by the protocol documented here (typically denoted S).
+- Client: An entity that seeks authorization from a server that supports
+  interactions in the Privacy Pass protocol (typically denoted C).
+- Key: The secret key used by the Server for authorizing client data.
+- Commitment: Alternative name for Server's public key corresponding to
+  the secret key that they hold.
 
-### Protocol messages
-
-Protocol messages are described in the TLS presentation language
-[RFC8446] and will be encoded as raw bytes strings within the containing
-headers.
+We assume that all protocol messages are encoded into raw byte format
+before being sent. We use the TLS presentation language [RFC8446] to
+describe the structure of protocol messages.
 
 ## Layout
 
@@ -239,12 +238,12 @@ enum { Normal(0) } IssuanceType;
 
 struct {
     IssuanceType type = 0;
-    opaque issue_data<0..2^16-1> = client_issue.issue_data;
+    opaque i_data<0..2^16-1> = i_data;
 }
 ~~~
 
 4. The server, upon receipt of the ``request`` should call the
-   ``SERVER_ISSUE`` interface with the value of ``issue_data`` with a
+   ``SERVER_ISSUE`` interface with the value of ``i_data`` with a
    result of ``server_issue_resp``.
 
 
@@ -289,7 +288,12 @@ Inputs:
 Outputs:
 - ``result``: The result of the redemption from the server.
 
-1. The client makes a POST request to
+1. The client should call the ``CLIENT_REDEEM`` interface with
+   ``server_id``, ``ciphersuite``, ``public_key``, ``token`` and
+   auxilary data of ``additional_data`` storing the resulting ``data``
+   and ``tag``.
+
+2. The client makes a POST request to
    <``server_origin``>/.well-known/privacy-pass with a message of type
    ``token-redemption`` and a body of:
 
@@ -302,11 +306,11 @@ struct {
 }
 ~~~
 
-2. The server, upon receipt of ``request`` should call the
+3. The server, upon receipt of ``request`` should call the
    ``SERVER_REDEEM`` interface with the ``data``, ``tag``, ``aux``
    storing the resulting ``resp``.
 
-3. The server should then respond to the POST request with a message of
+4. The server should then respond to the POST request with a message of
    type ``redemption-result`` and a signed body of:
 
 ~~~
@@ -341,12 +345,7 @@ Inputs:
    ``commitment``. If not, it should discard the token and fail the
    redemption attempt.
 
-4. The client should then call the ``CLIENT_REDEEM`` interface with
-   ``server_id``, ``ciphersuite``, ``public_key``, ``token`` and
-   auxilary data of ``additional_data`` storing the resulting ``data``
-   and ``tag``.
-
-5. As part of the request to ``target``, the client will include the
+4. As part of the request to ``target``, the client will include the
    token as part of the request in the ``Sec-Privacy-Pass`` header along
    with whatever other parameters are being passed as part of the
    request to ``target``. The header will contain a message of type
@@ -355,9 +354,10 @@ Inputs:
 ~~~
 struct {
     opaque server_id<1..2^16-1> = server_id;
-    opaque data<1..2^16-1> = data;
-    opaque tag<1..2^16-1> = tag;
-    opaque aux<1..2^16-1> = target;
+    uint16 ciphersuite = ciphersuite;
+    opaque public_key<1..2^16-1> = public_key;
+    opaque token<1..2^16-1> = token;
+    opaque additional_data<1..2^16-1> = additional_data;
 }
 ~~~
 
@@ -385,11 +385,15 @@ Inputs:
    redemption attempt.
 
 4. The client constructs a bytestring ``aux`` made up of the ``target``,
-   the current ``timestamp``, and ``additional_data``.
+   the current ``timestamp``, and ``additional_data``:
 
-5. The client should then call the ``CLIENT_REDEEM`` interface with
-   ``server_id``, ``ciphersuite``, ``public_key``, ``token`` and
-   ``aux``, storing the resulting ``data`` and ``tag``.
+~~~
+struct {
+    opaque target<1..2^16-1>;
+    uint64 timestamp;
+    opaque additional_data<0..2^16-1>;
+}
+~~~
 
 5. The client then performs a token redemption as described in
    {{token-redemption}}. Storing the resulting ``redemption-result``
