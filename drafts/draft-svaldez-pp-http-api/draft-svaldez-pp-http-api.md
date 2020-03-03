@@ -38,6 +38,9 @@ normative:
     author:
       ins: A. Davidson
       org: Cloudflare Portugal
+  verifiable-data-structures:
+    title: "Verifiable Data Structures"
+    target: https://github.com/google/trillian/blob/master/docs/papers/VerifiableDataStructures.pdf
 
 --- abstract
 
@@ -83,8 +86,6 @@ describe the structure of protocol messages.
   API.
 - {{redemption}}: Describes how redemption requests are performed via a
   HTTP API.
-- {{storage}}: Describes how HTTP clients should store and discard
-  received Privacy Pass tokens.
 
 ## Requirements
 
@@ -121,7 +122,53 @@ anonymization guarantees.
 
 ## Commitment Registry {#commitment-registry}
 
-(TODO: Expand on global registry)
+To ensure that a server isn't providing different views of their key
+material/commitments to different users, servers are expected to write
+their commitments to a verifiable data structure.
+
+Using a verifiable log-backed map ([verifiable-data-structures]), the
+server can publish their commitments to the log in a way that clients
+can detect when the server is attempting to provide a split-view of
+their key commitments to different clients.
+
+The key to the map is the ``server_origin``, with the value being:
+
+~~~
+struct {
+    opaque public_key<1..2^16-1>;
+    uint64 expiry;
+    uint8 supported_methods; # 3 = Issue/Redeem, 2 = Redeem, 1 = Issue
+    opaque signature<1..2^16-1>;
+} KeyCommitment;
+
+struct {
+    opaque server_id<1..2^16-1>;
+    uint16 ciphersuite;
+    opaque verification_key<1..2^16-1>;
+    KeyCommitment commitments<1..2^16-1>;
+}
+~~~
+
+The addition to the log is made via a signed message to the log
+operator, which verifies the authenticity against a public key
+associated with that server origin (either via the Web PKI or a
+out-of-band key).
+
+The server SHOULD then store an inclusion proof of the current key
+commitment so that it can present it when delivering the key commitment
+directly to the client or when the key commitment is being delivered by
+a delegated party (other registries/preloaded configuration lists/etc).
+
+The client can then perform a request for the key commitment against
+either the global registry or the server as described
+{{key-commitment}}.
+
+To avoid user segregation as a result of server configuration/commitment
+rotation, the log operator SHOULD enforce limits on how many active
+commitments exist and how quickly the commitments are being
+rotated. Clients SHOULD reject configurations/commitments that violate
+their requirements for avoiding user segregation.
+
 
 ## Server Configuration Retrieval {#config-retrieval}
 Inputs:
@@ -203,13 +250,16 @@ struct {
     uint16 ciphersuite;
     opaque verification_key<1..2^16-1>;
     KeyCommitment commitments<1..2^16-1>;
+    opaque inclusion_proofs<1..2^16-1>;
 }
 ~~~
 
 5. The client then verifies the signature for each key commitment and
 stores the list of commitments to the current scope. The client SHOULD
 not cache the commitments beyond the current scope, as new commitments
-should be fetched for each independent issuance and redemption request.
+should be fetched for each independent issuance and redemption
+request. The client SHOULD verify the ``inclusion_proofs`` to confirm
+that the key commitment has been submitted to a trusted registry.
 
 # Privacy Pass Issuance {#issuance}
 
@@ -422,6 +472,3 @@ redemption result by querying the current configuration of the Privacy
 Pass server. The inclusion of ``target`` and ``timestamp`` proves that
 the server attested to the validity of the token in relation to this
 particular request.
-
-# Storage {#storage}
-(TODO: Describe how tokens and intermediate data is stored.)
