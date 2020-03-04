@@ -21,21 +21,9 @@ author:
     country: Portugal
     email: alex.davidson92@gmail.com
 
-informative:
-  I-D.irtf-cfrg-voprf:
-  keytrans:
-    title: "Security Through Transparency"
-    target: https://security.googleblog.com/2017/01/security-through-transparency.html
-    authors:
-      -
-        ins: Ryan Hurst
-        org: Google
-      -
-        ins: Gary Belvin
-        org: Google
-
 normative:
   RFC2119:
+  RFC8446:
   draft-davidson-pp-protocol:
     title: "Privacy Pass: The Protocol"
     target: https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-davidson-pp-protocol
@@ -48,9 +36,24 @@ normative:
     author:
       ins: S. Valdez
       org: Google LLC
-  NIST:
-    title: Keylength - NIST Report on Cryptographic Key Length and Cryptoperiod (2016)
-    target: https://www.keylength.com/en/4/
+  X9.62:
+    title: "Public Key Cryptography for the Financial Services Industry: The Elliptic Curve Digital Signature Algorithm (ECDSA)"
+    author:
+      name: American National Standards Institute
+    seriesinfo: ANSI X9.62-2005
+    date: November 2005
+informative:
+  I-D.irtf-cfrg-voprf:
+  keytrans:
+    title: "Security Through Transparency"
+    target: https://security.googleblog.com/2017/01/security-through-transparency.html
+    authors:
+      -
+        ins: Ryan Hurst
+        org: Google
+      -
+        ins: Gary Belvin
+        org: Google
   TRUST:
     title: Trust Token API
     target: https://github.com/WICG/trust-token-api
@@ -73,41 +76,9 @@ normative:
       -
         ins: S. J. Lewis
         org: OpenPrivacy, Canada
-  KLOR20:
-    title: Anonymous Tokens with Private Metadata Bit
-    target: https://eprint.iacr.org/2020/072
-    authors:
-      -
-        ins: B. Kreuter
-        org: Google
-      -
-        ins: T. Lepoint
-        org: Google
-      -
-        ins: M. Orrú
-        org: ENS/INRIA, Paris, France; Recurse Center, NYC, USA
-      -
-        ins: M. Raykova
-        org: Google
-  DGSTV18:
-    title: Privacy Pass, Bypassing Internet Challenges Anonymously
-    target: https://petsymposium.org/2018/files/papers/issue3/popets-2018-0026.pdf
-    authors:
-      -
-        ins: A. Davidson
-        org: RHUL, UK
-      -
-        ins: I. Goldberg
-        org: University of Waterloo, Canada
-      -
-        ins: N. Sullivan
-        org: Cloudflare
-      -
-        ins: G. Tankersley
-        org: Independent
-      -
-        ins: F. Valsorda
-        org: Independent
+  Brave:
+    title: Brave Rewards
+    target: https://brave.com/brave-rewards/
   PPEXT:
     title: Privacy Pass Browser Extension
     target: https://github.com/privacypass/challenge-bypass-extension
@@ -117,12 +88,6 @@ normative:
     author:
       ins: N. Sullivan
       org: Cloudflare
-  X9.62:
-    title: "Public Key Cryptography for the Financial Services Industry: The Elliptic Curve Digital Signature Algorithm (ECDSA)"
-    author:
-      name: American National Standards Institute
-    seriesinfo: ANSI X9.62-2005
-    date: November 2005
 
 --- abstract
 
