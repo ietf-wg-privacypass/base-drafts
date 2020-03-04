@@ -38,6 +38,12 @@ normative:
     author:
       ins: A. Davidson
       org: Cloudflare Portugal
+  draft-davidson-pp-architecture:
+    title: "Privacy Pass: Architectural Framework"
+    target: https://github.com/alxdavids/privacy-pass-ietf/master/drafts/draft-davidson-pp-architecture
+    author:
+      ins: A. Davidson
+      org: Cloudflare Portugal
   verifiable-data-structures:
     title: "Verifiable Data Structures"
     target: https://github.com/google/trillian/blob/master/docs/papers/VerifiableDataStructures.pdf
@@ -167,7 +173,8 @@ To avoid user segregation as a result of server configuration/commitment
 rotation, the log operator SHOULD enforce limits on how many active
 commitments exist and how quickly the commitments are being
 rotated. Clients SHOULD reject configurations/commitments that violate
-their requirements for avoiding user segregation.
+their requirements for avoiding user segregation. These considerations
+are discussed as part of {{draft-davidson-pp-architecture}}.
 
 
 ## Server Configuration Retrieval {#config-retrieval}
