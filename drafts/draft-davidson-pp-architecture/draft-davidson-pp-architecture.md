@@ -175,7 +175,11 @@ Finally, we will discuss existing applications that make use of the
 Privacy Pass protocol, and highlight how these may fit with the proposed
 framework.
 
-## Preliminaries
+## Terminology
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in {{RFC2119}}.
 
 The following terms are used throughout this document.
 
@@ -185,6 +189,10 @@ The following terms are used throughout this document.
   denoted C)
 - Key: Server's secret key
 - Commitment: Alternative name for Server's public key.
+
+We assume that all protocol messages are encoded into raw byte format
+before being sent. We use the TLS presentation language {{RFC8446}} to
+describe the structure of protocol messages.
 
 ## Layout
 
@@ -217,12 +225,6 @@ The following terms are used throughout this document.
   architecture.
 - {{applications}}: A non-exhaustive list of the applications that make
   use of the Privacy Pass protocol, or some variant of it.
-
-## Requirements
-
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in {{RFC2119}}.
 
 # Architectural ecosystem assumptions {#ecosystem}
 
@@ -325,12 +327,8 @@ data in the Privacy Pass protocol. The framework provides a policy that
 states that these interfaces be implemented (for example, by clients and
 servers) to be considered valid entities in the Privacy Pass ecosystem.
 
-The interfaces have three configurable fields. The `Type` field
-indicates whether the interface runs `synchronously` or
-`asynchronously`. A `synchronous` interface returns data to the
-interface that has called it. An `asynchronous` interface sends its
-response to a new interface and the workflow continues. The `Visibility`
-field indicates that the interface is either contactable externally
+The interfaces have three configurable fields. The `Visibility` field
+indicates that the interface is either contactable externally
 (`external`) or that it is activated internally by the entity at some
 point (`internal`). The `Input` field determines valid input types of
 that are received by the interface. The `Returns` field provides the
@@ -380,10 +378,9 @@ detailed.
 ### SERVER_KEY_GEN {#interface-key-gen}
 
 - Visibility: `internal`
-- Type: `asynchronous`
 - Input: a string, `id`, corresponding to a ciphersuite identifier (see
   {{draft-davidson-pp-protocol}} for valid configurations).
-- Returns: a boolean indicating success.
+- Returns: a boolean `b`, indicating success.
 - Steps:
   1. Run `cfg = PP_Server_Setup(id)`.
   2. Construct a `config_update` message.
@@ -416,7 +413,6 @@ detailed.
 ### SERVER_STORE_CONFIG {#interface-srv-store-config}
 
 - Visibility: `internal`
-- Type: `asynchronous`
 - Input: a `server_config_store` message `msg` ({{msg-config-store}}).
 - Returns: `null`
 - Steps:
@@ -430,7 +426,6 @@ detailed.
 ### SERVER_CONFIG_RETRIEVAL {#interface-srv-config-retrieval}
 
 - Visibility: `internal`
-- Type: `synchronous`
 - Input: a string `method`.
 - Returns: A `server_config_retrieve` message ({{msg-config-retrieve}}).
 - Steps:
@@ -445,12 +440,11 @@ detailed.
      `<ciphersuites>` and `ex_config` to `<configs>`, where
      `(ex_ciphersuite,ex_config)` is the pair stored in local storage
      against `'pp-redeem'`.
-  5. Return `msg` to the querying interface.
+  5. Return `msg`.
 
 ### SERVER_HELLO {#interface-srv-hello}
 
 - Visibility: `external`
-- Type: `asynchronous`
 - Input: a string, `client_addr`, corresponding to an address that the
   client can be contacted on.
 - Return: `null`
@@ -460,7 +454,8 @@ detailed.
      `cfg=msg.config` based on the `server_config_retrieve` response
      `msg`.
   2. Send a `server_hello` message to the `CLIENT_CONFIG_RETRIEVAL`
-     interface for the client at `client_addr`.
+     interface for the client at `client_addr`. The `server_hello`
+     message must satisfy the following:
      1. The value `<server_id>=server_id` is the unique identifier for
         the Server.
      2. The value of `<ciphersuite>=ciphersuite` refers to the Privacy
@@ -468,14 +463,12 @@ detailed.
      3. The value of `<comm_id>` is a unique identifier for the current
         config version being used by the server. This can be an
         arbitrary string.
-     4. The value of `supports` MUST be set to a subset of the array
-        `["issue","redeem"]`, depending on which Privacy Pass methods
-        are supported.
+     4. The value of `<supports>` MUST be set to an integer corresponding
+        to the supported methods.
 
 ### SERVER_ISSUE {#interface-srv-issue}
 
 - Visibility: `external`
-- Type: `asynchronous`
 - Input: A `client_issue` message `msg` ({{msg-client-issue}})
 - Returns: `null`
 - Steps:
@@ -489,14 +482,13 @@ detailed.
         (evals, proof) = PP_Issue(srv_cfg, msg.issue_data)
      ~~~
 
-  3. The server sends an `server_issue_resp` message to the
-     `CLIENT_ISSUE_FINISH` interface, with the internal values set
-     appropriately.
+  3. Returns a `server_issue_resp` message back to the
+     `CLIENT_ISSUE_GEN` interface of the client associated with
+     `client_issue.client_id`.
 
 ### SERVER_REDEEM {#interface-srv-redeem}
 
 - Visibility: `external`
-- Type: `synchronous`
 - Input: A `client_redeem` message `msg` ({{msg-client-redeem}})
 - Returns: A `server_redeem_resp` message back to the calling
   `CLIENT_REDEEM` interface ({{msg-server-redeem-resp}}).
@@ -513,7 +505,8 @@ detailed.
      ~~~
 
   3. The Server returns a `server_redeem_resp` message back to the
-     `CLIENT_REDEEM` interface, with `<resp>=b`.
+     `CLIENT_REDEEM` interface of the client associated with
+     `client_redeem.client_id`, with `<resp>=b`.
 
 ## Client interfaces {#client-interfaces}
 
@@ -523,7 +516,6 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 ### CLIENT_CONFIG_RETRIEVAL {#interface-cli-retrieval}
 
 - Visibility: `external`
-- Type: `asynchronous`
 - Input: a `server_hello` message type denoted by `msg`,
   ({{msg-server-hello}}).
 - Return: a boolean, indicating whether the config was successfully
@@ -587,7 +579,6 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 ### CLIENT_ISSUE_GEN {#interface-cli-issue-gen}
 
 - Visibility: `internal`
-- Type: `asynchronous`
 - Input: a message `msg` of type `client_issue_generation`
   ({{msg-client-issue-generation}}).
 - Returns: `null`
@@ -610,11 +601,12 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      to the `CLIENT_ISSUE_STORAGE` interface.
   4. The client constructs a `client_issue` message and sends it to the
      server corresponding to `<server_id>` with `<issue_data>=i_data`.
+  5. Receives a `server_issue_resp` message back from the server, and
+     sends this to the `CLIENT_ISSUE_FINISH` interface.
 
 ### CLIENT_ISSUE_FINISH {#interface-cli-issue-finish}
 
-- Visibility: `external`
-- Type: `asynchronous`
+- Visibility: `internal`
 - Input: a message `msg` of type `server_issue_resp`
   ({{msg-server-issue-resp}}).
 - Returns: `null`
@@ -635,7 +627,6 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 ### CLIENT_REDEEM {#interface-cli-redeem}
 
 - Visibility: `internal`
-- Type: `asynchronous`
 - Input: a message `msg` of type `client_redeem_generation`
   ({{msg-client-redeem-generation}}).
 - Returns: a boolean value `ret` indicating whether the server accepted
@@ -658,13 +649,11 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      `<server_id>`, with `<data>=msg.token.data` and `<aux>=aux`.
 
   4. The client returns the value `<resp>` received in the
-     `server_redeem_resp` message back from the `SERVER_REDEEM`
-     interface.
+     `server_redeem_resp` message back from the server.
 
 ### CLIENT_ISSUE_STORAGE {#interface-cli-issue-storage}
 
 - Visibility: `internal`
-- Type: `asynchronous`
 - Input: a `client_issue_storage` message `msg`
   ({{msg-client-issue-storage}}).
 - Returns: `null`
@@ -685,7 +674,6 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 ### CLIENT_ISSUE_RETRIEVAL {#interface-cli-issue-retrieval}
 
 - Visibility: `internal`
-- Type: `synchronous`
 - Input: a `client_issue_retrieval` message `msg`
   ({{msg-client-issue-retrieval}}).
 - Returns: a `client_issue_retrieval_resp` message
@@ -694,12 +682,11 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. Retrieve the pair `(c_data,g_data)` keyed by `msg.server_id`,
      `msg.ciphersuite` and `msg.comm_id`.
   2. Return a `client_issue_retrieval` message containing the values
-     above to the `CLIENT_ISSUE_GEN` interface.
+     above to the `CLIENT_ISSUE_FINISH` interface.
 
 ### CLIENT_TOKEN_STORAGE {#interface-cli-token-storage}
 
 - Visibility: `internal`
-- Type: `asynchronous`
 - Input: a `client_token_storage` message `msg`
   ({{msg-client-token-storage}}).
 - Returns: `null`
@@ -719,7 +706,6 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 ### CLIENT_TOKEN_RETRIEVAL {#interface-cli-token-retrieval}
 
 - Visibility: `internal`
-- Type: `synchronous`
 - Input: a `client_token_retrieval` message `msg`
   ({{msg-client-token-retrieval}}).
 - Returns: a `client_token_retrieval_resp` message.
@@ -730,24 +716,25 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   3. Store the modified `tokens` object back in local storage.
   4. Return a `client_token_retrieval` message containing the token
      value above (or `null` if `tokens == null`) to the
-     `CLIENT_ISSUE_FINISH` interface.
+     `CLIENT_CONFIG_RETRIEVAL` interface.
 
 ## Global configuration registry interfaces {#config-interfaces}
 
 ### GLOBAL_CONFIG_UPDATE {#interface-cfg-update}
 
 - Visibility: `external`
-- Type: `asynchronous`
 - Input: a `config_update` message `msg` ({{msg-config-update}}).
 - Returns: `null`
 - Steps:
   1. Creates a data structure of the following form:
 
      ~~~
-        public_key: msg.public_key
-        expiry: msg.expiry
-        signature: msg.signature
-        supports: ['issue','redeem']
+        struct {
+          opaque public_key<1..2^32-1> = msg.public_key
+          opaque expiry<1..2^16-1> = msg.expiry
+          opaque signature<1..2^32-1> = msg.signature
+          int8   supports = 3 // 1 = redeem, 2 = issue, 3 = both
+        } Config
      ~~~
 
      and stores it in the global config registry, keyed by
@@ -768,15 +755,22 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      form:
 
      ~~~
-        ciphersuite: current.ciphersuite
-        comm_id: current.comm_id
+        struct {
+          Ciphersuite ciphersuite = current.ciphersuite
+          int16 comm_id = current.comm_id
+        }
      ~~~
+
+     where the `Ciphersuite` struct is described in
+     {{draft-davidson-pp-protocol}}.
 
   3. Updates `server_id.current` to be equal to a structure of the form:
 
      ~~~
-        ciphersuite: msg.ciphersuite
-        comm_id: msg.comm_id
+        struct {
+          Ciphersuite ciphersuite = msg.ciphersuite
+          int16 comm_id = msg.comm_id
+        }
      ~~~
 
   4. Updates `server_id.modified` to be equal to the current time.
@@ -784,7 +778,6 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 ### GLOBAL_CONFIG_RETRIEVAL {#interface-cfg-retrieval}
 
 - Visibility: `external`
-- Type: `synchronous`
 - Input: a `config_retrieval` message `msg` ({{msg-config-update}}).
 - Returns: a `config_retrieval_resp` message
   ({{msg-config-retrieval-resp}}).
