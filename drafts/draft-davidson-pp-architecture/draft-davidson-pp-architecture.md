@@ -120,16 +120,19 @@ server.
 In this document, we will provide a structural framework for building
 the ecosystem around the Privacy Pass protocol. Firstly, it will
 identify a number of common interfaces for integrating the Privacy Pass
-protocol and the API {{draft-davidson-pp-protocol}} for use with
-relevant applications.
+protocol and the API detailed in {{draft-davidson-pp-protocol}}. The API
+in the protocol document represents a basic one-on-one exchange between
+a client and a server. The interfaces that we describe in this document
+reproduce this API into the setting where clients and servers are part
+of a wider ecosystem.
 
-This framework will also include policies for the following
+On top of this, the document also includes policies for the following
 considerations:
 
-- Compatible server issuance and redemption running modes and associated
-  expectations.
 - How server configurations and key material should be stored.
 - Transparent rotation of server configurations and key material.
+- Compatible server issuance and redemption running modes and associated
+  expectations.
 - A concrete assessment and parametrization of the privacy budget
   associated with different settings of the above policies.
 - Recommendations for identifying malicious server behavior.
@@ -194,9 +197,13 @@ describe the structure of protocol messages.
 # Architectural ecosystem assumptions {#ecosystem}
 
 The Privacy Pass ecosystem refers to the global framework in which
-multiple instances of the Privacy Pass protocol operate. That is refers
-to all servers that support the protocol, or any extension of it, along
-with all of the clients that may interact with these servers.
+multiple instances of the Privacy Pass protocol operate. This refers to
+all servers that support the protocol, or any extension of it, along
+with all of the clients that may interact with these servers. Moreover,
+there is a singular public entity known as the 'global configuration
+registry'. This registry presents the public information related to all
+supported server key material. This is required to enable the client to
+process issuance responses from each of the available servers.
 
 The ecosystem itself, and the way it is constructed, is critical for
 evaluating the privacy of each individual client. We assume that a
@@ -291,6 +298,9 @@ the ecosystem, and provide a framework for generating and processing
 data in the Privacy Pass protocol. The framework provides a policy that
 states that these interfaces be implemented (for example, by clients and
 servers) to be considered valid entities in the Privacy Pass ecosystem.
+The interfaces wrap the Privacy Pass API functions detailed in
+{{draft-davidson-pp-protocol}} to provide functionality in the many-many
+ecosystem consisting of clients and servers.
 
 The interfaces have three configurable fields. The `Visibility` field
 indicates that the interface is either contactable externally
@@ -338,7 +348,8 @@ interfaces that follows.
 Any implementation of a Privacy Pass Server MUST implement the following
 contact points or interfaces. When the Server is contacted on these
 interfaces with the required input data, it should take the steps
-detailed.
+detailed. The inputs and responses for each of the interfaces correspond
+to the data structures defined in {{draft-davidson-pp-protocol}}.
 
 ### SERVER_KEY_GEN {#interface-key-gen}
 
@@ -347,7 +358,7 @@ detailed.
   {{draft-davidson-pp-protocol}} for valid configurations).
 - Returns: a boolean `b`, indicating success.
 - Steps:
-  1. Run `cfg = PP_Server_Setup(id)`.
+  1. Run `(cfg, update) = PP_Server_Setup(id)`.
   2. Construct a `config_update` message.
     1. The value `<server_id>` is the unique identifier for the Server.
     2. The value of `<expiry_time>` should be a point in the future
@@ -356,22 +367,24 @@ detailed.
     3. The value `<comm_id>` is a string used to distinguish between
        config entries corresponding to the same config, but where the
        key material has changed (e.g. after a key rotation).
-    4. The value of `<supports>` should be set to the the list of
-       functions that the configuration supports. If left blank, this
-       defaults to `['issue','redeem']`.
+    4. The value of `<supports>` should be set to an octet
+       corresponding to the functionality that is provided. The value
+       `0` indicates that no functionality is supported; `1` indicates
+       that the server supports the issuance phase; `2` indicates
+       support for the redemption phase; and `3` indicates support for
+       both phases. If unspecifed, this defaults to `3`.
+    5. The value of `<config>` is set to be equal to `update`.
     5. The value `<signature>` is computed over the bytes of the rest of
        message contents, using the Server long-term secret signing key
        `k_sign`. This can be computed by running:
 
        ~~~
-          data = <server_id> .. <ciphersuite> .. <comm_id>
-                    .. <public_key> .. <expiry> .. <supports>
+          data = <server_id> .. <config> .. <expiry> .. <supports>
           <signature> = sig_alg.sign(k_sign, data)
        ~~~
 
   3. Send the `config_update` message to the `GLOBAL_CONFIG_UPDATE`
-     interface, and if the `config_update_resp` message has `success`
-     set to `false`, then return `false`.
+     interface.
   4. Send a `server_config_store` message to the `SERVER_STORE_CONFIG`
      interface.
 
@@ -381,30 +394,28 @@ detailed.
 - Input: a `server_config_store` message `msg` ({{msg-config-store}}).
 - Returns: `null`
 - Steps:
-  1. Let `(ex_ciphersuite, ex_cfg)` correspond to the existing server
-     configuration in local storage.
-  2. Store the bytes of `(msg.ciphersuite, msg.config)` in local
-     storage, against the key `'pp-issue'`.
-  3. Store the bytes of `(ex_ciphersuite, ex_config)` in local storage
-     against the key `'pp-redeem'`.
+  1. Let `ex_cfg` correspond to the existing server
+     configuration keyed by `'pp-issue'`.
+  2. Store the bytes of `msg.config` in local storage, against the key
+     `'pp-issue'`.
+  3. Store the bytes of ` ex_cfg` in local storage against the key
+     `'pp-redeem'`.
 
 ### SERVER_CONFIG_RETRIEVAL {#interface-srv-config-retrieval}
 
 - Visibility: `internal`
-- Input: a string `method`.
+- Input: an octet `method` in `{1,2,3}`.
 - Returns: A `server_config_retrieve` message ({{msg-config-retrieve}}).
 - Steps:
   1. Let `storage` be the ID and the bytes of the server config
      currently stored in local storage, respectively.
-  2. If `!['pp-issue','pp-redeem'].includes(method)`, return `null`.
-  3. Let `msg` be a config retrieval message, where
-     `<ciphersuites>=[ciphersuite]` and `<configs>=[config]` for the
-     pair `(ciphersuite,config)` stored in local storage against
+  2. If `msg.config.supports != method` and `msg.config.supports != 3`,
+     then return `null`.
+  3. Let `msg` be a `server_config_retrieve` message, where
+     `<configs>=[config]` for `config` stored in local storage against
      `'pp-issue'`.
-  4. If `method == 'pp-redeem'`, append `ex_ciphersuite` to
-     `<ciphersuites>` and `ex_config` to `<configs>`, where
-     `(ex_ciphersuite,ex_config)` is the pair stored in local storage
-     against `'pp-redeem'`.
+  4. If `method == 2`, append `ex_config` to `<configs>`, where
+     `ex_config` is stored in local storage against `'pp-redeem'`.
   5. Return `msg`.
 
 ### SERVER_HELLO {#interface-srv-hello}
@@ -415,27 +426,21 @@ detailed.
 - Return: `null`
 - Steps:
   1. Send an empty message to the internal `SERVER_CONFIG_RETRIEVAL`
-     interface, and let `ciphersuite=msg.ciphersuite` and
-     `cfg=msg.config` based on the `server_config_retrieve` response
-     `msg`.
+     interface, and let `cfgs=msg.configs` based on the
+     `server_config_retrieve` response `msg`.
   2. Send a `server_hello` message to the `CLIENT_CONFIG_RETRIEVAL`
      interface for the client at `client_addr`. The `server_hello`
      message must satisfy the following:
      1. The value `<server_id>=server_id` is the unique identifier for
         the Server.
-     2. The value of `<ciphersuite>=ciphersuite` refers to the Privacy
-        Pass config currently used by the Server.
-     3. The value of `<comm_id>` is a unique identifier for the current
-        config version being used by the server. This can be an
-        arbitrary string.
-     4. The value of `<supports>` MUST be set to an integer corresponding
+     2. The value of `<supports>` MUST be set to an octet corresponding
         to the supported methods.
 
 ### SERVER_ISSUE {#interface-srv-issue}
 
 - Visibility: `external`
 - Input: A `client_issue` message `msg` ({{msg-client-issue}})
-- Returns: `null`
+- Returns: A `server_issue_resp` message
 - Steps:
   1. Send the message `'pp-issue'` to the internal
      `SERVER_CONFIG_RETRIEVAL` interface, and let
@@ -444,12 +449,12 @@ detailed.
   2. Run the following:
 
      ~~~
-        (evals, proof) = PP_Issue(srv_cfg, msg.issue_data)
+        issue_resp = PP_Issue(srv_cfg, msg.issue_data)
      ~~~
 
-  3. Returns a `server_issue_resp` message back to the
-     `CLIENT_ISSUE_GEN` interface of the client associated with
-     `client_issue.client_id`.
+  3. Returns a `server_issue_resp` message with `<data>=issue_resp`
+     message back to the caller `CLIENT_ISSUE_GEN` interface of the
+     client associated with `client_issue.client_id`.
 
 ### SERVER_REDEEM {#interface-srv-redeem}
 
@@ -459,19 +464,20 @@ detailed.
   `CLIENT_REDEEM` interface ({{msg-server-redeem-resp}}).
 - Steps:
   1. Send the message `'pp-redeem'` to the internal
-     `SERVER_CONFIG_RETRIEVAL` interface, let `(ciphersuites,configs)`
-     be the returned arrays
+     `SERVER_CONFIG_RETRIEVAL` interface, let `configs`
+     be the returned array.
   2. Run the following:
 
      ~~~
-        b = false
-        for i in 0..1:
-          b = PP_Verify(configs[i],msg.data,msg.tag,msg.aux)
+        resp = PP_Verify(configs[0],message)
+        if (!resp.success) {
+          resp = PP_Verify(configs[1],message)
+        }
      ~~~
 
-  3. The Server returns a `server_redeem_resp` message back to the
-     `CLIENT_REDEEM` interface of the client associated with
-     `client_redeem.client_id`, with `<resp>=b`.
+  3. The Server returns a `server_redeem_resp` message, with
+     `<data>=resp` back to the `CLIENT_REDEEM` interface of the client
+     associated with `client_redeem.client_id`.
 
 ## Client interfaces {#client-interfaces}
 
@@ -488,15 +494,15 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Steps:
   1. Construct a `config_retrieval` message using:
      1. `<server_id> = msg.server_id`;
-     2. `<ciphersuite> = msg.ciphersuite`;
-     3. `<comm_id> = msg.comm_id`;
   2. Send the `config_retrieval` message to the
      `GLOBAL_CONFIG_RETRIEVAL` interface, and receive a reply `resp` of
      type `config_retrieval_resp`.
   3. If `success` is set to `false`, return `false`.
-  4. Parse `resp.supports` and check that each entry is included in
-     `msg.supports`, otherwise return false.
-  5. The value `<signature>` is verified over the bytes of the rest of
+  4. Parse `resp[0].supports` and check that it includes support
+     for what is specified in `msg.supports`, otherwise return false.
+  5. Parse `resp[1].supports` and check that it includes support
+     for what is specified in `msg.supports`, otherwise return false.
+  6. The value `<signature>` is verified over the bytes of the rest of
      message contents, using the Server long-term verification key
      `k_vrfy`. This can be computed by running the function below and
      checking that `ret==true`, otherwise returning false.
@@ -507,39 +513,63 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
         ret = sig_alg.verify(k_vrfy, data, <signature>)
      ~~~
 
-  6. Construct a `client_token_retrieval` message and send it to
-     `CLIENT_TOKEN_RETRIEVAL` interface. Receive back `token` in a
-     `client_token_retrieval_resp` message.
-  7. If:
+  7. Construct a `client_token_retrieval` where
+
+     ~~~
+     ciphersuite = resp[0].ciphersuite
+     comm_id = resp[0].comm_id
+     ~~~
+
+     and send it to `CLIENT_TOKEN_RETRIEVAL` interface. Receive back
+     `token` in a `client_token_retrieval_resp` message. Set
+     `config_idx=0`.
+
+  8. If `token == null`, construct a `client_token_retrieval` message
+     where:
+
+     ~~~
+     ciphersuite = resp[1].ciphersuite
+     comm_id = resp[1].comm_id
+     ~~~
+
+     send it to `CLIENT_TOKEN_RETRIEVAL` interface. Receive back `token`
+     in a `client_token_retrieval_resp` message. Set
+     `config_idx=1'`.
+
+  9. If:
 
      ~~~
         token == null
-          && resp.active == "issue"
-          && resp.supports.includes("issue")
+          && (
+            resp[0].supports == 1
+            || resp[0].supports == 3
+          )
      ~~~
 
      construct a `client_issue_generation` message and send it to the
      `CLIENT_ISSUE_GEN` interface, with:
 
       1. `<server_id> = msg.server_id`;
-      2. `<public_key> = resp.public_key`;
+      2. `<config> = resp[0].config`;
 
-  8. If:
+  10. If:
 
      ~~~
         token != null
-          && resp.active != "inactive"
-          && resp.supports.includes("redeem")
+          && (
+            resp[config_type].supports == 2
+            || resp[config_type].supports == 3
+          )
      ~~~
 
-     construct a `redemption_generation` message and send it to the
+     construct a `client_redeem_generation` message and send it to the
      `CLIENT_REDEEM` interface. with:
 
       1. `<server_id> = msg.server_id`;
       2. `<token> = token`;
 
-  9.  If neither condition in (7) or (8) is satisfied, return false.
-  10. Return true.
+  11. If neither condition in (7) or (8) is satisfied, return false.
+  12. Return true.
 
 ### CLIENT_ISSUE_GEN {#interface-cli-issue-gen}
 
@@ -557,17 +587,20 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   2. The client runs:
 
      ~~~
-        (c_data, i_data, g_data) = PP_Generate(cli_cfg, m)
+        issue_input = PP_Generate(cli_cfg, m)
      ~~~
 
      where `m` is an integer corresponding to the number of tokens that
      should be generated.
   3. The client constructs a `client_issue_storage` message and sends it
-     to the `CLIENT_ISSUE_STORAGE` interface.
+     to the `CLIENT_ISSUE_STORAGE` interface, where
+     `<server_id>=msg.server_id`,
+     `<client_data>=issue_input.client_data`.
   4. The client constructs a `client_issue` message and sends it to the
-     server corresponding to `<server_id>` with `<issue_data>=i_data`.
-  5. Receives a `server_issue_resp` message back from the server, and
-     sends this to the `CLIENT_ISSUE_FINISH` interface.
+     server corresponding to `<server_id>` with
+     `<issue_data>=issue_input.msg_data`.
+  5. Receives a `server_issue_resp` message back from client_data
+     server, and sends this to the `CLIENT_ISSUE_FINISH` interface.
 
 ### CLIENT_ISSUE_FINISH {#interface-cli-issue-finish}
 
@@ -583,7 +616,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   3. The client runs:
 
      ~~~
-      tokens = PP_Process(cli_cfg, msg.evals, msg.proof, tmp.g_data)
+      tokens = PP_Process(cli_cfg, (msg.evals, msg.proof), tmp.g_data)
      ~~~
 
   4. The client constructs a `client_token_storage` message and sends it
@@ -627,10 +660,9 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 
      ~~~
         server_id: msg.server_id
-          ciphersuite: msg.ciphersuite
+          ciphersuite:client_data.ciphersuite
             comm_id: msg.comm_id
-              c_data: msg.c_data
-              g_data: msg.g_data
+              client_data: msg.client_data
      ~~~
 
      i.e. the structure is keyed by `server_id`, `ciphersuite` and
@@ -644,8 +676,8 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Returns: a `client_issue_retrieval_resp` message
   ({{msg-client-issue-retrieval-resp}}).
 - Steps:
-  1. Retrieve the pair `(c_data,g_data)` keyed by `msg.server_id`,
-     `msg.ciphersuite` and `msg.comm_id`.
+  1. Retrieve `client_data` where `msg.server_id`, `msg.ciphersuite`
+     and `msg.comm_id`.
   2. Return a `client_issue_retrieval` message containing the values
      above to the `CLIENT_ISSUE_FINISH` interface.
 
@@ -691,29 +723,18 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Input: a `config_update` message `msg` ({{msg-config-update}}).
 - Returns: `null`
 - Steps:
-  1. Creates a data structure of the following form:
-
-     ~~~
-        struct {
-          opaque public_key<1..2^32-1> = msg.public_key
-          opaque expiry<1..2^16-1> = msg.expiry
-          opaque signature<1..2^32-1> = msg.signature
-          int8   supports = 3 // 1 = redeem, 2 = issue, 3 = both
-        } Config
-     ~~~
-
-     and stores it in the global config registry, keyed by
-     `msg.server_id`, `msg.ciphersuite` and `msg.comm_id`. Therefore, the
-     registry data block takes the form:
+  1. Creates an entry in the global config registry, keyed by
+     `msg.server_id`, `msg.config.ciphersuite` and `msg.comm_id`.
+     Therefore, the registry data block takes the form:
 
      ~~~
         server_id: msg.server_id
-          ciphersuite: msg.ciphersuite
+          ciphersuite: msg.config.ciphersuite
             comm_id: msg.comm_id
-              public_key: msg.public_key
+              public_key: msg.config.public_key
               expiry: msg.expiry
               signature: msg.signature
-              supports: ['issue','redeem']
+              supports: msg.supports
      ~~~
 
   2. Updates `server_id.previous` to be equal to a structure of the
@@ -749,34 +770,31 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Steps:
   1. Retrieve the data structure `server_ds` from the global config
      registry, keyed by `msg.server_id`.
-  2. Let `active = 'issue'` if:
-
-     ~~~
-         server_ds.current.ciphersuite == msg.ciphersuite
-          && server_ds.current.comm_id == msg.comm_id
-     ~~~
-
-     Else, let `active = 'redeem'` if:
-
-     ~~~
-         server_ds.previous.ciphersuite == msg.ciphersuite
-          && server_ds.previous.comm_id == msg.comm_id
-     ~~~
-
-     Else, let `active = 'inactive'`.
-
-  3. Let `config_ds = server_ds[msg.ciphersuite][msg.comm_id]`
+  2. Let `current=server_ds[current.ciphersuite][current.comm_id]`
+  3. Let `previous=server_ds[previous.ciphersuite][previous.comm_id]`
   4. Return a `config_retrieval_resp` message of the form below, to the
      querying interface.
 
      ~~~
-        method: "config_retrieval_resp"
-        contents:
-          active: active
-          public_key: config_ds.public_key
-          expiry: config_ds.expiry
-          signature: config_ds.signature
-          supports: config_ds.supports
+        cfg_0 = config_entry {
+          ciphersuite: current.ciphersuite,
+          comm_id: current.comm_id,
+          config: current.config,
+          expiry: current.expiry,
+          signature: current.signature,
+          supports: current.supports,
+        };
+        cfg_1 = config_entry {
+          ciphersuite: current.ciphersuite,
+          comm_id: current.comm_id,
+          config: current.config,
+          expiry: current.expiry,
+          signature: current.signature,
+          supports: current.supports,
+        };
+        resp = config_retrieval_resp {
+          configs: [cfg_0, cfg_1],
+        }
      ~~~
 
 # Key management framework {#key-mgmt}
@@ -1447,49 +1465,43 @@ compatible typical message expression formats such as JSON.
 ### server_config_store {#msg-config-store}
 
 ~~~
-method: "server_config_store"
-contents:
-  ciphersuite: <ciphersuite>
-  configs: <config>
+struct {
+  ServerConfig configs[2];
+} server_config_store
 ~~~
 
 ### server_config_retrieve {#msg-config-retrieve}
 
 ~~~
-method: "server_config_retrieve"
-contents:
-  method: <method>
-  ciphersuites: <ciphersuites>
-  configs: <configs>
+struct {
+  uint8 method;
+  ServerConfig configs[2];
+} server_config_retrieve
 ~~~
 
 ### server_hello {#msg-server-hello}
 
 ~~~
-method: "server_hello"
-contents:
-  server_id: <server_id>
-  ciphersuite: <ciphersuite>
-  comm_id: <comm_id>
-  supports: ['issue','redeem']
+struct {
+  opaque server_id<0..255>;
+  uint8 supports;
+} server_hello
 ~~~
 
 ### server_issue_resp {#msg-server-issue-resp}
 
 ~~~
-method: "server_issue_resp"
-contents:
-  ciphersuite: <ciphersuite>
-  evals: <evals>
-  proof: <proof>
+struct {
+  IssuanceResponse data;
+} server_issue_resp
 ~~~
 
 ### server_redeem_resp {#msg-server-redeem-resp}
 
 ~~~
-method: "server_redeem_resp"
-contents:
-  resp: <resp>
+struct {
+  RedemptionResponse data;
+} server_redeem_resp
 ~~~
 
 ## Client message formats
@@ -1497,102 +1509,97 @@ contents:
 ### client_issue_generation {#msg-client-issue-generation}
 
 ~~~
-method: "client_issue_generation"
-contents:
-  server_id: <server_id>
-  ciphersuite: <ciphersuite>
-  public_key: <public_key>
-~~~
-
-### client_redeem_generation {#msg-client-redeem-generation}
-
-~~~
-method: "client_redeem_generation"
-contents:
-  server_id: <server_id>
-  ciphersuite: <ciphersuite>
-  public_key: <public_key>
-  token: <token>
+struct {
+  opaque server_id<0..255>;
+  ServerConfig config;
+} client_issue_generation
 ~~~
 
 ### client_issue_storage {#msg-client-issue-storage}
 
 ~~~
-method: "client_issue_storage"
-contents:
-  server_id: <server_id>
-  ciphersuite: <ciphersuite>
-  comm_id: <comm_id>
-  c_data: <c_data>
-  g_data: <g_data>
+struct {
+  opaque server_id<0..255>
+  Ciphersuite ciphersuite;
+  opaque comm_id<0..2^16-1>;
+  ClientIssuanceProcessing client_data;
+} client_issue_storage
 ~~~
 
 ### client_issue {#msg-client-issue}
 
 ~~~
-method: "client_issue"
-contents:
-  client_id: <client_id>
-  issue_data: <issue_data>
+struct {
+  opaque client_id<0..2^16-1>;
+  IssuanceMessage issue_data;
+} client_issue
 ~~~
 
 ### client_issue_retrieval {#msg-client-issue-retrieval}
 
 ~~~
-method: "client_issue_retrieval"
-contents:
-  server_id: <server_id>
-  ciphersuite: <ciphersuite>
-  comm_id: <comm_id>
+struct {
+  opaque server_id<0..255>;
+  Ciphersuite ciphersuite;
+  opaque comm_id<0..2^16-1>;
+} client_issue_retrieval
 ~~~
 
 ### client_issue_retrieval_resp {#msg-client-issue-retrieval-resp}
 
 ~~~
-method: "client_issue_retrieval_resp"
-contents:
-  c_data: <c_data>
-  g_data: <g_data>
+struct {
+  ClientIssuanceProcessing client_data;
+} client_issue_retrieval_resp
 ~~~
 
 ### client_token_storage {#msg-client-token-storage}
 
 ~~~
-method: "client_token_storage"
-contents:
-  server_id: <server_id>
-  ciphersuite: <ciphersuite>
-  comm_id: <comm_id>
-  tokens: <tokens>
+struct {
+  opaque server_id<0..255>;
+  Ciphersuite ciphersuite;
+  opaque comm_id<0..2^16-1>;
+  RedemptionToken tokens[m];
+} client_token_storage
 ~~~
 
 ### client_token_retrieval {#msg-client-token-retrieval}
 
 ~~~
-method: "client_token_retrieval"
-contents:
-  server_id: <server_id>
-  ciphersuite: <ciphersuite>
-  comm_id: <comm_id>
+struct {
+  opaque server_id<0..255>;
+  Ciphersuite ciphersuite;
+  opaque comm_id<0..2^16-1>;
+} client_token_retrieval
 ~~~
 
 ### client_token_retrieval_resp {#msg-client-token-retrieval-resp}
 
 ~~~
 method: "client_token_retrieval_resp"
-contents:
-  token: <token>
+struct {
+  RedemptionToken token;
+} client_token_retrieval_resp
+~~~
+
+### client_redeem_generation {#msg-client-redeem-generation}
+
+~~~
+struct {
+  opaque server_id<0..255>;
+  ServerConfig config;
+  RedemptionToken token;
+} client_redeem_generation
 ~~~
 
 ### client_redeem {#msg-client-redeem}
 
 ~~~
-method: "client_redeem"
-contents:
-  client_id: <client_id>
-  data: <data>
-  tag: <tag>
-  aux: <aux>
+struct {
+  opaque client_id<0..2^16-1>;
+  RedemptionMessage message;
+} client_redeem
 ~~~
 
 ## Global configuration interfaces
@@ -1600,33 +1607,36 @@ contents:
 ### config_update {#msg-config-update}
 
 ~~~
-method: "config_update"
-contents:
-  server_id: <server_id>
-  ciphersuite: <ciphersuite>
-  comm_id: <comm_id>
-  public_key: <public_key>
-  expiry: <expiry_time>
-  signature: <signature>
+struct {
+  opaque server_id<0..255>;
+  opaque comm_id<0..2^16-1>;
+  ServerConfig config;
+  datetime expiry;
+  opaque signature<1..2^32-1>;
+} config_update
 ~~~
 
 ### config_retrieval {#msg-config-retrieval}
 
 ~~~
-method: "config_retrieval"
-contents:
-  server_id: <server_id>
-  ciphersuite: <ciphersuite>
-  comm_id: <comm_id>
+struct {
+  opaque server_id<0..255>;
+} config_retrieval
 ~~~
 
 ### config_retrieval_resp {#msg-config-retrieval-resp}
 
 ~~~
-method: "config_retrieval_resp"
-contents:
-  public_key: <public_key>
-  expiry: <expiry>
-  signature: <signature>
-  supports: <supports>
+struct {
+  Ciphersuite ciphersuite;
+  opaque comm_id<0..2^16-1>;
+  ServerConfig config;
+  datetime expiry;
+  opaque signature<1..2^32-1>;
+  uint8 supports;
+} config_entry
+
+struct {
+  config_entry configs[2];
+} config_retrieval_resp
 ~~~
