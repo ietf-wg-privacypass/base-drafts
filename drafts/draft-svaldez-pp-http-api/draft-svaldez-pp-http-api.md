@@ -143,7 +143,7 @@ The key to the map is the ``server_origin``, with the value being:
 struct {
     opaque public_key<1..2^16-1>;
     uint64 expiry;
-    uint8 supported_methods; # 3 = Issue/Redeem, 2 = Redeem, 1 = Issue
+    uint8 supported_methods; # 3:Issue/Redeem, 2:Redeem, 1:Issue
     opaque signature<1..2^16-1>;
 } KeyCommitment;
 
@@ -184,8 +184,8 @@ Inputs:
 No outputs.
 
 1. The client makes an anonymous GET request to
-``CONFIG_ENDPOINT``/.well-known/privacy-pass (TODO: Add well-known
-registration) with a message of type ``fetch-config`` and a body of:
+``CONFIG_ENDPOINT``/.well-known/privacy-pass with a message of type
+``fetch-config`` and a body of:
 
 ~~~
 struct {
@@ -248,7 +248,7 @@ issuance or redemption or both.
 struct {
     opaque public_key<1..2^16-1>;
     uint64 expiry;
-    uint8 supported_methods; # 3 = Issue/Redeem, 2 = Redeem, 1 = Issue
+    uint8 supported_methods; # 3:Issue/Redeem, 2:Redeem, 1:Issue
     opaque signature<1..2^16-1>;
 } KeyCommitment;
 
@@ -263,7 +263,7 @@ struct {
 
 5. The client then verifies the signature for each key commitment and
 stores the list of commitments to the current scope. The client SHOULD
-not cache the commitments beyond the current scope, as new commitments
+NOT cache the commitments beyond the current scope, as new commitments
 should be fetched for each independent issuance and redemption
 request. The client SHOULD verify the ``inclusion_proofs`` to confirm
 that the key commitment has been submitted to a trusted registry.
@@ -479,3 +479,20 @@ redemption result by querying the current configuration of the Privacy
 Pass server. The inclusion of ``target`` and ``timestamp`` proves that
 the server attested to the validity of the token in relation to this
 particular request.
+
+# Security Considerations
+
+Security considerations for Privacy Pass are discussed in
+{{draft-davidson-pp-architecture}}.
+
+# IANA Considerations
+
+## Well-Known URI
+
+This specification registers a new well-known URI.
+
+URI suffix: “privacy-pass”
+
+Change controller: IETF.
+
+Specification document(s): this specification
