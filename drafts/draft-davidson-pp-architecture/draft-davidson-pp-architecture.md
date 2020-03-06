@@ -520,7 +520,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      comm_id = resp[0].comm_id
      ~~~
 
-     and send it to `CLIENT_TOKEN_RETRIEVAL` interface. Receive back
+     and send it to the `CLIENT_TOKEN_RETRIEVAL` interface. Receive back
      `token` in a `client_token_retrieval_resp` message. Set
      `config_idx=0`.
 
@@ -532,8 +532,8 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      comm_id = resp[1].comm_id
      ~~~
 
-     send it to `CLIENT_TOKEN_RETRIEVAL` interface. Receive back `token`
-     in a `client_token_retrieval_resp` message. Set
+     and send it to the `CLIENT_TOKEN_RETRIEVAL` interface. Receive back
+     `token` in a `client_token_retrieval_resp` message. Set
      `config_idx=1'`.
 
   9. If:
@@ -656,17 +656,9 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   ({{msg-client-issue-storage}}).
 - Returns: `null`
 - Steps:
-  1. Stores a data structure of the following form in local storage:
-
-     ~~~
-        server_id: msg.server_id
-          ciphersuite:client_data.ciphersuite
-            comm_id: msg.comm_id
-              client_data: msg.client_data
-     ~~~
-
-     i.e. the structure is keyed by `server_id`, `ciphersuite` and
-     `comm_id`.
+  1. Stores the `ClientIssuanceProcessing` struct represented by
+     `msg.client_data` in local storage, keyed by `server_id`,
+     `ciphersuite` and `comm_id`.
 
 ### CLIENT_ISSUE_RETRIEVAL {#interface-cli-issue-retrieval}
 
@@ -678,7 +670,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Steps:
   1. Retrieve `client_data` where `msg.server_id`, `msg.ciphersuite`
      and `msg.comm_id`.
-  2. Return a `client_issue_retrieval` message containing the values
+  2. Return a `client_issue_retrieval` message containing `client_data`
      above to the `CLIENT_ISSUE_FINISH` interface.
 
 ### CLIENT_TOKEN_STORAGE {#interface-cli-token-storage}
