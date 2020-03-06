@@ -94,9 +94,10 @@ informative:
 This document specifies the architectural framework for constructing
 secure and privacy-preserving instantiations of the Privacy Pass
 protocol (as described in {{draft-davidson-pp-protocol}}). The framework
-refers to the entire ecosystem of Privacy Pass clients and servers, and
-makes recommendations on how this ecosystem should be constructed in
-client privacy-focused manner.
+refers to the entire ecosystem of Privacy Pass clients and servers. This
+document makes recommendations on how this ecosystem should be
+constructed to ensure the privacy of clients and the security of all
+participating entities.
 
 --- middle
 
@@ -129,8 +130,8 @@ of a wider ecosystem.
 On top of this, the document also includes policies for the following
 considerations:
 
-- How server configurations and key material should be stored.
-- Transparent rotation of server configurations and key material.
+- How server configurations and key material should be stored and
+  rotated in an open and transparent manner.
 - Compatible server issuance and redemption running modes and associated
   expectations.
 - A concrete assessment and parametrization of the privacy budget
@@ -156,11 +157,12 @@ The following terms are used throughout this document.
 - Client: An entity that seeks authorization from a server (typically
   denoted C)
 - Key: Server's secret key
-- Commitment: Alternative name for Server's public key.
+- Config: The server configuration associated with the key material and
+  ciphersuite choices that it makes.
 
 We assume that all protocol messages are encoded into raw byte format
 before being sent. We use the TLS presentation language {{RFC8446}} to
-describe the structure of protocol messages.
+describe the structure of the data that is communicated and stored.
 
 ## Layout
 
@@ -176,11 +178,11 @@ describe the structure of protocol messages.
   how this configuration is retrieved and updated.
 - {{running-modes}}: Describes the different running modes that are
   currently expected from Privacy Pass servers.
-- {{privacy}}: A detailed analysis of the characteristics of the Privacy
-  Pass architecture that have an impact on the privacy of clients
+- {{privacy}}: An analysis of the characteristics of the Privacy Pass
+  architecture that have an impact on the privacy of clients
   participating in the ecosystem.
-- {{security}}: A detailed analysis of the security characteristics of
-  the protocol when viewed as a part of the wider architecture of the
+- {{security}}: An analysis of the security characteristics of the
+  protocol when viewed as a part of the wider architecture of the
   protocol ecosystem. Includes discussions of the cases for both servers
   and clients.
 - {{parametrization}}: Provides an example parametrization of the
@@ -208,9 +210,7 @@ process issuance responses from each of the available servers.
 The ecosystem itself, and the way it is constructed, is critical for
 evaluating the privacy of each individual client. We assume that a
 client's privacy refers to fraction of users that it represents in the
-anonymity set that it belongs to. This parameter, a value 0 < d =< 1,
-can also be referred to as the potential privacy loss of the client. We
-discuss this more in {{privacy}}.
+anonymity set that it belongs to. We discuss this more in {{privacy}}.
 
 ## Servers {#ecosystem-servers}
 
@@ -219,11 +219,11 @@ function is to undertake the role of the `Server` in
 {{draft-davidson-pp-protocol}}. To facilitate this, the server must hold
 the following data at any given time:
 
-- a valid server configuration as specified in
+- a valid server configuration (`ServerConfig`) as specified in
   {{draft-davidson-pp-protocol}};
 - a long-term signing key pair for a signature scheme `sig_alg`;
-- storage of Privacy Pass tokens that have been redeemed successfully
-  with the server.
+- storage of Privacy Pass tokens that have been previously redeemed with
+  the server.
 
 The server must be available at a specified address (uniquely identified
 by `server_id`) that accepts communications from Privacy Pass clients
@@ -394,29 +394,30 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
 - Input: a `server_config_store` message `msg` ({{msg-config-store}}).
 - Returns: `null`
 - Steps:
-  1. Let `ex_cfg` correspond to the existing server
-     configuration keyed by `'pp-issue'`.
+  1. Let `ex_cfg` correspond to the existing `ServerConfig` object keyed
+     by `issue`.
   2. Store the bytes of `msg.config` in local storage, against the key
-     `'pp-issue'`.
-  3. Store the bytes of ` ex_cfg` in local storage against the key
-     `'pp-redeem'`.
+     `issue`.
+  3. Store the bytes of `ex_cfg` in local storage against the key
+     `redeem`.
 
 ### SERVER_CONFIG_RETRIEVAL {#interface-srv-config-retrieval}
 
 - Visibility: `internal`
 - Input: an octet `method` in `{1,2,3}`.
-- Returns: A `server_config_retrieve` message ({{msg-config-retrieve}}).
+- Returns: A `server_config_retrieve` message `resp`
+  ({{msg-config-retrieve}}).
 - Steps:
   1. Let `storage` be the ID and the bytes of the server config
      currently stored in local storage, respectively.
-  2. If `msg.config.supports != method` and `msg.config.supports != 3`,
+  2. If `resp.config.supports != method && resp.config.supports != 3`,
      then return `null`.
-  3. Let `msg` be a `server_config_retrieve` message, where
+  3. Let `resp` be a `server_config_retrieve` message, where
      `<configs>=[config]` for `config` stored in local storage against
-     `'pp-issue'`.
+     `issue`.
   4. If `method == 2`, append `ex_config` to `<configs>`, where
-     `ex_config` is stored in local storage against `'pp-redeem'`.
-  5. Return `msg`.
+     `ex_config` is stored in local storage against the key `redeem`.
+  5. Return `resp`.
 
 ### SERVER_HELLO {#interface-srv-hello}
 
@@ -426,8 +427,8 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
 - Return: `null`
 - Steps:
   1. Send an empty message to the internal `SERVER_CONFIG_RETRIEVAL`
-     interface, and let `cfgs=msg.configs` based on the
-     `server_config_retrieve` response `msg`.
+     interface, and let `cfgs=resp.configs` based on the
+     `server_config_retrieve` response `resp`.
   2. Send a `server_hello` message to the `CLIENT_CONFIG_RETRIEVAL`
      interface for the client at `client_addr`. The `server_hello`
      message must satisfy the following:
@@ -442,7 +443,7 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
 - Input: A `client_issue` message `msg` ({{msg-client-issue}})
 - Returns: A `server_issue_resp` message
 - Steps:
-  1. Send the message `'pp-issue'` to the internal
+  1. Send the message `issue` to the internal
      `SERVER_CONFIG_RETRIEVAL` interface, and let
      `ciphersuite=msg.ciphersuites[0]` and `srv_cfg=msg.configs[0]`
      based on the `server_config_retrieve` response.
@@ -463,10 +464,13 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
 - Returns: A `server_redeem_resp` message back to the calling
   `CLIENT_REDEEM` interface ({{msg-server-redeem-resp}}).
 - Steps:
-  1. Send the message `'pp-redeem'` to the internal
+  1. Send the message `redeem` to the internal
      `SERVER_CONFIG_RETRIEVAL` interface, let `configs`
      be the returned array.
-  2. Run the following:
+  2. Send `msg.message.data` to the `SERVER_DOUBLE_SPEND_CHECK`
+     interface and, if the response is `true`, return an unsuccessful
+     `server_redeem_resp` message to the client.
+  3. Run the following:
 
      ~~~
         resp = PP_Verify(configs[0],message)
@@ -475,9 +479,30 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
         }
      ~~~
 
-  3. The Server returns a `server_redeem_resp` message, with
+  4. Send `msg.message.data` to the `SERVER_DOUBLE_SPEND_STORE`
+     interface.
+  5. The Server returns a `server_redeem_resp` message, with
      `<data>=resp` back to the `CLIENT_REDEEM` interface of the client
      associated with `client_redeem.client_id`.
+
+### SERVER_DOUBLE_SPEND_CHECK {#interface-srv-spend-check}
+
+- Visibility: `internal`
+- Input: A byte string `data` of type `opaque<1..2^32-1>`
+  ({{msg-client-redeem}}).
+- Returns: A boolean value `b`.
+- Steps:
+  1. Return `true` if `data` exists in the double-spend index, and
+     `false` otherwise.
+
+### SERVER_DOUBLE_SPEND_STORE {#interface-srv-spend-store}
+
+- Visibility: `internal`
+- Input: A byte string `data` of type `opaque<1..2^32-1>`
+  ({{msg-client-redeem}}).
+- Returns: `null`.
+- Steps:
+  1. Store `data` in the double-spend index.
 
 ## Client interfaces {#client-interfaces}
 
@@ -616,7 +641,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   3. The client runs:
 
      ~~~
-      tokens = PP_Process(cli_cfg, (msg.evals, msg.proof), tmp.g_data)
+      tokens = PP_Process(cli_cfg,(msg.evals, msg.proof),tmp.g_data)
      ~~~
 
   4. The client constructs a `client_token_storage` message and sends it
@@ -646,8 +671,9 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      `SERVER_REDEEM` interface of the Server referred to by
      `<server_id>`, with `<data>=msg.token.data` and `<aux>=aux`.
 
-  4. The client returns the value `<resp>` received in the
-     `server_redeem_resp` message back from the server.
+  4. The client returns the value boolean value indicated in the
+     `RedemptionResponse` received in the server's `server_redeem_resp`
+     message.
 
 ### CLIENT_ISSUE_STORAGE {#interface-cli-issue-storage}
 
@@ -743,7 +769,8 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
         }
      ~~~
 
-  4. Updates `server_id.modified` to be equal to the current time.
+  4. Appends the current time to the vector of datetime values in
+     `server_id.modified`.
 
 ### GLOBAL_CONFIG_RETRIEVAL {#interface-cfg-retrieval}
 
@@ -878,8 +905,8 @@ change during configuration updates. The `current` field refers to the
 latest configuration to support token issuance. The `previous` field is
 used for a single configuration that still permits redemption of tokens,
 this is used for ensuring that key rotations are smooth for clients. The
-`modified` field refers to the last time when the configuration was
-modified.
+`modified` field refers to a vector of all times when the configuration
+was modified.
 
 ## Configuration updates #{config-update}
 
@@ -922,7 +949,7 @@ See the `CLIENT_CONFIG_RETRIEVAL` interface
 The client checks that the configuration is consistent with the data it
 receives from the server. It also checks the validity of the `signature`
 field on the configuration that it retrieves. Later we also discuss
-optionally checking the value in `modified` for trying to identify
+optionally checking the values in `modified` for trying to identify
 malicious server behavior.
 
 ## Key revocation
@@ -1089,7 +1116,9 @@ before first accepting redemption tokens from the server. Concrete
 suggestions include the following:
 
 - If a server has updated the registry with many unexpired keys, or in
-  very quick intervals a client SHOULD reject the configuration. This
+  very quick intervals a client SHOULD reject the configuration. The
+  client can check this by checking the list of times when the server
+  modified their own configuration in the vector `modified`. This
   prevents a server from segregating clients into smaller windows using
   the redemption data that they hold.
 - If a server has only recently updated their configuration (within the
@@ -1118,12 +1147,14 @@ many issuers at any one time.
 
 As we noted in {{bi-mode}}, a strict bound should be applied to the
 active number of issuers that are allowed at one time in the ecosystem.
-We propose that allowing no more than 6 issuers at any one time is
+We propose that allowing no more than 4 issuers at any one time is
 highly preferable (leading to a maximum of 64 possible user
-segregations). Issuer replacements should only occur with the same
-frequency as config rotations as they can lead to similar losses in
-privacy if clients still hold redemption tokens for previously active
-issuers.
+segregations). However, as highlighted in {{parametrization}}, having a
+very large user base (> 5 million users), could potentially allow for
+larger values (for example, up to 8 issuers). Issuer replacements should
+only occur with the same frequency as config rotations as they can lead
+to similar losses in privacy if clients still hold redemption tokens for
+previously active issuers.
 
 In addition, we RECOMMEND that trusted registries indicate at all times
 which issuers are deemed to be active. If a client is asked to invoke
@@ -1144,8 +1175,8 @@ providing multiple active configurations.
 #### Maximum number of issuers inferred by client
 
 We RECOMMEND that clients only store redemption tokens for a fixed
-number of issuers at any one time. This number should be the same as, or
-strictly less than, the number of permitted active issuers.
+number of issuers at any one time. This number would ideally be less
+than the number of permitted active issuers.
 
 This prevents a malicious verifier from being able to invoke redemptions
 for many issuers since the client would only be holding redemption
@@ -1158,11 +1189,10 @@ stores the newly acquired tokens.
 
 While redemption tokens themselves encode no information about the
 client redeeming them, problems may occur if too many redemptions are
-allowed in a short burst. For instance, in the Internet setting, the
-first-party cookie for user U on domain A can be encoded in the trust
-token information channel and decoded on domain B, allowing domain B to
-learn the user's domain A cookie until either first-party cookie is
-cleared. Mitigations for this issue are similar to those proposed in
+allowed in a short burst. For instance, in the Internet setting, this
+may allow non-terminating verifiers to learn more information from the
+metadata that the client may hold (such as first-party cookies for other
+domains). Mitigations for this issue are similar to those proposed in
 {{issuers}} for tackling the problem of having large number of issuers.
 
 In SIAV, cached SRRs and their associated issuer public keys have a
@@ -1222,10 +1252,10 @@ we consider to be important are:
 - the signing key used to sign SRRs in the SIAV configuration.
 
 We recommend that Privacy Pass secret keys are rotated from anywhere
-between 1 and 12 weeks. With an active user-base, a month gives a fairly
+between 1 and 12 weeks. With an active user-base, a week gives a fairly
 large window for clients to participate in the Privacy Pass protocol and
 thus enjoy the privacy guarantees of being part of a larger group. The
-low ceiling of a year prevents a key compromise from being too
+low ceiling of 12 weeks prevents a key compromise from being too
 destructive. If a server realizes that a key compromise has occurred
 then the server should revoke the previous key in the trusted registry
 and specify a new key to be used.
@@ -1254,10 +1284,10 @@ in a given time window.
 
 In SIAV, the client instead caches the SRR that it received in the
 asynchronous redemption exchange with the issuer. If the same verifier
-attempts another trust attestation request, then the client simply
-returns the cached SRR. The SRRs can be revoked by the issuer, if need
-be, by providing an expiry date or by signaling that records from a
-particular window need to be refreshed.
+attempts another redemption request, then the client simply returns the
+cached SRR. The SRRs can be revoked by the issuer, if need be, by
+providing an expiry date or by signaling that records from a particular
+window need to be refreshed.
 
 # Protocol parametrization {#parametrization}
 
@@ -1265,7 +1295,7 @@ We provide a summary of the parameters that we use in the Privacy Pass
 protocol ecosystem. These parameters are informed by both privacy and
 security considerations that are highlighted in {{privacy}} and
 {{security}}, respectively. These parameters are intended as a single
-reference point for implementers when implementing the protocol.
+reference point for those implementing the protocol.
 
 Firstly, let U be the total number of users, I be the total number of
 issuers. Assuming that each user accept tokens from a uniform sampling
@@ -1278,7 +1308,7 @@ relative to the setting of A.
 | parameter | value |
 |---|---|
 | Minimum anonymity set size (A) | 5000 |
-| Recommended key lifetime (L) | 1 - 12 weeks |
+| Recommended key lifetime (L) | 2 - 24 weeks |
 | Recommended key rotation frequency (F) | L/2 |
 | Maximum allowed issuers (I) | log_2(U/A)-1 |
 | Maximum active issuance configurations | 1 |
@@ -1308,8 +1338,8 @@ used key. This makes the rotation period much smoother for clients.
 
 For privacy reasons, it is recommended that key epochs are chosen that
 limit clients to holding issuance data for a maximum of two keys. By
-choosing F = L/2 then the minimum value of F is 1/2 a month, since the
-minimum recommended value of L is 1 month. Therefore, by the initial
+choosing F = L/2 then the minimum value of F is a week, since the
+minimum recommended value of L is 2 weeks. Therefore, by the initial
 assumption, then all users should only have access to only two keys at
 any given time. This reduces the anonymity set by another half at most.
 
@@ -1375,7 +1405,7 @@ reason about.
 
 Extensions MUST NOT modify the format and/or structure of the global
 configuration registry, other than specifying the data format of each of
-the fields that are used. If en extension requires a modified
+the fields that are used. If an extension requires a modified
 configuration registry, then such a change is interpreted to lie outside
 of the Privacy Pass ecosystem, and is thus not supported.
 
@@ -1393,7 +1423,7 @@ challenge protection system to bypass future challenges {{PPSRV}}. These
 challenges can be expensive for clients, and there have been cases where
 bugs in the implementations can severely degrade client accessibility.
 
-Client's must install a browser extension {{PPEXT}} that acts as the
+Clients must install a browser extension {{PPEXT}} that acts as the
 Privacy Pass client in an exchange with Cloudflare's Privacy Pass
 server, when an initial challenge solution is provided. The client
 extension stores the issued tokens and presents a valid redemption token
