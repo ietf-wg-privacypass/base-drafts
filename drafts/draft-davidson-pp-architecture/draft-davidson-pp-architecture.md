@@ -386,7 +386,7 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
   3. Send the `config_update` message to the `GLOBAL_CONFIG_UPDATE`
      interface.
   4. Send a `server_config_store` message to the `SERVER_STORE_CONFIG`
-     interface.
+     interface containing the value of `cfg`.
 
 ### SERVER_STORE_CONFIG {#interface-srv-store-config}
 
@@ -509,7 +509,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 
      ~~~
         data = <server_id> .. <ciphersuite> .. <comm_id>
-                .. <public_key> .. <expiry> .. <supports>
+                .. <config> .. <expiry> .. <supports>
         ret = sig_alg.verify(k_vrfy, data, <signature>)
      ~~~
 
@@ -581,7 +581,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. The client runs:
 
      ~~~
-        cli_cfg = PP_Client_Setup(msg.ciphersuite, msg.public_key)
+        cli_cfg = PP_Client_Setup(msg.ciphersuite, msg.config)
      ~~~
 
   2. The client runs:
@@ -633,7 +633,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. The client runs:
 
      ~~~
-        cli_cfg = PP_Client_Setup(msg.ciphersuite, msg.public_key)
+        cli_cfg = PP_Client_Setup(msg.ciphersuite, msg.config)
      ~~~
 
   2. The client generates arbitrary auxiliary data `aux` and runs:
@@ -688,17 +688,8 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   ({{msg-client-token-storage}}).
 - Returns: `null`
 - Steps:
-  1. Stores a data structure of the following form in local storage:
-
-     ~~~
-        server_id: msg.server_id
-          ciphersuite: msg.ciphersuite
-            comm_id: msg.comm_id
-              tokens: msg.tokens
-     ~~~
-
-     i.e. the structure is keyed by `server_id`, `ciphersuite` and
-     `comm_id`.
+  1. Stores the vector of `RedemptionToken` objects in local storage
+     keyed by `server_id`, `ciphersuite` and `comm_id`.
 
 ### CLIENT_TOKEN_RETRIEVAL {#interface-cli-token-retrieval}
 
@@ -710,7 +701,8 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. Retrieve all the available token `tokens` keyed by `msg.server_id`,
      `msg.ciphersuite` and `msg.comm_id`.
   2. If `tokens != null`, let `token = tokens.pop()`.
-  3. Store the modified `tokens` object back in local storage.
+  3. Store the modified `tokens` object back in local storage by
+     interacting with the `CLIENT_TOKEN_STORAGE` interface.
   4. Return a `client_token_retrieval` message containing the token
      value above (or `null` if `tokens == null`) to the
      `CLIENT_CONFIG_RETRIEVAL` interface.
@@ -731,7 +723,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
         server_id: msg.server_id
           ciphersuite: msg.config.ciphersuite
             comm_id: msg.comm_id
-              public_key: msg.config.public_key
+              config: msg.config
               expiry: msg.expiry
               signature: msg.signature
               supports: msg.supports
@@ -848,7 +840,7 @@ server_id: <server_id_1>
   modified: <modified>
   ciphersuite: <ciphersuite_1>
     comm_id: <comm_id_1>
-      public_key: <public_key>
+      config: <config>
       expiry: <expiry>
       supports: <supports>
       signature: <signature>
@@ -858,7 +850,7 @@ server_id: <server_id_1>
     .
 
     comm_id: <comm_id_z>
-      public_key: <public_key>
+      config: <config>
       expiry: <expiry>
       supports: <supports>
       signature: <signature>
@@ -878,8 +870,11 @@ server_id: <server_id_x>
 
 Essentially, each server corresponds to a single `server_id` and
 `ciphersuite` corresponds to the different ciphersuites that the server
-can use. Each configuration is defined by the data in the `public_key`,
-`expiry`, `supports` and `signature` fields.
+can use. Each configuration is defined by the data in the `config`,
+`expiry`, `supports` and `signature` fields. The `config` field contains
+the data represented in the `ServerUpdate` struct
+{{draft-davidson-pp-protocol}}, for example including the public key
+`pub_key` of the server, and the value of `max_evals`.
 
 Each server defines a separate verification key in the
 `verification_key` field corresponding to the long-term signing key that
@@ -1511,7 +1506,7 @@ struct {
 ~~~
 struct {
   opaque server_id<0..255>;
-  ServerConfig config;
+  ServerUpdate config;
 } client_issue_generation
 ~~~
 
@@ -1588,7 +1583,7 @@ struct {
 ~~~
 struct {
   opaque server_id<0..255>;
-  ServerConfig config;
+  ServeUpdate config;
   RedemptionToken token;
 } client_redeem_generation
 ~~~
@@ -1610,7 +1605,7 @@ struct {
 struct {
   opaque server_id<0..255>;
   opaque comm_id<0..2^16-1>;
-  ServerConfig config;
+  ServerUpdate config;
   datetime expiry;
   opaque signature<1..2^32-1>;
 } config_update
@@ -1630,7 +1625,7 @@ struct {
 struct {
   Ciphersuite ciphersuite;
   opaque comm_id<0..2^16-1>;
-  ServerConfig config;
+  ServerUpdate config;
   datetime expiry;
   opaque signature<1..2^32-1>;
   uint8 supports;
