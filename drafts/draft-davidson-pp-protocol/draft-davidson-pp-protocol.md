@@ -108,10 +108,10 @@ informative:
 --- abstract
 
 This document specifies the Privacy Pass protocol for privacy-preserving
-methods for authorization of clients to servers. The privacy requirement
-is that client re-authorization events cannot be linked to any previous
-initial authorization. Privacy Pass is intended to be used as a
-performant protocol in the Internet setting.
+authorization of clients to servers. The privacy requirement is that
+client re-authorization events cannot be linked to any previous initial
+authorization. Privacy Pass is intended to be used as a performant
+protocol in the Internet setting.
 
 --- middle
 
@@ -126,10 +126,10 @@ with a cookie. This cookie can be presented the next time it interacts
 with the server. The resurfacing of this cookie allows the server to see
 that the client passed the authorization check in the past.
 Consequently, the server can re-authorize the client again immediately,
-without the need for completing a new challenge.
+without the need for the client to complete a new challenge.
 
 In scenarios where clients need to identify themselves, the
-authorization challenge usually takes the form of some sort of login
+authorization challenge usually take the form of some sort of login
 procedure. Otherwise, the server may just want to verify that the client
 demonstrates some particular facet of behavior (such as being human).
 Such cases may only require a lightweight form of challenge (such as
@@ -138,9 +138,9 @@ completing a CAPTCHA).
 In both cases, if a server issues cookies on successful completion of
 challenges, then the client can use this cookie to bypass future
 challenges for the lifetime of the cookie. The downside of this approach
-is that this provides the server with the ability to link all of the
+is that it provides the server with the ability to link all of the
 client's interactions that it witnesses. In these situations, the
-client's online privacy is dramatically reduced.
+client's effective privacy is dramatically reduced.
 
 The Privacy Pass protocol was initially introduced as a mechanism for
 authorizing clients that had already been authorized in the past,
@@ -159,18 +159,18 @@ slight variants of it; see: {{TRUST}}, {{OpenPrivacy}},
 cryptographic primitive known as a verifiable oblivious pseudorandom
 function (VOPRF) for implementing the authorization mechanism. Such
 VOPRF protocols can be implemented already in prime-order groups, and
-such constructions are currently being drafted in separate
-standardization processes {{I-D.irtf-cfrg-voprf}}.
+constructions are currently being drafted in separate standardization
+processes {{I-D.irtf-cfrg-voprf}}.
 
 The Privacy Pass protocol is split into three stages. The first stage,
 initialisation, produces the global server configuration that is
 broadcast to (and stored by) all clients. The "issuance" phase provides
 the client with unlinkable tokens that can be used to initiate
 re-authorization with the server in the future. The redemption phase
-allow the client to redeem a given re-authorization token with the
-server that it interacted with the issuance phase. In addition, the
-protocol must satisfy two cryptographic security requirements known as
-"unlinkability" and "unforgeability".
+allows the client to redeem a given re-authorization token with the
+server that it interacted with during the issuance phase. In addition,
+the protocol must satisfy two cryptographic security requirements known
+as "unlinkability" and "unforgeability".
 
 This document will lay out the generic description of the protocol,
 along with a secure implementation based on the VOPRF primitive. It will
@@ -197,8 +197,8 @@ considerations are covered in a separate document
 - {{voprf-protocol}}: Describes an instantiation of the API in
   {{pp-api}} based on the VOPRF protocol described in
   {{I-D.irtf-cfrg-voprf}}.
-- {{pp-ciphersuites}}: Describes ciphersuites for use with the Privacy Pass
-  protocol based on the instantiation in {{voprf-protocol}}.
+- {{pp-ciphersuites}}: Describes ciphersuites for use with the Privacy
+  Pass protocol based on the instantiation in {{voprf-protocol}}.
 - {{extensions}}: Describes the policy for implementing extensions to
   the Privacy Pass protocol.
 
@@ -250,7 +250,7 @@ the public API provided in {{I-D.irtf-cfrg-voprf}}.
 
 ## Data structures {#pp-structs}
 
-The following data structures are used throughtout the Privacy Pass
+The following data structures are used throughout the Privacy Pass
 protocol and written in the TLS presentation language {{RFC8446}}. It is
 intended that any of these data structures can be written into
 widely-adopted encoding schemes such as those detailed in TLS
@@ -944,9 +944,9 @@ For the explicit signatures of each of the functions, refer to
 5. g_data = []
 6. for i in 0..m:
        1. c_data[i] = GG.scalar_field().random().as_bytes()
-7. (blinds,groupElems) = ciph.VerifiableBlind(c_data)
+7. (blinds,group_elems) = ciph.VerifiableBlind(c_data)
 8. for i in 0..m:
-       1. i_data[i] = groupElems[i].as_bytes()
+       1. i_data[i] = group_elems[i].as_bytes()
        2. g_data[i] = blinds[i].as_bytes()
 9. Output ClientIssuanceInput {
               ClientIssuanceProcessing {
@@ -1079,7 +1079,7 @@ these below. Each of the ciphersuites is detailed in
   - maximum security parameter: 256 bits
 
 When referring to the 'maximum security parameter' size above, we are
-referring to the _maximum_ effective keylength of the ciphersuite, as
+referring to the _maximum_ effective key length of the ciphersuite, as
 specified in {{NIST}}. The reason that this is the maximum length is
 because there may be attacks that serve to lower the actual value of the
 security parameter. See {{I-D.irtf-cfrg-voprf}} for more details.
