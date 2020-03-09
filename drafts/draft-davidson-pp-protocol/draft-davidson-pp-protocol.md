@@ -1,7 +1,7 @@
 ---
 title: "Privacy Pass: The Protocol"
 abbrev: PP protocol
-docname: draft-pp-protocol-latest
+docname: draft-davidson-pp-protocol-latest
 date:
 category: info
 
