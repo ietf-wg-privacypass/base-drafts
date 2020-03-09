@@ -4,7 +4,8 @@ lib
 draft-privacy-pass.txt
 draft-privacy-pass.html
 metadata.min.js
-*.txt
-!releases
+draft-davidson-pp-protocol.txt
+draft-davidson-pp-architecture.txt
+draft-svaldez-pp-http-api.txt
 *.html
 .DS_STORE
