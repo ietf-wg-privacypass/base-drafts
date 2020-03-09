@@ -5,5 +5,6 @@ draft-privacy-pass.txt
 draft-privacy-pass.html
 metadata.min.js
 *.txt
+!releases
 *.html
 .DS_STORE
