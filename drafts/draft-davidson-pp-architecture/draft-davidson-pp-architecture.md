@@ -1,7 +1,7 @@
 ---
 title: "Privacy Pass: Architectural Framework"
 abbrev: PP protocol
-docname: draft-pp-protocol-latest
+docname: draft-davidson-pp-architecture-latest
 date:
 category: info
 
