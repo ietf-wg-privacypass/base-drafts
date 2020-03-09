@@ -1,6 +1,6 @@
 ---
 title: "Privacy Pass: Architectural Framework"
-abbrev: PP protocol
+abbrev: PP architecture
 docname: draft-davidson-pp-architecture-latest
 date:
 category: info
@@ -517,8 +517,8 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Return: a boolean, indicating whether the config was successfully
   retrieved.
 - Steps:
-  1. Construct a `config_retrieval` message using:
-     1. `<server_id> = msg.server_id`;
+  1. Construct a `config_retrieval` message using
+     `<server_id>=msg.server_id`.
   2. Send the `config_retrieval` message to the
      `GLOBAL_CONFIG_RETRIEVAL` interface, and receive a reply `resp` of
      type `config_retrieval_resp`.
@@ -541,8 +541,8 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   7. Construct a `client_token_retrieval` where
 
      ~~~
-     ciphersuite = resp[0].ciphersuite
-     comm_id = resp[0].comm_id
+        ciphersuite = resp[0].ciphersuite
+        comm_id = resp[0].comm_id
      ~~~
 
      and send it to the `CLIENT_TOKEN_RETRIEVAL` interface. Receive back
@@ -553,8 +553,8 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      where:
 
      ~~~
-     ciphersuite = resp[1].ciphersuite
-     comm_id = resp[1].comm_id
+        ciphersuite = resp[1].ciphersuite
+        comm_id = resp[1].comm_id
      ~~~
 
      and send it to the `CLIENT_TOKEN_RETRIEVAL` interface. Receive back
