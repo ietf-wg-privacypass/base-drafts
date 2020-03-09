@@ -26,7 +26,7 @@ normative:
   RFC8446:
   draft-davidson-pp-protocol:
     title: "Privacy Pass: The Protocol"
-    target: https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-davidson-pp-protocol
+    target: https://tools.ietf.org/html/draft-davidson-pp-protocol-00
     author:
       ins: A. Davidson
       org: Cloudflare Portugal
@@ -250,8 +250,8 @@ functional API:
 As per usual, we assume that any signature produced by the `.sign`
 function produces a result of `true` when verifying using `.verify`.
 Likewise, the scheme should also satisfy the well-known security
-property of existential unforgeability (TODO: IETF/IRTF citation?).
-Valid instantiations include DSA (and ECDSA) {{X9.62}}.
+property of existential unforgeability. Valid instantiations include DSA
+(and ECDSA) {{X9.62}}.
 
 ## Clients {#ecosystem-clients}
 
@@ -372,7 +372,7 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
        `0` indicates that no functionality is supported; `1` indicates
        that the server supports the issuance phase; `2` indicates
        support for the redemption phase; and `3` indicates support for
-       both phases. If unspecifed, this defaults to `3`.
+       both phases. If unspecified, this defaults to `3`.
     5. The value of `<config>` is set to be equal to `update`.
     5. The value `<signature>` is computed over the bytes of the rest of
        message contents, using the Server long-term secret signing key
