@@ -1,7 +1,7 @@
 ---
 title: "Privacy Pass: HTTP API"
 abbrev: PP http api
-docname: draft-pp-http-api-latest
+docname: draft-svaldez-pp-http-api-latest
 date:
 category: info
 
@@ -34,13 +34,13 @@ normative:
         org: The Varnish Cache Project
   draft-davidson-pp-protocol:
     title: "Privacy Pass: The Protocol"
-    target: https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-davidson-pp-protocol
+    target: https://tools.ietf.org/html/draft-davidson-pp-protocol-00
     author:
       ins: A. Davidson
       org: Cloudflare Portugal
   draft-davidson-pp-architecture:
     title: "Privacy Pass: Architectural Framework"
-    target: https://github.com/alxdavids/privacy-pass-ietf/master/drafts/draft-davidson-pp-architecture
+    target: https://tools.ietf.org/html/draft-davidson-pp-architecture-00
     author:
       ins: A. Davidson
       org: Cloudflare Portugal
@@ -50,9 +50,9 @@ normative:
 
 --- abstract
 
-This document specifies an integration for Privacy Pass over an HTTP API,
-along with recommendations on how key commitments are stored and accessed
-by HTTP-based consumers.
+This document specifies an integration for Privacy Pass over an HTTP
+API, along with recommendations on how key commitments are stored and
+accessed by HTTP-based consumers.
 
 --- middle
 
@@ -171,10 +171,10 @@ either the global registry or the server as described
 
 To avoid user segregation as a result of server configuration/commitment
 rotation, the log operator SHOULD enforce limits on how many active
-commitments exist and how quickly the commitments are being
-rotated. Clients SHOULD reject configurations/commitments that violate
-their requirements for avoiding user segregation. These considerations
-are discussed as part of {{draft-davidson-pp-architecture}}.
+commitments exist and how quickly the commitments are being rotated.
+Clients SHOULD reject configurations/commitments that violate their
+requirements for avoiding user segregation. These considerations are
+discussed as part of {{draft-davidson-pp-architecture}}.
 
 
 ## Server Configuration Retrieval {#config-retrieval}
@@ -184,8 +184,8 @@ Inputs:
 No outputs.
 
 1. The client makes an anonymous GET request to
-``CONFIG_ENDPOINT``/.well-known/privacy-pass with a message of type
-``fetch-config`` and a body of:
+   ``CONFIG_ENDPOINT``/.well-known/privacy-pass with a message of type
+   ``fetch-config`` and a body of:
 
 ~~~
 struct {
@@ -207,7 +207,7 @@ struct {
 ~~~
 
 3. The client then stores the associated configuration state under the
-corresponding ``server_origin``.
+   corresponding ``server_origin``.
 
 (TODO: This might be mergable with key commitment retrieval if server_id
 = server_origin)
@@ -238,8 +238,8 @@ struct {
 ~~~
 
 3. The server looks up the current configuration, and constructs a list
-of commitments to return, noting whether a key commitment is valid for
-issuance or redemption or both.
+   of commitments to return, noting whether a key commitment is valid
+   for issuance or redemption or both.
 
 4. The server then responds with a message of type ``commitment`` and a
    body of:
@@ -262,11 +262,12 @@ struct {
 ~~~
 
 5. The client then verifies the signature for each key commitment and
-stores the list of commitments to the current scope. The client SHOULD
-NOT cache the commitments beyond the current scope, as new commitments
-should be fetched for each independent issuance and redemption
-request. The client SHOULD verify the ``inclusion_proofs`` to confirm
-that the key commitment has been submitted to a trusted registry.
+   stores the list of commitments to the current scope. The client
+   SHOULD NOT cache the commitments beyond the current scope, as new
+   commitments should be fetched for each independent issuance and
+   redemption request. The client SHOULD verify the ``inclusion_proofs``
+   to confirm that the key commitment has been submitted to a trusted
+   registry.
 
 # Privacy Pass Issuance {#issuance}
 
@@ -300,8 +301,8 @@ struct {
 ~~~
 
 4. The server, upon receipt of the ``request`` should call the
-   ``SERVER_ISSUE`` interface with the value of ``i_data`` with a
-   result of ``server_issue_resp``.
+   ``SERVER_ISSUE`` interface with the value of ``i_data`` with a result
+   of ``server_issue_resp``.
 
 
 5. The server should then respond to the POST request with a message of
@@ -328,10 +329,9 @@ struct {
 
 There are two forms of Privacy Pass redemption that could function under
 the HTTP API. Either passing along a token directly to the target
-endpoint, which would perform its own redemption
-{{token-redemption}}, or the client redeeming the token and
-passing the result along to the target endpoint. These two methods are
-described below.
+endpoint, which would perform its own redemption {{token-redemption}},
+or the client redeeming the token and passing the result along to the
+target endpoint. These two methods are described below.
 
 ## Generic Token Redemption {#token-redemption}
 
