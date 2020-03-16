@@ -1,0 +1,11 @@
+categories:
+  - title: Protocol
+    label: -protocol
+  - title: Architecture
+    label: -architecture
+  - title: HTTP API
+    label: -http-api
+change-template: - $TITLE (#$NUMBER)
+template: |
+  ## What’s Changed
+  $CHANGES

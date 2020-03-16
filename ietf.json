@@ -1,0 +1,12 @@
+{
+    "group": "privacy-pass",
+    "group_info": {
+        "name": "Privacy Pass",
+        "type": "non-wg",
+        "email": "privacy-pass@ietf.org",
+        "activity_exclude_labels": ["editorial"]
+    },
+    "repo_type": "specs",
+    "revisions_tagged": true,
+    "activity_summary_to": ["group_email"]
+}
