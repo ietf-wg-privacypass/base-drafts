@@ -231,7 +231,7 @@ clients and servers supporting the Privacy Pass protocol encounter.
 - At any one time, we assume that the Server uses only one configuration
   containing their ciphersuite choice along with their secret key data.
 - We assume that the client has access to a global directory of the
-  current configurations used by all Privacy Pass servers.
+  current public parts of the configurations used by all servers.
 
 The wider ecosystem that this protocol is employed in is described in
 {{draft-davidson-pp-architecture}}.
