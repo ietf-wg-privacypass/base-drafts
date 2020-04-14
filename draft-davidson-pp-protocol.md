@@ -225,8 +225,8 @@ describe the structure of protocol data types and messages.
 
 ## Basic assumptions
 
-We make only a few minimal assumptions about the environment that the
-clients and servers supporting the Privacy Pass protocol encounter.
+We make only a few minimal assumptions about the environment of the
+clients and servers supporting the Privacy Pass protocol.
 
 - At any one time, we assume that the Server uses only one configuration
   containing their ciphersuite choice along with their secret key data.
@@ -296,8 +296,8 @@ opaque PublicKey<1..2^32-1>;
 ### ServerUpdate {#pp-srv-cfg-update}
 
 The `ServerUpdate` struct contains the public information related to
-a new `ServerConfig` message from a server. This is sent either directly
-to clients, or indirectly via an update process.
+a new `ServerConfig` message received from a server. This is sent
+either directly to clients, or indirectly via an update process.
 
 ~~~
 struct {
@@ -571,9 +571,9 @@ Outputs:
 - `ERR_MAX_EVALS`: Error occurred when a client attempted to invoke
   server issuance with a number of inputs that is larger than
   server-specified max_evals value.
-- `ERR_PROOF_VALIDATION`: Error occurred when a client is unable to
+- `ERR_PROOF_VALIDATION`: Error occurred when a client attempted to
   verify the proof that is part of the server's response.
-- `ERR_DOUBLE_SPEND`: Error occured when a client has attempted to
+- `ERR_DOUBLE_SPEND`: Error occurred when a client has attempted to
   redeem a token that has already been used for authorization.
 
 # Generalized protocol overview {#overview}
@@ -602,13 +602,13 @@ the generated configuration, along with the public key, so that
 clients are aware of which configuration to use when interacting with
 the server.
 
-In situations where the number of clients are small, a server perform
+In situations where the number of clients are small, a server performs
 this action by sending the data to the client directly. But in situations
-where there is a large number of clients, the best way of doing is likely
-to be via posting this information in a public bulletin board. We assume
-that the server only has a single configuration in place at any one time.
-There are privacy restrictions related to this that are described in more
-detail in the architectural document {{draft-davidson-pp-architecture}}.
+where there is a large number of clients, the best way of doing this is
+likely to be via posting this information in a public bulletin board. We
+assume that the server only has a single configuration in place at any one
+time. There are privacy restrictions related to this that are described in
+more detail in the architectural document {{draft-davidson-pp-architecture}}.
 
 We give a diagrammatic representation of the initialisation phase below.
 
