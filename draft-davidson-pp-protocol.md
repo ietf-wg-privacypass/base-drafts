@@ -136,41 +136,33 @@ Such cases may only require a lightweight form of challenge (such as
 completing a CAPTCHA).
 
 In both cases, if a server issues cookies on successful completion of
-challenges, then the client can use this cookie to bypass future
-challenges for the lifetime of the cookie. The downside of this approach
-is that it provides the server with the ability to link all of the
-client's interactions that it witnesses. In these situations, the
-client's effective privacy is dramatically reduced.
+challenges, the client can use this cookie to bypass future challenges 
+for the lifetime of the cookie. The downside of this approach is that 
+it provides the server with the ability to link all of the client's 
+interactions that it witnesses. This reduces the client's effective
+privacy.
 
 The Privacy Pass protocol was initially introduced as a mechanism for
 authorizing clients that had already been authorized in the past,
 without compromising their privacy {{DGSTV18}}. The protocol works by
 providing client's with privacy-preserving re-authentication tokens for
-a particular server. The tokens are "privacy-preserving" in the sense
-that they cannot be linked back to the previous session where they were
-issued.
+a particular server. The protocol must satisfy two cryptographic security 
+requirements known as unlinkability and unforgeability. See 
+{{sec-requirements}} for more discussion of these requirements.
 
-The Internet performance company Cloudflare has already implemented
-server-side support for an initial version of the Privacy Pass protocol
-{{PPSRV}}, and client-side implementations also exist {{PPEXT}}. More
-recently, a number of applications have been built upon the protocol, or
-slight variants of it; see: {{TRUST}}, {{OpenPrivacy}},
-{{PrivateStorage}}. The protocol can be instantiated using a
-cryptographic primitive known as a verifiable oblivious pseudorandom
-function (VOPRF) for implementing the authorization mechanism. Such
-VOPRF protocols can be implemented already in prime-order groups, and
-constructions are currently being drafted in separate standardization
-processes {{I-D.irtf-cfrg-voprf}}.
+The Privacy Pass protocol can be instantiated using a cryptographic 
+primitive known as a verifiable oblivious pseudorandom function (VOPRF) 
+as the authorization mechanism. Such VOPRF protocols can be implemented 
+already in prime-order groups, and constructions are currently being 
+drafted in separate standardization processes {{I-D.irtf-cfrg-voprf}}.
 
 The Privacy Pass protocol is split into three stages. The first stage,
-initialisation, produces the global server configuration that is
+"initialisation," produces the global server configuration that is
 broadcast to (and stored by) all clients. The "issuance" phase provides
 the client with unlinkable tokens that can be used to initiate
-re-authorization with the server in the future. The redemption phase
+re-authorization with the server in the future. The "redemption" phase
 allows the client to redeem a given re-authorization token with the
-server that it interacted with during the issuance phase. In addition,
-the protocol must satisfy two cryptographic security requirements known
-as "unlinkability" and "unforgeability".
+server that it interacted with during the issuance phase. 
 
 This document will lay out the generic description of the protocol,
 along with a secure implementation based on the VOPRF primitive. It will
@@ -280,17 +272,17 @@ configuration that is used by the server.
 struct {
   opaque id<0..2^16-1>
   Ciphersuite ciphersuite;
-  SecretKey key<1..2^32-1>;
+  PrivateKey key<1..2^32-1>;
   PublicKey pub_key<1..2^32-1>;
-  opaque max_evals<0..255>;
+  uint64 max_evals;
 } ServerConfig;
 ~~~
 
-The `SecretKey` and `PublicKey` types are just wrappers around byte
+The `PrivateKey` and `PublicKey` types are just wrappers around byte
 arrays.
 
 ~~~
-opaque SecretKey<1..2^32-1>;
+opaque PrivateKey<1..2^32-1>;
 opaque PublicKey<1..2^32-1>;
 ~~~
 
@@ -305,7 +297,7 @@ struct {
   opaque id<0..2^16-1>
   Ciphersuite ciphersuite;
   PublicKey pub_key<1..2^32-1>;
-  opaque max_evals<0..255>;
+  uint64 max_evals;
 } ServerUpdate;
 ~~~
 
@@ -316,7 +308,7 @@ configuration that is used by the client.
 
 ~~~
 struct {
-  ServerUpdate s;
+  ServerUpdate state;
 } ClientConfig;
 ~~~
 
@@ -348,16 +340,16 @@ struct {
 } ClientIssuanceElement;
 ~~~
 
-### IssuanceMessage {#pp-cli-issue-message}
+### IssuanceRequest {#pp-cli-issue-message}
 
-The `IssuanceMessage` struct corresponds to the message that the
+The `IssuanceRequest` struct corresponds to the message that the
 client sends to the server during the issuance phase of the protocol
 ({{issuance-phase}}).
 
 ~~~
 struct {
   ClientIssuanceElement issue_element<1..n>
-} IssuanceMessage;
+} IssuanceRequest;
 ~~~
 
 In the above, `issue_element` is a vector of length `n`, where `n` is
@@ -378,7 +370,7 @@ struct {
 ~~~
 
 The value of `n` is determined by the length of the
-`ClientIssuanceElement` vector in the `IssuanceMessage` struct. The
+`ClientIssuanceElement` vector in the `IssuanceRequest` struct. The
 internal data types are described below.
 
 ~~~
@@ -407,9 +399,9 @@ struct {
 } RedemptionToken;
 ~~~
 
-### RedemptionMessage {#pp-redemption-message}
+### RedemptionRequest {#pp-redemption-message}
 
-The `RedemptionMessage` struct consists of the data that is sent by the
+The `RedemptionRequest` struct consists of the data that is sent by the
 client during the redemption phase of the protocol
 ({{redemption-phase}}).
 
@@ -418,13 +410,13 @@ struct {
   opaque data<1..2^32-1>;
   opaque tag<1..2^32-1>;
   opaque aux<1..2^16-1>;
-} RedemptionMessage;
+} RedemptionRequest;
 ~~~
 
 ### RedemptionResponse {#pp-redemption-response}
 
 The `RedemptionResponse` struct corresponds a boolean value indicating
-whether the `RedemptionMessage` sent by the client is valid, along with
+whether the `RedemptionRequest` sent by the client is valid, along with
 any associated data.
 
 ~~~
@@ -504,7 +496,7 @@ client.
 Inputs:
 
 - `srv_cfg`:           A `ServerConfig` struct.
-- `issuance_message`:  A `IssuanceMessage` struct.
+- `issuance_message`:  A `IssuanceRequest` struct.
 
 Outputs:
 
@@ -551,7 +543,7 @@ Inputs:
 
 Outputs:
 
-- `message`: A `RedemptionMessage` struct.
+- `message`: A `RedemptionRequest` struct.
 
 ### PP_Verify
 
@@ -561,7 +553,7 @@ whether the data sent by the client is valid.
 Inputs:
 
 - `srv_cfg`: A `ServerConfig` struct.
-- `message`: A `RedemptionMessage` struct.
+- `message`: A `RedemptionRequest` struct.
 
 Outputs:
 
@@ -1013,7 +1005,7 @@ For the explicit signatures of each of the functions, refer to
 4. data = token.data
 5. issued = token.issued.as_element();
 6. tag = ciph.VerifiableFinalize(data,issued,aux)
-7. Output RedemptionMessage {
+7. Output RedemptionRequest {
               data: data,
               tag: tag,
               aux: aux,
