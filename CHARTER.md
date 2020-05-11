@@ -28,7 +28,9 @@ specify a preliminary set of extensions, including Issuer-supplied
 metadata and alternative cryptographic instantiations that support
 public verifiability of Issued tokens, as well as any additional
 extensions that may arise in the future. Security and privacy properties
-of the protocol shall be well-documented.
+of the protocol shall be well-documented. Formal analysis of the
+protocol will ensure that the security and privacy properties of the
+protocol are well-understood and well-documented.
 
 Second, describe and develop protocol use cases and properties thereof.
 This includes, though is not limited to:
@@ -54,6 +56,13 @@ This includes, though is not limited to:
 Third, and finally, specify a HTTP-layer API for the protocol. This
 includes a common understanding of how Privacy Pass is integrated with
 HTTP requests and responses for web-based applications.
+
+The following milestones (along with the approximate dates of
+completion) will be used to judge the progress of the working group:
+
+- Specification of protocol & surrounding architecture - February 2021.
+- Specification of application-layer requirements (including HTTP integration) - June 2021.
+- Specification of HTTP browser API (in coordination with W3C) - October 2021.
 
 Note that the specifications developed by this working group will be
 informed by the following initial drafts:
