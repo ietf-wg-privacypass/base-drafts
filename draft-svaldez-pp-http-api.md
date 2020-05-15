@@ -347,7 +347,7 @@ Outputs:
 
 1. The client should call the ``CLIENT_REDEEM`` interface with
    ``server_id``, ``ciphersuite``, ``public_key``, ``token`` and
-   auxilary data of ``additional_data`` storing the resulting ``data``
+   auxiliary data of ``additional_data`` storing the resulting ``data``
    and ``tag``.
 
 2. The client makes a POST request to

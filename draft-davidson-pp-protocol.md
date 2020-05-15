@@ -117,29 +117,29 @@ protocol in the Internet setting.
 
 # Introduction
 
-A common problem on the internet is providing an effective mechanism for
-servers to derive trust from the clients that it interacts with, without
+A common problem on the Internet is providing an effective mechanism for
+servers to derive trust from clients they interact with, without
 hampering the accessibility of honest clients. Typically, this can be
 done by providing some sort of authorization challenge to the client. A
-client providing a correct solution to the challenge can be provided
-with a cookie. This cookie can be presented the next time it interacts
+client that correctly solves the challenge can be provided with a cookie.
+This cookie can be presented the next time the client interacts
 with the server. The resurfacing of this cookie allows the server to see
 that the client passed the authorization check in the past.
 Consequently, the server can re-authorize the client again immediately,
-without the need for the client to complete a new challenge.
+without the need for the client to solve a new challenge.
 
 In scenarios where clients need to identify themselves, the
-authorization challenge usually take the form of some sort of login
+authorization challenge usually takes the form of some sort of login
 procedure. Otherwise, the server may just want to verify that the client
-demonstrates some particular facet of behavior (such as being human).
-Such cases may only require a lightweight form of challenge (such as
-completing a CAPTCHA).
+demonstrates some particular facet of behavior (such as, for example,
+being human). Such cases may only require a lightweight form of
+challenge (such as completing a CAPTCHA).
 
 In both cases, if a server issues cookies on successful completion of
-challenges, then the client can use this cookie to bypass future
-challenges for the lifetime of the cookie. The downside of this approach
-is that it provides the server with the ability to link all of the
-client's interactions that it witnesses. In these situations, the
+challenges, the client can use this cookie to bypass future challenges
+presented during the lifetime of the cookie. The downside of this
+approach is that it provides the server with the ability to link all of
+the client's interactions it witnesses. In these situations, the
 client's effective privacy is dramatically reduced.
 
 The Privacy Pass protocol was initially introduced as a mechanism for
@@ -152,25 +152,25 @@ issued.
 
 The Internet performance company Cloudflare has already implemented
 server-side support for an initial version of the Privacy Pass protocol
-{{PPSRV}}, and client-side implementations also exist {{PPEXT}}. More
-recently, a number of applications have been built upon the protocol, or
-slight variants of it; see: {{TRUST}}, {{OpenPrivacy}},
+{{PPSRV}}, and a client-side implementations is also available {{PPEXT}}.
+More recently, a number of applications have been built upon the protocol,
+or upon slight variants of it; see: {{TRUST}}, {{OpenPrivacy}},
 {{PrivateStorage}}. The protocol can be instantiated using a
 cryptographic primitive known as a verifiable oblivious pseudorandom
 function (VOPRF) for implementing the authorization mechanism. Such
-VOPRF protocols can be implemented already in prime-order groups, and
+VOPRF protocols can be implemented over prime-order groups, and
 constructions are currently being drafted in separate standardization
 processes {{I-D.irtf-cfrg-voprf}}.
 
 The Privacy Pass protocol is split into three stages. The first stage,
 initialisation, produces the global server configuration that is
-broadcast to (and stored by) all clients. The "issuance" phase provides
-the client with unlinkable tokens that can be used to initiate
-re-authorization with the server in the future. The redemption phase
-allows the client to redeem a given re-authorization token with the
-server that it interacted with during the issuance phase. In addition,
-the protocol must satisfy two cryptographic security requirements known
-as "unlinkability" and "unforgeability".
+broadcast to (and stored by) all clients. The second stage,
+the "issuance" phase provides the client with unlinkable tokens that
+can be used to initiate re-authorization with the server in the future.
+The third stage, the redemption phase, allows the client to redeem a
+given re-authorization token with the server that it interacted with
+during the issuance phase. The protocol must satisfy two cryptographic
+security requirements known as "unlinkability" and "unforgeability".
 
 This document will lay out the generic description of the protocol,
 along with a secure implementation based on the VOPRF primitive. It will
@@ -216,9 +216,8 @@ The following terms are used throughout this document.
   by the protocol documented here (typically denoted S).
 - Client: An entity that seeks authorization from a server that supports
   interactions in the Privacy Pass protocol (typically denoted C).
-- Key: The private key used by the Server for authorizing client data.
-- Commitment: Alternative name for Server's public key corresponding to
-  the private key that they hold.
+- Key: The private key used by the Server for authorizing client data
+  (typically denoted key).
 
 We assume that all protocol messages are encoded into raw byte format
 before being sent. We use the TLS presentation language {{RFC8446}} to
@@ -226,13 +225,13 @@ describe the structure of protocol data types and messages.
 
 ## Basic assumptions
 
-We make only a few minimal assumptions about the environment that the
-clients and servers that support the Privacy Pass protocol.
+We make only a few minimal assumptions about the environment of the
+clients and servers supporting the Privacy Pass protocol.
 
 - At any one time, we assume that the Server uses only one configuration
   containing their ciphersuite choice along with their private key data.
 - We assume that the client has access to a global directory of the
-  current configurations used by all Privacy Pass servers.
+  current public parts of the configurations used by all servers.
 
 The wider ecosystem that this protocol is employed in is described in
 {{draft-davidson-pp-architecture}}.
@@ -251,8 +250,8 @@ the public API provided in {{I-D.irtf-cfrg-voprf}}.
 ## Data structures {#pp-structs}
 
 The following data structures are used throughout the Privacy Pass
-protocol and written in the TLS presentation language {{RFC8446}}. It is
-intended that any of these data structures can be written into
+protocol and are written in the TLS presentation language {{RFC8446}}. It
+is intended that any of these data structures can be written into
 widely-adopted encoding schemes such as those detailed in TLS
 {{RFC8446}}, CBOR {{RFC7049}}, and JSON {{RFC7159}}.
 
@@ -278,7 +277,7 @@ configuration that is used by the server.
 
 ~~~
 struct {
-  opaque id<0..2^16-1>
+  opaque s_id<0..2^16-1>
   Ciphersuite ciphersuite;
   PrivateKey key<1..2^32-1>;
   PublicKey pub_key<1..2^32-1>;
@@ -296,13 +295,13 @@ opaque PublicKey<1..2^32-1>;
 
 ### ServerUpdate {#pp-srv-cfg-update}
 
-The `ServerUpdate` struct contains the public information related to the
-creation of a new `ServerConfig` message. This is sent either directly
-to clients, or indirectly via an update process.
+The `ServerUpdate` struct contains the public information related to
+a new `ServerConfig` message received from a server. This is sent
+either directly to clients, or indirectly via an update process.
 
 ~~~
 struct {
-  opaque id<0..2^16-1>
+  opaque s_id<0..2^16-1>
   Ciphersuite ciphersuite;
   PublicKey pub_key<1..2^32-1>;
   opaque max_evals<0..255>;
@@ -316,19 +315,19 @@ configuration that is used by the client.
 
 ~~~
 struct {
-  ServerUpdate s;
+  ServerUpdate s_update;
 } ClientConfig;
 ~~~
 
 ### ClientIssuanceInput {#pp-cli-issue-input}
 
 The `ClientIssuanceInput` struct describes the data that is generated by
-the client, that is necessary in sending to and processing issuance data
-received from the server.
+the client, that is necessary for sending to and for processing issuance
+data received from the server.
 
 ~~~
 struct {
-  ClientIssuanceProcessing client_data;
+  ClientIssuanceProcessing client_process_data;
   ClientIssuanceElement msg_data;
 } ClientIssuanceInput;
 ~~~
@@ -348,38 +347,37 @@ struct {
 } ClientIssuanceElement;
 ~~~
 
-### IssuanceMessage {#pp-cli-issue-message}
+### ClientIssuanceMessage {#pp-cli-issue-message}
 
-The `IssuanceMessage` struct corresponds to the message that the
+The `ClientIssuanceMessage` struct corresponds to the message that the
 client sends to the server during the issuance phase of the protocol
 ({{issuance-phase}}).
 
 ~~~
 struct {
   ClientIssuanceElement issue_element<1..n>
-} IssuanceMessage;
+} ClientIssuanceMessage;
 ~~~
 
-In the above, `issue_element` is a vector of length `n`, where `n` is
-some value that must satisfy `n =< m` for `m = max_evals` that is
-specified in the `ServerConfig`.
+In the above struct, the `issue_element` variable is a vector of
+length `n`, where `n` is some value that must
+satisfy `n =< m` for `m = max_evals`, as specified in `ServerConfig`.
 
-### IssuanceResponse {#pp-srv-issue-response}
+### ServerIssuanceResponse {#pp-srv-issue-response}
 
-The `IssuanceResponse` struct describes the data that returned by
-the server, derived from the issuance message that is sent by the
-client.
+The `ServerIssuanceResponse` struct describes the data returned by the
+server that is derived from the issuance message sent by the client.
 
 ~~~
 struct {
   ServerEvaluation evaluation<1..n>;
   ServerProof proof;
-} IssuanceResponse;
+} ServerIssuanceResponse;
 ~~~
 
 The value of `n` is determined by the length of the
-`ClientIssuanceElement` vector in the `IssuanceMessage` struct. The
-internal data types are described below.
+`ClientIssuanceElement` vector in the `ClientIssuanceMessage` struct.
+The internal data types are described below:
 
 ~~~
 struct {
@@ -398,7 +396,7 @@ struct {
 The `RedemptionToken` struct contains the data required to generate the
 client message in the redemption phase of the Privacy Pass protocol.
 This data is generated in the issuance phase of the protocol, after
-receiving the `IssuanceResponse` message.
+receiving the `ServerIssuanceResponse` message.
 
 ~~~
 struct {
@@ -407,7 +405,7 @@ struct {
 } RedemptionToken;
 ~~~
 
-### RedemptionMessage {#pp-redemption-message}
+### ClientRedemptionMessage {#pp-redemption-message}
 
 The `RedemptionMessage` struct consists of the data that is sent by the
 client during the redemption phase of the protocol
@@ -418,20 +416,20 @@ struct {
   opaque data<1..2^32-1>;
   opaque tag<1..2^32-1>;
   opaque aux<1..2^16-1>;
-} RedemptionMessage;
+} ClientRedemptionMessage;
 ~~~
 
-### RedemptionResponse {#pp-redemption-response}
+### ServerRedemptionResponse {#pp-redemption-response}
 
-The `RedemptionResponse` struct corresponds a boolean value indicating
-whether the `RedemptionMessage` sent by the client is valid, along with
-any associated data.
+The `ServerRedemptionResponse` struct corresponds to a boolean value
+that indicates whether the `ClientRedemptionMessage` sent by the client
+is valid. It can also contain any associated data.
 
 ~~~
 struct {
   boolean success;
   opaque additional_data<1..2^32-1>;
-} RedemptionResponse;
+} ServerRedemptionResponse;
 ~~~
 
 ## API functions {#pp-functions}
@@ -439,23 +437,22 @@ struct {
 The following functions wrap the core of the functionality required in
 the Privacy Pass protocol. For each of the descriptions, we essentially
 provide the function signature, leaving the actual contents to be
-provided by specific instantiations or extensions.
+defined by specific instantiations or extensions of the protocol.
 
 ### PP_Server_Setup
 
-Run by the Privacy Pass server to generate its configuration. The
-key-pair used in the server configuration are generated fresh on each
-invocation.
+Run by the server to generate its configuration. The key-pair used in
+the server configuration is generated fresh on each invocation.
 
 Inputs:
 
-- `id`:  A unique identifier corresponding to the setting of
-  `ServerConfig.id`.
+- `s_id`:  A unique identifier corresponding to the setting of
+  `ServerConfig.s_id`.
 
 Outputs:
 
-- `cfg`:    A `ServerConfig` struct ({{pp-srv-cfg-struct}}).
-- `update`: A `ServerUpdate` struct.
+- `s_cfg`:  A `ServerConfig` struct ({{pp-srv-cfg-struct}}).
+- `s_update`: A `ServerUpdate` struct.
 
 Throws:
 
@@ -463,19 +460,19 @@ Throws:
 
 ### PP_Client_Setup
 
-Run by the Privacy Pass client to generate its configuration. The input
+Run by the client to generate its configuration. The input
 public key `pub_key` in the client configuration MUST correspond to a
-valid server public key.
+valid server's public key.
 
 Inputs:
 
-- `id`:      A unique identifier corresponding to the setting of
-            `ServerConfig.id`.
-- `update`:  A `ServerUpdate` struct.
+- `s_id`:      A unique identifier corresponding to the setting of
+            `ServerConfig.s_id`.
+- `s_update`:  A `ServerUpdate` struct.
 
 Outputs:
 
-- `cfg`:     A `ClientConfig` struct ({{pp-cli-cfg-struct}}).
+- `cli_cfg`:   A `ClientConfig` struct ({{pp-cli-cfg-struct}}).
 
 Throws:
 
@@ -503,12 +500,12 @@ client.
 
 Inputs:
 
-- `srv_cfg`:           A `ServerConfig` struct.
-- `issuance_message`:  A `IssuanceMessage` struct.
+- `s_cfg`:             A `ServerConfig` struct.
+- `issuance_message`:  A `ClientIssuanceMessage` struct.
 
 Outputs:
 
-- `issuance_response`: A `IssuanceResponse` struct.
+- `issuance_response`: A `ServerIssuanceResponse` struct.
 
 Throws:
 
@@ -524,14 +521,14 @@ computation in `PP_Issue`.
 Inputs:
 
 - `cli_cfg`:           A `ClientConfig` struct.
-- `issuance_response`: A `IssuanceResponse` struct.
+- `issuance_response`: A `ServerIssuanceResponse` struct.
 - `processing_data`:   A `ClientIssuanceProcessing` struct.
 
 Outputs:
 
-- `tokens`: A vector of `RedemptionToken` structs, length equal to the
-  length of the `ServerEvaluation` vector in the
-  `IssuanceResponse` struct.
+- `tokens`: A vector of `RedemptionToken` structs, which length is
+  equal to the length of the `ServerEvaluation` vector in the
+  `ServerIssuanceResponse` struct.
 
 Throws:
 
@@ -551,7 +548,7 @@ Inputs:
 
 Outputs:
 
-- `message`: A `RedemptionMessage` struct.
+- `message`: A `ClientRedemptionMessage` struct.
 
 ### PP_Verify
 
@@ -560,27 +557,28 @@ whether the data sent by the client is valid.
 
 Inputs:
 
-- `srv_cfg`: A `ServerConfig` struct.
-- `message`: A `RedemptionMessage` struct.
+- `s_cfg`:   A `ServerConfig` struct.
+- `message`: A `ClientRedemptionMessage` struct.
 
 Outputs:
 
-- `response`: A `RedemptionResponse` struct.
+- `response`: A `ServerRedemptionResponse` struct.
 
 ## Error types {#errors}
 
 - `ERR_UNSUPPORTED_CONFIG`: Error occurred when trying to recover
   configuration with unknown identifier
-- `ERR_MAX_EVALS`: Client attempted to invoke server issuance with
-  number of inputs that is larger than server-specified max_evals value.
-- `ERR_PROOF_VALIDATION`: Client unable to verify proof that is part of
-  the server response.
-- `ERR_DOUBLE_SPEND`: Indicates that a client has attempted to redeem a
-  token that has already been used for authorization.
+- `ERR_MAX_EVALS`: Error occurred when a client attempted to invoke
+  server issuance with a number of inputs that is larger than
+  server-specified max_evals value.
+- `ERR_PROOF_VALIDATION`: Error occurred when a client attempted to
+  verify the proof that is part of the server's response.
+- `ERR_DOUBLE_SPEND`: Error occurred when a client has attempted to
+  redeem a token that has already been used for authorization.
 
 # Generalized protocol overview {#overview}
 
-In this document, we wan to provide a client (C) with the capability to
+In this document, we want to provide a client (C) with the capability to
 authenticate itself in a lightweight manner to a server (S). The
 authorization mechanism should not reveal to the server anything about
 the client; in addition, the client should not be able to forge valid
@@ -600,38 +598,38 @@ what is specified in {{I-D.irtf-cfrg-voprf}}.
 
 In the initialisation phase, the server generates the configuration that
 it will use for future instantiations of the protocol. It MUST broadcast
-the configuration that it generates, along with the public key, so that
+the generated configuration, along with the public key, so that
 clients are aware of which configuration to use when interacting with
 the server.
 
-In situations where the number of clients are small, it could do this by
-sending the data to the client directly. But in situations where there
-is a large number of clients, the best way of doing is likely to be via
-posting this information to a public bulletin board. We assume that the
-server only has a single configuration in place at any one time. There
-are privacy restrictions related to this that are described in more
-detail in the architectural document {{draft-davidson-pp-architecture}}.
+In situations where the number of clients are small, a server performs
+this action by sending the data to the client directly. But in situations
+where there is a large number of clients, the best way of doing this is
+likely to be via posting this information in a public bulletin board. We
+assume that the server only has a single configuration in place at any one
+time. There are privacy restrictions related to this that are described in
+more detail in the architectural document {{draft-davidson-pp-architecture}}.
 
 We give a diagrammatic representation of the initialisation phase below.
 
 ~~~
-  C(cfgs)                                                   S(cfg_id)
+  C(cfgs)                                                     S(s_id)
   -------------------------------------------------------------------
-                              (cfg, update) = PP_Server_Setup(cfg_id)
+                            (s_cfg, s_update) = PP_Server_Setup(s_id)
 
-                             update
+                            s_update
                       <-------------------
 
-  c_cfg = PP_Client_Setup(cfg_id,update)
-  cfgs.set(update.id,c_cfg)
+  c_cfg = PP_Client_Setup(s_id,s_update)
+  cfgs.set(update.s_id,c_cfg)
 ~~~
 
 In the following (and as above), we will assume that the server `S` is
-uniquely identifiable by an internal attribute `id`. We assume the same
-internal attribute exists for the public key `s_cfg.pub_key`. This can
-be obtained, for example, by hashing the contents of the object --
-either the name or underlying contained bytes -- using a
-collision-resistant hash function, such as SHA256.
+uniquely identifiable by an internal attribute `s_id`. We assume the same
+internal attribute exists for the public key `s_cfg.pub_key`. This id
+for the public key can be obtained, for example, by hashing the contents
+of the object --either the name or underlying contained bytes -- using a
+collision-resistant hash function, such as SHA-256.
 
 Note that the client stores their own configuration in the map `cfgs`
 for future Privacy Pass interactions with `S`.
@@ -646,13 +644,13 @@ protocol below.
 ~~~
   C(cfgs,store,m)                                            S(s_cfg)
   -------------------------------------------------------------------
-                              S.id
+                              S.s_id
                       <------------------
 
-  c_cfg = cfgs.get(S.id)
+  c_cfg = cfgs.get(S.s_id)
   issue_input = PP_Generate(c_cfg, m)
   msg = issue_input.msg_data
-  process = issue_input.client_data
+  process = issue_input.client_process_data
 
                                msg
                       ------------------->
@@ -663,13 +661,13 @@ protocol below.
                       <-------------------
 
   tokens = PP_Process(c_cfg,issue_resp,process)
-  store[S.id].push(tokens)
+  store[S.s_id].push(tokens)
 ~~~
 
 In the diagram above, the client MUST know the supported server
 configuration before it interacts with the Privacy Pass API. The client
 input `store` is used for appending redemption tokens that are linked to
-the server id `S.id`.
+the server id `S.s_id`.
 
 ## Redemption phase {#redemption-phase}
 
@@ -685,19 +683,19 @@ session.
                                S.id
                         <------------------
 
-  c_cfg = cfgs.get(S.id)
-  token = store[S.id].pop()
+  c_cfg = cfgs.get(S.s_id)
+  token = store[S.s_id].pop()
   msg = PP_Redeem(c_cfg,token,aux)
 
                                msg
                         ------------------>
 
-                               if (ds_idx.includes(data)) {
+                               if (ds_idx.includes(msg.data)) {
                                  panic(ERR_DOUBLE_SPEND)
                                }
-                               resp = PP_Verify(srv_cfg,data,tag,aux)
+                               resp = PP_Verify(s_cfg,msg)
                                if (resp.success) {
-                                 ds_idx.push(data)
+                                 ds_idx.push(msg.data)
                                }
 
                                 resp
@@ -710,7 +708,7 @@ the redemption request to the specific session. We RECOMMEND that `aux`
 is constructed as the following concatenated byte-encoded data:
 
 ~~~
-${C.id} .. ${S.id} .. ${current_time()} .. ${requested_resource()}
+${C.s_id} .. ${S.s_id} .. ${current_time()} .. ${requested_resource()}
 ~~~
 
 The usage of `current_time()` allows the server to check that the
@@ -721,9 +719,9 @@ order to trigger the authorization request.
 
 ### Double-spend protection
 
-To protect against clients that attempt to spend a value `data` more
+To protect against clients that attempt to spend a value `msg.data` more
 than once, the server uses an index, `ds_idx`, to collect valid inputs
-and then check against in future protocols. Since this store needs to
+and then check against it in future sessions. Since this store needs to
 only be optimized for storage and querying, a structure such as a Bloom
 filter suffices. Importantly, the server MUST only eject this storage
 after a key rotation occurs since all previous client data will be
@@ -766,13 +764,13 @@ session, to any previous issuance session that it has encountered.
 
 Formally speaking the security model is the following:
 
-- The adversary runs `PP_Server_Setup` and generates a key-pair `(k,
-  pk)`.
+- The adversary runs `PP_Server_Setup` and generates a key-pair `(key,
+  pub_key)`.
 - The adversary specifies a number `Q` of issuance phases to initiate,
   where each phase `i in 1..Q` consists of `m_i` server evaluations.
 - The adversary runs `PP_Issue` using the key-pair that it generated on
   each of the client messages in the issuance phase.
-- When the adversary wants it stops the issuance phase, and a random
+- When the adversary wants, it stops the issuance phase, and a random
   number `l` is picked from `1..Q`.
 - A redemption phase is initiated with a single token with index `i`
   randomly sampled from `1..m_l`.
@@ -795,8 +793,8 @@ responses that it sees.
 The security model takes the following form:
 
 - A server is created that runs `PP_Server_Setup` and broadcasts the
-  `ServerUpdate` message `update`.
-- The adversary runs `PP_Client_Setup` on `update`.
+  `ServerUpdate` message `s_update`.
+- The adversary runs `PP_Client_Setup` on `s_update`.
 - The adversary specifies a number `Q` of issuance phases to initiate
   with the server, where each phase `i in 1..Q` consists of `m_i` server
   evaluations. Let `m = sum(m_i)` where `i in 1..Q`.
@@ -834,7 +832,7 @@ in {{DGSTV18}} and {{KLOR20}}.
 
 ## VOPRF conventions
 
-The VOPRF ciphersuite {{I-D.irtf-cfrg-voprf}} that is used determines
+The VOPRF ciphersuite {{I-D.irtf-cfrg-voprf}} used determines
 the member functions and prime-order group used by the protocol. We
 detail a number of specific conventions here that we use for interacting
 with the specific ciphersuite.
@@ -907,20 +905,20 @@ For the explicit signatures of each of the functions, refer to
 3. (k,Y,GG) = ciph.VerifiableSetup()
 4. key = k.as_bytes()
 5. pub_key = Y.as_bytes()
-6. cfg = ServerConfig {
-             id: id
+6. s_cfg = ServerConfig {
+             s_id: id
              ciphersuite: ciph,
              key: key,
              pub_key: pub_key,
              max_evals: max_evals
          }
-7. update = ServerUpdate {
-                id: id
+7. s_update = ServerUpdate {
+                s_id: id
                 ciphersuite: ciph,
                 pub_key: pub_key,
                 max_evals: max_evals
             }
-8. Output (cfg, update)
+8. Output (s_cfg, s_update)
 ~~~
 
 ### PP_Client_Setup
@@ -929,9 +927,9 @@ For the explicit signatures of each of the functions, refer to
 1. ciph = recover_ciphersuite_from_id(id)
 2. if ciph == null: panic(ERR_UNSUPPORTED_CONFIG)
 3. cfg = ClientConfig {
-            s: update
+            s_update: s_update
          }
-4. Output cfg
+4. Output cli_cfg
 ~~~
 
 ### PP_Generate
@@ -962,8 +960,8 @@ For the explicit signatures of each of the functions, refer to
 ### PP_Issue
 
 ~~~
-1. ciph = srv_cfg.ciphersuite
-2. pk = srv_cfg.pub_key.as_element()
+1. ciph = s_cfg.ciphersuite
+2. pk = s_cfg.pub_key.as_element()
 3. GG = ciph.group()
 4. m = msg_data.length
 5. if m > max_evals: panic(ERR_MAX_EVALS)
@@ -1023,9 +1021,9 @@ For the explicit signatures of each of the functions, refer to
 ### PP_Verify
 
 ~~~
-1. ciph = srv_cfg.ciphersuite
+1. ciph = s_cfg.ciphersuite
 2. GG = ciph.group()
-3. key = srv_cfg.key
+3. key = s_cfg.key
 4. T = ciph.H1(msg.data)
 5. N' = ciph.Eval(key,T)
 6. tag' = ciph.Finalize(msg.data,N',msg.aux)
@@ -1056,7 +1054,7 @@ notion of unforgeability, where the adversary is granted a verification
 oracle, under the chosen-target Diffie-Hellman assumption.
 
 Note that the existing security proofs do not leverage the VOPRF
-primitive as a black-box in the security reductions. Instead it relies
+primitive as a black-box in the security reductions. Instead, it relies
 on the underlying operations in a non-black-box manner. Hence, an
 explicit reduction from the generic VOPRF primitive to the Privacy Pass
 protocol would strengthen these security guarantees.
