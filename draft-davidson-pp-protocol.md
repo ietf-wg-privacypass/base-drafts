@@ -216,9 +216,9 @@ The following terms are used throughout this document.
   by the protocol documented here (typically denoted S).
 - Client: An entity that seeks authorization from a server that supports
   interactions in the Privacy Pass protocol (typically denoted C).
-- Key: The secret key used by the Server for authorizing client data.
+- Key: The private key used by the Server for authorizing client data.
 - Commitment: Alternative name for Server's public key corresponding to
-  the secret key that they hold.
+  the private key that they hold.
 
 We assume that all protocol messages are encoded into raw byte format
 before being sent. We use the TLS presentation language {{RFC8446}} to
@@ -230,7 +230,7 @@ We make only a few minimal assumptions about the environment that the
 clients and servers that support the Privacy Pass protocol.
 
 - At any one time, we assume that the Server uses only one configuration
-  containing their ciphersuite choice along with their secret key data.
+  containing their ciphersuite choice along with their private key data.
 - We assume that the client has access to a global directory of the
   current configurations used by all Privacy Pass servers.
 
@@ -280,17 +280,17 @@ configuration that is used by the server.
 struct {
   opaque id<0..2^16-1>
   Ciphersuite ciphersuite;
-  SecretKey key<1..2^32-1>;
+  PrivateKey key<1..2^32-1>;
   PublicKey pub_key<1..2^32-1>;
   opaque max_evals<0..255>;
 } ServerConfig;
 ~~~
 
-The `SecretKey` and `PublicKey` types are just wrappers around byte
+The `PrivateKey` and `PublicKey` types are just wrappers around byte
 arrays.
 
 ~~~
-opaque SecretKey<1..2^32-1>;
+opaque PrivateKey<1..2^32-1>;
 opaque PublicKey<1..2^32-1>;
 ~~~
 
