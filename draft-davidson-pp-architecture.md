@@ -324,20 +324,20 @@ the generic protocol. These functions can be split into server and
 client functionality.
 
 1. Server functionality:
-   - `PP_Server_Setup`: Generates server configuration and keys
-   - `PP_Issue`: Run on the contents of the client message in the
+   - `ServerSetup`: Generates server configuration and keys
+   - `Issue`: Run on the contents of the client message in the
      issuance phase.
-   - `PP_Verify`: Run on the contents of the client message in the
+   - `Verify`: Run on the contents of the client message in the
      redemption phase.
 
 2. Client functionality:
-   - `PP_Client_Setup`: Generates the client configuration based on the
+   - `ClientSetup`: Generates the client configuration based on the
      configuration used by a given server.
-   - `PP_Generate`: Generates public and private data associated with
+   - `Generate`: Generates public and private data associated with
      the contents of the client message in the issuance phase.
-   - `PP_Process`: Processes the contents of the server response in the
+   - `Process`: Processes the contents of the server response in the
      issuance phase.
-   - `PP_Redeem`: Generates the data that forms the client message in
+   - `Redeem`: Generates the data that forms the client message in
      the redemption phase.
 
 We will use each of the functions internally in the description of the
@@ -358,7 +358,7 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
   {{draft-davidson-pp-protocol}} for valid configurations).
 - Returns: a boolean `b`, indicating success.
 - Steps:
-  1. Run `(cfg, update) = PP_Server_Setup(id)`.
+  1. Run `(cfg, update) = ServerSetup(id)`.
   2. Construct a `config_update` message.
     1. The value `<server_id>` is the unique identifier for the Server.
     2. The value of `<expiry_time>` should be a point in the future
@@ -450,7 +450,7 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
   2. Run the following:
 
      ~~~
-        issue_resp = PP_Issue(srv_cfg, msg.issue_data)
+        issue_resp = Issue(srv_cfg, msg.issue_data)
      ~~~
 
   3. Returns a `server_issue_resp` message with `<data>=issue_resp`
@@ -473,9 +473,9 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
   3. Run the following:
 
      ~~~
-        resp = PP_Verify(configs[0],message)
+        resp = Verify(configs[0],message)
         if (!resp.success) {
-          resp = PP_Verify(configs[1],message)
+          resp = Verify(configs[1],message)
         }
      ~~~
 
@@ -606,13 +606,13 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. The client runs:
 
      ~~~
-        cli_cfg = PP_Client_Setup(msg.ciphersuite, msg.config)
+        cli_cfg = ClientSetup(msg.ciphersuite, msg.config)
      ~~~
 
   2. The client runs:
 
      ~~~
-        issue_input = PP_Generate(cli_cfg, m)
+        issue_input = Generate(cli_cfg, m)
      ~~~
 
      where `m` is an integer corresponding to the number of tokens that
@@ -641,7 +641,7 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   3. The client runs:
 
      ~~~
-      tokens = PP_Process(cli_cfg,(msg.evals, msg.proof),tmp.g_data)
+      tokens = Process(cli_cfg,(msg.evals, msg.proof),tmp.g_data)
      ~~~
 
   4. The client constructs a `client_token_storage` message and sends it
@@ -658,13 +658,13 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
   1. The client runs:
 
      ~~~
-        cli_cfg = PP_Client_Setup(msg.ciphersuite, msg.config)
+        cli_cfg = ClientSetup(msg.ciphersuite, msg.config)
      ~~~
 
   2. The client generates arbitrary auxiliary data `aux` and runs:
 
      ~~~
-        tag = PP_Redeem(cli_cfg, msg.token, aux)
+        tag = Redeem(cli_cfg, msg.token, aux)
      ~~~
 
   3. The client constructs a `client_redeem` message and sends it to the

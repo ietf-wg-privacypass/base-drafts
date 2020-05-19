@@ -439,7 +439,7 @@ the Privacy Pass protocol. For each of the descriptions, we essentially
 provide the function signature, leaving the actual contents to be
 defined by specific instantiations or extensions of the protocol.
 
-### PP_Server_Setup
+### ServerSetup
 
 Run by the server to generate its configuration. The key-pair used in
 the server configuration is generated fresh on each invocation.
@@ -458,7 +458,7 @@ Throws:
 
 - `ERR_UNSUPPORTED_CONFIG` ({{errors}})
 
-### PP_Client_Setup
+### ClientSetup
 
 Run by the client to generate its configuration. The input
 public key `pub_key` in the client configuration MUST correspond to a
@@ -478,7 +478,7 @@ Throws:
 
 - `ERR_UNSUPPORTED_CONFIG` ({{errors}})
 
-### PP_Generate
+### Generate
 
 A function run by the client to generate the initial data that is used
 as its input in the Privacy Pass protocol.
@@ -493,7 +493,7 @@ Outputs:
 
 - `issuance_data`: A `ClientIssuanceInput` struct.
 
-### PP_Issue
+### Issue
 
 A function run by the server to issue valid redemption tokens to the
 client.
@@ -511,12 +511,12 @@ Throws:
 
 - `ERR_MAX_EVALS` ({{errors}})
 
-### PP_Process
+### Process
 
 Run by the client when processing the server response in the issuance
 phase of the protocol. The output of this function is an array of
 `RedemptionToken` objects that are unlinkable from the server's
-computation in `PP_Issue`.
+computation in `Issue`.
 
 Inputs:
 
@@ -534,7 +534,7 @@ Throws:
 
 - `ERR_PROOF_VALIDATION` ({{errors}})
 
-### PP_Redeem
+### Redeem
 
 Run by the client in the redemption phase of the protocol to generate
 the client's message.
@@ -550,7 +550,7 @@ Outputs:
 
 - `message`: A `ClientRedemptionMessage` struct.
 
-### PP_Verify
+### Verify
 
 Run by the server in the redemption phase of the protocol. Determines
 whether the data sent by the client is valid.
@@ -615,12 +615,12 @@ We give a diagrammatic representation of the initialisation phase below.
 ~~~
   C(cfgs)                                                     S(s_id)
   -------------------------------------------------------------------
-                            (s_cfg, s_update) = PP_Server_Setup(s_id)
+                            (s_cfg, s_update) = ServerSetup(s_id)
 
                             s_update
                       <-------------------
 
-  c_cfg = PP_Client_Setup(s_id,s_update)
+  c_cfg = ClientSetup(s_id,s_update)
   cfgs.set(update.s_id,c_cfg)
 ~~~
 
@@ -648,19 +648,19 @@ protocol below.
                       <------------------
 
   c_cfg = cfgs.get(S.s_id)
-  issue_input = PP_Generate(c_cfg, m)
+  issue_input = Generate(c_cfg, m)
   msg = issue_input.msg_data
   process = issue_input.client_process_data
 
                                msg
                       ------------------->
 
-                                  issue_resp = PP_Issue(s_cfg,c_dat)
+                                  issue_resp = Issue(s_cfg,c_dat)
 
                            issue_resp
                       <-------------------
 
-  tokens = PP_Process(c_cfg,issue_resp,process)
+  tokens = Process(c_cfg,issue_resp,process)
   store[S.s_id].push(tokens)
 ~~~
 
@@ -685,7 +685,7 @@ session.
 
   c_cfg = cfgs.get(S.s_id)
   token = store[S.s_id].pop()
-  msg = PP_Redeem(c_cfg,token,aux)
+  msg = Redeem(c_cfg,token,aux)
 
                                msg
                         ------------------>
@@ -693,7 +693,7 @@ session.
                                if (ds_idx.includes(msg.data)) {
                                  panic(ERR_DOUBLE_SPEND)
                                }
-                               resp = PP_Verify(s_cfg,msg)
+                               resp = Verify(s_cfg,msg)
                                if (resp.success) {
                                  ds_idx.push(msg.data)
                                }
@@ -764,11 +764,11 @@ session, to any previous issuance session that it has encountered.
 
 Formally speaking the security model is the following:
 
-- The adversary runs `PP_Server_Setup` and generates a key-pair `(key,
+- The adversary runs `ServerSetup` and generates a key-pair `(key,
   pub_key)`.
 - The adversary specifies a number `Q` of issuance phases to initiate,
   where each phase `i in 1..Q` consists of `m_i` server evaluations.
-- The adversary runs `PP_Issue` using the key-pair that it generated on
+- The adversary runs `Issue` using the key-pair that it generated on
   each of the client messages in the issuance phase.
 - When the adversary wants, it stops the issuance phase, and a random
   number `l` is picked from `1..Q`.
@@ -792,9 +792,9 @@ responses that it sees.
 
 The security model takes the following form:
 
-- A server is created that runs `PP_Server_Setup` and broadcasts the
+- A server is created that runs `ServerSetup` and broadcasts the
   `ServerUpdate` message `s_update`.
-- The adversary runs `PP_Client_Setup` on `s_update`.
+- The adversary runs `ClientSetup` on `s_update`.
 - The adversary specifies a number `Q` of issuance phases to initiate
   with the server, where each phase `i in 1..Q` consists of `m_i` server
   evaluations. Let `m = sum(m_i)` where `i in 1..Q`.
@@ -897,7 +897,7 @@ data types.
 For the explicit signatures of each of the functions, refer to
 {{pp-functions}}.
 
-### PP_Server_Setup
+### ServerSetup
 
 ~~~
 1. ciph = recover_ciphersuite_from_id(id)
@@ -921,7 +921,7 @@ For the explicit signatures of each of the functions, refer to
 8. Output (s_cfg, s_update)
 ~~~
 
-### PP_Client_Setup
+### ClientSetup
 
 ~~~
 1. ciph = recover_ciphersuite_from_id(id)
@@ -932,7 +932,7 @@ For the explicit signatures of each of the functions, refer to
 4. Output cli_cfg
 ~~~
 
-### PP_Generate
+### Generate
 
 ~~~
 1. ciph = cli_cfg.s.ciphersuite
@@ -957,7 +957,7 @@ For the explicit signatures of each of the functions, refer to
           }
 ~~~
 
-### PP_Issue
+### Issue
 
 ~~~
 1. ciph = s_cfg.ciphersuite
@@ -982,7 +982,7 @@ For the explicit signatures of each of the functions, refer to
             }
 ~~~
 
-### PP_Process
+### Process
 
 ~~~
 1. ciph = cli_cfg.s.ciphersuite
@@ -1002,7 +1002,7 @@ For the explicit signatures of each of the functions, refer to
 12. Output tokens
 ~~~
 
-### PP_Redeem
+### Redeem
 
 ~~~
 1. ciph = cli_cfg.s.ciphersuite
@@ -1018,7 +1018,7 @@ For the explicit signatures of each of the functions, refer to
           }
 ~~~
 
-### PP_Verify
+### Verify
 
 ~~~
 1. ciph = s_cfg.ciphersuite
