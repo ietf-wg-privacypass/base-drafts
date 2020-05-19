@@ -157,7 +157,7 @@ already in prime-order groups, and constructions are currently being
 drafted in separate standardization processes {{I-D.irtf-cfrg-voprf}}.
 
 The Privacy Pass protocol is split into three stages. The first stage,
-"initialisation," produces the global server configuration that is
+"initialisation", produces the global server configuration that is
 broadcast to (and stored by) all clients. The "issuance" phase provides
 the client with unlinkable tokens that can be used to initiate
 re-authorization with the server in the future. The "redemption" phase
