@@ -5,8 +5,8 @@ mechanism for anonymous token creation and redemption. Servers (Issuers)
 create and later verify tokens that are redeemed by an ecosystem of
 clients, such that:
 
-- Any token granted by a given Issuer is unlinkable with all other
-  tokens granted by the same Issuer.
+- Any token granted by a given Issuer is indistinguishable from all
+  other tokens granted by the same Issuer key at redemption time.
 - Clients can verify that a token granted by an Issuer corresponds to a
   committed keypair.
 - Tokens are unforgeable.
@@ -20,16 +20,17 @@ Working Group can be split into three distinct goals:
 First, specify an extensible protocol for creating and redeeming
 anonymous and transferrable tokens. The protocol should permit suitable
 cryptographic ciphersuites and security parameterization for
-cryptographic agility. Negotiation of cryptographic parameters during
-the protocol is an application-specific property and thus out of scope
-for the Working Group. Specification of the underlying cryptographic
-algorithms or protocols is also out of scope. The Working Group will
-specify a preliminary set of extensions, including Issuer-supplied
-metadata and alternative cryptographic instantiations that support
-public verifiability of Issued tokens, as well as any additional
-extensions that may arise in the future. Security and privacy properties
-of the protocol shall be well-documented. Formal analysis of the
-protocol will ensure that the security and privacy properties of the
+cryptographic agility. The cryptographic profile used by the protocol
+participants will be determined by the specific instantiation of the
+protocol, and it will be chosen ahead of time. We will work closely with
+the CFRG to agree acceptable cryptographic ciphersuites and parameters
+that satisfy the security/privacy properties of the protocol. The
+Working Group will specify a preliminary set of extensions, including
+Issuer-supplied metadata and alternative cryptographic instantiations
+that support public verifiability of Issued tokens, as well as any
+additional extensions that may arise in the future. Security and privacy
+properties of the protocol shall be well-documented. Formal analysis of
+the protocol will ensure that the security and privacy properties of the
 protocol are well-understood and well-documented.
 
 Second, describe and develop protocol use cases and properties thereof.
@@ -61,8 +62,10 @@ The following milestones (along with the approximate dates of
 completion) will be used to judge the progress of the working group:
 
 - Specification of protocol & surrounding architecture - February 2021.
-- Specification of application-layer requirements (including HTTP integration) - June 2021.
-- Specification of HTTP browser API (in coordination with W3C) - October 2021.
+- Specification of application-layer requirements (including HTTP
+  integration) - June 2021.
+- Specification of HTTP browser API (in coordination with W3C) - October
+  2021.
 
 Note that the specifications developed by this working group will be
 informed by the following initial drafts:
