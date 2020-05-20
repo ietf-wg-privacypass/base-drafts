@@ -5,8 +5,8 @@ mechanism for anonymous token creation and redemption. Servers (Issuers)
 create and later verify tokens that are redeemed by an ecosystem of
 clients, such that:
 
-- Any token granted by a given Issuer is indistinguishable from all
-  other tokens granted by the same Issuer key at redemption time.
+- An Issues cannot link a redeemed token to one of N previously granted tokens
+  with probability non-negligibly larger than 1/N.
 - Clients can verify that a token granted by an Issuer corresponds to a
   committed keypair.
 - Tokens are unforgeable.
@@ -23,8 +23,8 @@ cryptographic ciphersuites and security parameterization for
 cryptographic agility. The cryptographic profile used by the protocol
 participants will be determined by the specific instantiation of the
 protocol, and it will be chosen ahead of time. We will work closely with
-the CFRG to agree acceptable cryptographic ciphersuites and parameters
-that satisfy the security/privacy properties of the protocol. The
+the CFRG in determining acceptable cryptographic ciphersuites and parameters
+that satisfy the security and privacy properties of the protocol. The
 Working Group will specify a preliminary set of extensions, including
 Issuer-supplied metadata and alternative cryptographic instantiations
 that support public verifiability of Issued tokens, as well as any
