@@ -150,18 +150,6 @@ a particular server. The tokens are "privacy-preserving" in the sense
 that they cannot be linked back to the previous session where they were
 issued.
 
-The Internet performance company Cloudflare has already implemented
-server-side support for an initial version of the Privacy Pass protocol
-{{PPSRV}}, and a client-side implementations is also available {{PPEXT}}.
-More recently, a number of applications have been built upon the protocol,
-or upon slight variants of it; see: {{TRUST}}, {{OpenPrivacy}},
-{{PrivateStorage}}. The protocol can be instantiated using a
-cryptographic primitive known as a verifiable oblivious pseudorandom
-function (VOPRF) for implementing the authorization mechanism. Such
-VOPRF protocols can be implemented over prime-order groups, and
-constructions are currently being drafted in separate standardization
-processes {{I-D.irtf-cfrg-voprf}}.
-
 The Privacy Pass protocol is split into three stages. The first stage,
 initialisation, produces the global server configuration that is
 broadcast to (and stored by) all clients. The second stage,
@@ -279,17 +267,17 @@ configuration that is used by the server.
 struct {
   opaque s_id<0..2^16-1>
   Ciphersuite ciphersuite;
-  SecretKey key<1..2^32-1>;
+  PrivateKey key<1..2^32-1>;
   PublicKey pub_key<1..2^32-1>;
-  opaque max_evals<0..255>;
+  uint64 max_evals;
 } ServerConfig;
 ~~~
 
-The `SecretKey` and `PublicKey` types are just wrappers around byte
+The `PrivateKey` and `PublicKey` types are just wrappers around byte
 arrays.
 
 ~~~
-opaque SecretKey<1..2^32-1>;
+opaque PrivateKey<1..2^32-1>;
 opaque PublicKey<1..2^32-1>;
 ~~~
 
@@ -304,7 +292,7 @@ struct {
   opaque s_id<0..2^16-1>
   Ciphersuite ciphersuite;
   PublicKey pub_key<1..2^32-1>;
-  opaque max_evals<0..255>;
+  uint64 max_evals;
 } ServerUpdate;
 ~~~
 
@@ -315,7 +303,7 @@ configuration that is used by the client.
 
 ~~~
 struct {
-  ServerUpdate s_update;
+  ServerUpdate state;
 } ClientConfig;
 ~~~
 
@@ -347,16 +335,16 @@ struct {
 } ClientIssuanceElement;
 ~~~
 
-### ClientIssuanceMessage {#pp-cli-issue-message}
+### ClientIssuanceRequest {#pp-cli-issue-message}
 
-The `ClientIssuanceMessage` struct corresponds to the message that the
+The `ClientIssuanceRequest` struct corresponds to the message that the
 client sends to the server during the issuance phase of the protocol
 ({{issuance-phase}}).
 
 ~~~
 struct {
   ClientIssuanceElement issue_element<1..n>
-} ClientIssuanceMessage;
+} ClientIssuanceRequest;
 ~~~
 
 In the above struct, the `issue_element` variable is a vector of
@@ -376,8 +364,8 @@ struct {
 ~~~
 
 The value of `n` is determined by the length of the
-`ClientIssuanceElement` vector in the `ClientIssuanceMessage` struct.
-The internal data types are described below:
+`ClientIssuanceElement` vector in the `ClientIssuanceRequest` struct. The
+internal data types are described below.
 
 ~~~
 struct {
@@ -405,9 +393,9 @@ struct {
 } RedemptionToken;
 ~~~
 
-### ClientRedemptionMessage {#pp-redemption-message}
+### ClientRedemptionRequest {#pp-redemption-message}
 
-The `RedemptionMessage` struct consists of the data that is sent by the
+The `RedemptionRequest` struct consists of the data that is sent by the
 client during the redemption phase of the protocol
 ({{redemption-phase}}).
 
@@ -416,13 +404,13 @@ struct {
   opaque data<1..2^32-1>;
   opaque tag<1..2^32-1>;
   opaque aux<1..2^16-1>;
-} ClientRedemptionMessage;
+} ClientRedemptionRequest;
 ~~~
 
 ### ServerRedemptionResponse {#pp-redemption-response}
 
 The `ServerRedemptionResponse` struct corresponds to a boolean value
-that indicates whether the `ClientRedemptionMessage` sent by the client
+that indicates whether the `ClientRedemptionRequest` sent by the client
 is valid. It can also contain any associated data.
 
 ~~~
@@ -500,8 +488,8 @@ client.
 
 Inputs:
 
-- `s_cfg`:             A `ServerConfig` struct.
-- `issuance_message`:  A `ClientIssuanceMessage` struct.
+- `srv_cfg`:           A `ServerConfig` struct.
+- `issuance_request`:  A `ClientIssuanceRequest` struct.
 
 Outputs:
 
@@ -548,7 +536,7 @@ Inputs:
 
 Outputs:
 
-- `message`: A `ClientRedemptionMessage` struct.
+- `message`: A `ClientRedemptionRequest` struct.
 
 ### Verify
 
@@ -557,8 +545,8 @@ whether the data sent by the client is valid.
 
 Inputs:
 
-- `s_cfg`:   A `ServerConfig` struct.
-- `message`: A `ClientRedemptionMessage` struct.
+- `srv_cfg`: A `ServerConfig` struct.
+- `message`: A `ClientRedemptionRequest` struct.
 
 Outputs:
 
@@ -1011,7 +999,7 @@ For the explicit signatures of each of the functions, refer to
 4. data = token.data
 5. issued = token.issued.as_element();
 6. tag = ciph.VerifiableFinalize(data,issued,aux)
-7. Output RedemptionMessage {
+7. Output RedemptionRequest {
               data: data,
               tag: tag,
               aux: aux,
