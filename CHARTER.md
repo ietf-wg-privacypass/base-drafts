@@ -5,8 +5,8 @@ mechanism for anonymous token creation and redemption. Servers (Issuers)
 create and later verify tokens that are redeemed by an ecosystem of
 clients, such that:
 
-- An Issues cannot link a redeemed token to one of N previously granted tokens
-  with probability non-negligibly larger than 1/N.
+- An Issuer cannot link a redeemed token to one of N previously granted tokens
+  using the same key with probability non-negligibly larger than 1/N.
 - Clients can verify that a token granted by an Issuer corresponds to a
   committed keypair.
 - Tokens are unforgeable.
