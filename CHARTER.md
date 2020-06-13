@@ -64,6 +64,8 @@ The following milestones (along with the approximate dates of
 completion) will be used to judge the progress of the working group:
 
 - Specification of protocol & surrounding architecture - February 2021.
+- Risk assessment for centralization in Privacy Pass deployments for
+  multiple design options - February 2021
 - Specification of application-layer requirements (including HTTP
   integration) - June 2021.
 - Specification of HTTP browser API (in coordination with W3C) - October
