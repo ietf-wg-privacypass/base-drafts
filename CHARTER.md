@@ -1,13 +1,13 @@
 # Privacy Pass IETF WG Charter
 
 The Privacy Pass protocol provides a performant, application-layer
-mechanism for anonymous token creation and redemption. Servers (Issuers)
+mechanism for token creation and anonymous redemption. Servers (Issuers)
 create and later verify tokens that are redeemed by an ecosystem of
 clients, such that:
 
-- An Issuer cannot link a redeemed token to one of N previously granted tokens
+- An Issuer cannot link a redeemed token to one of N previously created tokens
   using the same key with probability non-negligibly larger than 1/N.
-- Clients can verify that a token granted by an Issuer corresponds to a
+- Clients can verify that a token created by an Issuer corresponds to a
   committed keypair.
 - Tokens are unforgeable.
 - The token issuance and redemption mechanisms are efficient.
@@ -22,13 +22,15 @@ anonymous and transferrable tokens. The protocol should permit suitable
 cryptographic ciphersuites and security parameterization for
 cryptographic agility. The cryptographic profile used by the protocol
 participants will be determined by the specific instantiation of the
-protocol, and it will be chosen ahead of time. We will work closely with
+protocol, and it will be fixed for the duration of an Issuer's committed
+keypair. We will work closely with
 the CFRG in determining acceptable cryptographic ciphersuites and parameters
 that satisfy the security and privacy properties of the protocol. The
 Working Group will specify a preliminary set of extensions, including
-Issuer-supplied metadata and alternative cryptographic instantiations
-that support public verifiability of Issued tokens, as well as any
-additional extensions that may arise in the future. Security and privacy
+Issuer-supplied metadata and cryptographic instantiations
+that additionally support public verifiability of Issued tokens, and may
+consider any
+additional extensions that arise in the future. Security and privacy
 properties of the protocol shall be well-documented. Formal analysis of
 the protocol will ensure that the security and privacy properties of the
 protocol are well-understood and well-documented.
@@ -41,7 +43,7 @@ This includes, though is not limited to:
 2. Defining the privacy goals for each Client during protocol execution,
    along with expectations placed on the Issuers and the ecosystem at
    large.
-3. Describing recommended parameterizations of variables associated with
+3. Describing recommended parameterization(s) of variables associated with
    the protocol ecosystem that control the size of the anonymity set
    that the client belongs to.
 4. Describing verification mechanisms for trusting Issuers and their
