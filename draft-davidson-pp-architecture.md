@@ -92,7 +92,7 @@ informative:
 --- abstract
 
 This document specifies the architectural framework for constructing
-secure and privacy-preserving instantiations of the Privacy Pass
+secure and anonymity-preserving instantiations of the Privacy Pass
 protocol (as described in {{draft-davidson-pp-protocol}}). The framework
 refers to the entire ecosystem of Privacy Pass clients and servers. This
 document makes recommendations on how this ecosystem should be
@@ -103,7 +103,7 @@ participating entities.
 
 # Introduction
 
-The Privacy Pass protocol provides a privacy-preserving mechanism for
+The Privacy Pass protocol provides an anonymity-preserving mechanism for
 authorization of clients with servers. The protocol is detailed in
 {{draft-davidson-pp-protocol}} and is intended for use in
 performance-critical settings, such as while browsing the Internet.
@@ -1057,9 +1057,9 @@ issuers can lead to privacy concerns for the clients in the ecosystem.
 Therefore, we are careful to ensure that the number of issuers is kept
 strictly bounded by a fixed small number M. The actual issuers can be
 replaced with different issuers as long as the total never exceeds M.
-Moreover, issuer replacements also have an effect on client privacy that
-is similar to when a key rotation occurs, so replacement should only be
-permitted at similar intervals.
+Moreover, issuer replacements also have an effect on client anonymity
+that is similar to when a key rotation occurs, so replacement should
+only be permitted at similar intervals.
 
 See {{privacy}} for more details about safe choices of M.
 
@@ -1098,7 +1098,7 @@ key, any client that invokes the issuance protocol shortly afterwards
 will be part of a small number of possible clients that can redeem. To
 mechanize this attack strategy, a server could introduce a configuration
 rotation policy which would force clients into smaller windows where a
-given config is valid. This would mean that client privacy would only
+given config is valid. This would mean that client anonymity would only
 have utility with respect to the smaller group of users that hold
 redemption data for a particular key window.
 
@@ -1134,7 +1134,7 @@ BISV, BIFV, BIAV configurations of using the Privacy Pass protocol
 ({{running-modes}}), a verifier OV can trigger redemptions for any of
 the available issuers. Each redemption token that a client holds
 essentially corresponds to a bit of information about the client that OV
-can learn. Therefore, there is an exponential loss in privacy relative
+can learn. Therefore, there is an exponential loss in anonymity relative
 to the number of issuers that there are.
 
 For example, if there are 32 issuers, then OV learns 32 bits of
@@ -1153,7 +1153,7 @@ segregations). However, as highlighted in {{parametrization}}, having a
 very large user base (> 5 million users), could potentially allow for
 larger values. Issuer replacements should only occur with the same
 frequency as config rotations as they can lead to similar losses in
-privacy if clients still hold redemption tokens for previously active
+anonymity if clients still hold redemption tokens for previously active
 issuers.
 
 In addition, we RECOMMEND that trusted registries indicate at all times
@@ -1241,8 +1241,8 @@ client. There is an exception if a large number of clients colluded to
 accept bad data, then any client that didn't accept would be part of a
 smaller anonymity set. However, such an situation would be identical to
 the situation where the total number of clients in the ecosystem is
-small. Therefore, the privacy impact would be equivalent; see
-{{issuers}} for more details.
+small. Therefore, the reduction in the size of the anonymity set would
+be equivalent; see {{issuers}} for more details.
 
 # Security considerations {#security}
 
@@ -1274,7 +1274,7 @@ we consider to be important are:
 We recommend that Privacy Pass secret keys are rotated from anywhere
 between 1 and 12 weeks. With an active user-base, a week gives a fairly
 large window for clients to participate in the Privacy Pass protocol and
-thus enjoy the privacy guarantees of being part of a larger group. The
+thus enjoy the anonymity guarantees of being part of a larger group. The
 low ceiling of 12 weeks prevents a key compromise from being too
 destructive. If a server realizes that a key compromise has occurred
 then the server should revoke the previous key in the trusted registry
@@ -1481,7 +1481,7 @@ passes when it interacts with the PrivateStorage API.
 ## Basic Attention Tokens
 
 The browser Brave uses Basic Attention Tokens (BATs) to provide the
-basis for a privacy-preserving rewards scheme {{Brave}}. The BATs are
+basis for an anonymity-preserving rewards scheme {{Brave}}. The BATs are
 essentially Privacy Pass redemption tokens that are provided by a
 central Brave server when a client performs some action that triggers a
 reward event (such as watching an advertisement). When the client

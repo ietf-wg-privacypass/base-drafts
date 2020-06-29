@@ -74,11 +74,36 @@ informative:
       -
         ins: F. Valsorda
         org: Independent
+  TrustTokenAPI:
+    title: Getting started with Trust Tokens
+    target: https://web.dev/trust-tokens/
+    author:
+      name: Google
+  PrivateStorage:
+    title: The Path from S4 to PrivateStorage
+    target: https://medium.com/least-authority/the-path-from-s4-to-privatestorage-ae9d4a10b2ae
+    author:
+      name: Liz Steininger
+      ins: L. Steininger
+      org: Least Authority
+  OpenPrivacy:
+    title: Token Based Services - Differences from PrivacyPass
+    target: https://openprivacy.ca/assets/towards-anonymous-prepaid-services.pdf
+    authors:
+      -
+        ins: E. Atwater
+        org: OpenPrivacy, Canada
+      -
+        ins: S. J. Lewis
+        org: OpenPrivacy, Canada
+  Brave:
+    title: Brave Rewards
+    target: https://brave.com/brave-rewards/
 
 --- abstract
 
 This document specifies the Privacy Pass protocol. This protocol
-provides privacy-preserving authorization of clients to servers. In
+provides anonymity-preserving authorization of clients to servers. In
 particular, client re-authorization events cannot be linked to any
 previous initial authorization. Privacy Pass is intended to be used as a
 performant protocol in the application-layer.
@@ -124,27 +149,7 @@ considerations are covered in a separate document
 {{draft-svaldez-pp-http-api}} provides an instantiation of this protocol
 intended for the HTTP setting.
 
-## Layout
-
-- {{prelim}}: Describes the terminology and assumptions adopted
-  throughout this document.
-- {{pp-api}}: Describes the internal functions and data structures that
-  are used by the Privacy Pass protocol.
-- {{overview}}: Describes the generic protocol structure, based on the
-  API provided in {{pp-api}}.
-- {{sec-reqs}}: Describes the security requirements of the
-  generic protocol description.
-- {{voprf-protocol}}: Describes an instantiation of the API in
-  {{pp-api}} based on the VOPRF protocol described in
-  {{I-D.irtf-cfrg-voprf}}.
-- {{pp-ciphersuites}}: Describes ciphersuites for use with the Privacy
-  Pass protocol based on the instantiation in {{voprf-protocol}}.
-- {{extensions}}: Describes the policy for implementing extensions to
-  the Privacy Pass protocol.
-
-# Preliminaries {#prelim}
-
-## Terminology
+# Terminology
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
@@ -162,6 +167,49 @@ The following terms are used throughout this document.
 We assume that all protocol messages are encoded into raw byte format
 before being sent. We use the TLS presentation language {{RFC8446}} to
 describe the structure of protocol data types and messages.
+
+# Background
+
+We discuss the core motivation behind the protocol along with the
+guarantees and assumptions that we make in this document.
+
+## Motivating use-cases
+
+The Privacy Pass protocol was originally developed to provide anonymous
+authorization of users of anonymity-preserving tools on the Internet,
+such as Tor and VPNs. In particular, the protocol allows clients to
+reveal authorization tokens that they have been issued without linking
+the authorization to the actual issuance event. This means that the
+tokens cannot be used to link the browsing patterns of clients that
+reveal tokens.
+
+The web performance company Cloudflare uses a form of Privacy Pass to
+issue tokens to users that have completed Internet challenges
+{{DGSTV18}}. This allows clients to redeem tokens instead of solving
+additional challenges in the future. Other use-cases have since arisen
+with similar core security goals: {{TrustTokenAPI}}, {{PrivateStorage}},
+{{OpenPrivacy}}, {{Brave}}.
+
+## Anonymity and security guarantees
+
+As mentioned above, the protocol provides anonymity-preserving tokens
+for authorizing clients. Throughout this document, we use the terms
+"anonymous", "anonymous-preserving" and "anonymity" to refer to the core
+security guarantee of the protocol. This guarantee is the following
+statement.
+
+- Any client that is issued a token by a server key and subsequently
+  redeems it, remains anonymous within the set of all clients issued
+  tokens under the same key.
+
+We also require a security guarantee for the server to maintain the
+utility of the authorization protocol.
+
+- Any client that is issued `N` tokens under a given server key cannot
+  redeem greater than `N` valid tokens.
+
+We discuss all of the protocol security requirements more thoroughly in
+{{sec-reqs}}.
 
 ## Basic assumptions
 
@@ -509,7 +557,7 @@ We discuss the security requirements that are necessary to uphold when
 instantiating the Privacy Pass protocol. In particular, we focus on the
 security requirements of "unlinkability", and "unforgeability".
 Informally, the notion of unlinkability is required to preserve the
-privacy of the client in the redemption phase of the protocol. The
+anonymity of the client in the redemption phase of the protocol. The
 notion of unforgeability is to protect against adversarial clients that
 look to subvert the security of the protocol.
 
@@ -795,7 +843,7 @@ are applicable.
 
 The extensions MUST also conform with the extension framework policy as
 set out in the architectural framework document. For example, this may
-concern any potential impact on client privacy that the extension may
+concern any potential impact on client anonymity that the extension may
 introduce.
 
 --- back
