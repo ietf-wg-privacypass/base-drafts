@@ -584,6 +584,28 @@ before. Such tokens only need to be checked for each issuer
 individually. This prevents clients from "replaying" previous requests,
 and is necessary for achieving the unforgeability requirement.
 
+## Additional token metadata
+
+Some use-cases of the Privacy Pass protocol benefit from associating a
+limited amount of metadata with tokens that can be read by the Issuer
+when a token is redeemed. Adding metadata to tokens can be used as a
+vector to segment the anonymity of the protocol Clients. Therefore, it
+is important that any metadata that is added is heavily limited.
+
+Any additional metadata that can be added to redemption tokens should be
+described in the specific protocol instantiation. Note that any
+additional metadata will have to be justified in light of the privacy
+concerns raised above. For more details on the impacts associated with
+segmenting user privacy, see {{draft-davidson-pp-architecture}}.
+
+Any metadata added to tokens will be considered either "public" or
+"private". Public metadata corresponds to unmodifiable bits that a
+client can read. Private metadata corresponds to unmodifiable private
+bits that should be obscured to the client.
+
+Note that the instantiation in {{voprf-protocol}} provides randomized
+redemption tokens with no additional metadata.
+
 # VOPRF instantiation {#voprf-protocol}
 
 In this section, we show how to instantiate the functional API in
