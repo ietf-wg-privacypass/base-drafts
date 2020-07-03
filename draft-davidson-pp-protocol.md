@@ -177,15 +177,15 @@ guarantees and assumptions that we make in this document.
 
 The Privacy Pass protocol was originally developed to provide anonymous
 authorization of users of anonymity-preserving tools on the Internet,
-such as Tor. In particular, the protocol allows clients to
-reveal authorization tokens that they have been issued without linking
-the authorization to the actual issuance event. This means that the
-tokens cannot be used to link the browsing patterns of clients that
-reveal tokens.
+such as Tor. In particular, the protocol allows clients to reveal
+authorization tokens that they have been issued without linking the
+authorization to the actual issuance event. This means that the tokens
+cannot be used to link the browsing patterns of clients that reveal
+tokens.
 
-The Privacy Pass protocol has a number of use cases in practice. 
-See {{DGSTV18}}, {{TrustTokenAPI}}, {{PrivateStorage}}, {{OpenPrivacy}}, 
-and {{Brave}} for examples.
+The Privacy Pass protocol has a number of use cases in practice. See
+{{DGSTV18}}, {{TrustTokenAPI}}, {{PrivateStorage}}, {{OpenPrivacy}}, and
+{{Brave}} for examples.
 
 ## Anonymity and security guarantees
 
@@ -195,16 +195,18 @@ for authorizing clients. Throughout this document, we use the terms
 security guarantee of the protocol. This guarantee is the following
 statement.
 
-- A token issued by a server key and subsequently redeemed is indistinguishable from any other 
-  token issued under the same key.
+- A token issued by a server key and subsequently redeemed is
+  indistinguishable from any other token issued under the same key.
 
-We also require that clients cannot forge tokens, as otherwise Privacy Pass would
-have little value as an authorization protocol. This requirement is stated as follows.
+We also require that clients cannot forge tokens, as otherwise Privacy
+Pass would have little value as an authorization protocol. This
+requirement is stated as follows.
 
 - Any client that is issued `N` tokens under a given server key cannot
   redeem more than `N` valid tokens.
 
-{{sec-reqs}} elaborates on these protocol anonymity and security requirements.
+{{sec-reqs}} elaborates on these protocol anonymity and security
+requirements.
 
 ## Basic assumptions
 
@@ -246,7 +248,8 @@ client.
 The client initialises a global storage system `store` that allows it
 store the tokens that are received during issuance. The storage system
 is a map of Issuer identifiers (`Issuer.id`) to arrays of stored tokens.
-We assume that the client knows the Issuer public key `pkI` ahead of time.
+We assume that the client knows the Issuer public key `pkI` ahead of
+time.
 
 ## Issuance phase {#issuance-phase}
 
@@ -441,8 +444,8 @@ struct {
 ### RedemptionResponse {#pp-redemption-response}
 
 The `RedemptionResponse` struct corresponds to a boolean value that
-indicates whether the `RedemptionMessage` sent by the client is
-valid. It can also contain any associated data.
+indicates whether the `RedemptionMessage` sent by the client is valid.
+It can also contain any associated data.
 
 ~~~
 struct {
@@ -465,8 +468,8 @@ as its input in the Privacy Pass protocol.
 
 Inputs:
 
-- `m`:       A `uint8` value corresponding to the number of Privacy
-             Pass tokens to generate.
+- `m`:       A `uint8` value corresponding to the number of Privacy Pass
+             tokens to generate.
 
 Outputs:
 
@@ -500,8 +503,8 @@ Inputs:
 
 Outputs:
 
-- `tokens`: A vector of `RedemptionToken` structs, whose length is
-  equal to length of the internal `ServerEvaluation` vector in the
+- `tokens`: A vector of `RedemptionToken` structs, whose length is equal
+  to length of the internal `ServerEvaluation` vector in the
   `IssuanceResponse` struct.
 
 Throws:
@@ -576,8 +579,8 @@ Formally speaking the security model is the following:
   `(pkI, skI)`.
 - The adversary specifies a number `Q` of issuance phases to initiate,
   where each phase `i in range(Q)` consists of `m_i` Issue evaluations.
-- The adversary runs `Issue` using the keypair that it generated on
-  each of the Client messages in the issuance phase.
+- The adversary runs `Issue` using the keypair that it generated on each
+  of the Client messages in the issuance phase.
 - When the adversary wants, it stops the issuance phase, and a random
   number `l` is picked from `range(Q)`.
 - A redemption phase is initiated with a single token with index `i`
@@ -655,8 +658,8 @@ single key.
 In this section, we show how to instantiate the functional API in
 {{pp-api}} with the VOPRF protocol described in {{I-D.irtf-cfrg-voprf}}.
 Moreover, we show that this protocol satisfies the security requirements
-laid out in {{sec-reqs}}, based on the security proofs provided
-in {{DGSTV18}} and {{KLOR20}}.
+laid out in {{sec-reqs}}, based on the security proofs provided in
+{{DGSTV18}} and {{KLOR20}}.
 
 ## Recommended ciphersuites {#voprf-ciph-recs}
 
@@ -831,10 +834,9 @@ described in {{overview}}, then the change may have to result in changes
 to the draft specification here also.
 
 Each new extension that modifies the internals of the protocol in either
-of the two ways MUST re-justify that the extended protocol
-still satisfies the security requirements in {{sec-reqs}}.
-Protocol extensions MAY put forward new security guarantees if they
-are applicable.
+of the two ways MUST re-justify that the extended protocol still
+satisfies the security requirements in {{sec-reqs}}. Protocol extensions
+MAY put forward new security guarantees if they are applicable.
 
 The extensions MUST also conform with the extension framework policy as
 set out in the architectural framework document. For example, this may
