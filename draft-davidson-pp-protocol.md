@@ -604,7 +604,8 @@ client can read. Private metadata corresponds to unmodifiable private
 bits that should be obscured to the client.
 
 Note that the instantiation in {{voprf-protocol}} provides randomized
-redemption tokens with no additional metadata.
+redemption tokens with no additional metadata for an Issuer with a
+single key.
 
 # VOPRF instantiation {#voprf-protocol}
 

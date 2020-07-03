@@ -1151,7 +1151,7 @@ We propose that allowing no more than 4 issuers at any one time is
 highly preferable (leading to a maximum of 64 possible user
 segregations). However, as highlighted in {{parametrization}}, having a
 very large user base (> 5 million users), could potentially allow for
-larger values. issuer replacements should only occur with the same
+larger values. Issuer replacements should only occur with the same
 frequency as config rotations as they can lead to similar losses in
 privacy if clients still hold redemption tokens for previously active
 issuers.
@@ -1347,9 +1347,9 @@ We make the following assumptions in these parameter choices.
   key.
 
 In terms of additional metadata, the only concrete applications of
-Privacy Pass that use additional metadata require just a single bit,
-such as {{TrustTokenAPI}}. Therefore, we set the ceiling of permitted
-metadata to 1 bit for now, this may be revisited in future revisions.
+Privacy Pass that use additional metadata require just a single bit.
+Therefore, we set the ceiling of permitted metadata to 1 bit for now,
+this may be revisited in future revisions.
 
 The maximum choice of I is based on the equation 1/2 * U/2^(2I) = A.
 This is derived from the fact that permitting I issuers lead to 2^I
