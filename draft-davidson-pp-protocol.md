@@ -177,18 +177,15 @@ guarantees and assumptions that we make in this document.
 
 The Privacy Pass protocol was originally developed to provide anonymous
 authorization of users of anonymity-preserving tools on the Internet,
-such as Tor and VPNs. In particular, the protocol allows clients to
+such as Tor. In particular, the protocol allows clients to
 reveal authorization tokens that they have been issued without linking
 the authorization to the actual issuance event. This means that the
 tokens cannot be used to link the browsing patterns of clients that
 reveal tokens.
 
-The web performance company Cloudflare uses a form of Privacy Pass to
-issue tokens to users that have completed Internet challenges
-{{DGSTV18}}. This allows clients to redeem tokens instead of solving
-additional challenges in the future. Other use-cases have since arisen
-with similar core security goals: {{TrustTokenAPI}}, {{PrivateStorage}},
-{{OpenPrivacy}}, {{Brave}}.
+The Privacy Pass protocol has a number of use cases in practice. 
+See {{DGSTV18}}, {{TrustTokenAPI}}, {{PrivateStorage}}, {{OpenPrivacy}}, 
+and {{Brave}} for examples.
 
 ## Anonymity and security guarantees
 
@@ -198,18 +195,16 @@ for authorizing clients. Throughout this document, we use the terms
 security guarantee of the protocol. This guarantee is the following
 statement.
 
-- Any client that is issued a token by a server key and subsequently
-  redeems it, remains anonymous within the set of all clients issued
-  tokens under the same key.
+- A token issued by a server key and subsequently redeemed is indistinguishable from any other 
+  token issued under the same key.
 
-We also require a security guarantee for the server to maintain the
-utility of the authorization protocol.
+We also require that clients cannot forge tokens, as otherwise Privacy Pass would
+have little value as an authorization protocol. This requirement is stated as follows.
 
 - Any client that is issued `N` tokens under a given server key cannot
-  redeem greater than `N` valid tokens.
+  redeem more than `N` valid tokens.
 
-We discuss all of the protocol security requirements more thoroughly in
-{{sec-reqs}}.
+{{sec-reqs}} elaborates on these protocol anonymity and security requirements.
 
 ## Basic assumptions
 
