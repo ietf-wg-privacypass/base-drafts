@@ -36,24 +36,8 @@ normative:
     author:
       ins: S. Valdez
       org: Google LLC
-  X9.62:
-    title: "Public Key Cryptography for the Financial Services Industry: The Elliptic Curve Digital Signature Algorithm (ECDSA)"
-    author:
-      name: American National Standards Institute
-    seriesinfo: ANSI X9.62-2005
-    date: November 2005
 informative:
   I-D.irtf-cfrg-voprf:
-  keytrans:
-    title: "Security Through Transparency"
-    target: https://security.googleblog.com/2017/01/security-through-transparency.html
-    authors:
-      -
-        ins: Ryan Hurst
-        org: Google
-      -
-        ins: Gary Belvin
-        org: Google
   TrustTokenAPI:
     title: Getting started with Trust Tokens
     target: https://web.dev/trust-tokens/
@@ -198,9 +182,7 @@ redemption tokens. We highlight possible Client and Server
 configurations in {{running-modes}}.
 
 The Server must be available at a specified address (uniquely identified
-by some global identifier denoted by `idS`) that accepts communications
-from Privacy Pass clients {{ecosystem-clients}} on the interfaces
-defined in {{server-interfaces}}.
+by some global identifier).
 
 ## Clients {#ecosystem-clients}
 
@@ -689,7 +671,7 @@ This is derived from the fact that permitting I issuers lead to 2^I
 segregations of the total user-base U. Moreover, if we permit M = 1,
 then this effectively halves the anonymity set for each issuer, and thus
 we incur a factor of 2I in the exponent. By reducing I, we limit the
-possibility of performing the attacks mentioned in {{segregation}}.
+possibility of performing the attacks mentioned in {{privacy}}.
 
 We must also account for each user holding issued data for more then one
 possible active keys. While this may also be a vector for monitoring the
@@ -732,9 +714,7 @@ The Privacy Pass protocol and ecosystem are both intended to be
 receptive to extensions that expand the current set of functionality. In
 {{draft-davidson-pp-protocol}}, some points are made about how
 implementing the Privacy Pass API can be instantiated using different
-underlying primitives. The interfaces described in {{integration}}
-utilize the API in such a way that internal changes should result in no
-visible change to implementers of the Privacy Pass protocol.
+underlying primitives.
 
 As specified in {{draft-davidson-pp-protocol}}, all extensions to the
 Privacy Pass protocol SHOULD be specified as separate documents that
@@ -750,13 +730,6 @@ justified, and guidelines on changes to the parametrization in
 {{parametrization}}. Similarly, extensions MAY also add new Server
 running modes, if applicable, to those that are documented in
 {{running-modes}}.
-
-We RECOMMEND that any extension to the Privacy Pass architecture does
-not add new interfaces to those that are listed in {{integration}}. We
-expect that any extension is expressible using the interfaces themselves
-and reimplementing the existing functionality, if need be. Abiding by
-this policy maintains a simplified execution chain that is easy to
-reason about.
 
 Any extension to the Privacy Pass protocol must adhere to the guidelines
 specified in {{key-mgmt}} for managing Issuer public key data.
