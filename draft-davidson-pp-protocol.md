@@ -75,10 +75,10 @@ informative:
         ins: F. Valsorda
         org: Independent
   TrustTokenAPI:
-    title: Getting started with Trust Tokens
-    target: https://web.dev/trust-tokens/
+    title: Trust Token API
+    target: https://github.com/WICG/trust-token-api
     author:
-      name: Google
+      name: WICG
   PrivateStorage:
     title: The Path from S4 to PrivateStorage
     target: https://medium.com/least-authority/the-path-from-s4-to-privatestorage-ae9d4a10b2ae
