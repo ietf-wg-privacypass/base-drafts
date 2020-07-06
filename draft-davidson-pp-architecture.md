@@ -77,11 +77,9 @@ informative:
 
 This document specifies the architectural framework for constructing
 secure and anonymity-preserving instantiations of the Privacy Pass
-protocol (as described in {{draft-davidson-pp-protocol}}). The framework
-refers to the entire ecosystem of Privacy Pass clients and servers. This
-document makes recommendations on how this ecosystem should be
-constructed to ensure the privacy of clients and the security of all
-participating entities.
+protocol. It provides recommendations on how the protocol ecosystem
+should be constructed to ensure the privacy of clients, and the security
+of all participating entities.
 
 --- middle
 
@@ -89,40 +87,32 @@ participating entities.
 
 The Privacy Pass protocol provides an anonymity-preserving mechanism for
 authorization of clients with servers. The protocol is detailed in
-{{draft-davidson-pp-protocol}} and is intended for use in
-performance-critical settings, such as while browsing the Internet.
+{{draft-davidson-pp-protocol}} and is intended for use in the
+application-layer.
 
 The way that the ecosystem around the protocol is set up can have
 significant impacts on the stated privacy and security guarantees of the
 protocol. For instance, the number of servers issuing Privacy Pass
 tokens, along with the number of registered clients, determines the
-privacy budget available to each individual client. This can be further
+anonymity set of each individual client. Moreover, this can be
 influenced by other factors, such as: the key rotation policy used by
 each server; and, the number of supported ciphersuites. There are also
-client-behavior patterns that can reduce the effective security of the
+client behavior patterns that can reduce the effective security of the
 server.
 
 In this document, we will provide a structural framework for building
-the ecosystem around the Privacy Pass protocol. Firstly, it will
-identify a number of common interfaces for integrating the Privacy Pass
-protocol and the API detailed in {{draft-davidson-pp-protocol}}. The API
-in the protocol document represents a basic one-on-one exchange between
-a client and a server. The interfaces that we describe in this document
-reproduce this API into the setting where clients and servers are part
-of a wider ecosystem.
+the ecosystem around the Privacy Pass protocol. The core of the document
+also includes policies for the following considerations.
 
-On top of this, the document also includes policies for the following
-considerations:
-
-- How server key material should be stored and rotated in an open and
-  transparent manner.
+- How server key material should be managed and accessed.
 - Compatible server issuance and redemption running modes and associated
   expectations.
 - Considerations for how clients should evaluate the relationships that
   they hold with Issuers.
+- Detailed analysis of the privacy and security considerations
+  associated with the protocol.
 - A concrete assessment and parametrization of the privacy budget
   associated with different settings of the above policies.
-- Assessment of client incentives for eschewing privacy features.
 - The incorporation of potential extensions into the wider ecosystem.
 
 Finally, we will discuss existing applications that make use of the
@@ -140,9 +130,7 @@ The following terms are used throughout this document.
 - Server: An entity that issues anonymous tokens to clients. In
   symmetric verification cases, the Server must also verify tokens. Also
   referred to as the Issuer.
-- Client: An entity that seeks authorization from a Server (typically
-  denoted C).
-- Key: Server's secret key.
+- Client: An entity that seeks authorization from a Server.
 
 We assume that all protocol messages are encoded into raw byte format
 before being sent. We use the TLS presentation language {{RFC8446}} to
@@ -153,11 +141,11 @@ describe the structure of the data that is communicated and stored.
 The Privacy Pass ecosystem refers to the global framework in which
 multiple instances of the Privacy Pass protocol operate. This refers to
 all servers that support the protocol, or any extension of it, along
-with all of the clients that may interact with these servers.
+with all of the Clients that may interact with these Servers.
 
 The ecosystem itself, and the way it is constructed, is critical for
-evaluating the privacy of each individual client. We assume that a
-client's privacy refers to fraction of users that it represents in the
+evaluating the privacy of each individual Client. We assume that a
+Client's privacy refers to fraction of users that it represents in the
 anonymity set that it belongs to. We discuss this more in {{privacy}}.
 
 TODO: Add diagram of ecosystem
@@ -177,9 +165,9 @@ Note that, in the core protocol instantiation from
 {{draft-davidson-pp-protocol}}, the redemption phase is a symmetric
 protocol. This means that the Issuer is the same Server that ultimately
 processes token redemptions from Clients. However, plausible extensions
-to the protocol specification may allow public verification of
-redemption tokens. We highlight possible Client and Server
-configurations in {{running-modes}}.
+to the protocol specification may allow forwarding or public
+verification of redemption tokens. We highlight possible Client and
+Server configurations in {{running-modes}}.
 
 The Server must be available at a specified address (uniquely identified
 by some global identifier).
@@ -188,8 +176,8 @@ by some global identifier).
 
 Clients in the Privacy Pass ecosystem are entities whose primary
 function is to undertake the role of the `Client` in
-{{draft-davidson-pp-protocol}}. The clients are assumed to only store
-data related to the tokens that it has been issued by the server. This
+{{draft-davidson-pp-protocol}}. Clients are assumed to only store data
+related to the tokens that it has been issued by the Server. This
 storage is used for constructing redemption requests.
 
 ### Client identifying information {#client-ip}
@@ -213,7 +201,7 @@ tokens corresponds to a number of different pieces of information.
 
 For reasons that we address later in {{privacy}}, the way that the
 Server publishes and maintains this information impacts the effective
-privacy of the clients. In this section we describe the main policies
+privacy of the clients. In this section, we describe the main policies
 that need to be satisfied for a key management system that serves a
 particular Privacy Pass ecosystem.
 
@@ -225,36 +213,36 @@ documentation.
 ## Public key registries
 
 Issuer's must provide their public keys to clients along with details
-about the cryptographic ciphersuite that they are using. For reasons
-that we will go into subsequently, Clients need sources of truth for
-learning information about the Server configuration that is being used.
+about the cryptographic ciphersuite that they are using. In {{privacy}},
+we address the importance of providing Clients with sources of truth for
+learning the Server's key configuration.
 
 In particular, Server key material should be hosted publicly at
-tamper-proof locations that are globally consistent. Clients that
-retrieve key information for a Server should be assured that this key
-information is the same for all other clients. This is to protect
-against Servers that try and track users by issuing individual keys for
-each user.
+tamper-proof locations -- known as key registries -- that are globally
+consistent. Clients that retrieve key information for a Server should be
+assured that this key information is the same for all other clients.
+This is to protect against Servers that try and track users by issuing
+individual keys for each user.
 
 We RECOMMEND that any key registry is append-only, and publishes the
-timings of all updates. The key registry should be operated
+timings of all Server updates. The key registry should be operated
 independently of any Issuer that publishes key material to the registry.
 This ensures that any Client can make better judgements on whether to
-trust the registry (and the Issuer itself).
+trust the registry (and each Server).
 
 ## Key rotation
 
 Token issuance associates all issued tokens with a particular choice of
 key. If a Server issues tokens with many keys, then this may harm the
-anonymity of the Client, by being able to map the Client's access
-patterns by inspecting the tokens that it owns.
+anonymity of the Client. For example, they would be able to map the
+Client's access patterns by inspecting which key each token they possess
+has been issued under.
 
-To prevent against this Server's MUST only use one private key for
+To prevent against this, Servers MUST only use one private key for
 issuing tokens at any given time. Two keys that are used for redemption
-are permitted to allow Servers to rotate keys in a way that doesn't
-invalidate all tokens that a Client owns.
+are permitted to allow Servers to rotate keys smoothly.
 
-Key rotations must be limited for similar reasons, see
+Key rotations must be limited for similar reasons. See
 {{parametrization}} for guidelines on what frequency of key rotations
 are permitted.
 
@@ -273,47 +261,45 @@ contents to a globally trusted location. Moreover, regular checks should
 be made to ascertain whether a Server is publishing different key
 material to multiple registries (see {{split-view}}).
 
+Clients may also choose to publicly expose registries that they do not
+trust. This could be done by posting on some public bulletin board, or
+via other means such as Client gossip protocols.
+
 # Server running modes {#running-modes}
 
 We provide an overview of some of the possible frameworks for
-configuring the way that servers run in the Privacy Pass ecosystem. In
-short, servers may be configured to provide symmetric issuance and
-redemption with clients. While some servers may be configured as proxies
-that accept Privacy Pass data and send it to another server that
+configuring the way that Servers run in the Privacy Pass ecosystem. In
+short, Servers may be configured to provide symmetric issuance and
+redemption with clients. While some Servers may be configured as proxies
+that accept Privacy Pass data and send it to another Server that
 actually processes issuance and/or redemption data. Finally, we also
 consider instances of the protocol that may permit public verification.
 
 The intention with providing each of these running modes is to cover the
 different applications that utilize variants of the Privacy Pass
-protocol. We RECOMMEND that any Privacy Pass server implementation
+protocol. We RECOMMEND that any Privacy Pass Server implementation
 adheres to one of these frameworks.
 
 ## Single-Issuer Single-Verifier {#sisv}
 
 The simplest way of considering the Privacy Pass protocol is in a
 setting where the same server plays the role of issuer and verifier, we
-call this "Single-Issuer Single-Verifier" (SISV). In SISV, we consider a
-server S that publishes commitments for their secret key k, that a
-client C has access to.
+call this "Single-Issuer Single-Verifier" (SISV).
 
 When S wants to issue tokens to C, they invoke the issuance protocol
-where C generates their own inputs, and S uses their secret key k. In
+where C generates their own inputs, and S uses their secret key skS. In
 this setting, C can only perform token redemption with S. When a token
 redemption is required, C and S invoke the redemption phase of the
 protocol, where C uses an issued token from a previous exchange, and S
-uses k as their input again.
-
-In SISV, C proves that it holds a valid authorization token issued by S
-at some point in the past (without revealing exactly when). S can use
-this information to inform it's own decision-making about C without
-having to recompute the re-authorize the user.
+uses skS to validate the redemption.
 
 ## Single-Issuer Forwarding-Verifier {#sifv}
 
-In this setting, each client C obtains issued tokens from a server S via
-the issuance phase of the protocol. The difference is that the Client
-can prove that they hold a valid authorization with any verifier V. We
-still only consider S to hold their own secret key.
+In this setting, each Client C obtains issued tokens from a Server S via
+the issuance phase of the protocol. The difference is that C can prove
+that they hold a valid authorization with any verifier V. We still only
+consider S to hold their own secret key. We name this mode
+"Single-Issuer Forwarding-Verifier" (SIFV).
 
 When C interacts with V, V can ask C to provide proof of authorization
 to the separate issuer S. The first stage of the redemption phase of the
@@ -322,10 +308,6 @@ redemption token to V. This message is then used in a redemption
 exchange between V and S, where V plays the role of the Client. Then S
 sends the result of the redemption verification to V, and V uses this
 result to determine whether C has a valid token.
-
-This configuration is known as "Single-Issuer Forwarding-Verifier" or
-SIFV to refer to the verifier V who uses the output of the redemption
-phase for their own decision-making.
 
 ## Single-Issuer Asynchronous-Verifier {#siav}
 
@@ -370,7 +352,7 @@ verification.
 In this case, the Client C obtains a redemption token from S. The
 redemption token is publicly verifiable in the sense that any entity
 that knows the public key for S can verify the token. This running mode
-is known as SIPV.
+is known as "Single-Issuer Public-Verifier" (SIPV).
 
 ## Bounded-Issuers {#bi-mode}
 
@@ -383,24 +365,40 @@ BIFV, BIAV and BIPV.
 As we will discuss later in {{privacy}}, configuring a large number of
 issuers can lead to privacy concerns for the clients in the ecosystem.
 Therefore, we are careful to ensure that the number of issuers is kept
-strictly bounded by a fixed small number M. The actual issuers can be
-replaced with different issuers as long as the total never exceeds M.
-Moreover, issuer replacements also have an effect on client anonymity
-that is similar to when a key rotation occurs, so replacement should
-only be permitted at similar intervals.
+strictly bounded. The actual issuers can be replaced with different
+issuers as long as the total never exceeds this bound. Moreover, issuer
+replacements also have an effect on client anonymity that is similar to
+when a key rotation occurs. Issuer so replacement should only be
+permitted at similar intervals.
 
-See {{privacy}} for more details about safe choices of M.
+See {{privacy}} for more details about safe choices of this bound.
 
-# Client-Issuer relationship {#client-issuer}
+# Client-Issuer trust relationship {#client-issuer}
 
 It is important, based on the architecture above, that any Client can
 determine whether it would like to interact with a given Issuer in the
-ecosystem. This judgement can be based on a multitude of factors. In
-this document, we highlight some of the import
+ecosystem. Note that this decision must be taken before a Client issues
+a valid redemption to the Server, since redemptions reveal the anonymity
+set that the Client belongs to.
 
-## Trusting issuers
+This judgement can be based on a multitude of factors, associated with
+the way that a Server presents itself in the ecosystem. A non-exhaustive
+list of Server characteristics that a Client MAY want to check are the
+following.
 
-TODO: explain how clients should decide whether to trust issuers or not
+- Which key registry a Server posts their key updates to.
+- How frequent key updates are issued, and which ciphersuite they use.
+- The reason given to initiate the redemption.
+
+To aid Client trust decisions, a Server can publish a "Privacy Pass
+policy" that documents the procedures that the Server uses to ensure
+that Client privacy is respected. If a Server does not publish such a
+document then the Client may choose to use its own judgement, or to
+reject the Server altogether.
+
+It should be noted that the Client trust decision can be made apriori by
+specifying an allow-list of all Issuers that it accepts tokens from.
+This means that these checks do not have to be performed online.
 
 # Privacy considerations {#privacy}
 
@@ -412,12 +410,12 @@ guarantees, the way that the ecosystem is constructed can be used to
 identify clients based on this limited information.
 
 The goal of the Privacy Pass ecosystem is to construct an environment
-where can easily measure (and maximize) relative anonymity of any client
-that is part of it. An inherent feature of being part of this ecosystem
-is that any client can only remain private relative to the entire space
-of users using the protocol. Moreover, by owning tokens for a given set
-of keys, the client's anonymity set shrinks to the total number of
-clients controlling tokens for the same keys.
+that can easily measure (and maximize) the relative anonymity of any
+client that is part of it. An inherent feature of being part of this
+ecosystem is that any client can only remain private relative to the
+entire space of users using the protocol. Moreover, by owning tokens for
+a given set of keys, the client's anonymity set shrinks to the total
+number of clients controlling tokens for the same keys.
 
 In the following, we consider the possible ways that Servers and Issuers
 can leverage their position to try and reduce the anonymity sets that
@@ -427,64 +425,86 @@ these actions.
 
 ## Server key rotation
 
-Techniques to introduce segregation are closely linked to the type of
-key schedule that is used by the server. When a server rotates their
-key, any client that invokes the issuance protocol shortly afterwards
-will be part of a small number of possible clients that can redeem. To
-mechanize this attack strategy, a server could introduce a key rotation
-policy which would force clients into smaller windows where a given
-issuing key is being valid. This would mean that client anonymity would
-only have utility with respect to the smaller group of users that hold
-redemption data for a particular key window.
+Techniques to introduce Client "segregation" can be used to reduce
+Client anonymity. Such techniques are closely linked to the type of key
+schedule that is used by the server. When a server rotates their key,
+any client that invokes the issuance protocol in this key cycle will be
+part of a group of possible Clients owning valid tokens for this key. To
+mechanize this attack strategy, a Server could introduce a key rotation
+policy that forces Clients into small key cycles. Thus, reducing the
+size of the anonymity set for these Clients.
 
-We RECOMMEND that great care is taken over key rotations, in particular
-server's should only invoke key rotation for fairly large periods of
-time such as between 1 and 12 weeks. Key rotations represent a trade-off
-between client privacy and continued server security. Therefore, it is
-still important that key rotations occur on a fairly regular cycle to
-reduce the harmfulness of a server key compromise.
+We RECOMMEND that Servers should only invoke key rotation for fairly
+large periods of time such as between 1 and 12 weeks. Key rotations
+represent a trade-off between Client privacy and continued server
+security. Therefore, it is still important that key rotations occur on a
+fairly regular cycle to reduce the harmfulness of a Server key
+compromise.
 
-## Large numbers of issuers {#issuers}
+## Large numbers of Issuers {#issuers}
 
-Similarly to the Issuer rotation dynamic that is  raised above, if there
-are a large number of issuers, similar user segregation can occur. In
-the BISV, BIFV, BIAV configurations of using the Privacy Pass protocol
-({{running-modes}}), a verifier OV can trigger redemptions for any of
-the available issuers. Each redemption token that a client holds
-essentially corresponds to a bit of information about the client that OV
-can learn. Therefore, there is an exponential loss in anonymity relative
-to the number of issuers that there are.
+Similarly to the Issuer rotation dynamic that is raised above, if there
+are a large number of Issuers then segregation can occur. In the BIFV,
+BIAV and BIPV running modes ({{running-modes}}), a verifier OV can
+trigger redemptions for any of the available Issuers. Each redemption
+token that a client holds essentially corresponds to a bit of
+information about the client that OV can learn. Therefore, there is an
+exponential loss in anonymity relative to the number of Issuers that
+there are.
 
-For example, if there are 32 issuers, then OV learns 32 bits of
+For example, if there are 32 Issuers, then OV learns 32 bits of
 information about the client. If the distribution of issuer trust is
 anything close to a uniform distribution, then this is likely to
 uniquely identify any client amongst all other Internet users. Assuming
 a uniform distribution is clearly the worst-case scenario, and unlikely
 to be accurate, but it provides a stark warning against allowing too
-many issuers at any one time.
+many Issuers at any one time.
 
-As we noted in {{bi-mode}}, a strict bound should be applied to the
-active number of issuers that are allowed at one time in the ecosystem.
-We propose that allowing no more than 4 issuers at any one time is
-highly preferable (leading to a maximum of 64 possible user
+In cases where Clients can hold tokens for all Issuers at any given
+time, a strict bound SHOULD be applied to the active number of Issuers
+in the ecosystem. We propose that allowing no more than 4 Issuers at any
+one time is highly preferable (leading to a maximum of 64 possible user
 segregations). However, as highlighted in {{parametrization}}, having a
 very large user base (> 5 million users), could potentially allow for
 larger values. Issuer replacements should only occur with the same
 frequency as config rotations as they can lead to similar losses in
 anonymity if clients still hold redemption tokens for previously active
-issuers.
+Issuers.
 
 In addition, we RECOMMEND that trusted registries indicate at all times
-which issuers are deemed to be active. If a client is asked to invoke
+which Issuers are deemed to be active. If a client is asked to invoke
 any Privacy Pass exchange for an issuer that is not declared active,
 then the client SHOULD refuse to retrieve the server configuration
 during the protocol.
+
+### Allowing larger number of Issuers {#more-issuers}
+
+The bounds on the numbers of Issuers that we proposed above are very
+restrictive. This is due to the fact that we considered a situation
+where a Client could be issued (and forced to redeem) tokens for any
+issuing key.
+
+An alternative system is to ensure a robust strategy for ensuring that
+Clients only possess redemption tokens for a similarly small number of
+Issuers at any one time. This prevents a malicious verifier from being
+able to invoke redemptions for many Issuers since the Client would only
+be holding redemption tokens for a small set of Issuers. When a Client
+is issued tokens from a new issuer and already has tokens from the
+maximum number of Issuers, it simply deletes the oldest set of
+redemption tokens in storage and then stores the newly acquired tokens.
+
+For example, if Clients ensure that they only hold redemption tokens 4
+Issuers, then this increases the potential size of the anonymity sets
+that the Client belongs to. However, this doesn't protect Clients
+completely, as the selection of Issuers they possess tokens for is still
+revealing. Understanding this trade-off is important in deciding the
+effective anonymity of each Client in the system.
 
 ## Partitioning of Issuer key material {#split-view}
 
 If there are multiple key registries, or if a key registry colludes with
 an Issuer, then it is possible to provide a split-view of an Issuer's
-key material to different clients. This would involve posting different
+key material to different Clients. This would involve posting different
 key material in different locations, or actively modifying the key
 material at a given location.
 
@@ -493,46 +513,33 @@ ecosystem, and within the guidelines stated in {{key-mgmt}}. Any Client
 should follow the recommendations in {{client-issuer}} for determining
 whether an Issuer and its key material should be trusted.
 
-## Maximum number of issuers inferred by client
-
-We RECOMMEND that clients only store redemption tokens for a fixed
-number of issuers at any one time. This number would ideally be less
-than the number of permitted active issuers.
-
-This prevents a malicious verifier from being able to invoke redemptions
-for many issuers since the client would only be holding redemption
-tokens for a small set of issuers. When a client is issued tokens from a
-new issuer and already has tokens from the maximum number of issuers, it
-simply deletes the oldest set of redemption tokens in storage and then
-stores the newly acquired tokens.
-
 ## Additional token metadata
 
 In {{draft-davidson-pp-protocol}}, it is permissible to add public and
-private metadata bits to redemption tokens. While the core protocol
-instantiation that is described does not include additional metadata,
-future instantiations may use this functionality to provide redemption
-verifiers with additional information about the user.
+private metadata bits to redemption tokens. The core protocol
+instantiation that is described does not include additional metadata.
+However, future instantiations may use this functionality to provide
+redemption verifiers with additional information about the user.
 
 Note that any arbitrary bits of information can be used to further
-segment the size of the user's anonymity set. Any issuer that wanted to
+segment the size of the user's anonymity set. Any Issuer that wanted to
 track a single user could add a single metadata bit to user tokens. For
 the tracked user it would set the bit to `1`, and `0` otherwise. Adding
 additional bits provides an exponential increase in tracking granularity
-similarly to introducing more issuers (though with more potential
+similarly to introducing more Issuers (though with more potential
 targeting).
 
-For this reason, the amount of metadata used by an issuer in creating
-redemption tokens must be taken into account together with the bits of
-information that issuer's may learn about clients from the means listed
-above. We discuss this more in {{parametrization}}.
+For this reason, the amount of metadata used by an Issuer in creating
+redemption tokens must be taken into account -- together with the bits
+of information that Issuer's may learn about Clients otherwise. We
+discuss this more in {{parametrization}}.
 
 ## Tracking and identity leakage
 
 Privacy losses may be encountered if too many redemptions are allowed in
 a short burst. For instance, in the Internet setting, this may allow
-non-terminating verifiers to learn more information from the metadata
-that the client may hold (such as first-party cookies for other
+forwarding or asynchronous verifiers to learn more information from the
+metadata that the Client may hold (such as first-party cookies for other
 domains). Mitigations for this issue are similar to those proposed in
 {{issuers}} for tackling the problem of having large number of issuers.
 
@@ -548,74 +555,72 @@ Clients may see an incentive in accepting all tokens that are issued by
 a server, even if the tokens fail later verification checks. This is
 because tokens effectively represent a form of currency that they can
 later redeem for some sort of benefit. The verification checks that are
-put in place are there to ensure that the client does not sacrifice
-their anonymity. However, a client may judge the "monetary" benefit of
+put in place are there to ensure that the Client does not sacrifice
+their anonymity. However, a Client may judge the "monetary" benefit of
 owning tokens to be greater than their own privacy.
 
-Firstly, none of the interfaces that we have described permit this type
-of behavior, as they utilize the underlying Privacy Pass API that
-carries out this verification. A client behaving in this way would not
-be compliant with the protocol.
+Firstly, a Client behaving in this way would not be compliant with the
+protocol, as laid out in {{draft-davidson-pp-protocol}}.
 
 Secondly, acting in this way only affects the privacy of the immediate
-client. There is an exception if a large number of clients colluded to
-accept bad data, then any client that didn't accept would be part of a
-smaller anonymity set. However, such an situation would be identical to
-the situation where the total number of clients in the ecosystem is
+Client. There is an exception if a large number of Clients colluded to
+accept bad data, then any Client that didn't accept would be part of a
+smaller anonymity set. However, such a situation would be identical to
+the situation where the total number of Clients in the ecosystem is
 small. Therefore, the reduction in the size of the anonymity set would
 be equivalent; see {{issuers}} for more details.
 
 # Security considerations {#security}
 
-We present a number of security considerations that prevent a malicious
-actors from abusing the protocol.
+We present a number of security considerations that prevent malicious
+Clients from abusing the protocol.
 
 ## Double-spend protection
 
 All issuing server should implement a robust storage-query mechanism for
-checking that tokens sent by clients have not been spent before. Such
+checking that tokens sent by Clients have not been spent before. Such
 tokens only need to be checked for each issuer individually. But all
-issuers must perform global double-spend checks to avoid clients from
+Issuers must perform global double-spend checks to avoid Clients from
 exploiting the possibility of spending tokens more than once against
 distributed token checking systems. For the same reason, the global data
 storage must have quick update times. While an update is occurring it
-may be possible for a malicious client to spend a token more than once.
+may be possible for a malicious Client to spend a token more than once.
 
 ## Issuer key rotation
 
-We highlighted previously that short key-cycles can be used to
-reduce client privacy. However, regular key rotations of the issuing key
-are still recommended to maintain good server key hygiene.
+We highlighted previously that short key-cycles can be used to reduce
+Client privacy. However, regular key rotations of the issuing key are
+still recommended to maintain good server key hygiene.
 
 We recommend that Privacy Pass issuing keys are rotated from anywhere
 between 1 and 12 weeks. With an active user-base, a week gives a fairly
-large window for clients to participate in the Privacy Pass protocol and
+large window for Clients to participate in the Privacy Pass protocol and
 thus enjoy the anonymity guarantees of being part of a larger group. The
 low ceiling of 12 weeks prevents a key compromise from being too
 destructive. If a server realizes that a key compromise has occurred
 then the server should sample a new key and upload the public key to the
-registry where it displays this information -- while invoking any
-revocation procedures that may apply for the old key.
+key registry; invoking any revocation procedures that may apply for the
+old key.
 
 ## Token exhaustion
 
-When a client holds tokens for an issuer, it is possible for any
-verifier to invoke that client to redeem tokens for that issuer. This
-can lead to an attack where a malicious verifier can force a client to
+When a Client holds tokens for an issuer, it is possible for any
+verifier to invoke that Client to redeem tokens for that issuer. This
+can lead to an attack where a malicious verifier can force a Client to
 spend all of their tokens for a given issuer. To prevent this from
 happening, methods should be put into place to prevent many tokens from
 being redeemed at once.
 
 For example, it may be possible to cache a redemption for the entity
-that is invoking a token redemption. In SISV/SIFV, if the verifier
-requests more tokens then the client simply returns the cached token
-that it returned previously. This could also be handled by simply not
-redeeming any tokens for the entity if a redemption had already occurred
-in a given time window.
+that is invoking a token redemption. If the verifier requests more
+tokens then the Client simply returns the cached token that it returned
+previously. This could also be handled by simply not redeeming any
+tokens for verification if a redemption had already occurred in a given
+time window.
 
-In SIAV, the client instead caches the SRR that it received in the
+In SIAV, the Client instead caches the SRR that it received in the
 asynchronous redemption exchange with the issuer. If the same verifier
-attempts another redemption request, then the client simply returns the
+attempts another redemption request, then the Client simply returns the
 cached SRR. The SRRs can be revoked by the issuer, if need be, by
 providing an expiry date or by signaling that records from a particular
 window need to be refreshed.
@@ -691,11 +696,7 @@ Finally, the minimum security parameter size is related to the
 cryptographic security offered by the protocol that is run. This
 parameter corresponds to the number of operations that any adversary has
 in breaking one of the security guarantees in the Privacy Pass protocol
-{{draft-davidson-pp-protocol}}. The existing protocol document contains
-an instantiation based on verifiable oblivious pseudorandom functions
-(VOPRFs) {{I-D.irtf-cfrg-voprf}}. Careful attention should be paid to
-whether the available ciphersuites for a protocol instantiation meets
-this criteria.
+{{draft-davidson-pp-protocol}}.
 
 ## Example parameterization
 
@@ -708,28 +709,29 @@ value of I should be 3.
 If the value of U is much bigger (e.g. 5 million) then this would permit
 I = (log_2(5000000/5000)-1)/2 ~= 4 issuers.
 
+## Allowing more Issuers
+
+Using the recommendations in {{more-issuers}}, it is possible to
+tolerate larger number of Issuers if Clients in the ecosystem ensure
+that they only store tokens for a small number of them. In particular,
+if Clients limit their storage of redemption tokens to the bound implied
+by I, then prevents a malicious verifier from triggering redemptions for
+all Issuers in the ecosystem.
+
 # Extension integration policy {#extensions}
 
 The Privacy Pass protocol and ecosystem are both intended to be
-receptive to extensions that expand the current set of functionality. In
-{{draft-davidson-pp-protocol}}, some points are made about how
-implementing the Privacy Pass API can be instantiated using different
-underlying primitives.
-
-As specified in {{draft-davidson-pp-protocol}}, all extensions to the
+receptive to extensions that expand the current set of functionality. As
+specified in {{draft-davidson-pp-protocol}}, all extensions to the
 Privacy Pass protocol SHOULD be specified as separate documents that
 modify the content of this document in some way. We provide guidance on
 the type of modifications that are possible in the following.
 
-Aside from the underlying protocol, extensions MAY modify the protocol
-interfaces from the definition in this document. Such extensions MUST
-document exactly which interfaces are changed and any new message
-formats that arise. Any such extension should also come with a detailed
-analysis of the privacy impacts of the extension, why these impacts are
-justified, and guidelines on changes to the parametrization in
-{{parametrization}}. Similarly, extensions MAY also add new Server
-running modes, if applicable, to those that are documented in
-{{running-modes}}.
+Any such extension should also come with a detailed analysis of the
+privacy impacts of the extension, why these impacts are justified, and
+guidelines on changes to the parametrization in {{parametrization}}.
+Similarly, extensions MAY also add new Server running modes, if
+applicable, to those that are documented in {{running-modes}}.
 
 Any extension to the Privacy Pass protocol must adhere to the guidelines
 specified in {{key-mgmt}} for managing Issuer public key data.
