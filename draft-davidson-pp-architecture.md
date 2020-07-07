@@ -146,7 +146,45 @@ evaluating the privacy of each individual Client. We assume that a
 Client's privacy refers to fraction of users that it represents in the
 anonymity set that it belongs to. We discuss this more in {{privacy}}.
 
-TODO: Add diagram of ecosystem
+~~~
+    +-----------------------------------------------------+
+    |                                                     |
+    | Ecosystem                                           |
+    |                                                     |
+    |                                                     |
+    |                                                     |
+    |      +-----+                                        |
+    |      |     |                        +-----+         |
+    |      | C1  | <--------------------> |     |         |
+    |      |     |                        | S1  |         |
+    |      +-----+        +-------------> |     |         |
+    |                     |               +-----+         |
+    |                     |                               |
+    |      +-----+        |                               |
+    |      |     | <------+                               |
+    |      | C2  |                                        |
+    |      |     | <------+               +-----+         |
+    |      +-----+        +-------------> |     |         |
+    |                                     | S2  |         |
+    |                     +-------------> |     |         |
+    |      +-----+        |               +-----+         |
+    |      |     |        |                               |
+    |      | C3  | <------+                               |
+    |      |     |                                        |
+    |      +-----+                                        |
+    |                                                     |
+    +-----------------------------------------------------+
+~~~
+
+In the above diagram, the arrows indicate the open channels between a
+Client and a Server. An open channel indicates that a Client accepts
+Privacy Pass tokens from this Server. The channel also infers which
+Servers, the client can be linked to by redemption of tokens.
+
+If no channel exists, this means that the Client
+chooses not to accept tokens from (or redeem tokens with) that
+particular Server. We discuss the roles of Servers and Clients further
+in {{ecosystem-servers}} and {{ecosystem-clients}}, respectively.
 
 ## Servers {#ecosystem-servers}
 
@@ -178,6 +216,9 @@ function is to undertake the role of the `Client` in
 {{draft-davidson-pp-protocol}}. Clients are assumed to only store data
 related to the tokens that it has been issued by the Server. This
 storage is used for constructing redemption requests.
+
+Clients MAY choose not to accept tokens from Servers that they do not
+trust. See {{client-issuer}} for a wider discussion.
 
 ### Client identifying information {#client-ip}
 
@@ -218,7 +259,7 @@ learning the Server's key configuration.
 In particular, Server key material MUST be publicly available in a
 tamper-proof data structure, which we refer to as a key registry. A
 registry must be globally consistent. Clients using the same registry
-should coordinate in some way to ensure they have a  consistent view of
+should coordinate in some way to ensure they have a consistent view of
 said registry. This can be done via gossiping or some other mechanism.
 The exact mechanism for this coordination will be described elsewhere.
 It is assumed there will be at least one such mechanism.
@@ -228,6 +269,38 @@ structure, such as a Merkle Tree. The key registry should be operated
 independently of any Issuer that publishes key material to the registry.
 This ensures that any Client can make better judgements on whether to
 trust the registry and, transitively, each Server.
+
+~~~
++---------------------------------------------------------------+
+|                                                               |
+| Ecosystem                                                     |
+|                                pkS1                           |
+|  +---------------------+                    +-+               |
+|  |  key_registry_1     | <----------------->|C|               |
+|  |                     |                    +-+               |
+|  ++--------------------+ <------+     pkS1                    |
+|   ^                             +---------------------> +-+   |
+|   |   +---------------------+         pkS3              |C|   |
+|   |   |  key_registry_2     | <-----------------------> +-+   |
+|   |   |                     |                                 |
+|   |   +------+---------+----+ <---------+                     |
+|   |          ^         ^          pkS2  |                     |
+|   | pkS1     | pkS2    | pkS3           |   +-+               |
+|   |          |         |                +-> |C|               |
+|  ++---+    +-+--+    +-+--+                 +-+               |
+|  |    |    |    |    |    |                                   |
+|  | S1 |    | S2 |    | S3 |                                   |
+|  |    |    |    |    |    |                                   |
+|  +----+    +----+    +----+                                   |
+|                                                               |
+|                                                               |
++---------------------------------------------------------------+
+~~~
+
+While there may be multiple key registries for a given ecosystem, a
+Server MUST only publish its key material to a single registry. This
+ensures that the Server is keeping a consistent view of its key
+material.
 
 ## Key rotation
 
