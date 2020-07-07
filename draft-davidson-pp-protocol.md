@@ -176,8 +176,7 @@ guarantees and assumptions that we make in this document.
 ## Motivating use-cases
 
 The Privacy Pass protocol was originally developed to provide anonymous
-authorization of users of anonymity-preserving tools on the Internet,
-such as Tor. In particular, the protocol allows clients to reveal
+authorization of Tor users. In particular, the protocol allows clients to reveal
 authorization tokens that they have been issued without linking the
 authorization to the actual issuance event. This means that the tokens
 cannot be used to link the browsing patterns of clients that reveal
@@ -189,21 +188,17 @@ The Privacy Pass protocol has a number of use cases in practice. See
 
 ## Anonymity and security guarantees
 
-As mentioned above, the protocol provides anonymity-preserving tokens
-for authorizing clients. Throughout this document, we use the terms
+Privacy Pass provides anonymity-preserving authorization tokens for clients. 
+Throughout this document, we use the terms
 "anonymous", "anonymous-preserving" and "anonymity" to refer to the core
-security guarantee of the protocol. This guarantee is the following
-statement.
+security guarantee of the protocol. Informally, this guarantee means that
+any token issued by a server key and subsequently redeemed is indistinguishable 
+from any other token issued under the same key.
 
-- A token issued by a server key and subsequently redeemed is
-  indistinguishable from any other token issued under the same key.
-
-We also require that clients cannot forge tokens, as otherwise Privacy
-Pass would have little value as an authorization protocol. This
-requirement is stated as follows.
-
-- Any client that is issued `N` tokens under a given server key cannot
-  redeem more than `N` valid tokens.
+Privacy Pass also prohibits clients from forging tokens, as otherwise the protocol
+would have little value as an authorization protocol. Informally, this means any client 
+that is issued `N` tokens under a given server key cannot redeem more than `N` valid 
+tokens.
 
 {{sec-reqs}} elaborates on these protocol anonymity and security
 requirements.
