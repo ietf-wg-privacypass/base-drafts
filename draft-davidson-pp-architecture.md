@@ -107,10 +107,8 @@ also includes policies for the following considerations.
 - How server key material should be managed and accessed.
 - Compatible server issuance and redemption running modes and associated
   expectations.
-- Considerations for how clients should evaluate the relationships that
-  they hold with Issuers.
-- Detailed analysis of the privacy and security considerations
-  associated with the protocol.
+- How clients should evaluate Issuer trust relationships.
+- Security and privacy properties of the protocol.
 - A concrete assessment and parametrization of the privacy budget
   associated with different settings of the above policies.
 - The incorporation of potential extensions into the wider ecosystem.
@@ -165,8 +163,8 @@ Note that, in the core protocol instantiation from
 {{draft-davidson-pp-protocol}}, the redemption phase is a symmetric
 protocol. This means that the Issuer is the same Server that ultimately
 processes token redemptions from Clients. However, plausible extensions
-to the protocol specification may allow forwarding or public
-verification of redemption tokens. We highlight possible Client and
+to the protocol specification may allow public verification of tokens by 
+entities which do not hold the secret Privacy Pass keying material. We highlight possible Client and
 Server configurations in {{running-modes}}.
 
 The Server must be available at a specified address (uniquely identified
@@ -202,13 +200,11 @@ tokens corresponds to a number of different pieces of information.
 For reasons that we address later in {{privacy}}, the way that the
 Server publishes and maintains this information impacts the effective
 privacy of the clients. In this section, we describe the main policies
-that need to be satisfied for a key management system that serves a
-particular Privacy Pass ecosystem.
+that need to be satisfied for a key management system in a Privacy Pass ecosystem.
 
 Note that we only specify a set of guidelines and recommendations for
-operating a key registry in this document. Actual specification of such
-a registry and how it operates will be covered in separate
-documentation.
+operating a public key registry in this document. Actual specification of such
+a registry and how it operates will be covered elsewhere.
 
 ## Public key registries
 
@@ -217,18 +213,17 @@ about the cryptographic ciphersuite that they are using. In {{privacy}},
 we address the importance of providing Clients with sources of truth for
 learning the Server's key configuration.
 
-In particular, Server key material should be hosted publicly at
-tamper-proof locations -- known as key registries -- that are globally
-consistent. Clients that retrieve key information for a Server should be
-assured that this key information is the same for all other clients.
-This is to protect against Servers that try and track users by issuing
-individual keys for each user.
+In particular, Server key material MUST be publicly available in a tamper-proof
+data structure, which we refer to as a key registry. A registry must be globally 
+consistent. Clients using the same registry should coordinate in some way to 
+ensure they have a  consistent view of said registry. This can be done via gossiping
+or some other mechanism. The exact mechanism for this coordination will be described
+elsewhere. It is assumed there will be at least one such mechanism.
 
-We RECOMMEND that any key registry is append-only, and publishes the
-timings of all Server updates. The key registry should be operated
-independently of any Issuer that publishes key material to the registry.
-This ensures that any Client can make better judgements on whether to
-trust the registry (and each Server).
+It is RECOMMENDED that each key registry is an append-only data structure, such as a Merkle Tree. 
+The key registry should be operated independently of any Issuer that publishes key material to the 
+registry. This ensures that any Client can make better judgements on whether to trust the registry 
+and, transitively, each Server.
 
 ## Key rotation
 
@@ -239,18 +234,18 @@ Client's access patterns by inspecting which key each token they possess
 has been issued under.
 
 To prevent against this, Servers MUST only use one private key for
-issuing tokens at any given time. Two keys that are used for redemption
-are permitted to allow Servers to rotate keys smoothly.
+issuing tokens at any given time. Servers may use two or more keys for redemption
+to allow Servers for seamless key rotation.
 
-Key rotations must be limited for similar reasons. See
+Key rotations must be limited in frequency for similar reasons. See
 {{parametrization}} for guidelines on what frequency of key rotations
 are permitted.
 
 ## Ciphersuites
 
 Since a Server is only permitted to have a single active issuing key,
-this transitively implies that only a single ciphersuite is allowed. If
-a Server wishes to change their ciphersuite, they should do so during a
+this implies that only a single ciphersuite is allowed per issuance period. If
+a Server wishes to change their ciphersuite, they MUST do so during a
 key rotation.
 
 ## Checking registry integrity
@@ -272,7 +267,7 @@ configuring the way that Servers run in the Privacy Pass ecosystem. In
 short, Servers may be configured to provide symmetric issuance and
 redemption with clients. While some Servers may be configured as proxies
 that accept Privacy Pass data and send it to another Server that
-actually processes issuance and/or redemption data. Finally, we also
+actually processes issuance or redemption data. Finally, we also
 consider instances of the protocol that may permit public verification.
 
 The intention with providing each of these running modes is to cover the
@@ -627,7 +622,7 @@ window need to be refreshed.
 
 ## Avoiding Issuer centralization
 
-TODO: explain potential and mitigations for issue centralization
+[[OPEN ISSUE: explain potential and mitigations for Issuer centralization]]
 
 # Protocol parametrization {#parametrization}
 
