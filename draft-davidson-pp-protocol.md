@@ -594,7 +594,7 @@ in {{DGSTV18}} and {{KLOR20}}.
 
 ## Recommended ciphersuites {#voprf-ciph-recs}
 
-We recommend that the Issuer chooses one of the following ciphersuites
+The RECOMMENDED Issuer ciphersuites are as follows:
 detailed in {{I-D.irtf-cfrg-voprf}}:
 
 - OPRF(curve448, SHA-512) (ID = 0x0002);
@@ -603,7 +603,7 @@ detailed in {{I-D.irtf-cfrg-voprf}}:
 
 We deliberately avoid the usage of smaller ciphersuites (associated with
 P-256 and curve25519) due to the potential to reduce security via
-static-DH attacks. See {{I-D.irtf-cfrg-voprf}} for more details.
+static Diffie Hellman attacks. See {{I-D.irtf-cfrg-voprf}} for more details.
 
 ## Protocol contexts
 
