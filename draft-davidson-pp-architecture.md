@@ -54,11 +54,11 @@ informative:
       -
         ins: Gary Belvin
         org: Google
-  TRUST:
-    title: Trust Token API
-    target: https://github.com/WICG/trust-token-api
+  TrustTokenAPI:
+    title: Getting started with Trust Tokens
+    target: https://web.dev/trust-tokens/
     author:
-      name: WICG
+      name: Google
   PrivateStorage:
     title: The Path from S4 to PrivateStorage
     target: https://medium.com/least-authority/the-path-from-s4-to-privatestorage-ae9d4a10b2ae
@@ -1015,7 +1015,7 @@ phase for their own decision-making.
 
 ## Single-Issue Asynchronous-Verifier {#siav}
 
-This setting is inspired by recently proposed APIs such as {{TRUST}}. It
+This setting is inspired by recently proposed APIs such as {{TrustTokenAPI}}. It
 is similar to the SIFV configuration, except that the verifiers V no
 longer interact with the issuer S. Only C interacts with S, and this is
 done asynchronously to the trust attestation request from V. Hence
@@ -1063,7 +1063,7 @@ permitted at similar intervals.
 
 See {{privacy}} for more details about safe choices of M.
 
-# Privacy analysis {#privacy}
+# Privacy considerations {#privacy}
 
 In the Privacy Pass protocol {{draft-davidson-pp-protocol}}, redemption
 tokens intentionally encode no special information into redemption
@@ -1151,10 +1151,10 @@ We propose that allowing no more than 4 issuers at any one time is
 highly preferable (leading to a maximum of 64 possible user
 segregations). However, as highlighted in {{parametrization}}, having a
 very large user base (> 5 million users), could potentially allow for
-larger values (for example, up to 8 issuers). Issuer replacements should
-only occur with the same frequency as config rotations as they can lead
-to similar losses in privacy if clients still hold redemption tokens for
-previously active issuers.
+larger values. Issuer replacements should only occur with the same
+frequency as config rotations as they can lead to similar losses in
+privacy if clients still hold redemption tokens for previously active
+issuers.
 
 In addition, we RECOMMEND that trusted registries indicate at all times
 which issuers are deemed to be active. If a client is asked to invoke
@@ -1185,13 +1185,33 @@ new issuer and already has tokens from the maximum number of issuers, it
 simply deletes the oldest set of redemption tokens in storage and then
 stores the newly acquired tokens.
 
+### Additional token metadata
+
+In {{draft-davidson-pp-protocol}}, it is permissible to add public and
+private metadata bits to redemption tokens. While the core protocol
+instantiation that is described does not include additional metadata,
+future instantiations may use this functionality to provide redemption
+verifiers with additional information about the user.
+
+Note that any arbitrary bits of information can be used to further
+segment the size of the user's anonymity set. Any issuer that wanted to
+track a single user could add a single metadata bit to user tokens. For
+the tracked user it would set the bit to `1`, and `0` otherwise. Adding
+additional bits provides an exponential increase in tracking granularity
+similarly to introducing more issuers (though with more potential
+targeting).
+
+For this reason, the amount of metadata used by an issuer in creating
+redemption tokens must be taken into account together with the bits of
+information that issuer's may learn about clients from the means listed
+above. We discuss this more in {{parametrization}}.
+
 ## Tracking and identity leakage
 
-While redemption tokens themselves encode no information about the
-client redeeming them, problems may occur if too many redemptions are
-allowed in a short burst. For instance, in the Internet setting, this
-may allow non-terminating verifiers to learn more information from the
-metadata that the client may hold (such as first-party cookies for other
+Privacy losses may be encountered if too many redemptions are allowed in
+a short burst. For instance, in the Internet setting, this may allow
+non-terminating verifiers to learn more information from the metadata
+that the client may hold (such as first-party cookies for other
 domains). Mitigations for this issue are similar to those proposed in
 {{issuers}} for tackling the problem of having large number of issuers.
 
@@ -1298,19 +1318,21 @@ security considerations that are highlighted in {{privacy}} and
 reference point for those implementing the protocol.
 
 Firstly, let U be the total number of users, I be the total number of
-issuers. Assuming that each user accept tokens from a uniform sampling
-of all the possible issuers, as a worst-case analysis, this segregates
-users into a total of 2^I buckets. As such, we see an exponential
-reduction in the size of the anonymity set for any given user. This
-allows us to specify the privacy constraints of the protocol below,
-relative to the setting of A.
+issuers. We let M be the total number of metadata bits that are allowed
+to be added by any given issuer. Assuming that each user accept tokens
+from a uniform sampling of all the possible issuers, as a worst-case
+analysis, this segregates users into a total of 2^I buckets. As such, we
+see an exponential reduction in the size of the anonymity set for any
+given user. This allows us to specify the privacy constraints of the
+protocol below, relative to the setting of A.
 
 | parameter | value |
 |---|---|
 | Minimum anonymity set size (A) | 5000 |
 | Recommended key lifetime (L) | 2 - 24 weeks |
 | Recommended key rotation frequency (F) | L/2 |
-| Maximum allowed issuers (I) | log_2(U/A)-1 |
+| Maximum additional metadata bits (M) | 1 |
+| Maximum allowed issuers (I) | (log_2(U/A)-1)/2 |
 | Maximum active issuance configurations | 1 |
 | Maximum active redemption configurations | 2 |
 | Minimum cryptographic security parameter | 128 bits |
@@ -1320,14 +1342,21 @@ relative to the setting of A.
 We make the following assumptions in these parameter choices.
 
 - Inferring the identity of a user in a 5000-strong anonymity set is
-  difficult
+  difficult.
 - After 2 weeks, all clients in a system will have rotated to the new
-  key
+  key.
 
-The maximum choice of I is based on the equation 1/2 * U/2^I = A. This
-is because I issuers lead to 2^I segregations of the total user-base U.
-By reducing I we limit the possibility of performing the attacks
-mentioned in {{segregation}}.
+In terms of additional metadata, the only concrete applications of
+Privacy Pass that use additional metadata require just a single bit.
+Therefore, we set the ceiling of permitted metadata to 1 bit for now,
+this may be revisited in future revisions.
+
+The maximum choice of I is based on the equation 1/2 * U/2^(2I) = A.
+This is derived from the fact that permitting I issuers lead to 2^I
+segregations of the total user-base U. Moreover, if we permit M = 1,
+then this effectively halves the anonymity set for each issuer, and thus
+we incur a factor of 2I in the exponent. By reducing I, we limit the
+possibility of performing the attacks mentioned in {{segregation}}.
 
 We must also account for each user holding issued data for more then one
 possible active keys. While this may also be a vector for monitoring the
@@ -1357,12 +1386,12 @@ this criteria.
 
 Using the specification above, we can give some example
 parameterizations. For example, the current Privacy Pass browser
-extension {{PPEXT}} has over 150,000 active users (from Chrome and
-Firefox). As a result, log_2(U/A) is approximately 5 and so the maximum
-value of I should be 4.
+extension {{PPEXT}} has nearly 300000 active users (from Chrome and
+Firefox). As a result, log_2(U/A) is approximately 6 and so the maximum
+value of I should be 3.
 
 If the value of U is much bigger (e.g. 5 million) then this would permit
-I = log_2(5000000/5000)-1 = 8 issuers.
+I = (log_2(5000000/5000)-1)/2 ~= 4 issuers.
 
 # Recommendations for identifying malicious behavior {#recs-srvr}
 
@@ -1433,7 +1462,7 @@ without completing a challenge.
 
 ## Trust Token API
 
-The Trust Token API {{TRUST}} has been devised as a generic API for
+The Trust Token API {{TrustTokenAPI}} has been devised as a generic API for
 providing Privacy Pass functionality in the browser setting. The API is
 intended to be implemented directly into browsers so that server's can
 directly trigger the Privacy Pass workflow.
