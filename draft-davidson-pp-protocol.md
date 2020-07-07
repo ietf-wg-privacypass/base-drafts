@@ -34,8 +34,8 @@ normative:
     title: "Privacy Pass: HTTP API"
     target: https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-davidson-pp-architecture
     author:
-      ins: A. Davidson
-      org: Cloudflare
+      ins: S. Valdez
+      org: Google
 informative:
   RFC7049:
   RFC7159:
@@ -625,10 +625,13 @@ For the explicit signatures of each of the functions, refer to
 
 ~~~
 def Generate(m):
-  inputs = []
+  tokens = []
+  blindedTokens = []
   for i in range(m):
-    inputs[i] = random_bytes()
-  (tokens, blindedTokens) = Blind(inputs)
+    x = random_bytes()
+    (token, blindedToken) = Blind(x)
+    token[i] = token
+    blindedToken[i] = blindedToken
   return IssuanceInput {
            internal: tokens,
            msg: blindedTokens,
@@ -636,6 +639,12 @@ def Generate(m):
 ~~~
 
 ### Issue
+
+For this functionality, note that we supply multiple tokens in `msg` to
+`Evaluate`. This allows batching a single proof object for multiple
+evaluations. While the construction in {{I-D.irtf-cfrg-voprf}} only
+permits a single input, we follow the advice for providing vectors of
+inputs.
 
 ~~~
 def Issue(pkI, skI, msg):
@@ -647,6 +656,9 @@ def Issue(pkI, skI, msg):
 ~~~
 
 ### Process
+
+Similarly to `Issue`, we follow the advice for providing vectors of
+inputs to the `Unblind` function for verifying the batched proof object.
 
 ~~~
 Process(pkI, input, resp):
