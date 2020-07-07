@@ -155,7 +155,7 @@ primary function is to undertake the role of the `Issuer` in
 {{draft-davidson-pp-protocol}}. To facilitate this, the Issuer MUST hold
 a Privacy Pass protocol keypair at any given time. The Issuer public key
 MUST be made available to all Clients in such a way that key rotations
-and other updates can be monitored. The Issuer MAY also require
+and other updates are publicly visible. The Issuer MAY also require
 additional state for ensuring this. We provide a wider discussion in
 {{key-mgmt}}.
 
@@ -163,12 +163,13 @@ Note that, in the core protocol instantiation from
 {{draft-davidson-pp-protocol}}, the redemption phase is a symmetric
 protocol. This means that the Issuer is the same Server that ultimately
 processes token redemptions from Clients. However, plausible extensions
-to the protocol specification may allow public verification of tokens by 
-entities which do not hold the secret Privacy Pass keying material. We highlight possible Client and
-Server configurations in {{running-modes}}.
+to the protocol specification may allow public verification of tokens by
+entities which do not hold the secret Privacy Pass keying material. We
+highlight possible Client and Server configurations in
+{{running-modes}}.
 
-The Server must be available at a specified address (uniquely identified
-by some global identifier).
+The Server must be uniquely identifiable by all Clients with a
+consistent identifier.
 
 ## Clients {#ecosystem-clients}
 
@@ -200,11 +201,12 @@ tokens corresponds to a number of different pieces of information.
 For reasons that we address later in {{privacy}}, the way that the
 Server publishes and maintains this information impacts the effective
 privacy of the clients. In this section, we describe the main policies
-that need to be satisfied for a key management system in a Privacy Pass ecosystem.
+that need to be satisfied for a key management system in a Privacy Pass
+ecosystem.
 
 Note that we only specify a set of guidelines and recommendations for
-operating a public key registry in this document. Actual specification of such
-a registry and how it operates will be covered elsewhere.
+operating a public key registry in this document. Actual specification
+of such a registry and how it operates will be covered elsewhere.
 
 ## Public key registries
 
@@ -213,17 +215,19 @@ about the cryptographic ciphersuite that they are using. In {{privacy}},
 we address the importance of providing Clients with sources of truth for
 learning the Server's key configuration.
 
-In particular, Server key material MUST be publicly available in a tamper-proof
-data structure, which we refer to as a key registry. A registry must be globally 
-consistent. Clients using the same registry should coordinate in some way to 
-ensure they have a  consistent view of said registry. This can be done via gossiping
-or some other mechanism. The exact mechanism for this coordination will be described
-elsewhere. It is assumed there will be at least one such mechanism.
+In particular, Server key material MUST be publicly available in a
+tamper-proof data structure, which we refer to as a key registry. A
+registry must be globally consistent. Clients using the same registry
+should coordinate in some way to ensure they have a  consistent view of
+said registry. This can be done via gossiping or some other mechanism.
+The exact mechanism for this coordination will be described elsewhere.
+It is assumed there will be at least one such mechanism.
 
-It is RECOMMENDED that each key registry is an append-only data structure, such as a Merkle Tree. 
-The key registry should be operated independently of any Issuer that publishes key material to the 
-registry. This ensures that any Client can make better judgements on whether to trust the registry 
-and, transitively, each Server.
+It is RECOMMENDED that each key registry is an append-only data
+structure, such as a Merkle Tree. The key registry should be operated
+independently of any Issuer that publishes key material to the registry.
+This ensures that any Client can make better judgements on whether to
+trust the registry and, transitively, each Server.
 
 ## Key rotation
 
@@ -234,8 +238,8 @@ Client's access patterns by inspecting which key each token they possess
 has been issued under.
 
 To prevent against this, Servers MUST only use one private key for
-issuing tokens at any given time. Servers may use two or more keys for redemption
-to allow Servers for seamless key rotation.
+issuing tokens at any given time. Servers may use two or more keys for
+redemption to allow Servers for seamless key rotation.
 
 Key rotations must be limited in frequency for similar reasons. See
 {{parametrization}} for guidelines on what frequency of key rotations
@@ -244,21 +248,9 @@ are permitted.
 ## Ciphersuites
 
 Since a Server is only permitted to have a single active issuing key,
-this implies that only a single ciphersuite is allowed per issuance period. If
-a Server wishes to change their ciphersuite, they MUST do so during a
-key rotation.
-
-## Checking registry integrity
-
-Out-of-band checks that establish the integrity of a key registry should
-be available. For example, by publishing hashes of the current registry
-contents to a globally trusted location. Moreover, regular checks should
-be made to ascertain whether a Server is publishing different key
-material to multiple registries (see {{split-view}}).
-
-Clients may also choose to publicly expose registries that they do not
-trust. This could be done by posting on some public bulletin board, or
-via other means such as Client gossip protocols.
+this implies that only a single ciphersuite is allowed per issuance
+period. If a Server wishes to change their ciphersuite, they MUST do so
+during a key rotation.
 
 # Server running modes {#running-modes}
 
@@ -288,13 +280,13 @@ redemption is required, C and S invoke the redemption phase of the
 protocol, where C uses an issued token from a previous exchange, and S
 uses skS to validate the redemption.
 
-## Single-Issuer Forwarding-Verifier {#sifv}
+## Single-Issuer Delegated-Verifier {#sidv}
 
 In this setting, each Client C obtains issued tokens from a Server S via
 the issuance phase of the protocol. The difference is that C can prove
 that they hold a valid authorization with any verifier V. We still only
 consider S to hold their own secret key. We name this mode
-"Single-Issuer Forwarding-Verifier" (SIFV).
+"Single-Issuer Delegated-Verifier" (SIDV).
 
 When C interacts with V, V can ask C to provide proof of authorization
 to the separate issuer S. The first stage of the redemption phase of the
@@ -307,7 +299,7 @@ result to determine whether C has a valid token.
 ## Single-Issuer Asynchronous-Verifier {#siav}
 
 This setting is inspired by recently proposed APIs such as
-{{TrustTokenAPI}}. It is similar to the SIFV configuration, except that
+{{TrustTokenAPI}}. It is similar to the SIDV configuration, except that
 the verifiers V no longer interact with the issuer S. Only C interacts
 with S, and this is done asynchronously to the authorization request
 from V. Hence "Asynchronous-Verifier" (SIAV).
@@ -488,10 +480,12 @@ is issued tokens from a new issuer and already has tokens from the
 maximum number of Issuers, it simply deletes the oldest set of
 redemption tokens in storage and then stores the newly acquired tokens.
 
-For example, if Clients ensure that they only hold redemption tokens 4
-Issuers, then this increases the potential size of the anonymity sets
+For example, if Clients ensure that they only hold redemption tokens for
+4 Issuers, then this increases the potential size of the anonymity sets
 that the Client belongs to. However, this doesn't protect Clients
-completely, as the selection of Issuers they possess tokens for is still
+completely as it would if only 4 Issuers were permitted across the whole
+system. For example, these 4 Issuers could be different for each Client.
+Therefore, the selection of Issuers they possess tokens for is still
 revealing. Understanding this trade-off is important in deciding the
 effective anonymity of each Client in the system.
 
@@ -533,7 +527,7 @@ discuss this more in {{parametrization}}.
 
 Privacy losses may be encountered if too many redemptions are allowed in
 a short burst. For instance, in the Internet setting, this may allow
-forwarding or asynchronous verifiers to learn more information from the
+delegated or asynchronous verifiers to learn more information from the
 metadata that the Client may hold (such as first-party cookies for other
 domains). Mitigations for this issue are similar to those proposed in
 {{issuers}} for tackling the problem of having large number of issuers.
@@ -622,7 +616,8 @@ window need to be refreshed.
 
 ## Avoiding Issuer centralization
 
-[[OPEN ISSUE: explain potential and mitigations for Issuer centralization]]
+[[OPEN ISSUE: explain potential and mitigations for Issuer
+centralization]]
 
 # Protocol parametrization {#parametrization}
 
