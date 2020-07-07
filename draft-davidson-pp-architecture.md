@@ -270,6 +270,20 @@ with.
 Each client must be addressed by a unique identifier, given by
 `client_id`.
 
+### Hidden identity {#client-ip}
+
+Throughout this document, we assume that the Client identity (such as
+its IP address, and other similar characteristics) is not tracked and
+stored by the Server. This is because it is  trivial for a Server to
+track the redemption patterns of a Client over the lifetime of the
+identity that it uses.
+
+Client's cannot monitor whether a Server is doing this. If a Client
+needs stricter assurances, then it should consider using an
+anonymity-preserving tools to interact with Servers, such as Tor. Such
+tools can be used to hide the Client identity across multiple
+interactions.
+
 ## Global configuration store {#ecosystem-config}
 
 The global configuration store controls all the configuration data that
@@ -325,20 +339,20 @@ client functionality.
 
 1. Server functionality:
    - `ServerSetup`: Generates server configuration and keys
-   - `Issue`: Run on the contents of the client message in the
-     issuance phase.
+   - `Issue`: Run on the contents of the client message in the issuance
+     phase.
    - `Verify`: Run on the contents of the client message in the
      redemption phase.
 
 2. Client functionality:
    - `ClientSetup`: Generates the client configuration based on the
      configuration used by a given server.
-   - `Generate`: Generates public and private data associated with
-     the contents of the client message in the issuance phase.
+   - `Generate`: Generates public and private data associated with the
+     contents of the client message in the issuance phase.
    - `Process`: Processes the contents of the server response in the
      issuance phase.
-   - `Redeem`: Generates the data that forms the client message in
-     the redemption phase.
+   - `Redeem`: Generates the data that forms the client message in the
+     redemption phase.
 
 We will use each of the functions internally in the description of the
 interfaces that follows.
@@ -367,12 +381,12 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
     3. The value `<comm_id>` is a string used to distinguish between
        config entries corresponding to the same config, but where the
        key material has changed (e.g. after a key rotation).
-    4. The value of `<supports>` should be set to an octet
-       corresponding to the functionality that is provided. The value
-       `0` indicates that no functionality is supported; `1` indicates
-       that the server supports the issuance phase; `2` indicates
-       support for the redemption phase; and `3` indicates support for
-       both phases. If unspecified, this defaults to `3`.
+    4. The value of `<supports>` should be set to an octet corresponding
+       to the functionality that is provided. The value `0` indicates
+       that no functionality is supported; `1` indicates that the server
+       supports the issuance phase; `2` indicates support for the
+       redemption phase; and `3` indicates support for both phases. If
+       unspecified, this defaults to `3`.
     5. The value of `<config>` is set to be equal to `update`.
     5. The value `<signature>` is computed over the bytes of the rest of
        message contents, using the Server long-term secret signing key
@@ -443,10 +457,10 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
 - Input: A `client_issue` message `msg` ({{msg-client-issue}})
 - Returns: A `server_issue_resp` message
 - Steps:
-  1. Send the message `issue` to the internal
-     `SERVER_CONFIG_RETRIEVAL` interface, and let
-     `ciphersuite=msg.ciphersuites[0]` and `srv_cfg=msg.configs[0]`
-     based on the `server_config_retrieve` response.
+  1. Send the message `issue` to the internal `SERVER_CONFIG_RETRIEVAL`
+     interface, and let `ciphersuite=msg.ciphersuites[0]` and
+     `srv_cfg=msg.configs[0]` based on the `server_config_retrieve`
+     response.
   2. Run the following:
 
      ~~~
@@ -464,9 +478,8 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
 - Returns: A `server_redeem_resp` message back to the calling
   `CLIENT_REDEEM` interface ({{msg-server-redeem-resp}}).
 - Steps:
-  1. Send the message `redeem` to the internal
-     `SERVER_CONFIG_RETRIEVAL` interface, let `configs`
-     be the returned array.
+  1. Send the message `redeem` to the internal `SERVER_CONFIG_RETRIEVAL`
+     interface, let `configs` be the returned array.
   2. Send `msg.message.data` to the `SERVER_DOUBLE_SPEND_CHECK`
      interface and, if the response is `true`, return an unsuccessful
      `server_redeem_resp` message to the client.
@@ -523,10 +536,10 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      `GLOBAL_CONFIG_RETRIEVAL` interface, and receive a reply `resp` of
      type `config_retrieval_resp`.
   3. If `success` is set to `false`, return `false`.
-  4. Parse `resp[0].supports` and check that it includes support
-     for what is specified in `msg.supports`, otherwise return false.
-  5. Parse `resp[1].supports` and check that it includes support
-     for what is specified in `msg.supports`, otherwise return false.
+  4. Parse `resp[0].supports` and check that it includes support for
+     what is specified in `msg.supports`, otherwise return false.
+  5. Parse `resp[1].supports` and check that it includes support for
+     what is specified in `msg.supports`, otherwise return false.
   6. The value `<signature>` is verified over the bytes of the rest of
      message contents, using the Server long-term verification key
      `k_vrfy`. This can be computed by running the function below and
@@ -694,8 +707,8 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Returns: a `client_issue_retrieval_resp` message
   ({{msg-client-issue-retrieval-resp}}).
 - Steps:
-  1. Retrieve `client_data` where `msg.server_id`, `msg.ciphersuite`
-     and `msg.comm_id`.
+  1. Retrieve `client_data` where `msg.server_id`, `msg.ciphersuite` and
+     `msg.comm_id`.
   2. Return a `client_issue_retrieval` message containing `client_data`
      above to the `CLIENT_ISSUE_FINISH` interface.
 
@@ -922,8 +935,8 @@ Each update results in adding a new config underneath an existing
 has occurred.
 
 For reasons that are addressed more closely in {{privacy}}, the global
-configuration registry must ensure that the only configurations that
-are used at any given time, are those referred to in `current` and
+configuration registry must ensure that the only configurations that are
+used at any given time, are those referred to in `current` and
 `previous`. This is done to ensure that the server is not able to serve
 tokens to clients from multiple different configurations (which could be
 used to decrease the size of client anonymity sets).
@@ -1015,11 +1028,11 @@ phase for their own decision-making.
 
 ## Single-Issue Asynchronous-Verifier {#siav}
 
-This setting is inspired by recently proposed APIs such as {{TrustTokenAPI}}. It
-is similar to the SIFV configuration, except that the verifiers V no
-longer interact with the issuer S. Only C interacts with S, and this is
-done asynchronously to the trust attestation request from V. Hence
-"Asynchronous-Verifier" (SIAV).
+This setting is inspired by recently proposed APIs such as
+{{TrustTokenAPI}}. It is similar to the SIFV configuration, except that
+the verifiers V no longer interact with the issuer S. Only C interacts
+with S, and this is done asynchronously to the trust attestation request
+from V. Hence "Asynchronous-Verifier" (SIAV).
 
 When V invokes a redemption for C, C then invokes a redemption exchange
 with S in a separate session. If verification is carried out
@@ -1462,10 +1475,10 @@ without completing a challenge.
 
 ## Trust Token API
 
-The Trust Token API {{TrustTokenAPI}} has been devised as a generic API for
-providing Privacy Pass functionality in the browser setting. The API is
-intended to be implemented directly into browsers so that server's can
-directly trigger the Privacy Pass workflow.
+The Trust Token API {{TrustTokenAPI}} has been devised as a generic API
+for providing Privacy Pass functionality in the browser setting. The API
+is intended to be implemented directly into browsers so that server's
+can directly trigger the Privacy Pass workflow.
 
 ## Zero-knowledge Access Passes
 

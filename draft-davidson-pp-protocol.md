@@ -176,29 +176,29 @@ guarantees and assumptions that we make in this document.
 ## Motivating use-cases
 
 The Privacy Pass protocol was originally developed to provide anonymous
-authorization of Tor users. In particular, the protocol allows clients to reveal
-authorization tokens that they have been issued without linking the
-authorization to the actual issuance event. This means that the tokens
-cannot be used to link the browsing patterns of clients that reveal
-tokens.
+authorization of Tor users. In particular, the protocol allows clients
+to reveal authorization tokens that they have been issued without
+linking the authorization to the actual issuance event. This means that
+the tokens cannot be used to link the browsing patterns of clients that
+reveal tokens.
 
-The Privacy Pass protocol has a number of use cases in practice. See
-{{DGSTV18}}, {{TrustTokenAPI}}, {{PrivateStorage}}, {{OpenPrivacy}}, and
-{{Brave}} for examples.
+Beyond these uses-cases, the Privacy Pass protocol is used in a number
+of practical applications. See {{DGSTV18}}, {{TrustTokenAPI}},
+{{PrivateStorage}}, {{OpenPrivacy}}, and {{Brave}} for examples.
 
 ## Anonymity and security guarantees
 
-Privacy Pass provides anonymity-preserving authorization tokens for clients. 
-Throughout this document, we use the terms
-"anonymous", "anonymous-preserving" and "anonymity" to refer to the core
-security guarantee of the protocol. Informally, this guarantee means that
-any token issued by a server key and subsequently redeemed is indistinguishable 
-from any other token issued under the same key.
+Privacy Pass provides anonymity-preserving authorization tokens for
+clients. Throughout this document, we use the terms "anonymous",
+"anonymous-preserving" and "anonymity" to refer to the core security
+guarantee of the protocol. Informally, this guarantee means that any
+token issued by a server key and subsequently redeemed is
+indistinguishable from any other token issued under the same key.
 
-Privacy Pass also prohibits clients from forging tokens, as otherwise the protocol
-would have little value as an authorization protocol. Informally, this means any client 
-that is issued `N` tokens under a given server key cannot redeem more than `N` valid 
-tokens.
+Privacy Pass also prohibits clients from forging tokens, as otherwise
+the protocol would have little value as an authorization protocol.
+Informally, this means any client that is issued `N` tokens under a
+given server key cannot redeem more than `N` valid tokens.
 
 {{sec-reqs}} elaborates on these protocol anonymity and security
 requirements.
@@ -210,6 +210,8 @@ clients and servers supporting the Privacy Pass protocol.
 
 - At any one time, we assume that the Issuer uses only one configuration
   containing their ciphersuite choice along with their secret key data.
+  This ensures that all Clients are issued tokens under the single key
+  associated with any given epoch.
 - We assume that the client has access to a global directory of the
   current public parts of the configurations used the Issuer.
 
@@ -244,7 +246,9 @@ The client initialises a global storage system `store` that allows it
 store the tokens that are received during issuance. The storage system
 is a map of Issuer identifiers (`Issuer.id`) to arrays of stored tokens.
 We assume that the client knows the Issuer public key `pkI` ahead of
-time.
+time. In {{draft-davidson-pp-architecture}} we discuss mechanisms that
+the Client can use to ensure that this public key is consistent across
+the entire ecosystem.
 
 ## Issuance phase {#issuance-phase}
 
@@ -658,16 +662,16 @@ laid out in {{sec-reqs}}, based on the security proofs provided in
 
 ## Recommended ciphersuites {#voprf-ciph-recs}
 
-The RECOMMENDED Issuer ciphersuites are as follows:
-detailed in {{I-D.irtf-cfrg-voprf}}:
+The RECOMMENDED Issuer ciphersuites are as follows: detailed in
+{{I-D.irtf-cfrg-voprf}}:
 
 - OPRF(curve448, SHA-512) (ID = 0x0002);
 - OPRF(P-384, SHA-512) (ID = 0x0004);
 - OPRF(P-521, SHA-512) (ID = 0x0005).
 
 We deliberately avoid the usage of smaller ciphersuites (associated with
-P-256 and curve25519) due to the potential to reduce security via
-static Diffie Hellman attacks. See {{I-D.irtf-cfrg-voprf}} for more details.
+P-256 and curve25519) due to the potential to reduce security via static
+Diffie Hellman attacks. See {{I-D.irtf-cfrg-voprf}} for more details.
 
 ## Protocol contexts
 
