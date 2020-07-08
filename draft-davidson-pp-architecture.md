@@ -178,8 +178,7 @@ anonymity set that it belongs to. We discuss this more in {{privacy}}.
 
 In the above diagram, the arrows indicate the open channels between a
 Client and a Server. An open channel indicates that a Client accepts
-Privacy Pass tokens from this Server. The channel also infers which
-Servers, the client can be linked to by redemption of tokens.
+Privacy Pass tokens from this Server.
 
 If no channel exists, this means that the Client
 chooses not to accept tokens from (or redeem tokens with) that
@@ -271,30 +270,25 @@ This ensures that any Client can make better judgements on whether to
 trust the registry and, transitively, each Server.
 
 ~~~
-+---------------------------------------------------------------+
-|                                                               |
-| Ecosystem                                                     |
-|                                pkS1                           |
-|  +---------------------+                    +-+               |
-|  |  key_registry_1     | <----------------->|C|               |
-|  |                     |                    +-+               |
-|  ++--------------------+ <------+     pkS1                    |
-|   ^                             +---------------------> +-+   |
-|   |   +---------------------+         pkS3              |C|   |
-|   |   |  key_registry_2     | <-----------------------> +-+   |
-|   |   |                     |                                 |
-|   |   +------+---------+----+ <---------+                     |
-|   |          ^         ^          pkS2  |                     |
-|   | pkS1     | pkS2    | pkS3           |   +-+               |
-|   |          |         |                +-> |C|               |
-|  ++---+    +-+--+    +-+--+                 +-+               |
-|  |    |    |    |    |    |                                   |
-|  | S1 |    | S2 |    | S3 |                                   |
-|  |    |    |    |    |    |                                   |
-|  +----+    +----+    +----+                                   |
-|                                                               |
-|                                                               |
-+---------------------------------------------------------------+
++--------------------------------------------------------+
+|                                                        |
+| Ecosystem                            +---+             |
+|                                      | C |             |
+|  +--------------+ <------ pkS1 ----> +---+             |
+|  |  Registry 1  |                                      |
+|  ++-------------+ <-------------- pkS1 --------> +---+ |
+|   |                                              | C | |
+|   |   +--------------+ <--------- pkS3 --------> +---+ |
+|   |   |  Registry 2  |                                 |
+|  pkS1 +----^-------^-+ <--------- pkS2 --------> +---+ |
+|   |        |       |                             | C | |
+|   |       pkS2    pkS3                           +---+ |
+|   |        |       |                                   |
+|  ++---+  +-+--+  +-+--+                                |
+|  | S1 |  | S2 |  | S3 |                                |
+|  +----+  +----+  +----+                                |
+|                                                        |
++--------------------------------------------------------+
 ~~~
 
 While there may be multiple key registries for a given ecosystem, a
