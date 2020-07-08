@@ -113,10 +113,10 @@ performant protocol in the application-layer.
 # Introduction
 
 A common problem on the Internet is providing an effective mechanism for
-servers to derive trust from clients they interact with. Typically, this
-can be done by providing some sort of authorization challenge to the
-client. But this also negatively impacts the experience of clients that
-regularly have to solve such challenges.
+servers to derive trust from clients that they interact with. Typically,
+this can be done by providing some sort of authorization challenge to
+the client. But this also negatively impacts the experience of clients
+that regularly have to solve such challenges.
 
 To mitigate accessibility issues, a client that correctly solves the
 challenge can be provided with a cookie. This cookie can be presented
@@ -129,9 +129,9 @@ their online privacy.
 
 The Privacy Pass protocol provides a set of cross-domain authorization
 tokens that protect the client's anonymity in message exchanges with a
-server. This allows clients to communicate to a server an attestation of
-a previously authenticated action, without having to reauthenticate
-manually. The tokens are retain anonymity in the sense that the act of
+server. This allows clients to communicate an attestation of a
+previously authenticated server action, without having to reauthenticate
+manually. The tokens retain anonymity in the sense that the act of
 revealing them cannot be linked back to the session where they were
 initially issued.
 
@@ -145,7 +145,7 @@ running and maintaining the Privacy Pass protocol in the Internet
 setting. In addition, it DOES NOT cover the choices that are necessary
 for ensuring that client privacy leaks do not occur. Both of these
 considerations are covered in a separate document
-{{draft-davidson-pp-architecture}}. A separate document
+{{draft-davidson-pp-architecture}}. In addition,
 {{draft-svaldez-pp-http-api}} provides an instantiation of this protocol
 intended for the HTTP setting.
 
@@ -158,11 +158,10 @@ document are to be interpreted as described in {{RFC2119}}.
 The following terms are used throughout this document.
 
 - Issuer: A service that provides the server-side functionality required
-  by the protocol documented here. May also be known as the Server.
+  by the protocol. May also be known as the Server.
 - Client: An entity that seeks authorization from a server that supports
   interactions in the Privacy Pass protocol.
-- Key: The secret key used by the Server for authorizing client data
-  (typically denoted key).
+- Key: The secret key used by the Server for authorizing Client data.
 
 We assume that all protocol messages are encoded into raw byte format
 before being sent. We use the TLS presentation language {{RFC8446}} to
@@ -206,7 +205,7 @@ requirements.
 ## Basic assumptions
 
 We make only a few minimal assumptions about the environment of the
-clients and servers supporting the Privacy Pass protocol.
+Clients and Servers supporting the Privacy Pass protocol.
 
 - At any one time, we assume that the Issuer uses only one configuration
   containing their ciphersuite choice along with their secret key data.
@@ -223,9 +222,9 @@ The wider ecosystem that this protocol is employed in is described in
 The Privacy Pass protocol is split into two phases that are built upon
 the functionality described in {{pp-api}} later.
 
-The first phase, "issuance", provides the client with unlinkable tokens
+The first phase, "issuance", provides the Client with unlinkable tokens
 that can be used to initiate re-authorization with the server in the
-future. The second phase, "redemption", allows the client to redeem a
+future. The second phase, "redemption", allows the Client to redeem a
 given re-authorization token with the server that it interacted with
 during the issuance phase. The protocol must satisfy two cryptographic
 security requirements known as "unlinkability" and "unforgeability".
@@ -237,23 +236,24 @@ Before the protocol takes place, the Issuer chooses a ciphersuite and
 generates a keypair by running `(pkI, skI) = KeyGen()`. This
 configuration must be available to all Clients that interact with the
 Issuer (for the purpose of engaging in a Privacy Pass exchange). We
-assume that the Issuer has a unique identifier `id` that is known to the
-client.
+assume that the Issuer has a public (and unique) identity that the
+Client uses to retrieve this configuration.
 
 ## Client setup {#client-setup}
 
-The client initialises a global storage system `store` that allows it
+The Client initialises a global storage system `store` that allows it
 store the tokens that are received during issuance. The storage system
 is a map of Issuer identifiers (`Issuer.id`) to arrays of stored tokens.
 We assume that the client knows the Issuer public key `pkI` ahead of
-time. In {{draft-davidson-pp-architecture}} we discuss mechanisms that
-the Client can use to ensure that this public key is consistent across
-the entire ecosystem.
+time. The Client picks a value `m` of tokens to receive during the
+issuance phase. In {{draft-davidson-pp-architecture}} we discuss
+mechanisms that the Client can use to ensure that this public key is
+consistent across the entire ecosystem.
 
 ## Issuance phase {#issuance-phase}
 
-The issuance phase allows the Client to receive anonymous authorization
-tokens from the Issuer.
+The issuance phase allows the Client to receive `m` anonymous
+authorization tokens from the Issuer.
 
 ~~~
   Client(pkI, m)                              Issuer(skI, pkI)
@@ -318,28 +318,26 @@ request has happened in an appropriate time window.
 ### Double-spend protection
 
 To protect against clients that attempt to spend a value `msg.data` more
-than once, the server uses an index, `dsIdx`, to collect valid inputs
-and then check against it in future sessions. Since this store needs to
-only be optimized for storage and querying, a structure such as a Bloom
-filter suffices. The storage should be parameterized to live as long as
-the Issuer keypair that is in use. See {{sec-reqs} for more details.
+than once, the server uses an index, `dsIdx`, to collect valid inputs it
+witnesses. Since this store needs to only be optimized for storage and
+querying, a structure such as a Bloom filter suffices. The storage
+should be parameterized to live as long as the Issuer keypair that is in
+use. See {{sec-reqs} for more details.
 
 ## Handling errors
 
 It is possible for the API functions from {{pp-functions}} to return one
 of the errors indicated in {{errors}} rather than their expected value.
-In these cases, we assume that the entire protocol aborts. If this
-occurs during the server's operations for one of the documented errors,
-then the server returns an error response indicating the error type that
-occurred.
+In these cases, we assume that the entire protocol aborts.
 
 # Functionality {#pp-api}
 
 This section details the data types and API functions that are used to
 construct the protocol in {{overview}}.
 
-We provide an explicit instantiation of the Privacy Pass API, based on
-the public API provided in {{I-D.irtf-cfrg-voprf}}.
+We provide an explicit instantiation of the Privacy Pass API in
+{{voprf-api}}, based on the public API provided in
+{{I-D.irtf-cfrg-voprf}}.
 
 ## Data structures {#pp-structs}
 
@@ -354,8 +352,8 @@ widely-adopted encoding schemes such as those detailed in TLS
 The `Ciphersuite` enum provides identifiers for each of the supported
 ciphersuites of the protocol. Some initial values that are supported by
 the core protocol are described in {{pp-ciphersuites}}. Note that the
-list of supported ciphersuites may be expanded by extensions to core
-protocol description.
+list of supported ciphersuites may be expanded by extensions to the core
+protocol description in separate documents.
 
 ### Keys {#pp-issuer-keys}
 
@@ -462,7 +460,7 @@ defined by specific instantiations or extensions of the protocol.
 
 ### Generate
 
-A function run by the client to generate the initial data that is used
+A function run by the Client to generate the initial data that is used
 as its input in the Privacy Pass protocol.
 
 Inputs:
@@ -477,7 +475,7 @@ Outputs:
 ### Issue
 
 A function run by the server to issue valid redemption tokens to the
-client.
+Client.
 
 Inputs:
 
@@ -491,14 +489,14 @@ Outputs:
 
 ### Process
 
-Run by the client when processing the server response in the issuance
+Run by the Client when processing the server response in the issuance
 phase of the protocol.
 
 Inputs:
 
 - `pkI`: An Issuer `PublicKey`.
-- `resp`: An `IssuanceResponse` struct.
 - `input`: An `IssuanceInput` struct.
+- `resp`: An `IssuanceResponse` struct.
 
 Outputs:
 
@@ -512,8 +510,8 @@ Throws:
 
 ### Redeem
 
-Run by the client in the redemption phase of the protocol to generate
-the client's message.
+Run by the Client in the redemption phase of the protocol to generate
+the Client's message.
 
 Inputs:
 
@@ -529,7 +527,7 @@ Outputs:
 ### Verify
 
 Run by the server in the redemption phase of the protocol. Determines
-whether the data sent by the client is valid.
+whether the data sent by the Client is valid.
 
 Inputs:
 
@@ -543,9 +541,9 @@ Outputs:
 
 ## Error types {#errors}
 
-- `ERR_PROOF_VALIDATION`: Error occurred when a client attempted to
+- `ERR_PROOF_VALIDATION`: Error occurred when a Client attempted to
   verify the proof that is part of the server's response.
-- `ERR_DOUBLE_SPEND`: Error occurred when a client has attempted to
+- `ERR_DOUBLE_SPEND`: Error occurred when a Client has attempted to
   redeem a token that has already been used for authorization.
 
 # Security considerations {#sec-reqs}
@@ -554,28 +552,22 @@ We discuss the security requirements that are necessary to uphold when
 instantiating the Privacy Pass protocol. In particular, we focus on the
 security requirements of "unlinkability", and "unforgeability".
 Informally, the notion of unlinkability is required to preserve the
-anonymity of the client in the redemption phase of the protocol. The
-notion of unforgeability is to protect against adversarial clients that
-look to subvert the security of the protocol.
+anonymity of the Client in the redemption phase of the protocol. The
+notion of unforgeability is to protect against an adversarial Client
+that may look to subvert the security of the protocol.
 
-Since these are cryptographic security requirements we discuss them with
-respect to a polynomial-time algorithm known as the adversary that is
-looking to subvert the security guarantee. More details on both security
-requirements can be found in {{DGSTV18}} and {{KLOR20}}.
+Both requirements are modelled as typical cryptographic security games,
+following the formats laid out in {{DGSTV18}} and {{KLOR20}}.
 
 Note that the privacy requirements of the protocol are covered in the
 architectural framework document {{draft-davidson-pp-architecture}}.
 
 ## Unlinkability {#unlinkability}
 
-Informally, the "unlinkability" requirement states that it is impossible
-for an adversarial Issuer to link the Client's message in a redemption
-session, to any previous issuance session that it has encountered.
-
 Formally speaking the security model is the following:
 
-- The adversary runs the Issuer setup and generates a Issue keypair
-  `(pkI, skI)`.
+- The adversary runs the Issuer setup and generates a keypair `(pkI,
+  skI)`.
 - The adversary specifies a number `Q` of issuance phases to initiate,
   where each phase `i in range(Q)` consists of `m_i` Issue evaluations.
 - The adversary runs `Issue` using the keypair that it generated on each
@@ -595,10 +587,10 @@ probability of success greater than `1/Q`.
 ## One-more unforgeability {#unforgeability}
 
 The one-more unforgeability requirement states that it is hard for any
-adversarial Client that has received `m` valid tokens from a Issue to
-redeem `m+1` of them. In essence, this requirement prevents a malicious
-Client from being able to forge valid tokens based on the Issue
-responses that it sees.
+adversarial Client that has received `m` valid tokens from the issuance
+phase to redeem `m+1` of them. In essence, this requirement prevents a
+malicious Client from being able to forge valid tokens based on the
+Issue responses that it sees.
 
 The security model roughly takes the following form:
 
@@ -634,8 +626,9 @@ and is necessary for achieving the unforgeability requirement.
 Some use-cases of the Privacy Pass protocol benefit from associating a
 limited amount of metadata with tokens that can be read by the Issuer
 when a token is redeemed. Adding metadata to tokens can be used as a
-vector to segment the anonymity of the protocol Clients. Therefore, it
-is important that any metadata that is added is heavily limited.
+vector to segment the anonymity of the Client in the protocol.
+Therefore, it is important that any metadata that is added is heavily
+limited.
 
 Any additional metadata that can be added to redemption tokens should be
 described in the specific protocol instantiation. Note that any
@@ -651,6 +644,13 @@ bits that should be obscured to the client.
 Note that the instantiation in {{voprf-protocol}} provides randomized
 redemption tokens with no additional metadata for an Issuer with a
 single key.
+
+## Maximum number of tokens issued {#max-tokens}
+
+Servers SHOULD impose a hard ceiling on the number of
+tokens that can be issued in a single issuance phase to a Client. If
+there is no limit, malicious clients could abuse this and cause excessive
+computation, leading to a Denial-of-Service attack.
 
 # VOPRF instantiation {#voprf-protocol}
 
@@ -670,7 +670,8 @@ The RECOMMENDED Issuer ciphersuites are as follows: detailed in
 - OPRF(P-521, SHA-512) (ID = 0x0005).
 
 We deliberately avoid the usage of smaller ciphersuites (associated with
-P-256 and curve25519) due to the potential to reduce security via static
+P-256 and curve25519) due to the potential to reduce security to
+unfavourable levels via static
 Diffie Hellman attacks. See {{I-D.irtf-cfrg-voprf}} for more details.
 
 ## Protocol contexts
@@ -686,8 +687,11 @@ generate the Client context.
 
 ## Functionality {#voprf-api}
 
-For the explicit signatures of each of the functions, refer to
-{{pp-api}}.
+We instantiate each functions using the API functions in
+{{I-D.irtf-cfrg-voprf}}. Note that we use the framework mentioned in the
+document to allow for batching multiple tokens into a single VOPRF
+evaluation. For the explicit signatures of each of the functions, refer
+to {{pp-api}}.
 
 ### Generate
 
@@ -791,7 +795,7 @@ derived from the core instantiations of the protocol (such as in
 
 In each of the ciphersuites below, the maximum security provided
 corresponds to the maximum difficulty of computing a discrete logarithm
-in the group. Note that the actual security level MAY be lower, see the
+in the group. Note that the actual security level MAY be lower. See the
 security considerations in {{I-D.irtf-cfrg-voprf}} for examples.
 
 ## PP(OPRF2)
