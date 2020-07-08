@@ -37,7 +37,6 @@ normative:
       ins: S. Valdez
       org: Google LLC
 informative:
-  I-D.irtf-cfrg-voprf:
   TrustTokenAPI:
     title: Getting started with Trust Tokens
     target: https://web.dev/trust-tokens/
