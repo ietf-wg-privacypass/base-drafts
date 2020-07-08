@@ -92,7 +92,7 @@ informative:
 --- abstract
 
 This document specifies the architectural framework for constructing
-secure and privacy-preserving instantiations of the Privacy Pass
+secure and anonymity-preserving instantiations of the Privacy Pass
 protocol (as described in {{draft-davidson-pp-protocol}}). The framework
 refers to the entire ecosystem of Privacy Pass clients and servers. This
 document makes recommendations on how this ecosystem should be
@@ -103,7 +103,7 @@ participating entities.
 
 # Introduction
 
-The Privacy Pass protocol provides a privacy-preserving mechanism for
+The Privacy Pass protocol provides an anonymity-preserving mechanism for
 authorization of clients with servers. The protocol is detailed in
 {{draft-davidson-pp-protocol}} and is intended for use in
 performance-critical settings, such as while browsing the Internet.
@@ -270,6 +270,17 @@ with.
 Each client must be addressed by a unique identifier, given by
 `client_id`.
 
+### Client identifying information {#client-ip}
+
+Privacy properties of this protocol do not take into account other
+possibly identifying information available in an implementation, such as
+a client's IP address. Servers which monitor IP addresses may use this
+to track client redemption patterns over time. Clients cannot check
+whether servers monitor such identifying information. Thus, clients
+SHOULD minimize or remove identifying information where possible, e.g.,
+by using anonymity-preserving tools such as Tor to interact with
+Servers.
+
 ## Global configuration store {#ecosystem-config}
 
 The global configuration store controls all the configuration data that
@@ -325,20 +336,20 @@ client functionality.
 
 1. Server functionality:
    - `ServerSetup`: Generates server configuration and keys
-   - `Issue`: Run on the contents of the client message in the
-     issuance phase.
+   - `Issue`: Run on the contents of the client message in the issuance
+     phase.
    - `Verify`: Run on the contents of the client message in the
      redemption phase.
 
 2. Client functionality:
    - `ClientSetup`: Generates the client configuration based on the
      configuration used by a given server.
-   - `Generate`: Generates public and private data associated with
-     the contents of the client message in the issuance phase.
+   - `Generate`: Generates public and private data associated with the
+     contents of the client message in the issuance phase.
    - `Process`: Processes the contents of the server response in the
      issuance phase.
-   - `Redeem`: Generates the data that forms the client message in
-     the redemption phase.
+   - `Redeem`: Generates the data that forms the client message in the
+     redemption phase.
 
 We will use each of the functions internally in the description of the
 interfaces that follows.
@@ -367,12 +378,12 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
     3. The value `<comm_id>` is a string used to distinguish between
        config entries corresponding to the same config, but where the
        key material has changed (e.g. after a key rotation).
-    4. The value of `<supports>` should be set to an octet
-       corresponding to the functionality that is provided. The value
-       `0` indicates that no functionality is supported; `1` indicates
-       that the server supports the issuance phase; `2` indicates
-       support for the redemption phase; and `3` indicates support for
-       both phases. If unspecified, this defaults to `3`.
+    4. The value of `<supports>` should be set to an octet corresponding
+       to the functionality that is provided. The value `0` indicates
+       that no functionality is supported; `1` indicates that the server
+       supports the issuance phase; `2` indicates support for the
+       redemption phase; and `3` indicates support for both phases. If
+       unspecified, this defaults to `3`.
     5. The value of `<config>` is set to be equal to `update`.
     5. The value `<signature>` is computed over the bytes of the rest of
        message contents, using the Server long-term secret signing key
@@ -443,10 +454,10 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
 - Input: A `client_issue` message `msg` ({{msg-client-issue}})
 - Returns: A `server_issue_resp` message
 - Steps:
-  1. Send the message `issue` to the internal
-     `SERVER_CONFIG_RETRIEVAL` interface, and let
-     `ciphersuite=msg.ciphersuites[0]` and `srv_cfg=msg.configs[0]`
-     based on the `server_config_retrieve` response.
+  1. Send the message `issue` to the internal `SERVER_CONFIG_RETRIEVAL`
+     interface, and let `ciphersuite=msg.ciphersuites[0]` and
+     `srv_cfg=msg.configs[0]` based on the `server_config_retrieve`
+     response.
   2. Run the following:
 
      ~~~
@@ -464,9 +475,8 @@ to the data structures defined in {{draft-davidson-pp-protocol}}.
 - Returns: A `server_redeem_resp` message back to the calling
   `CLIENT_REDEEM` interface ({{msg-server-redeem-resp}}).
 - Steps:
-  1. Send the message `redeem` to the internal
-     `SERVER_CONFIG_RETRIEVAL` interface, let `configs`
-     be the returned array.
+  1. Send the message `redeem` to the internal `SERVER_CONFIG_RETRIEVAL`
+     interface, let `configs` be the returned array.
   2. Send `msg.message.data` to the `SERVER_DOUBLE_SPEND_CHECK`
      interface and, if the response is `true`, return an unsuccessful
      `server_redeem_resp` message to the client.
@@ -523,10 +533,10 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
      `GLOBAL_CONFIG_RETRIEVAL` interface, and receive a reply `resp` of
      type `config_retrieval_resp`.
   3. If `success` is set to `false`, return `false`.
-  4. Parse `resp[0].supports` and check that it includes support
-     for what is specified in `msg.supports`, otherwise return false.
-  5. Parse `resp[1].supports` and check that it includes support
-     for what is specified in `msg.supports`, otherwise return false.
+  4. Parse `resp[0].supports` and check that it includes support for
+     what is specified in `msg.supports`, otherwise return false.
+  5. Parse `resp[1].supports` and check that it includes support for
+     what is specified in `msg.supports`, otherwise return false.
   6. The value `<signature>` is verified over the bytes of the rest of
      message contents, using the Server long-term verification key
      `k_vrfy`. This can be computed by running the function below and
@@ -694,8 +704,8 @@ Client in the Privacy Pass ecosystem ({{ecosystem-clients}}).
 - Returns: a `client_issue_retrieval_resp` message
   ({{msg-client-issue-retrieval-resp}}).
 - Steps:
-  1. Retrieve `client_data` where `msg.server_id`, `msg.ciphersuite`
-     and `msg.comm_id`.
+  1. Retrieve `client_data` where `msg.server_id`, `msg.ciphersuite` and
+     `msg.comm_id`.
   2. Return a `client_issue_retrieval` message containing `client_data`
      above to the `CLIENT_ISSUE_FINISH` interface.
 
@@ -922,8 +932,8 @@ Each update results in adding a new config underneath an existing
 has occurred.
 
 For reasons that are addressed more closely in {{privacy}}, the global
-configuration registry must ensure that the only configurations that
-are used at any given time, are those referred to in `current` and
+configuration registry must ensure that the only configurations that are
+used at any given time, are those referred to in `current` and
 `previous`. This is done to ensure that the server is not able to serve
 tokens to clients from multiple different configurations (which could be
 used to decrease the size of client anonymity sets).
@@ -1015,11 +1025,11 @@ phase for their own decision-making.
 
 ## Single-Issue Asynchronous-Verifier {#siav}
 
-This setting is inspired by recently proposed APIs such as {{TrustTokenAPI}}. It
-is similar to the SIFV configuration, except that the verifiers V no
-longer interact with the issuer S. Only C interacts with S, and this is
-done asynchronously to the trust attestation request from V. Hence
-"Asynchronous-Verifier" (SIAV).
+This setting is inspired by recently proposed APIs such as
+{{TrustTokenAPI}}. It is similar to the SIFV configuration, except that
+the verifiers V no longer interact with the issuer S. Only C interacts
+with S, and this is done asynchronously to the trust attestation request
+from V. Hence "Asynchronous-Verifier" (SIAV).
 
 When V invokes a redemption for C, C then invokes a redemption exchange
 with S in a separate session. If verification is carried out
@@ -1057,9 +1067,9 @@ issuers can lead to privacy concerns for the clients in the ecosystem.
 Therefore, we are careful to ensure that the number of issuers is kept
 strictly bounded by a fixed small number M. The actual issuers can be
 replaced with different issuers as long as the total never exceeds M.
-Moreover, issuer replacements also have an effect on client privacy that
-is similar to when a key rotation occurs, so replacement should only be
-permitted at similar intervals.
+Moreover, issuer replacements also have an effect on client anonymity
+that is similar to when a key rotation occurs, so replacement should
+only be permitted at similar intervals.
 
 See {{privacy}} for more details about safe choices of M.
 
@@ -1098,7 +1108,7 @@ key, any client that invokes the issuance protocol shortly afterwards
 will be part of a small number of possible clients that can redeem. To
 mechanize this attack strategy, a server could introduce a configuration
 rotation policy which would force clients into smaller windows where a
-given config is valid. This would mean that client privacy would only
+given config is valid. This would mean that client anonymity would only
 have utility with respect to the smaller group of users that hold
 redemption data for a particular key window.
 
@@ -1134,7 +1144,7 @@ BISV, BIFV, BIAV configurations of using the Privacy Pass protocol
 ({{running-modes}}), a verifier OV can trigger redemptions for any of
 the available issuers. Each redemption token that a client holds
 essentially corresponds to a bit of information about the client that OV
-can learn. Therefore, there is an exponential loss in privacy relative
+can learn. Therefore, there is an exponential loss in anonymity relative
 to the number of issuers that there are.
 
 For example, if there are 32 issuers, then OV learns 32 bits of
@@ -1153,7 +1163,7 @@ segregations). However, as highlighted in {{parametrization}}, having a
 very large user base (> 5 million users), could potentially allow for
 larger values. Issuer replacements should only occur with the same
 frequency as config rotations as they can lead to similar losses in
-privacy if clients still hold redemption tokens for previously active
+anonymity if clients still hold redemption tokens for previously active
 issuers.
 
 In addition, we RECOMMEND that trusted registries indicate at all times
@@ -1241,8 +1251,8 @@ client. There is an exception if a large number of clients colluded to
 accept bad data, then any client that didn't accept would be part of a
 smaller anonymity set. However, such an situation would be identical to
 the situation where the total number of clients in the ecosystem is
-small. Therefore, the privacy impact would be equivalent; see
-{{issuers}} for more details.
+small. Therefore, the reduction in the size of the anonymity set would
+be equivalent; see {{issuers}} for more details.
 
 # Security considerations {#security}
 
@@ -1274,7 +1284,7 @@ we consider to be important are:
 We recommend that Privacy Pass secret keys are rotated from anywhere
 between 1 and 12 weeks. With an active user-base, a week gives a fairly
 large window for clients to participate in the Privacy Pass protocol and
-thus enjoy the privacy guarantees of being part of a larger group. The
+thus enjoy the anonymity guarantees of being part of a larger group. The
 low ceiling of 12 weeks prevents a key compromise from being too
 destructive. If a server realizes that a key compromise has occurred
 then the server should revoke the previous key in the trusted registry
@@ -1462,10 +1472,10 @@ without completing a challenge.
 
 ## Trust Token API
 
-The Trust Token API {{TrustTokenAPI}} has been devised as a generic API for
-providing Privacy Pass functionality in the browser setting. The API is
-intended to be implemented directly into browsers so that server's can
-directly trigger the Privacy Pass workflow.
+The Trust Token API {{TrustTokenAPI}} has been devised as a generic API
+for providing Privacy Pass functionality in the browser setting. The API
+is intended to be implemented directly into browsers so that server's
+can directly trigger the Privacy Pass workflow.
 
 ## Zero-knowledge Access Passes
 
@@ -1481,7 +1491,7 @@ passes when it interacts with the PrivateStorage API.
 ## Basic Attention Tokens
 
 The browser Brave uses Basic Attention Tokens (BATs) to provide the
-basis for a privacy-preserving rewards scheme {{Brave}}. The BATs are
+basis for an anonymity-preserving rewards scheme {{Brave}}. The BATs are
 essentially Privacy Pass redemption tokens that are provided by a
 central Brave server when a client performs some action that triggers a
 reward event (such as watching an advertisement). When the client

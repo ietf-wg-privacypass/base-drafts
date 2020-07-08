@@ -74,11 +74,36 @@ informative:
       -
         ins: F. Valsorda
         org: Independent
+  TrustTokenAPI:
+    title: Trust Token API
+    target: https://github.com/WICG/trust-token-api
+    author:
+      name: WICG
+  PrivateStorage:
+    title: The Path from S4 to PrivateStorage
+    target: https://medium.com/least-authority/the-path-from-s4-to-privatestorage-ae9d4a10b2ae
+    author:
+      name: Liz Steininger
+      ins: L. Steininger
+      org: Least Authority
+  OpenPrivacy:
+    title: Token Based Services - Differences from PrivacyPass
+    target: https://openprivacy.ca/assets/towards-anonymous-prepaid-services.pdf
+    authors:
+      -
+        ins: E. Atwater
+        org: OpenPrivacy, Canada
+      -
+        ins: S. J. Lewis
+        org: OpenPrivacy, Canada
+  Brave:
+    title: Brave Rewards
+    target: https://brave.com/brave-rewards/
 
 --- abstract
 
 This document specifies the Privacy Pass protocol. This protocol
-provides privacy-preserving authorization of clients to servers. In
+provides anonymity-preserving authorization of clients to servers. In
 particular, client re-authorization events cannot be linked to any
 previous initial authorization. Privacy Pass is intended to be used as a
 performant protocol in the application-layer.
@@ -124,27 +149,7 @@ considerations are covered in a separate document
 {{draft-svaldez-pp-http-api}} provides an instantiation of this protocol
 intended for the HTTP setting.
 
-## Layout
-
-- {{prelim}}: Describes the terminology and assumptions adopted
-  throughout this document.
-- {{pp-api}}: Describes the internal functions and data structures that
-  are used by the Privacy Pass protocol.
-- {{overview}}: Describes the generic protocol structure, based on the
-  API provided in {{pp-api}}.
-- {{sec-reqs}}: Describes the security requirements of the
-  generic protocol description.
-- {{voprf-protocol}}: Describes an instantiation of the API in
-  {{pp-api}} based on the VOPRF protocol described in
-  {{I-D.irtf-cfrg-voprf}}.
-- {{pp-ciphersuites}}: Describes ciphersuites for use with the Privacy
-  Pass protocol based on the instantiation in {{voprf-protocol}}.
-- {{extensions}}: Describes the policy for implementing extensions to
-  the Privacy Pass protocol.
-
-# Preliminaries {#prelim}
-
-## Terminology
+# Terminology
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
@@ -163,6 +168,41 @@ We assume that all protocol messages are encoded into raw byte format
 before being sent. We use the TLS presentation language {{RFC8446}} to
 describe the structure of protocol data types and messages.
 
+# Background
+
+We discuss the core motivation behind the protocol along with the
+guarantees and assumptions that we make in this document.
+
+## Motivating use-cases
+
+The Privacy Pass protocol was originally developed to provide anonymous
+authorization of Tor users. In particular, the protocol allows clients
+to reveal authorization tokens that they have been issued without
+linking the authorization to the actual issuance event. This means that
+the tokens cannot be used to link the browsing patterns of clients that
+reveal tokens.
+
+Beyond these uses-cases, the Privacy Pass protocol is used in a number
+of practical applications. See {{DGSTV18}}, {{TrustTokenAPI}},
+{{PrivateStorage}}, {{OpenPrivacy}}, and {{Brave}} for examples.
+
+## Anonymity and security guarantees
+
+Privacy Pass provides anonymity-preserving authorization tokens for
+clients. Throughout this document, we use the terms "anonymous",
+"anonymous-preserving" and "anonymity" to refer to the core security
+guarantee of the protocol. Informally, this guarantee means that any
+token issued by a server key and subsequently redeemed is
+indistinguishable from any other token issued under the same key.
+
+Privacy Pass also prohibits clients from forging tokens, as otherwise
+the protocol would have little value as an authorization protocol.
+Informally, this means any client that is issued `N` tokens under a
+given server key cannot redeem more than `N` valid tokens.
+
+{{sec-reqs}} elaborates on these protocol anonymity and security
+requirements.
+
 ## Basic assumptions
 
 We make only a few minimal assumptions about the environment of the
@@ -170,6 +210,8 @@ clients and servers supporting the Privacy Pass protocol.
 
 - At any one time, we assume that the Issuer uses only one configuration
   containing their ciphersuite choice along with their secret key data.
+  This ensures that all Clients are issued tokens under the single key
+  associated with any given epoch.
 - We assume that the client has access to a global directory of the
   current public parts of the configurations used the Issuer.
 
@@ -203,7 +245,10 @@ client.
 The client initialises a global storage system `store` that allows it
 store the tokens that are received during issuance. The storage system
 is a map of Issuer identifiers (`Issuer.id`) to arrays of stored tokens.
-We assume that the client knows the Issuer public key `pkI` ahead of time.
+We assume that the client knows the Issuer public key `pkI` ahead of
+time. In {{draft-davidson-pp-architecture}} we discuss mechanisms that
+the Client can use to ensure that this public key is consistent across
+the entire ecosystem.
 
 ## Issuance phase {#issuance-phase}
 
@@ -398,8 +443,8 @@ struct {
 ### RedemptionResponse {#pp-redemption-response}
 
 The `RedemptionResponse` struct corresponds to a boolean value that
-indicates whether the `RedemptionMessage` sent by the client is
-valid. It can also contain any associated data.
+indicates whether the `RedemptionMessage` sent by the client is valid.
+It can also contain any associated data.
 
 ~~~
 struct {
@@ -422,8 +467,8 @@ as its input in the Privacy Pass protocol.
 
 Inputs:
 
-- `m`:       A `uint8` value corresponding to the number of Privacy
-             Pass tokens to generate.
+- `m`:       A `uint8` value corresponding to the number of Privacy Pass
+             tokens to generate.
 
 Outputs:
 
@@ -457,8 +502,8 @@ Inputs:
 
 Outputs:
 
-- `tokens`: A vector of `RedemptionToken` structs, whose length is
-  equal to length of the internal `ServerEvaluation` vector in the
+- `tokens`: A vector of `RedemptionToken` structs, whose length is equal
+  to length of the internal `ServerEvaluation` vector in the
   `IssuanceResponse` struct.
 
 Throws:
@@ -509,7 +554,7 @@ We discuss the security requirements that are necessary to uphold when
 instantiating the Privacy Pass protocol. In particular, we focus on the
 security requirements of "unlinkability", and "unforgeability".
 Informally, the notion of unlinkability is required to preserve the
-privacy of the client in the redemption phase of the protocol. The
+anonymity of the client in the redemption phase of the protocol. The
 notion of unforgeability is to protect against adversarial clients that
 look to subvert the security of the protocol.
 
@@ -533,8 +578,8 @@ Formally speaking the security model is the following:
   `(pkI, skI)`.
 - The adversary specifies a number `Q` of issuance phases to initiate,
   where each phase `i in range(Q)` consists of `m_i` Issue evaluations.
-- The adversary runs `Issue` using the keypair that it generated on
-  each of the Client messages in the issuance phase.
+- The adversary runs `Issue` using the keypair that it generated on each
+  of the Client messages in the issuance phase.
 - When the adversary wants, it stops the issuance phase, and a random
   number `l` is picked from `range(Q)`.
 - A redemption phase is initiated with a single token with index `i`
@@ -612,21 +657,21 @@ single key.
 In this section, we show how to instantiate the functional API in
 {{pp-api}} with the VOPRF protocol described in {{I-D.irtf-cfrg-voprf}}.
 Moreover, we show that this protocol satisfies the security requirements
-laid out in {{sec-reqs}}, based on the security proofs provided
-in {{DGSTV18}} and {{KLOR20}}.
+laid out in {{sec-reqs}}, based on the security proofs provided in
+{{DGSTV18}} and {{KLOR20}}.
 
 ## Recommended ciphersuites {#voprf-ciph-recs}
 
-The RECOMMENDED Issuer ciphersuites are as follows:
-detailed in {{I-D.irtf-cfrg-voprf}}:
+The RECOMMENDED Issuer ciphersuites are as follows: detailed in
+{{I-D.irtf-cfrg-voprf}}:
 
 - OPRF(curve448, SHA-512) (ID = 0x0002);
 - OPRF(P-384, SHA-512) (ID = 0x0004);
 - OPRF(P-521, SHA-512) (ID = 0x0005).
 
 We deliberately avoid the usage of smaller ciphersuites (associated with
-P-256 and curve25519) due to the potential to reduce security via
-static Diffie Hellman attacks. See {{I-D.irtf-cfrg-voprf}} for more details.
+P-256 and curve25519) due to the potential to reduce security via static
+Diffie Hellman attacks. See {{I-D.irtf-cfrg-voprf}} for more details.
 
 ## Protocol contexts
 
@@ -788,14 +833,13 @@ described in {{overview}}, then the change may have to result in changes
 to the draft specification here also.
 
 Each new extension that modifies the internals of the protocol in either
-of the two ways MUST re-justify that the extended protocol
-still satisfies the security requirements in {{sec-reqs}}.
-Protocol extensions MAY put forward new security guarantees if they
-are applicable.
+of the two ways MUST re-justify that the extended protocol still
+satisfies the security requirements in {{sec-reqs}}. Protocol extensions
+MAY put forward new security guarantees if they are applicable.
 
 The extensions MUST also conform with the extension framework policy as
 set out in the architectural framework document. For example, this may
-concern any potential impact on client privacy that the extension may
+concern any potential impact on client anonymity that the extension may
 introduce.
 
 --- back
