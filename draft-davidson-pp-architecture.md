@@ -270,19 +270,16 @@ with.
 Each client must be addressed by a unique identifier, given by
 `client_id`.
 
-### Hidden identity {#client-ip}
+### Client identifying information {#client-ip}
 
-Throughout this document, we assume that the Client identity (such as
-its IP address, and other similar characteristics) is not tracked and
-stored by the Server. This is because it is  trivial for a Server to
-track the redemption patterns of a Client over the lifetime of the
-identity that it uses.
-
-Client's cannot monitor whether a Server is doing this. If a Client
-needs stricter assurances, then it should consider using an
-anonymity-preserving tools to interact with Servers, such as Tor. Such
-tools can be used to hide the Client identity across multiple
-interactions.
+Privacy properties of this protocol do not take into account other
+possibly identifying information available in an implementation, such as
+a client's IP address. Servers which monitor IP addresses may use this
+to track client redemption patterns over time. Clients cannot check
+whether servers monitor such identifying information. Thus, clients
+SHOULD minimize or remove identifying information where possible, e.g.,
+by using anonymity-preserving tools such as Tor to interact with
+Servers.
 
 ## Global configuration store {#ecosystem-config}
 
