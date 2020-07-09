@@ -847,5 +847,5 @@ introduce.
 # Document contributors
 
 - Alex Davidson (alex.davidson92@gmail.com)
-- Sofía Celi    (cherenkov@riseup.net)
-- Chris Wood    (caw@heapingbits.net)
+- Sofía Celi (cherenkov@riseup.net)
+- Christopher Wood (caw@heapingbits.net)
