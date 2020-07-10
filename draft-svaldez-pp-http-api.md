@@ -59,8 +59,8 @@ accessed by HTTP-based consumers.
 # Introduction
 
 The Privacy Pass protocol as described in {{draft-davidson-pp-protocol}}
-can be integrated with a number of different settings, from Server to
-Server communication to browsing the internet.
+can be integrated with a number of different settings, from server to
+server communication to browsing the internet.
 
 In this document, we will provide an API to use for integrating Privacy
 Pass with an HTTP framework. Providing the format of HTTP requests and
@@ -68,7 +68,7 @@ responses needed to implement the Privacy Pass protocol.
 
 ## Terminology
 
-We use the same definition of Server and Client that is used in
+We use the same definition of server and client that is used in
 {{draft-davidson-pp-protocol}} and {{draft-davidson-pp-architecture}}.
 
 We assume that all protocol messages are encoded into raw byte format
@@ -79,7 +79,7 @@ describe the structure of protocol messages.
 
 - {{wrapping}}: Describes the wrapping of messages within HTTP
   requests/responses.
-- {{server-config}}: Describes how HTTP Clients retrieve server
+- {{server-config}}: Describes how HTTP clients retrieve server
   configurations and key commitments.
 - {{issuance}}: Describes how issuance requests are performed via a HTTP
   API.
@@ -94,7 +94,7 @@ document are to be interpreted as described in {{RFC2119}}.
 
 # Privacy Pass HTTP API Wrapping {#wrapping}
 
-Messages from HTTP-based Clients to HTTP-based Servers are performed as
+Messages from HTTP-based clients to HTTP-based servers are performed as
 GET and POST requests. The messages are sent via the
 ``Sec-Privacy-Pass`` header.
 
@@ -108,27 +108,26 @@ GET and POST requests. The messages are sent via the
 
 Note that the requests may contain addition Headers, request data and
 URL parameters that are not specified here, these extra fields should be
-ignored, though may be used by the Server to determine whether to
+ignored, though may be used by the server to determine whether to
 fulfill the requested issuance/redemption.
 
-# Server Configuration/Commitments {#server-config}
+# Server key registry {#server-config}
 
-A Client SHOULD fetch the Server configuration and current public key
-commitments prior to performing issuance and redemption. This
-configuration is accessible via a ``CONFIG_ENDPOINT``, either provided
-by the Server or by a global registry that provides consistency and
-anonymization guarantees.
+A client SHOULD fetch a server's current public key information prior to
+performing issuance and redemption. This configuration is accessible via
+a ``CONFIG_ENDPOINT``, either provided by the server or by a global
+registry that provides consistency and anonymization guarantees.
 
-## Commitment Registry {#commitment-registry}
+## Key Registry {#commitment-registry}
 
-To ensure that a Server isn't providing different views of their public
-key material to different users, Servers are expected to write their
+To ensure that a server isn't providing different views of their public
+key material to different users, servers are expected to write their
 commitments to a verifiable data structure.
 
 Using a verifiable log-backed map ([verifiable-data-structures]), the
-Server can publish their commitments to the log in a way that Clients
-can detect when the Server is attempting to provide a split-view of
-their key commitments to different Clients.
+server can publish their commitments to the log in a way that clients
+can detect when the server is attempting to provide a split-view of
+their key commitments to different clients.
 
 The key to the map is the ``server_origin``, with the value being:
 
@@ -150,23 +149,23 @@ struct {
 
 The addition to the log is made via a signed message to the log
 operator, which verifies the authenticity against a public key
-associated with that Server origin (either via the Web PKI or a
+associated with that server origin (either via the Web PKI or a
 out-of-band key). The signature should be computed under a long-term
-signing key that is associated with the Server identity.
+signing key that is associated with the server identity.
 
-The Server SHOULD then store an inclusion proof of the current key
+The server SHOULD then store an inclusion proof of the current key
 commitment so that it can present it when delivering the key commitment
-directly to the Client or when the key commitment is being delivered by
+directly to the client or when the key commitment is being delivered by
 a delegated party (other registries/preloaded configuration lists/etc).
 
-The Client can then perform a request for the key commitment against
-either the global registry or the Server as described in
+The client can then perform a request for the key commitment against
+either the global registry or the server as described in
 {{key-commitment}}. Note that the signature should be verified by the
-Client to ensure that the key material is owned by the Server. This
-requires that the Client know the public verification key that is
-associated with the Server.
+client to ensure that the key material is owned by the server. This
+requires that the client know the public verification key that is
+associated with the server.
 
-To avoid user segregation as a result of Server configuration/commitment
+To avoid user segregation as a result of server configuration/commitment
 rotation, the log operator SHOULD enforce limits on how many active
 commitments exist and how quickly the commitments are being rotated.
 Clients SHOULD reject configurations/commitments that violate their
@@ -176,11 +175,11 @@ discussed as part of {{draft-davidson-pp-architecture}}.
 
 ## Server Configuration Retrieval {#config-retrieval}
 Inputs:
-- ``server_origin``: The origin to retrieve a Server configuration for.
+- ``server_origin``: The origin to retrieve a server configuration for.
 
 No outputs.
 
-1. The Client makes an anonymous GET request to
+1. The client makes an anonymous GET request to
    ``CONFIG_ENDPOINT``/.well-known/privacy-pass with a message of type
    ``fetch-config`` and a body of:
 
@@ -190,7 +189,7 @@ struct {
 }
 ~~~
 
-2. The Server looks up the configuration associated with the origin
+2. The server looks up the configuration associated with the origin
    ``server_origin`` and responds with a message of type ``config`` and
    a body of:
 
@@ -203,7 +202,7 @@ struct {
 }
 ~~~
 
-3. The Client then stores the associated configuration state under the
+3. The client then stores the associated configuration state under the
    corresponding ``server_origin``.
 
 (TODO: This might be mergable with key commitment retrieval if server_id
@@ -211,7 +210,7 @@ struct {
 
 # Key Commitment Retrieval {#key-commitment}
 
-The Client SHOULD retrieve Server key commitments prior to both an
+The client SHOULD retrieve server key commitments prior to both an
 issuance and redemption to verify the consistency of the keys and to
 monitor for key rotation between issuance and redemption events.
 
@@ -220,10 +219,10 @@ Inputs:
 
 No outputs.
 
-1. The Client fetches the configuration state ``server_id``,
+1. The client fetches the configuration state ``server_id``,
    ``ciphersuite``, ``commitment_id`` associated with ``server_origin``.
 
-2. The Client makes an anonymous GET request to
+2. The client makes an anonymous GET request to
    ``CONFIG_ENDPOINT``/.well-known/privacy-pass with a message of type
    ``fetch-commitment`` and a body of:
 
@@ -234,11 +233,11 @@ struct {
 }
 ~~~
 
-3. The Server looks up the current configuration, and constructs a list
+3. The server looks up the current configuration, and constructs a list
    of commitments to return, noting whether a key commitment is valid
    for issuance or redemption or both.
 
-4. The Server then responds with a message of type ``commitment`` and a
+4. The server then responds with a message of type ``commitment`` and a
    body of:
 
 ~~~
@@ -258,14 +257,14 @@ struct {
 }
 ~~~
 
-5. The Client then verifies the signature for each key commitment and
-   stores the list of commitments to the current scope. The Client
+5. The client then verifies the signature for each key commitment and
+   stores the list of commitments to the current scope. The client
    SHOULD NOT cache the commitments beyond the current scope, as new
    commitments should be fetched for each independent issuance and
-   redemption request. The Client SHOULD verify the ``inclusion_proofs``
+   redemption request. The client SHOULD verify the ``inclusion_proofs``
    to confirm that the key commitment has been submitted to a trusted
-   registry. Once the Client receives the ``ciphersuite`` for the
-   Server, it should implement all Privacy Pass API functions (as
+   registry. Once the client receives the ``ciphersuite`` for the
+   server, it should implement all Privacy Pass API functions (as
    detailed in {{draft-davidson-pp-protocol}}) using this ciphersuite.
 
 # Privacy Pass Issuance {#issuance}
@@ -278,14 +277,14 @@ Outputs:
 - ``tokens``: A list of tokens that have been signed via the Privacy
   Pass protocol.
 
-1. When a Client wants to request tokens from a server, it should first
-   fetch a key commitment from the issuer via the process described in
+1. When a client wants to request tokens from a server, it should first
+   fetch a key commitment from the server via the process described in
    {{key-commitment}} and keep the result as ``commitment``.
 
-2. The Client should then call the ``Generate`` function requesting
+2. The client should then call the ``Generate`` function requesting
    ``count`` tokens storing the resulting ``input`` data.
 
-3. The Client then makes a POST request to
+3. The client then makes a POST request to
    <``server_origin``>/.well-known/privacy-pass with a message of type
    ``request-issuance`` and a body of:
 
@@ -303,7 +302,7 @@ struct {
    ``msg`` with a result of ``resp``.
 
 
-5. The Server should then respond to the POST request with a message of
+5. The server should then respond to the POST request with a message of
    type ``issue`` and a body of:
 
 ~~~
@@ -313,11 +312,11 @@ struct {
 }
 ~~~
 
-1. The Client should then should call the ``Process`` function with the
+1. The client should then should call the ``Process`` function with the
    ``public_key``, stored ``inputs`` and resulting ``resp``, to extract
    a list of ``redemption_tokens``.
 
-2. The Client should store the ``public_key`` associated with these
+2. The client should store the ``public_key`` associated with these
    tokens and the elements of ``redemption_tokens`` under storage
    partitioned by    the ``server_origin``, accessible only via the
    Privacy Pass API.
@@ -327,13 +326,13 @@ struct {
 There are two forms of Privacy Pass redemption that could function under
 the HTTP API. Either passing along a token directly to the target
 endpoint, which would perform its own redemption {{token-redemption}},
-or the Client redeeming the token and passing the result along to the
+or the client redeeming the token and passing the result along to the
 target endpoint. These two methods are described below.
 
 ## Generic Token Redemption {#token-redemption}
 
 Inputs:
-- ``server_id``: The Server ID to redeem a token against.
+- ``server_id``: The server ID to redeem a token against.
 - ``ciphersuite``: The ciphersuite for this token.
 - ``public_key``: The public key associated with this token.
 - ``redemption_token``: A Privacy Pass token.
@@ -342,11 +341,11 @@ Inputs:
 Outputs:
 - ``result``: The result of the redemption from the server.
 
-1. The Client should call the ``Redeem`` function with
+1. The client should call the ``Redeem`` function with
    ``redemption_token`` and additional data of ``info`` storing the
    resulting ``data`` and ``tag``.
 
-2. The Client makes a POST request to
+2. The client makes a POST request to
    <``server_origin``>/.well-known/privacy-pass with a message of type
    ``token-redemption`` and a body of:
 
@@ -363,7 +362,7 @@ struct {
    interface with ``public_key``, ``secret_key`` and the received
    ``data``, ``tag``, ``info`` storing the resulting ``resp``.
 
-4. The Server should then respond to the POST request with a message of
+4. The server should then respond to the POST request with a message of
    type ``redemption-result`` and a signed body of:
 
 ~~~
@@ -376,31 +375,31 @@ struct {
 }
 ~~~
 
-4. The Client upon receipt of this message should verify the
+4. The client upon receipt of this message should verify the
    ``signature`` using the ``verification_key`` from the configuration
    and return the ``result``.
 
 ## Direct Redemption {#direct-redemption}
 
 Inputs:
-- ``server_origin``: The Server origin to redeem a token for.
+- ``server_origin``: The server origin to redeem a token for.
 - ``target``: The target endpoint to send the token to.
 - ``additional_data``: Additional data to bind to this redemption
   request.
 
-1. When a Client wants to redeem tokens for a server, it should first
-   fetch a key commitment from the issuer via the process described in
+1. When a client wants to redeem tokens for a server, it should first
+   fetch a key commitment from the server via the process described in
    {{key-commitment}} and keep the result as ``commitment``.
 
-2. The Client should then look up the storage partition associated with
+2. The client should then look up the storage partition associated with
    ``server_origin`` and fetch a ``redemption_token`` and
    ``public_key``.
 
-3. The Client should verify that the ``public_key`` is in the current
+3. The client should verify that the ``public_key`` is in the current
    ``commitment``. If not, it should discard the token and fail the
    redemption attempt.
 
-4. As part of the request to ``target``, the Client will include the
+4. As part of the request to ``target``, the client will include the
    token as part of the request in the ``Sec-Privacy-Pass`` header along
    with whatever other parameters are being passed as part of the
    request to ``target``. The header will contain a message of type
@@ -423,24 +422,24 @@ the request to ``target``.
 ## Delegated Redemption {#delegated-redemption}
 
 Inputs:
-- ``server_origin``: The Server origin to redeem a token for.
+- ``server_origin``: The server origin to redeem a token for.
 - ``target``: The target endpoint to send the token to.
 - ``additional_data``: Additional data to bind to this redemption
   request.
 
-1. When a Client wants to redeem tokens for a server, it should first
-   fetch a key commitment from the issuer via the process described in
+1. When a client wants to redeem tokens for a server, it should first
+   fetch a key commitment from the server via the process described in
    {{key-commitment}} and keep the result as ``commitment``.
 
-2. The Client should then look up the storage partition associated with
+2. The client should then look up the storage partition associated with
    ``server_origin`` and fetch a ``redemption_token`` and
    ``public_key``.
 
-3. The Client should verify that the ``public_key`` is in the current
+3. The client should verify that the ``public_key`` is in the current
    ``commitment``. If not, it should discard the token and fail the
    redemption attempt.
 
-4. The Client constructs a bytestring ``info`` made up of the
+4. The client constructs a bytestring ``info`` made up of the
    ``target``, the current ``timestamp``, and ``additional_data``:
 
 ~~~
@@ -451,11 +450,11 @@ struct {
 }
 ~~~
 
-5. The Client then performs a token redemption as described in
+5. The client then performs a token redemption as described in
    {{token-redemption}}. Storing the resulting ``redemption-result``
    message.
 
-6. As part of the request to ``target``, the Client will include the
+6. As part of the request to ``target``, the client will include the
    redemption result as part of the request in the ``Sec-Privacy-Pass``
    header along with whatever other parameters are being passed as part
    of the request to ``target``. The header will contain a message of
@@ -476,7 +475,7 @@ At this point, the ``target`` can verify the integrity of
 ``timestamp``, and ``additional_data`` and verify the signature of the
 redemption result by querying the current configuration of the Privacy
 Pass server. The inclusion of ``target`` and ``timestamp`` proves that
-the Server attested to the validity of the token in relation to this
+the server attested to the validity of the token in relation to this
 particular request.
 
 # Security Considerations

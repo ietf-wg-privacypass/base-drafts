@@ -157,11 +157,11 @@ document are to be interpreted as described in {{RFC2119}}.
 
 The following terms are used throughout this document.
 
-- Issuer: A service that provides the server-side functionality required
-  by the protocol. May also be known as the Server.
+- Server: A service that provides the server-side functionality required
+  by the protocol. May be referred to as the issuer.
 - Client: An entity that seeks authorization from a server that supports
   interactions in the Privacy Pass protocol.
-- Key: The secret key used by the Server for authorizing Client data.
+- Key: The secret key used by the server for authorizing client data.
 
 We assume that all protocol messages are encoded into raw byte format
 before being sent. We use the TLS presentation language {{RFC8446}} to
@@ -205,14 +205,14 @@ requirements.
 ## Basic assumptions
 
 We make only a few minimal assumptions about the environment of the
-Clients and Servers supporting the Privacy Pass protocol.
+clients and servers supporting the Privacy Pass protocol.
 
-- At any one time, we assume that the Issuer uses only one configuration
+- At any one time, we assume that the server uses only one configuration
   containing their ciphersuite choice along with their secret key data.
-  This ensures that all Clients are issued tokens under the single key
+  This ensures that all clients are issued tokens under the single key
   associated with any given epoch.
 - We assume that the client has access to a global directory of the
-  current public parts of the configurations used the Issuer.
+  current public parts of the configurations used the server.
 
 The wider ecosystem that this protocol is employed in is described in
 {{draft-davidson-pp-architecture}}.
@@ -222,55 +222,55 @@ The wider ecosystem that this protocol is employed in is described in
 The Privacy Pass protocol is split into two phases that are built upon
 the functionality described in {{pp-api}} later.
 
-The first phase, "issuance", provides the Client with unlinkable tokens
+The first phase, "issuance", provides the client with unlinkable tokens
 that can be used to initiate re-authorization with the server in the
-future. The second phase, "redemption", allows the Client to redeem a
+future. The second phase, "redemption", allows the client to redeem a
 given re-authorization token with the server that it interacted with
 during the issuance phase. The protocol must satisfy two cryptographic
 security requirements known as "unlinkability" and "unforgeability".
 These requirements are covered in {{sec-reqs}}.
 
-## Issuer setup {#issuer-setup}
+## Server setup {#server-setup}
 
-Before the protocol takes place, the Issuer chooses a ciphersuite and
-generates a keypair by running `(pkI, skI) = KeyGen()`. This
-configuration must be available to all Clients that interact with the
-Issuer (for the purpose of engaging in a Privacy Pass exchange). We
-assume that the Issuer has a public (and unique) identity that the
-Client uses to retrieve this configuration.
+Before the protocol takes place, the server chooses a ciphersuite and
+generates a keypair by running `(pkS, skS) = KeyGen()`. This
+configuration must be available to all clients that interact with the
+server (for the purpose of engaging in a Privacy Pass exchange). We
+assume that the server has a public (and unique) identity that the
+client uses to retrieve this configuration.
 
 ## Client setup {#client-setup}
 
-The Client initialises a global storage system `store` that allows it
+The client initialises a global storage system `store` that allows it
 store the tokens that are received during issuance. The storage system
-is a map of Issuer identifiers (`Issuer.id`) to arrays of stored tokens.
-We assume that the client knows the Issuer public key `pkI` ahead of
-time. The Client picks a value `m` of tokens to receive during the
+is a map of server identifiers (`server.id`) to arrays of stored tokens.
+We assume that the client knows the server public key `pkS` ahead of
+time. The client picks a value `m` of tokens to receive during the
 issuance phase. In {{draft-davidson-pp-architecture}} we discuss
-mechanisms that the Client can use to ensure that this public key is
+mechanisms that the client can use to ensure that this public key is
 consistent across the entire ecosystem.
 
 ## Issuance phase {#issuance-phase}
 
-The issuance phase allows the Client to receive `m` anonymous
-authorization tokens from the Issuer.
+The issuance phase allows the client to receive `m` anonymous
+authorization tokens from the server.
 
 ~~~
-  Client(pkI, m)                              Issuer(skI, pkI)
+  Client(pkS, m)                              Server(skS, pkS)
   ------------------------------------------------------------
   cInput = Generate(m)
-  msg = cInput.msg
+  req = cInput.req
 
-                              msg
+                              req
                       ------------------->
 
-                             issuerResp = Issue(skI, pkI, msg)
+                             serverResp = Issue(skS, pkS, req)
 
                            issueResp
                       <-------------------
 
-  tokens = Process(pkI, cInput, issueResp)
-  store[Issuer.id].push(tokens)
+  tokens = Process(pkS, cInput, issueResp)
+  store[server.id].push(tokens)
 ~~~
 
 ## Redemption phase {#redemption-phase}
@@ -280,20 +280,20 @@ the server, using data that it has received from a previous issuance
 phase.
 
 ~~~
-  Client(info)                                   Issuer(skI)
+  Client(info)                                   Server(skS)
   ------------------------------------------------------------
   token = store[Issue.id].pop()
-  msg = Redeem(token, info)
+  req = Redeem(token, info)
 
-                               msg
+                               req
                         ------------------>
 
-                               if (dsIdx.includes(msg.data)) {
+                               if (dsIdx.includes(req.data)) {
                                  raise ERR_DOUBLE_SPEND
                                }
-                               resp = Verify(skI, msg)
+                               resp = Verify(skS, req)
                                if (resp.success) {
-                                 dsIdx.push(msg.data)
+                                 dsIdx.push(req.data)
                                }
 
                                 resp
@@ -308,7 +308,7 @@ the redemption request to the specific session. We RECOMMEND that `info`
 is constructed as the following concatenated byte-encoded data:
 
 ~~~
-len(aux) || aux || len(Issuer.id) || Issuer.id || current_time()
+len(aux) || aux || len(server.id) || server.id || current_time()
 ~~~
 
 where `aux` is arbitrary auxiliary data chosen by the client. The usage
@@ -317,11 +317,11 @@ request has happened in an appropriate time window.
 
 ### Double-spend protection
 
-To protect against clients that attempt to spend a value `msg.data` more
+To protect against clients that attempt to spend a value `req.data` more
 than once, the server uses an index, `dsIdx`, to collect valid inputs it
 witnesses. Since this store needs to only be optimized for storage and
 querying, a structure such as a Bloom filter suffices. The storage
-should be parameterized to live as long as the Issuer keypair that is in
+should be parameterized to live as long as the server keypair that is in
 use. See {{sec-reqs} for more details.
 
 ## Handling errors
@@ -355,10 +355,10 @@ the core protocol are described in {{pp-ciphersuites}}. Note that the
 list of supported ciphersuites may be expanded by extensions to the core
 protocol description in separate documents.
 
-### Keys {#pp-issuer-keys}
+### Keys {#pp-server-keys}
 
 We use the following types to describe the public and private keys used
-by the Issuer.
+by the server.
 
 ~~~
 opaque PublicKey<1..2^16-1>
@@ -374,7 +374,7 @@ Firstly, we define sequences of bytes that partition the client input.
 
 ~~~
 opaque Internal<1..2^16-1>
-opaque IssuanceMessage<1..2^16-1>
+opaque IssuanceRequest<1..2^16-1>
 ~~~
 
 These data types represent members of the wider `IssuanceInput` data
@@ -383,18 +383,18 @@ type.
 ~~~
 struct {
   Internal data[m]
-  IssuanceMessage msg[m]
+  IssuanceRequest req[m]
 } IssuanceInput;
 ~~~
 
 Note that a `IssuanceInput` contains equal-length arrays of `Internal`
-and `IssuanceMessage` types corresponding to the number of tokens that
+and `IssuanceRequest` types corresponding to the number of tokens that
 should be issued.
 
 ### IssuanceResponse {#pp-srv-issue-response}
 
 Firstly, the `IssuedToken` type corresponds to a single sequence of
-bytes that represents a single issued token received from the Issuer.
+bytes that represents a single issued token received from the server.
 
 ~~~
 opaque IssuedToken<1..2^16-1>
@@ -410,8 +410,8 @@ struct {
 }
 ~~~
 
-The value of `m` is equal to the length of the `IssuanceMessage` vector
-sent by the Client.
+The value of `m` is equal to the length of the `IssuanceRequest` vector
+sent by the client.
 
 ### RedemptionToken {#pp-redemption-token}
 
@@ -425,9 +425,9 @@ struct {
 } RedemptionToken;
 ~~~
 
-### RedemptionMessage {#pp-redemption-message}
+### RedemptionRequest {#pp-redemption-message}
 
-The `RedemptionMessage` struct consists of the data that is sent by the
+The `RedemptionRequest` struct consists of the data that is sent by the
 client during the redemption phase of the protocol.
 
 ~~~
@@ -435,13 +435,13 @@ struct {
   opaque data<1..2^16-1>;
   opaque tag<1..2^16-1>;
   opaque info<1..2^16-1>;
-} RedemptionMessage;
+} RedemptionRequest;
 ~~~
 
 ### RedemptionResponse {#pp-redemption-response}
 
 The `RedemptionResponse` struct corresponds to a boolean value that
-indicates whether the `RedemptionMessage` sent by the client is valid.
+indicates whether the `RedemptionRequest` sent by the client is valid.
 It can also contain any associated data.
 
 ~~~
@@ -460,7 +460,7 @@ defined by specific instantiations or extensions of the protocol.
 
 ### Generate
 
-A function run by the Client to generate the initial data that is used
+A function run by the client to generate the initial data that is used
 as its input in the Privacy Pass protocol.
 
 Inputs:
@@ -475,13 +475,13 @@ Outputs:
 ### Issue
 
 A function run by the server to issue valid redemption tokens to the
-Client.
+client.
 
 Inputs:
 
-- `pkI`: An Issuer `PublicKey`.
-- `skI`: An Issuer `PrivateKey`.
-- `msg`:  An `IssuanceMessage` struct.
+- `pkS`: A server `PublicKey`.
+- `skS`: A server `PrivateKey`.
+- `req`: An `IssuanceRequest` struct.
 
 Outputs:
 
@@ -489,12 +489,12 @@ Outputs:
 
 ### Process
 
-Run by the Client when processing the server response in the issuance
+Run by the client when processing the server response in the issuance
 phase of the protocol.
 
 Inputs:
 
-- `pkI`: An Issuer `PublicKey`.
+- `pkS`: An server `PublicKey`.
 - `input`: An `IssuanceInput` struct.
 - `resp`: An `IssuanceResponse` struct.
 
@@ -510,8 +510,8 @@ Throws:
 
 ### Redeem
 
-Run by the Client in the redemption phase of the protocol to generate
-the Client's message.
+Run by the client in the redemption phase of the protocol to generate
+the client's message.
 
 Inputs:
 
@@ -522,18 +522,18 @@ Inputs:
 
 Outputs:
 
-- `msg`: A `RedemptionMessage` struct.
+- `req`: A `RedemptionRequest` struct.
 
 ### Verify
 
 Run by the server in the redemption phase of the protocol. Determines
-whether the data sent by the Client is valid.
+whether the data sent by the client is valid.
 
 Inputs:
 
-- `pkI`: An Issuer `PublicKey`.
-- `skI`: An Issuer `PrivateKey`.
-- `msg`: A `RedemptionMessage` struct.
+- `pkS`: An server `PublicKey`.
+- `skS`: An server `PrivateKey`.
+- `req`: A `RedemptionRequest` struct.
 
 Outputs:
 
@@ -541,9 +541,9 @@ Outputs:
 
 ## Error types {#errors}
 
-- `ERR_PROOF_VALIDATION`: Error occurred when a Client attempted to
+- `ERR_PROOF_VALIDATION`: Error occurred when a client attempted to
   verify the proof that is part of the server's response.
-- `ERR_DOUBLE_SPEND`: Error occurred when a Client has attempted to
+- `ERR_DOUBLE_SPEND`: Error occurred when a client has attempted to
   redeem a token that has already been used for authorization.
 
 # Security considerations {#sec-reqs}
@@ -552,8 +552,8 @@ We discuss the security requirements that are necessary to uphold when
 instantiating the Privacy Pass protocol. In particular, we focus on the
 security requirements of "unlinkability", and "unforgeability".
 Informally, the notion of unlinkability is required to preserve the
-anonymity of the Client in the redemption phase of the protocol. The
-notion of unforgeability is to protect against an adversarial Client
+anonymity of the client in the redemption phase of the protocol. The
+notion of unforgeability is to protect against an adversarial client
 that may look to subvert the security of the protocol.
 
 Both requirements are modelled as typical cryptographic security games,
@@ -566,12 +566,12 @@ architectural framework document {{draft-davidson-pp-architecture}}.
 
 Formally speaking the security model is the following:
 
-- The adversary runs the Issuer setup and generates a keypair `(pkI,
-  skI)`.
+- The adversary runs the server setup and generates a keypair `(pkS,
+  skS)`.
 - The adversary specifies a number `Q` of issuance phases to initiate,
   where each phase `i in range(Q)` consists of `m_i` Issue evaluations.
 - The adversary runs `Issue` using the keypair that it generated on each
-  of the Client messages in the issuance phase.
+  of the client messages in the issuance phase.
 - When the adversary wants, it stops the issuance phase, and a random
   number `l` is picked from `range(Q)`.
 - A redemption phase is initiated with a single token with index `i`
@@ -587,25 +587,25 @@ probability of success greater than `1/Q`.
 ## One-more unforgeability {#unforgeability}
 
 The one-more unforgeability requirement states that it is hard for any
-adversarial Client that has received `m` valid tokens from the issuance
+adversarial client that has received `m` valid tokens from the issuance
 phase to redeem `m+1` of them. In essence, this requirement prevents a
-malicious Client from being able to forge valid tokens based on the
+malicious client from being able to forge valid tokens based on the
 Issue responses that it sees.
 
 The security model roughly takes the following form:
 
 - The adversary specifies a number `Q` of issuance phases to initiate
-  with the Issuer, where each phase `i in range(Q)` consists of `m_i`
-  Issuer evaluation. Let `m = sum(m_i)` where `i in range(Q)`.
+  with the server, where each phase `i in range(Q)` consists of `m_i`
+  server evaluation. Let `m = sum(m_i)` where `i in range(Q)`.
 - The adversary receives `Q` responses, where the response with index
   `i` contains `m_i` individual tokens.
-- The adversary initiates `m_adv` redemption sessions with the Issuer
-  and the Issuer verifies that the sessions are successful (return
+- The adversary initiates `m_adv` redemption sessions with the server
+  and the server verifies that the sessions are successful (return
   true), and that each request includes a unique token. The adversary
   succeeds in `m_succ =< m_adv` redemption sessions.
 - The adversary succeeds if `m_succ > m`.
 
-The security requirement is that the adversarial Client has only a
+The security requirement is that the adversarial client has only a
 negligible probability of succeeding.
 
 Note that {{KLOR20}} strengthens the capabilities of the adversary, in
@@ -617,16 +617,16 @@ the server responses in the issuance phase are valid.
 
 All issuing servers should implement a robust, global storage-query
 mechanism for checking that tokens sent by clients have not been spent
-before. Such tokens only need to be checked for each issuer
+before. Such tokens only need to be checked for each server
 individually. This prevents clients from "replaying" previous requests,
 and is necessary for achieving the unforgeability requirement.
 
 ## Additional token metadata
 
 Some use-cases of the Privacy Pass protocol benefit from associating a
-limited amount of metadata with tokens that can be read by the Issuer
+limited amount of metadata with tokens that can be read by the server
 when a token is redeemed. Adding metadata to tokens can be used as a
-vector to segment the anonymity of the Client in the protocol.
+vector to segment the anonymity of the client in the protocol.
 Therefore, it is important that any metadata that is added is heavily
 limited.
 
@@ -642,15 +642,15 @@ client can read. Private metadata corresponds to unmodifiable private
 bits that should be obscured to the client.
 
 Note that the instantiation in {{voprf-protocol}} provides randomized
-redemption tokens with no additional metadata for an Issuer with a
+redemption tokens with no additional metadata for an server with a
 single key.
 
 ## Maximum number of tokens issued {#max-tokens}
 
-Servers SHOULD impose a hard ceiling on the number of
-tokens that can be issued in a single issuance phase to a Client. If
-there is no limit, malicious clients could abuse this and cause excessive
-computation, leading to a Denial-of-Service attack.
+Servers SHOULD impose a hard ceiling on the number of tokens that can be
+issued in a single issuance phase to a client. If there is no limit,
+malicious clients could abuse this and cause excessive computation,
+leading to a Denial-of-Service attack.
 
 # VOPRF instantiation {#voprf-protocol}
 
@@ -662,7 +662,7 @@ laid out in {{sec-reqs}}, based on the security proofs provided in
 
 ## Recommended ciphersuites {#voprf-ciph-recs}
 
-The RECOMMENDED Issuer ciphersuites are as follows: detailed in
+The RECOMMENDED server ciphersuites are as follows: detailed in
 {{I-D.irtf-cfrg-voprf}}:
 
 - OPRF(curve448, SHA-512) (ID = 0x0002);
@@ -671,17 +671,17 @@ The RECOMMENDED Issuer ciphersuites are as follows: detailed in
 
 We deliberately avoid the usage of smaller ciphersuites (associated with
 P-256 and curve25519) due to the potential to reduce security to
-unfavourable levels via static
-Diffie Hellman attacks. See {{I-D.irtf-cfrg-voprf}} for more details.
+unfavourable levels via static Diffie Hellman attacks. See
+{{I-D.irtf-cfrg-voprf}} for more details.
 
 ## Protocol contexts
 
 Note that we must run the verifiable version of the protocol in
-{{I-D.irtf-cfrg-voprf}}. Therefore the `Issuer` takes the role of the
-`Server` running in `modeVerifiable`. In other words, the `Issuer` runs
-`(ctxtI, pkI) = SetupVerifiableServer(suite)`; where `suite` is one of
+{{I-D.irtf-cfrg-voprf}}. Therefore the `server` takes the role of the
+`Server` running in `modeVerifiable`. In other words, the `server` runs
+`(ctxtI, pkS) = SetupVerifiableServer(suite)`; where `suite` is one of
 the ciphersuites in {{voprf-ciph-recs}}, `ctxt` contains the internal
-VOPRF Server functionality and secret key `skI`, and `pkI` is the Issuer
+VOPRF server functionality and secret key `skS`, and `pkS` is the server
 public key. Likewise, run `ctxtC = SetupVerifiableClient(suite)` to
 generate the Client context.
 
@@ -706,21 +706,21 @@ def Generate(m):
     blindedToken[i] = blindedToken
   return IssuanceInput {
            internal: tokens,
-           msg: blindedTokens,
+           req: blindedTokens,
          }
 ~~~
 
 ### Issue
 
-For this functionality, note that we supply multiple tokens in `msg` to
+For this functionality, note that we supply multiple tokens in `req` to
 `Evaluate`. This allows batching a single proof object for multiple
 evaluations. While the construction in {{I-D.irtf-cfrg-voprf}} only
 permits a single input, we follow the advice for providing vectors of
 inputs.
 
 ~~~
-def Issue(pkI, skI, msg):
-  Ev = Evaluate(skI, pkI, msg)
+def Issue(pkS, skS, req):
+  Ev = Evaluate(skS, pkS, req)
   return IssuanceResponse {
            tokens: Ev.elements,
            proof: Ev.proof,
@@ -733,8 +733,8 @@ Similarly to `Issue`, we follow the advice for providing vectors of
 inputs to the `Unblind` function for verifying the batched proof object.
 
 ~~~
-Process(pkI, input, resp):
-  unblindedTokens = Unblind(pkI, input.data, input.msg, resp)
+Process(pkS, input, resp):
+  unblindedTokens = Unblind(pkS, input.data, input.req, resp)
   redemptionTokens = []
   for bt in unblindedTokens:
     rt = RedemptionToken { data: input.data, issued: bt }
@@ -747,7 +747,7 @@ Process(pkI, input, resp):
 ~~~
 def Redeem(token, info):
   tag = Finalize(token.data, token.issued, info)
-  return RedemptionMessage {
+  return RedemptionRequest {
            data: data,
            tag: tag,
            info: info,
@@ -757,8 +757,8 @@ def Redeem(token, info):
 ### Verify
 
 ~~~
-def Verify(pkI, skI, msg):
-  resp = VerifyFinalize(skI, pkI, msg.data, msg.info, msg.tag)
+def Verify(pkS, skS, req):
+  resp = VerifyFinalize(skS, pkS, req.data, req.info, req.tag)
   Output RedemptionResponse {
            success: resp
          }
