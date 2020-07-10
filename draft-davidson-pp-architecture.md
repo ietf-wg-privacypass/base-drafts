@@ -494,6 +494,14 @@ security. Therefore, it is still important that key rotations occur on a
 fairly regular cycle to reduce the harmfulness of a server key
 compromise.
 
+With an active user-base, a week gives a fairly large window for clients
+to participate in the Privacy Pass protocol and thus enjoy the anonymity
+guarantees of being part of a larger group. The low ceiling of 12 weeks
+prevents a key compromise from being too destructive. If a server
+realizes that a key compromise has occurred then the server should
+sample a new key, and upload the public key to the key registry;
+invoking any revocation procedures that may apply for the old key.
+
 ## Large numbers of servers {#servers}
 
 Similarly to the server rotation dynamic that is raised above, if there
@@ -639,22 +647,6 @@ exploiting the possibility of spending tokens more than once against
 distributed token checking systems. For the same reason, the global data
 storage must have quick update times. While an update is occurring it
 may be possible for a malicious client to spend a token more than once.
-
-## server key rotation
-
-We highlighted previously that short key-cycles can be used to reduce
-client privacy. However, regular key rotations of the issuing key are
-still recommended to maintain good server key hygiene.
-
-We recommend that Privacy Pass issuing keys are rotated from anywhere
-between 1 and 12 weeks. With an active user-base, a week gives a fairly
-large window for clients to participate in the Privacy Pass protocol and
-thus enjoy the anonymity guarantees of being part of a larger group. The
-low ceiling of 12 weeks prevents a key compromise from being too
-destructive. If a server realizes that a key compromise has occurred
-then the server should sample a new key and upload the public key to the
-key registry; invoking any revocation procedures that may apply for the
-old key.
 
 ## Token exhaustion
 
