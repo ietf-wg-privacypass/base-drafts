@@ -264,7 +264,7 @@ authorization tokens from the server.
                               req
                       ------------------->
 
-                             serverResp = Issue(skS, pkS, req)
+                             serverResp = Issue(pkS, skS, req)
 
                            issueResp
                       <-------------------
@@ -280,7 +280,7 @@ the server, using data that it has received from a previous issuance
 phase.
 
 ~~~
-  Client(info)                                   Server(skS)
+  Client(info)                                Server(skS, pkS)
   ------------------------------------------------------------
   token = store[Issue.id].pop()
   req = Redeem(token, info)
@@ -291,7 +291,7 @@ phase.
                                if (dsIdx.includes(req.data)) {
                                  raise ERR_DOUBLE_SPEND
                                }
-                               resp = Verify(skS, req)
+                               resp = Verify(pkS, skS, req)
                                if (resp.success) {
                                  dsIdx.push(req.data)
                                }
@@ -311,9 +311,10 @@ is constructed as the following concatenated byte-encoded data:
 len(aux) || aux || len(server.id) || server.id || current_time()
 ~~~
 
-where `aux` is arbitrary auxiliary data chosen by the client. The usage
-of `current_time()` allows the server to check that the redemption
-request has happened in an appropriate time window.
+where `len(x)` is the length of `x` in bytes, and `aux` is arbitrary
+auxiliary data chosen by the client. The usage of `current_time()`
+allows the server to check that the redemption request has happened in
+an appropriate time window.
 
 ### Double-spend protection
 

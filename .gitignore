@@ -13,3 +13,4 @@ lib
 .targets.mk
 *.upload
 .DS_Store
+releases/
