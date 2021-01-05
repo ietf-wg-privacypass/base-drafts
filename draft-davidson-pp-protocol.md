@@ -19,6 +19,13 @@ author:
     city: Lisbon
     country: Portugal
     email: alex.davidson92@gmail.com
+ -
+    ins: S. Celi
+    name: Sofía Celi
+    org: Cloudflare
+    city: Lisbon
+    country: Portugal
+    email: sceli@cloudflare.com
 
 normative:
   RFC2119:
