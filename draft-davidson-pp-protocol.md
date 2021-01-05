@@ -12,13 +12,7 @@ stand_alone: yes
 pi: [toc, sortrefs, symrefs]
 
 author:
- -
-    ins: A. Davidson
-    name: Alex Davidson
-    org: Cloudflare
-    city: Lisbon
-    country: Portugal
-    email: alex.davidson92@gmail.com
+
  -
     ins: S. Celi
     name: Sofía Celi
@@ -26,6 +20,21 @@ author:
     city: Lisbon
     country: Portugal
     email: sceli@cloudflare.com
+ -
+    ins: A. Davidson
+    name: Alex Davidson
+    org: Cloudflare
+    city: Lisbon
+    country: Portugal
+    email: alex.davidson92@gmail.com
+-
+    ins: A. Faz-Hernandez
+    name: Armando Faz-Hernandez
+    org: Cloudflare
+    street: 101 Townsend St
+    city: San Francisco
+    country: United States of America
+    email: armfazh@cloudflare.com
 
 normative:
   RFC2119:
