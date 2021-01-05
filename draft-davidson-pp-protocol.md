@@ -12,6 +12,14 @@ stand_alone: yes
 pi: [toc, sortrefs, symrefs]
 
 author:
+
+ -
+    ins: S. Celi
+    name: Sofía Celi
+    org: Cloudflare
+    city: Lisbon
+    country: Portugal
+    email: sceli@cloudflare.com
  -
     ins: A. Davidson
     name: Alex Davidson
@@ -19,7 +27,7 @@ author:
     city: Lisbon
     country: Portugal
     email: alex.davidson92@gmail.com
- -
+-
     ins: A. Faz-Hernandez
     name: Armando Faz-Hernandez
     org: Cloudflare
