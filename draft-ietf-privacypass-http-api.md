@@ -1,7 +1,7 @@
 ---
-title: "Privacy Pass: HTTP API"
+title: "Privacy Pass HTTP API"
 abbrev: PP http api
-docname: draft-svaldez-pp-http-api-latest
+docname: draft-ietf-privacypass-http-api-latest
 date:
 category: info
 

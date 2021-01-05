@@ -20,12 +20,12 @@ subject to a Simplified BSD License) in Contributions.
 ## Other Resources
 
 Discussion of this work occurs on the
-[cfrg working group mailing list](https://mailarchive.ietf.org/arch/browse/cfrg/)
-([subscribe](https://www.ietf.org/mailman/listinfo/cfrg)).  In addition to
+[privacypass working group mailing list](https://mailarchive.ietf.org/arch/browse/privacy-pass/)
+([subscribe](https://www.ietf.org/mailman/listinfo/privacy-pass)).  In addition to
 contributions in GitHub, you are encouraged to participate in discussions there.
 
 **Note**: Some working groups adopt a policy whereby substantive discussion of
 technical issues needs to occur on the mailing list.
 
 You might also like to familiarize yourself with other
-[working group documents](https://datatracker.ietf.org/wg/cfrg/documents/).
+[working group documents](https://datatracker.ietf.org/wg/privacypass/documents/).
