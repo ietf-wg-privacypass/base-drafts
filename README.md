@@ -4,7 +4,9 @@ The current home for material associated with Privacy Pass documentation
 associated with the IETF.
 
 - [WG Charter](/CHARTER.md)
+- [Editor's Copy](https://ietf-wg-privacypass.github.io/base-drafts/)
 - Mailing list: <privacy-pass@ietf.org>
+
 
 ## Building Drafts
 
