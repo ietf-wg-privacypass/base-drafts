@@ -1,7 +1,7 @@
 ---
-title: "Privacy Pass: The Protocol"
+title: "Privacy Pass Protocol Specification"
 abbrev: PP protocol
-docname: draft-davidson-pp-protocol-latest
+docname: draft-ietf-privacypass-protocol-latest
 date:
 category: info
 
@@ -12,7 +12,6 @@ stand_alone: yes
 pi: [toc, sortrefs, symrefs]
 
 author:
-
  -
     ins: S. Celi
     name: Sofía Celi
@@ -23,11 +22,10 @@ author:
  -
     ins: A. Davidson
     name: Alex Davidson
-    org: Cloudflare
     city: Lisbon
     country: Portugal
     email: alex.davidson92@gmail.com
--
+ -
     ins: A. Faz-Hernandez
     name: Armando Faz-Hernandez
     org: Cloudflare

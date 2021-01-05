@@ -1,7 +1,7 @@
 ---
-title: "Privacy Pass: Architectural Framework"
+title: "Privacy Pass Architectural Framework"
 abbrev: PP architecture
-docname: draft-davidson-pp-architecture-latest
+docname: draft-ietf-privacypass-architecture-latest
 date:
 category: info
 
