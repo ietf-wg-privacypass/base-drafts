@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Privacy Pass Architectural Framework</title>
+<meta content="Alex Davidson" name="author">
+<meta content="
+       This document specifies the architectural framework for constructing
+secure and anonymity-preserving instantiations of the Privacy Pass
+protocol. It provides recommendations on how the protocol ecosystem
+should be constructed to ensure the privacy of clients, and the security
+of all participating entities. 
+    " name="description">
+<meta content="xml2rfc 3.5.0" name="generator">
+<meta content="Internet-Draft" name="keyword">
+<meta content="draft-ietf-privacypass-architecture" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.5.0
+    Python 3.8.5
+    appdirs 1.4.4
+    ConfigArgParse 1.2.3
+    google-i18n-address 2.4.0
+    html5lib 1.1
+    intervaltree 3.0.2
+    Jinja2 2.11.2
+    kitchen 1.2.6
+    lxml 4.5.0
+    pycountry 19.8.18
+    pyflakes 2.1.1
+    PyYAML 5.3.1
+    requests 2.22.0
+    setuptools 45.2.0
+    six 1.14.0
+-->
+<link href="draft-ietf-privacypass-architecture.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@import url('https://martinthomson.github.io/i-d-template/fonts.css');
+
+html {
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --small-font-size: 14.5px;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+#title, h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabin Condensed", sans-serif;
+  font-weight: 600;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+#title {
+  padding: 1em 0 0.2em;
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+}
+#abstract+p, #abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 18px;
+  line-height: 24px;
+}
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+}
+ol ol, ul ul, ol ul, ul ol {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+ul.compact, .ulCompact,
+ol.compact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl > dd {
+  margin-bottom: .8em;
+  min-height: 1.3em;
+}
+dl.compact > dd, .dlCompact > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+dd.break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href].selfRef {
+  color: var(--text-color);
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px 'Oxygen Mono', monospace;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+}
+@media screen {
+  pre {
+    display: inline-block;
+    overflow-x: auto;
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  pre + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+  table {
+    display: inline-block;
+    overflow-x: auto;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+tr:nth-child(2n) > td {
+  background-color: var(--background-color);
+}
+tr:nth-child(2n+1) > td {
+  background-color: var(--highlight-color);
+}
+thead+tbody > tr:nth-child(2n) > td {
+  background-color: var(--highlight-color);
+}
+thead+tbody > tr:nth-child(2n+1) > td {
+  background-color: var(--background-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  visibility: hidden;
+  user-select: none;
+}
+a.pilcrow[href] { color: #ddd; }
+a.pilcrow[href]:hover { text-decoration: none; }
+@media screen {
+  :hover > a.pilcrow {
+    visibility: visible;
+  }
+  a.pilcrow:hover {
+    background-color: transparent;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+}
+
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 8em;
+}
+#identifiers dt {
+  width: var(--identifier-width);
+  margin: 0;
+  clear: left;
+  float: left;
+  text-align: right;
+}
+#identifiers dd {
+  margin: 0 0 0 calc(1em + var(--identifier-width));
+  min-width: 5em;
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+#toc nav ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#toc nav li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+#toc a.xref {
+  white-space: normal;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dd {
+  margin-left: 8em;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+.index ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+.index ul ul {
+  margin: 0;
+}
+.index li {
+  margin: 0;
+  text-indent: -2em;
+  padding-left: 2em;
+  padding-bottom: 5px;
+}
+.indexIndex {
+  margin: 0.5em 0 1em;
+}
+.index a {
+  font-weight: 700;
+}
+/* make the index two-column on all but the smallest screens */
+@media (min-width: 500px) {
+  .index ul {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  .index ul ul {
+    column-count: 1;
+    column-gap: 0;
+  }
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc.active {
+      opacity: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 8px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active nav {
+    display: block;
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin-top: 2px;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #toc nav > ul  {
+    margin-bottom: 2em;
+  }
+  #toc ul {
+    margin: 0 0 0 4px;
+    font-size: var(--small-font-size);
+  }
+  #toc ul p, #toc ul li {
+    margin: 2px 0;
+    line-height: 22px;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Changes introduced to fix issues found during implementation */
+
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin: 8px 0.5em 0;
+}
+
+/* Fix the dl styling to match the RFC 7992 attributes */
+dl > dt,
+dl.dlParallel > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+
+/* Provide styling for table cell text alignment */
+table .text-left, table .text-left {
+  text-align: left;
+}
+table .text-center, table .text-center {
+  text-align: center;
+}
+table .text-right, table .text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 20em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  dd {
+    page-break-before: avoid;
+  }
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+/* Tweak the bcp14 keyword presentation */
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+</style>
+
+</head>
+<body>
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">PP architecture</td>
+<td class="right">January 2021</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Davidson</td>
+<td class="center">Expires 9 July 2021</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Network Working Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-ietf-privacypass-architecture</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2021-01-05" class="published">5 January 2021</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2021-07-09">9 July 2021</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">A. Davidson</div>
+<div class="org">Cloudflare Portugal</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Privacy Pass Architectural Framework</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document specifies the architectural framework for constructing
+secure and anonymity-preserving instantiations of the Privacy Pass
+protocol. It provides recommendations on how the protocol ecosystem
+should be constructed to ensure the privacy of clients, and the security
+of all participating entities.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 9 July 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2021 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Simplified BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Simplified BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction" class="xref">Introduction</a><a href="#section-toc.1-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-terminology" class="xref">Terminology</a><a href="#section-toc.1-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-ecosystem-participants" class="xref">Ecosystem participants</a><a href="#section-toc.1-1.3.1" class="pilcrow">¶</a></p>
+<ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-servers" class="xref">Servers</a><a href="#section-toc.1-1.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-clients" class="xref">Clients</a><a href="#section-toc.1-1.3.2.2.1" class="pilcrow">¶</a></p>
+<ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.3.2.2.2.1">
+                    <p id="section-toc.1-1.3.2.2.2.1.1"><a href="#section-3.2.1" class="xref">3.2.1</a>.  <a href="#name-client-identifying-informat" class="xref">Client identifying information</a><a href="#section-toc.1-1.3.2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-key-management-framework" class="xref">Key management framework</a><a href="#section-toc.1-1.4.1" class="pilcrow">¶</a></p>
+<ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="xref">4.1</a>.  <a href="#name-public-key-registries" class="xref">Public key registries</a><a href="#section-toc.1-1.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>.  <a href="#name-key-rotation" class="xref">Key rotation</a><a href="#section-toc.1-1.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="xref">4.3</a>.  <a href="#name-ciphersuites" class="xref">Ciphersuites</a><a href="#section-toc.1-1.4.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-server-running-modes" class="xref">Server running modes</a><a href="#section-toc.1-1.5.1" class="pilcrow">¶</a></p>
+<ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-single-verifier" class="xref">Single-Verifier</a><a href="#section-toc.1-1.5.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-delegated-verifier" class="xref">Delegated-Verifier</a><a href="#section-toc.1-1.5.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="xref">5.3</a>.  <a href="#name-asynchronous-verifier" class="xref">Asynchronous-Verifier</a><a href="#section-toc.1-1.5.2.3.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="xref">5.4</a>.  <a href="#name-public-verifier" class="xref">Public-Verifier</a><a href="#section-toc.1-1.5.2.4.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.5.2.5">
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="xref">5.5</a>.  <a href="#name-bounded-number-of-servers" class="xref">Bounded number of servers</a><a href="#section-toc.1-1.5.2.5.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-client-server-trust-relatio" class="xref">Client-Server trust relationship</a><a href="#section-toc.1-1.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-privacy-considerations" class="xref">Privacy considerations</a><a href="#section-toc.1-1.7.1" class="pilcrow">¶</a></p>
+<ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="xref">7.1</a>.  <a href="#name-server-key-rotation" class="xref">Server key rotation</a><a href="#section-toc.1-1.7.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="xref">7.2</a>.  <a href="#name-large-numbers-of-servers" class="xref">Large numbers of servers</a><a href="#section-toc.1-1.7.2.2.1" class="pilcrow">¶</a></p>
+<ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.7.2.2.2.1">
+                    <p id="section-toc.1-1.7.2.2.2.1.1"><a href="#section-7.2.1" class="xref">7.2.1</a>.  <a href="#name-allowing-larger-number-of-s" class="xref">Allowing larger number of servers</a><a href="#section-toc.1-1.7.2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                </ul>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.7.2.3">
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="xref">7.3</a>.  <a href="#name-partitioning-of-server-key-" class="xref">Partitioning of server key material</a><a href="#section-toc.1-1.7.2.3.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="xref">7.4</a>.  <a href="#name-additional-token-metadata" class="xref">Additional token metadata</a><a href="#section-toc.1-1.7.2.4.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.7.2.5">
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="xref">7.5</a>.  <a href="#name-tracking-and-identity-leaka" class="xref">Tracking and identity leakage</a><a href="#section-toc.1-1.7.2.5.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.7.2.6">
+                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="xref">7.6</a>.  <a href="#name-client-incentives-for-anony" class="xref">Client incentives for anonymity reduction</a><a href="#section-toc.1-1.7.2.6.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>.  <a href="#name-security-considerations" class="xref">Security considerations</a><a href="#section-toc.1-1.8.1" class="pilcrow">¶</a></p>
+<ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="xref">8.1</a>.  <a href="#name-double-spend-protection" class="xref">Double-spend protection</a><a href="#section-toc.1-1.8.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="xref">8.2</a>.  <a href="#name-token-exhaustion" class="xref">Token exhaustion</a><a href="#section-toc.1-1.8.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="xref">8.3</a>.  <a href="#name-avoiding-server-centralizat" class="xref">Avoiding server centralization</a><a href="#section-toc.1-1.8.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="xref">9</a>.  <a href="#name-protocol-parametrization" class="xref">Protocol parametrization</a><a href="#section-toc.1-1.9.1" class="pilcrow">¶</a></p>
+<ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="xref">9.1</a>.  <a href="#name-justification" class="xref">Justification</a><a href="#section-toc.1-1.9.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="xref">9.2</a>.  <a href="#name-example-parameterization" class="xref">Example parameterization</a><a href="#section-toc.1-1.9.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.9.2.3">
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="xref">9.3</a>.  <a href="#name-allowing-more-servers" class="xref">Allowing more servers</a><a href="#section-toc.1-1.9.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="xref">10</a>. <a href="#name-extension-integration-polic" class="xref">Extension integration policy</a><a href="#section-toc.1-1.10.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="xref">11</a>. <a href="#name-existing-applications" class="xref">Existing applications</a><a href="#section-toc.1-1.11.1" class="pilcrow">¶</a></p>
+<ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="xref">11.1</a>.  <a href="#name-cloudflare-challenge-pages" class="xref">Cloudflare challenge pages</a><a href="#section-toc.1-1.11.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="xref">11.2</a>.  <a href="#name-trust-token-api" class="xref">Trust Token API</a><a href="#section-toc.1-1.11.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.11.2.3">
+                <p id="section-toc.1-1.11.2.3.1"><a href="#section-11.3" class="xref">11.3</a>.  <a href="#name-zero-knowledge-access-passe" class="xref">Zero-knowledge Access Passes</a><a href="#section-toc.1-1.11.2.3.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.11.2.4">
+                <p id="section-toc.1-1.11.2.4.1"><a href="#section-11.4" class="xref">11.4</a>.  <a href="#name-basic-attention-tokens" class="xref">Basic Attention Tokens</a><a href="#section-toc.1-1.11.2.4.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.11.2.5">
+                <p id="section-toc.1-1.11.2.5.1"><a href="#section-11.5" class="xref">11.5</a>.  <a href="#name-token-based-services" class="xref">Token Based Services</a><a href="#section-toc.1-1.11.2.5.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="xref">12</a>. <a href="#name-references" class="xref">References</a><a href="#section-toc.1-1.12.1" class="pilcrow">¶</a></p>
+<ul class="toc ulEmpty compact">
+<li class="toc ulEmpty compact" id="section-toc.1-1.12.2.1">
+                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="xref">12.1</a>.  <a href="#name-normative-references" class="xref">Normative References</a><a href="#section-toc.1-1.12.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="toc ulEmpty compact" id="section-toc.1-1.12.2.2">
+                <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="xref">12.2</a>.  <a href="#name-informative-references" class="xref">Informative References</a><a href="#section-toc.1-1.12.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-appendix.a" class="xref">Appendix A</a>.  <a href="#name-contributors" class="xref">Contributors</a><a href="#section-toc.1-1.13.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="toc ulEmpty compact" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#section-appendix.b" class="xref"></a><a href="#name-authors-address" class="xref">Author's Address</a><a href="#section-toc.1-1.14.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">The Privacy Pass protocol provides an anonymity-preserving mechanism for
+authorization of clients with servers. The protocol is detailed in
+<span>[<a href="#draft-davidson-pp-protocol" class="xref">draft-davidson-pp-protocol</a>]</span> and is intended for use in the
+application-layer.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">The way that the ecosystem around the protocol is set up can have
+significant impacts on the stated privacy and security guarantees of the
+protocol. For instance, the number of servers issuing Privacy Pass
+tokens, along with the number of registered clients, determines the
+anonymity set of each individual client. Moreover, this can be
+influenced by other factors, such as: the key rotation policy used by
+each server; and, the number of supported ciphersuites. There are also
+client behavior patterns that can reduce the effective security of the
+server.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">In this document, we will provide a structural framework for building
+the ecosystem around the Privacy Pass protocol. The core of the document
+also includes policies for the following considerations.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1-4.1">How server key material should be managed and accessed.<a href="#section-1-4.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-1-4.2">Compatible server issuance and redemption running modes and associated
+expectations.<a href="#section-1-4.2" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-1-4.3">How clients should evaluate server trust relationships.<a href="#section-1-4.3" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-1-4.4">Security and privacy properties of the protocol.<a href="#section-1-4.4" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-1-4.5">A concrete assessment and parametrization of the privacy budget
+associated with different settings of the above policies.<a href="#section-1-4.5" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-1-4.6">The incorporation of potential extensions into the wider ecosystem.<a href="#section-1-4.6" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="section-1-5">Finally, we will discuss existing applications that make use of the
+Privacy Pass protocol, and highlight how these may fit with the proposed
+framework.<a href="#section-1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="terminology">
+<section id="section-2">
+      <h2 id="name-terminology">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+      </h2>
+<p id="section-2-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span>.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">The following terms are used throughout this document.<a href="#section-2-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2-3.1">Server: An entity that issues anonymous tokens to clients. In
+symmetric verification cases, the server must also verify tokens. Also
+referred to as the server.<a href="#section-2-3.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-2-3.2">Client: An entity that seeks authorization from a server.<a href="#section-2-3.2" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="section-2-4">We assume that all protocol messages are encoded into raw byte format
+before being sent. We use the TLS presentation language <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span> to
+describe the structure of the data that is communicated and stored.<a href="#section-2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="ecosystem">
+<section id="section-3">
+      <h2 id="name-ecosystem-participants">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-ecosystem-participants" class="section-name selfRef">Ecosystem participants</a>
+      </h2>
+<p id="section-3-1">The Privacy Pass ecosystem refers to the global framework in which
+multiple instances of the Privacy Pass protocol operate. This refers to
+all servers that support the protocol, or any extension of it, along
+with all of the clients that may interact with these servers.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">The ecosystem itself, and the way it is constructed, is critical for
+evaluating the privacy of each individual client. We assume that a
+client's privacy refers to fraction of users that it represents in the
+anonymity set that it belongs to. We discuss this more in <a href="#privacy" class="xref">Section 7</a>.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<div class="artwork art-text alignLeft" id="section-3-3">
+<pre>
+    +-----------------------------------------------------+
+    |                                                     |
+    | Ecosystem                                           |
+    |                                                     |
+    |                                                     |
+    |                                                     |
+    |      +-----+                                        |
+    |      |     |                        +-----+         |
+    |      | C1  | &lt;--------------------&gt; |     |         |
+    |      |     |                        | S1  |         |
+    |      +-----+        +-------------&gt; |     |         |
+    |                     |               +-----+         |
+    |                     |                               |
+    |      +-----+        |                               |
+    |      |     | &lt;------+                               |
+    |      | C2  |                                        |
+    |      |     | &lt;------+               +-----+         |
+    |      +-----+        +-------------&gt; |     |         |
+    |                                     | S2  |         |
+    |                     +-------------&gt; |     |         |
+    |      +-----+        |               +-----+         |
+    |      |     |        |                               |
+    |      | C3  | &lt;------+                               |
+    |      |     |                                        |
+    |      +-----+                                        |
+    |                                                     |
+    +-----------------------------------------------------+
+</pre><a href="#section-3-3" class="pilcrow">¶</a>
+</div>
+<p id="section-3-4">In the above diagram, the arrows indicate the open channels between a
+client and a server. An open channel indicates that a client accepts
+Privacy Pass tokens from this server.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<p id="section-3-5">If no channel exists, this means that the client chooses not to accept
+tokens from (or redeem tokens with) that particular server. We discuss
+the roles of servers and clients further in <a href="#ecosystem-servers" class="xref">Section 3.1</a> and
+<a href="#ecosystem-clients" class="xref">Section 3.2</a>, respectively.<a href="#section-3-5" class="pilcrow">¶</a></p>
+<div id="ecosystem-servers">
+<section id="section-3.1">
+        <h3 id="name-servers">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-servers" class="section-name selfRef">Servers</a>
+        </h3>
+<p id="section-3.1-1">Generally, servers in the Privacy Pass ecosystem are entities whose
+primary function is to undertake the role of the <code>server</code> in
+<span>[<a href="#draft-davidson-pp-protocol" class="xref">draft-davidson-pp-protocol</a>]</span>. To facilitate this, the server MUST hold
+a Privacy Pass protocol keypair at any given time. The server public key
+MUST be made available to all clients in such a way that key rotations
+and other updates are publicly visible. The server MAY also require
+additional state for ensuring this. We provide a wider discussion in
+<a href="#key-mgmt" class="xref">Section 4</a>.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">Note that, in the core protocol instantiation from
+<span>[<a href="#draft-davidson-pp-protocol" class="xref">draft-davidson-pp-protocol</a>]</span>, the redemption phase is a symmetric
+protocol. This means that the server is the same server that ultimately
+processes token redemptions from clients. However, plausible extensions
+to the protocol specification may allow public verification of tokens by
+entities which do not hold the secret Privacy Pass keying material. We
+highlight possible client and server configurations in
+<a href="#running-modes" class="xref">Section 5</a>.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">The server must be uniquely identifiable by all clients with a
+consistent identifier.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="ecosystem-clients">
+<section id="section-3.2">
+        <h3 id="name-clients">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-clients" class="section-name selfRef">Clients</a>
+        </h3>
+<p id="section-3.2-1">Clients in the Privacy Pass ecosystem are entities whose primary
+function is to undertake the role of the <code>Client</code> in
+<span>[<a href="#draft-davidson-pp-protocol" class="xref">draft-davidson-pp-protocol</a>]</span>. Clients are assumed to only store data
+related to the tokens that it has been issued by the server. This
+storage is used for constructing redemption requests.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">Clients MAY choose not to accept tokens from servers that they do not
+trust. See <a href="#client-server" class="xref">Section 6</a> for a wider discussion.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+<div id="client-ip">
+<section id="section-3.2.1">
+          <h4 id="name-client-identifying-informat">
+<a href="#section-3.2.1" class="section-number selfRef">3.2.1. </a><a href="#name-client-identifying-informat" class="section-name selfRef">Client identifying information</a>
+          </h4>
+<p id="section-3.2.1-1">Privacy properties of this protocol do not take into account other
+possibly identifying information available in an implementation, such as
+a client's IP address. Servers which monitor IP addresses may use this
+to track client redemption patterns over time. Clients cannot check
+whether servers monitor such identifying information. Thus, clients
+SHOULD minimize or remove identifying information where possible, e.g.,
+by using anonymity-preserving tools such as Tor to interact with
+servers.<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="key-mgmt">
+<section id="section-4">
+      <h2 id="name-key-management-framework">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-key-management-framework" class="section-name selfRef">Key management framework</a>
+      </h2>
+<p id="section-4-1">The key material and protocol configuration that a server uses to issue
+tokens corresponds to a number of different pieces of information.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-2.1">The ciphersuite that the server is using.<a href="#section-4-2.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-4-2.2">The public keys that are active for the server.<a href="#section-4-2.2" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="section-4-3">For reasons that we address later in <a href="#privacy" class="xref">Section 7</a>, the way that the
+server publishes and maintains this information impacts the effective
+privacy of the clients. In this section, we describe the main policies
+that need to be satisfied for a key management system in a Privacy Pass
+ecosystem.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">Note that we only specify a set of guidelines and recommendations for
+operating a public key registry in this document. Actual specification
+of such a registry and how it operates will be covered elsewhere.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<div id="public-key-registries">
+<section id="section-4.1">
+        <h3 id="name-public-key-registries">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-public-key-registries" class="section-name selfRef">Public key registries</a>
+        </h3>
+<p id="section-4.1-1">Server's must provide their public keys to clients along with details
+about the cryptographic ciphersuite that they are using. In <a href="#privacy" class="xref">Section 7</a>,
+we address the importance of providing clients with sources of truth for
+learning the server's key configuration.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">In particular, server key material MUST be publicly available in a
+tamper-proof data structure, which we refer to as a key registry. A
+registry must be globally consistent. Clients using the same registry
+should coordinate in some way to ensure they have a consistent view of
+said registry. This can be done via gossiping or some other mechanism.
+The exact mechanism for this coordination will be described elsewhere.
+It is assumed there will be at least one such mechanism.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">It is RECOMMENDED that each key registry is an append-only data
+structure, such as a Merkle Tree. The key registry should be operated
+independently of any server that publishes key material to the registry.
+This ensures that any client can make better judgements on whether to
+trust the registry and, transitively, each server.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<div class="artwork art-text alignLeft" id="section-4.1-4">
+<pre>
++--------------------------------------------------------+
+|                                                        |
+| Ecosystem                            +---+             |
+|                                      | C |             |
+|  +--------------+ &lt;------ pkS1 ----&gt; +---+             |
+|  |  Registry 1  |                                      |
+|  ++-------------+ &lt;-------------- pkS1 --------&gt; +---+ |
+|   |                                              | C | |
+|   |   +--------------+ &lt;--------- pkS3 --------&gt; +---+ |
+|   |   |  Registry 2  |                                 |
+|  pkS1 +----^-------^-+ &lt;--------- pkS2 --------&gt; +---+ |
+|   |        |       |                             | C | |
+|   |       pkS2    pkS3                           +---+ |
+|   |        |       |                                   |
+|  ++---+  +-+--+  +-+--+                                |
+|  | S1 |  | S2 |  | S3 |                                |
+|  +----+  +----+  +----+                                |
+|                                                        |
++--------------------------------------------------------+
+</pre><a href="#section-4.1-4" class="pilcrow">¶</a>
+</div>
+<p id="section-4.1-5">While there may be multiple key registries for a given ecosystem, a
+server MUST only publish its key material to a single registry. This
+ensures that the server is keeping a consistent view of its key
+material.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="key-rotation">
+<section id="section-4.2">
+        <h3 id="name-key-rotation">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-key-rotation" class="section-name selfRef">Key rotation</a>
+        </h3>
+<p id="section-4.2-1">Token issuance associates all issued tokens with a particular choice of
+key. If a server issues tokens with many keys, then this may harm the
+anonymity of the Client. For example, they would be able to map the
+Client's access patterns by inspecting which key each token they possess
+has been issued under.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">To prevent against this, servers MUST only use one private key for
+issuing tokens at any given time. Servers may use two or more keys for
+redemption to allow servers for seamless key rotation.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">Key rotations must be limited in frequency for similar reasons. See
+<a href="#parametrization" class="xref">Section 9</a> for guidelines on what frequency of key rotations
+are permitted.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="ciphersuites">
+<section id="section-4.3">
+        <h3 id="name-ciphersuites">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-ciphersuites" class="section-name selfRef">Ciphersuites</a>
+        </h3>
+<p id="section-4.3-1">Since a server is only permitted to have a single active issuing key,
+this implies that only a single ciphersuite is allowed per issuance
+period. If a server wishes to change their ciphersuite, they MUST do so
+during a key rotation.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="running-modes">
+<section id="section-5">
+      <h2 id="name-server-running-modes">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-server-running-modes" class="section-name selfRef">Server running modes</a>
+      </h2>
+<p id="section-5-1">We provide an overview of some of the possible frameworks for
+configuring the way that servers run in the Privacy Pass ecosystem. In
+short, servers may be configured to provide symmetric issuance and
+redemption with clients. While some servers may be configured as proxies
+that accept Privacy Pass data and send it to another server that
+actually processes issuance or redemption data. Finally, we also
+consider instances of the protocol that may permit public verification.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">The intention with providing each of these running modes is to cover the
+different applications that utilize variants of the Privacy Pass
+protocol. We RECOMMEND that any Privacy Pass server implementation
+adheres to one of these frameworks.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<div id="sv">
+<section id="section-5.1">
+        <h3 id="name-single-verifier">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-single-verifier" class="section-name selfRef">Single-Verifier</a>
+        </h3>
+<p id="section-5.1-1">The simplest way of considering the Privacy Pass protocol is in a
+setting where the same server plays the role of server and verifier, we
+call this "Single-Verifier" (SV).<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">Let S be the server, and C be the client. When S wants to issue tokens
+to C, they invoke the issuance protocol where C generates their own
+inputs, and S uses their secret key skS. In this setting, C can only
+perform token redemption with S. When a token redemption is required, C
+and S invoke the redemption phase of the protocol, where C uses an
+issued token from a previous exchange, and S uses skS to validate the
+redemption.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="dv">
+<section id="section-5.2">
+        <h3 id="name-delegated-verifier">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-delegated-verifier" class="section-name selfRef">Delegated-Verifier</a>
+        </h3>
+<p id="section-5.2-1">In this setting, each client C obtains issued tokens from a derver S via
+the issuance phase of the protocol. The difference is that C can prove
+that they hold a valid authorization with any verifier V. We still only
+consider S to hold their own secret key. We name this mode
+"Delegated-Verifier" (DV).<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">When C interacts with V, V can ask C to provide proof of authorization
+to the separate server S. The first stage of the redemption phase of the
+protocol is invoked between C and V, which sees C send an unused
+redemption token to V. This message is then used in a redemption
+exchange between V and S, where V plays the role of the Client. Then S
+sends the result of the redemption verification to V, and V uses this
+result to determine whether C has a valid token.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="av">
+<section id="section-5.3">
+        <h3 id="name-asynchronous-verifier">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-asynchronous-verifier" class="section-name selfRef">Asynchronous-Verifier</a>
+        </h3>
+<p id="section-5.3-1">This setting is inspired by recently proposed APIs such as
+<span>[<a href="#TrustTokenAPI" class="xref">TrustTokenAPI</a>]</span>. It is similar to the DV configuration, except that
+the verifiers V no longer interact with the server S. Only C interacts
+with S, and this is done asynchronously to the authorization request
+from V. Hence "Asynchronous-Verifier" (AV).<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-2">When V invokes a redemption for C, C then invokes a redemption exchange
+with S in a separate session. If verification is carried out
+successfully by S, S instead returns a Signed Redemption Record (SRR)
+that contains the following information:<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+<div class="artwork art-text alignLeft art-json" id="section-5.3-3">
+<pre>
+"result": {
+  "timestamp":"2019-10-09-11:06:11",
+  "verifier": "V",
+},
+"signature":sig,
+</pre><a href="#section-5.3-3" class="pilcrow">¶</a>
+</div>
+<p id="section-5.3-4">The <code>signature</code> field carries a signature evaluated over the contents of
+<code>result</code> using a long-term signing key for the server S, of which the
+corresponding public key is well-known to C and V. This would need to be
+published alongside other public key data for S. Then C can prove that
+they hold a valid authorization from S to V by sending the SRR to V. The
+SRR can be verified by V by verifying the signature, using the
+well-known public key for S.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
+<p id="section-5.3-5">Such records can be cached to display again in the future. The server
+can also add an expiry date to the record to determine when the client
+must refresh the record.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="pv">
+<section id="section-5.4">
+        <h3 id="name-public-verifier">
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-public-verifier" class="section-name selfRef">Public-Verifier</a>
+        </h3>
+<p id="section-5.4-1">We consider the case where client redemptions can be verified publicly
+using the server public key. This allows for defining extensions of
+Privacy Pass that use public-key cryptography to allow public
+verification.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<p id="section-5.4-2">In this case, the client C obtains a redemption token from S. The
+redemption token is publicly verifiable in the sense that any entity
+that knows the public key for S can verify the token. This running mode
+is known as "Public-Verifier" (PV).<a href="#section-5.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="bi-mode">
+<section id="section-5.5">
+        <h3 id="name-bounded-number-of-servers">
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-bounded-number-of-servers" class="section-name selfRef">Bounded number of servers</a>
+        </h3>
+<p id="section-5.5-1">Each of the configurations above can be generalized to settings where a
+bounded number of servers are allowed, and verifiers can invoke
+authorization verification for any of the available servers.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-2">As we will discuss later in <a href="#privacy" class="xref">Section 7</a>, configuring a large number of
+servers can lead to privacy concerns for the clients in the ecosystem.
+Therefore, we are careful to ensure that the number of servers is kept
+strictly bounded. The actual servers can be replaced with different
+servers as long as the total never exceeds this bound. Moreover, server
+replacements also have an effect on client anonymity that is similar to
+when a key rotation occurs. server so replacement should only be
+permitted at similar intervals.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
+<p id="section-5.5-3">See <a href="#privacy" class="xref">Section 7</a> for more details about maintaining privacy with multiple
+servers.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="client-server">
+<section id="section-6">
+      <h2 id="name-client-server-trust-relatio">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-client-server-trust-relatio" class="section-name selfRef">Client-Server trust relationship</a>
+      </h2>
+<p id="section-6-1">It is important, based on the architecture above, that any client can
+determine whether it would like to interact with a given server in the
+ecosystem. Note that this decision must be taken before a client issues
+a valid redemption to the server, since redemptions reveal the anonymity
+set that the client belongs to.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">This judgement can be based on a multitude of factors, associated with
+the way that a server presents itself in the ecosystem. A non-exhaustive
+list of server characteristics that a client MAY want to check are the
+following.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6-3.1">Which key registry a server posts their key updates to.<a href="#section-6-3.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-6-3.2">How frequent key updates are issued, and which ciphersuite they use.<a href="#section-6-3.2" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-6-3.3">The reason given to initiate the redemption.<a href="#section-6-3.3" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="section-6-4">To aid client trust decisions, a server can publish a "Privacy Pass
+policy" that documents the procedures that the server uses to ensure
+that client privacy is respected. If a server does not publish such a
+document then the client may choose to use its own judgement, or to
+reject the server altogether.<a href="#section-6-4" class="pilcrow">¶</a></p>
+<p id="section-6-5">It should be noted that the client trust decision can be made apriori by
+specifying an allow-list of all servers that it accepts tokens from.
+This means that these checks do not have to be performed online.<a href="#section-6-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="privacy">
+<section id="section-7">
+      <h2 id="name-privacy-considerations">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy considerations</a>
+      </h2>
+<p id="section-7-1">In the Privacy Pass protocol <span>[<a href="#draft-davidson-pp-protocol" class="xref">draft-davidson-pp-protocol</a>]</span>, redemption
+tokens intentionally encode very little information beyond which key was
+used to sign them. The protocol intentionally uses components that
+provide cryptographic guarantees of this fact. However, even with these
+guarantees, the way that the ecosystem is constructed can be used to
+identify clients based on this limited information.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">The goal of the Privacy Pass ecosystem is to construct an environment
+that can easily measure (and maximize) the relative anonymity of any
+client that is part of it. An inherent feature of being part of this
+ecosystem is that any client can only remain private relative to the
+entire space of users using the protocol. Moreover, by owning tokens for
+a given set of keys, the client's anonymity set shrinks to the total
+number of clients controlling tokens for the same keys.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">In the following, we consider the possible ways that servers and servers
+can leverage their position to try and reduce the anonymity sets that
+clients belong to (or, user segregation). For each case, we provide
+mitigations that the Privacy Pass ecosystem must implement to prevent
+these actions.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<div id="server-key-rotation">
+<section id="section-7.1">
+        <h3 id="name-server-key-rotation">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-server-key-rotation" class="section-name selfRef">Server key rotation</a>
+        </h3>
+<p id="section-7.1-1">Techniques to introduce client "segregation" can be used to reduce
+client anonymity. Such techniques are closely linked to the type of key
+schedule that is used by the server. When a server rotates their key,
+any client that invokes the issuance protocol in this key cycle will be
+part of a group of possible clients owning valid tokens for this key. To
+mechanize this attack strategy, a server could introduce a key rotation
+policy that forces clients into small key cycles. Thus, reducing the
+size of the anonymity set for these clients.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">We RECOMMEND that servers should only invoke key rotation for fairly
+large periods of time such as between 1 and 12 weeks. Key rotations
+represent a trade-off between client privacy and continued server
+security. Therefore, it is still important that key rotations occur on a
+fairly regular cycle to reduce the harmfulness of a server key
+compromise.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.1-3">With an active user-base, a week gives a fairly large window for clients
+to participate in the Privacy Pass protocol and thus enjoy the anonymity
+guarantees of being part of a larger group. The low ceiling of 12 weeks
+prevents a key compromise from being too destructive. If a server
+realizes that a key compromise has occurred then the server should
+sample a new key, and upload the public key to the key registry;
+invoking any revocation procedures that may apply for the old key.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="servers">
+<section id="section-7.2">
+        <h3 id="name-large-numbers-of-servers">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-large-numbers-of-servers" class="section-name selfRef">Large numbers of servers</a>
+        </h3>
+<p id="section-7.2-1">Similarly to the server rotation dynamic that is raised above, if there
+are a large number of servers then segregation can occur. In the FV, AV
+and PV running modes (<a href="#running-modes" class="xref">Section 5</a>), a verifier OV can trigger
+redemptions for any of the available servers. Each redemption token that
+a client holds essentially corresponds to a bit of information about the
+client that OV can learn. Therefore, there is an exponential loss in
+anonymity relative to the number of servers that there are.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-2">For example, if there are 32 servers, then OV learns 32 bits of
+information about the client. If the distribution of server trust is
+anything close to a uniform distribution, then this is likely to
+uniquely identify any client amongst all other Internet users. Assuming
+a uniform distribution is clearly the worst-case scenario, and unlikely
+to be accurate, but it provides a stark warning against allowing too
+many servers at any one time.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<p id="section-7.2-3">In cases where clients can hold tokens for all servers at any given
+time, a strict bound SHOULD be applied to the active number of servers
+in the ecosystem. We propose that allowing no more than 4 servers at any
+one time is highly preferable (leading to a maximum of 64 possible user
+segregations). However, as highlighted in <a href="#parametrization" class="xref">Section 9</a>, having a
+very large user base (&gt; 5 million users), could potentially allow for
+larger values. server replacements should only occur with the same
+frequency as config rotations as they can lead to similar losses in
+anonymity if clients still hold redemption tokens for previously active
+servers.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+<p id="section-7.2-4">In addition, we RECOMMEND that trusted registries indicate at all times
+which servers are deemed to be active. If a client is asked to invoke
+any Privacy Pass exchange for an server that is not declared active,
+then the client SHOULD refuse to retrieve the server configuration
+during the protocol.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<div id="more-servers">
+<section id="section-7.2.1">
+          <h4 id="name-allowing-larger-number-of-s">
+<a href="#section-7.2.1" class="section-number selfRef">7.2.1. </a><a href="#name-allowing-larger-number-of-s" class="section-name selfRef">Allowing larger number of servers</a>
+          </h4>
+<p id="section-7.2.1-1">The bounds on the numbers of servers that we proposed above are very
+restrictive. This is due to the fact that we considered a situation
+where a client could be issued (and forced to redeem) tokens for any
+issuing key.<a href="#section-7.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.2.1-2">An alternative system is to ensure a robust strategy for ensuring that
+clients only possess redemption tokens for a similarly small number of
+servers at any one time. This prevents a malicious verifier from being
+able to invoke redemptions for many servers since the client would only
+be holding redemption tokens for a small set of servers. When a client
+is issued tokens from a new server and already has tokens from the
+maximum number of servers, it simply deletes the oldest set of
+redemption tokens in storage and then stores the newly acquired tokens.<a href="#section-7.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.2.1-3">For example, if clients ensure that they only hold redemption tokens for
+4 servers, then this increases the potential size of the anonymity sets
+that the client belongs to. However, this doesn't protect clients
+completely as it would if only 4 servers were permitted across the whole
+system. For example, these 4 servers could be different for each client.
+Therefore, the selection of servers they possess tokens for is still
+revealing. Understanding this trade-off is important in deciding the
+effective anonymity of each client in the system.<a href="#section-7.2.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="split-view">
+<section id="section-7.3">
+        <h3 id="name-partitioning-of-server-key-">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-partitioning-of-server-key-" class="section-name selfRef">Partitioning of server key material</a>
+        </h3>
+<p id="section-7.3-1">If there are multiple key registries, or if a key registry colludes with
+an server, then it is possible to provide a split-view of an server's
+key material to different clients. This would involve posting different
+key material in different locations, or actively modifying the key
+material at a given location.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.3-2">Key registries should operate independently of server's in the
+ecosystem, and within the guidelines stated in <a href="#key-mgmt" class="xref">Section 4</a>. Any client
+should follow the recommendations in <a href="#client-server" class="xref">Section 6</a> for determining
+whether an server and its key material should be trusted.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="additional-token-metadata">
+<section id="section-7.4">
+        <h3 id="name-additional-token-metadata">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-additional-token-metadata" class="section-name selfRef">Additional token metadata</a>
+        </h3>
+<p id="section-7.4-1">In <span>[<a href="#draft-davidson-pp-protocol" class="xref">draft-davidson-pp-protocol</a>]</span>, it is permissible to add public and
+private metadata bits to redemption tokens. The core protocol
+instantiation that is described does not include additional metadata.
+However, future instantiations may use this functionality to provide
+redemption verifiers with additional information about the user.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-2">Note that any arbitrary bits of information can be used to further
+segment the size of the user's anonymity set. Any server that wanted to
+track a single user could add a single metadata bit to user tokens. For
+the tracked user it would set the bit to <code>1</code>, and <code>0</code> otherwise. Adding
+additional bits provides an exponential increase in tracking granularity
+similarly to introducing more servers (though with more potential
+targeting).<a href="#section-7.4-2" class="pilcrow">¶</a></p>
+<p id="section-7.4-3">For this reason, the amount of metadata used by an server in creating
+redemption tokens must be taken into account -- together with the bits
+of information that server's may learn about clients otherwise. We
+discuss this more in <a href="#parametrization" class="xref">Section 9</a>.<a href="#section-7.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="tracking-and-identity-leakage">
+<section id="section-7.5">
+        <h3 id="name-tracking-and-identity-leaka">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-tracking-and-identity-leaka" class="section-name selfRef">Tracking and identity leakage</a>
+        </h3>
+<p id="section-7.5-1">Privacy losses may be encountered if too many redemptions are allowed in
+a short burst. For instance, in the Internet setting, this may allow
+delegated or asynchronous verifiers to learn more information from the
+metadata that the client may hold (such as first-party cookies for other
+domains). Mitigations for this issue are similar to those proposed in
+<a href="#servers" class="xref">Section 7.2</a> for tackling the problem of having large number of servers.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<p id="section-7.5-2">In AV, cached SRRs and their associated server public keys have a
+similar tracking potential to first party cookies in the browser
+setting. These considerations will be covered in a separate document,
+detailing Privacy Pass protocol integration into the wider web
+architecture <span>[<a href="#draft-svaldez-pp-http-api" class="xref">draft-svaldez-pp-http-api</a>]</span>.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="client-incentives-for-anonymity-reduction">
+<section id="section-7.6">
+        <h3 id="name-client-incentives-for-anony">
+<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-client-incentives-for-anony" class="section-name selfRef">Client incentives for anonymity reduction</a>
+        </h3>
+<p id="section-7.6-1">Clients may see an incentive in accepting all tokens that are issued by
+a server, even if the tokens fail later verification checks. This is
+because tokens effectively represent a form of currency that they can
+later redeem for some sort of benefit. The verification checks that are
+put in place are there to ensure that the client does not sacrifice
+their anonymity. However, a client may judge the "monetary" benefit of
+owning tokens to be greater than their own privacy.<a href="#section-7.6-1" class="pilcrow">¶</a></p>
+<p id="section-7.6-2">Firstly, a client behaving in this way would not be compliant with the
+protocol, as laid out in <span>[<a href="#draft-davidson-pp-protocol" class="xref">draft-davidson-pp-protocol</a>]</span>.<a href="#section-7.6-2" class="pilcrow">¶</a></p>
+<p id="section-7.6-3">Secondly, acting in this way only affects the privacy of the immediate
+client. There is an exception if a large number of clients colluded to
+accept bad data, then any client that didn't accept would be part of a
+smaller anonymity set. However, such a situation would be identical to
+the situation where the total number of clients in the ecosystem is
+small. Therefore, the reduction in the size of the anonymity set would
+be equivalent; see <a href="#servers" class="xref">Section 7.2</a> for more details.<a href="#section-7.6-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security">
+<section id="section-8">
+      <h2 id="name-security-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations" class="section-name selfRef">Security considerations</a>
+      </h2>
+<p id="section-8-1">We present a number of security considerations that prevent malicious
+clients from abusing the protocol.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<div id="double-spend-protection">
+<section id="section-8.1">
+        <h3 id="name-double-spend-protection">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-double-spend-protection" class="section-name selfRef">Double-spend protection</a>
+        </h3>
+<p id="section-8.1-1">All issuing server should implement a robust storage-query mechanism for
+checking that tokens sent by clients have not been spent before. Such
+tokens only need to be checked for each server individually. But all
+servers must perform global double-spend checks to avoid clients from
+exploiting the possibility of spending tokens more than once against
+distributed token checking systems. For the same reason, the global data
+storage must have quick update times. While an update is occurring it
+may be possible for a malicious client to spend a token more than once.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="token-exhaustion">
+<section id="section-8.2">
+        <h3 id="name-token-exhaustion">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-token-exhaustion" class="section-name selfRef">Token exhaustion</a>
+        </h3>
+<p id="section-8.2-1">When a client holds tokens for an server, it is possible for any
+verifier to invoke that client to redeem tokens for that server. This
+can lead to an attack where a malicious verifier can force a client to
+spend all of their tokens for a given server. To prevent this from
+happening, methods should be put into place to prevent many tokens from
+being redeemed at once.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">For example, it may be possible to cache a redemption for the entity
+that is invoking a token redemption. If the verifier requests more
+tokens then the client simply returns the cached token that it returned
+previously. This could also be handled by simply not redeeming any
+tokens for verification if a redemption had already occurred in a given
+time window.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+<p id="section-8.2-3">In AV, the client instead caches the SRR that it received in the
+asynchronous redemption exchange with the server. If the same verifier
+attempts another redemption request, then the client simply returns the
+cached SRR. The SRRs can be revoked by the server, if need be, by
+providing an expiry date or by signaling that records from a particular
+window need to be refreshed.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="avoiding-server-centralization">
+<section id="section-8.3">
+        <h3 id="name-avoiding-server-centralizat">
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-avoiding-server-centralizat" class="section-name selfRef">Avoiding server centralization</a>
+        </h3>
+<p id="section-8.3-1">[[OPEN ISSUE: explain potential and mitigations for server
+centralization]]<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="parametrization">
+<section id="section-9">
+      <h2 id="name-protocol-parametrization">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-protocol-parametrization" class="section-name selfRef">Protocol parametrization</a>
+      </h2>
+<p id="section-9-1">We provide a summary of the parameters that we use in the Privacy Pass
+protocol ecosystem. These parameters are informed by both privacy and
+security considerations that are highlighted in <a href="#privacy" class="xref">Section 7</a> and
+<a href="#security" class="xref">Section 8</a>, respectively. These parameters are intended as a single
+reference point for those implementing the protocol.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">Firstly, let U be the total number of users, I be the total number of
+servers. We let M be the total number of metadata bits that are allowed
+to be added by any given server. Assuming that each user accept tokens
+from a uniform sampling of all the possible servers, as a worst-case
+analysis, this segregates users into a total of 2^I buckets. As such, we
+see an exponential reduction in the size of the anonymity set for any
+given user. This allows us to specify the privacy constraints of the
+protocol below, relative to the setting of A.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-1">
+        <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">parameter</th>
+            <th class="text-left" rowspan="1" colspan="1">value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Minimum anonymity set size (A)</td>
+            <td class="text-left" rowspan="1" colspan="1">5000</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Recommended key lifetime (L)</td>
+            <td class="text-left" rowspan="1" colspan="1">2 - 24 weeks</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Recommended key rotation frequency (F)</td>
+            <td class="text-left" rowspan="1" colspan="1">L/2</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Maximum additional metadata bits (M)</td>
+            <td class="text-left" rowspan="1" colspan="1">1</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Maximum allowed servers (I)</td>
+            <td class="text-left" rowspan="1" colspan="1">(log_2(U/A)-1)/2</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Maximum active issuance keys</td>
+            <td class="text-left" rowspan="1" colspan="1">1</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Maximum active redemption keys</td>
+            <td class="text-left" rowspan="1" colspan="1">2</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Minimum cryptographic security parameter</td>
+            <td class="text-left" rowspan="1" colspan="1">128 bits</td>
+          </tr>
+        </tbody>
+      </table>
+<div id="justification">
+<section id="section-9.1">
+        <h3 id="name-justification">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-justification" class="section-name selfRef">Justification</a>
+        </h3>
+<p id="section-9.1-1">We make the following assumptions in these parameter choices.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9.1-2.1">Inferring the identity of a user in a 5000-strong anonymity set is
+difficult.<a href="#section-9.1-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-9.1-2.2">After 2 weeks, all clients in a system will have rotated to the new
+key.<a href="#section-9.1-2.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-9.1-3">In terms of additional metadata, the only concrete applications of
+Privacy Pass that use additional metadata require just a single bit.
+Therefore, we set the ceiling of permitted metadata to 1 bit for now,
+this may be revisited in future revisions.<a href="#section-9.1-3" class="pilcrow">¶</a></p>
+<p id="section-9.1-4">The maximum choice of I is based on the equation 1/2 * U/2^(2I) = A.
+This is derived from the fact that permitting I servers lead to 2^I
+segregations of the total user-base U. Moreover, if we permit M = 1,
+then this effectively halves the anonymity set for each server, and thus
+we incur a factor of 2I in the exponent. By reducing I, we limit the
+possibility of performing the attacks mentioned in <a href="#privacy" class="xref">Section 7</a>.<a href="#section-9.1-4" class="pilcrow">¶</a></p>
+<p id="section-9.1-5">We must also account for each user holding issued data for more then one
+possible active keys. While this may also be a vector for monitoring the
+access patterns of clients, it is likely to unavoidable that clients
+hold valid issuance data for the previous key epoch. This also means
+that the server can continue to verify redemption data for a previously
+used key. This makes the rotation period much smoother for clients.<a href="#section-9.1-5" class="pilcrow">¶</a></p>
+<p id="section-9.1-6">For privacy reasons, it is recommended that key epochs are chosen that
+limit clients to holding issuance data for a maximum of two keys. By
+choosing F = L/2 then the minimum value of F is a week, since the
+minimum recommended value of L is 2 weeks. Therefore, by the initial
+assumption, then all users should only have access to only two keys at
+any given time. This reduces the anonymity set by another half at most.<a href="#section-9.1-6" class="pilcrow">¶</a></p>
+<p id="section-9.1-7">Finally, the minimum security parameter size is related to the
+cryptographic security offered by the protocol that is run. This
+parameter corresponds to the number of operations that any adversary has
+in breaking one of the security guarantees in the Privacy Pass protocol
+<span>[<a href="#draft-davidson-pp-protocol" class="xref">draft-davidson-pp-protocol</a>]</span>.<a href="#section-9.1-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="example-parameterization">
+<section id="section-9.2">
+        <h3 id="name-example-parameterization">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-example-parameterization" class="section-name selfRef">Example parameterization</a>
+        </h3>
+<p id="section-9.2-1">Using the specification above, we can give some example
+parameterizations. For example, the current Privacy Pass browser
+extension <span>[<a href="#PPEXT" class="xref">PPEXT</a>]</span> has nearly 300000 active users (from Chrome and
+Firefox). As a result, log_2(U/A) is approximately 6 and so the maximum
+value of I should be 3.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-2">If the value of U is much bigger (e.g. 5 million) then this would permit
+I = (log_2(5000000/5000)-1)/2 ~= 4 servers.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="allowing-more-servers">
+<section id="section-9.3">
+        <h3 id="name-allowing-more-servers">
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-allowing-more-servers" class="section-name selfRef">Allowing more servers</a>
+        </h3>
+<p id="section-9.3-1">Using the recommendations in <a href="#more-servers" class="xref">Section 7.2.1</a>, it is possible to
+tolerate larger number of servers if clients in the ecosystem ensure
+that they only store tokens for a small number of them. In particular,
+if clients limit their storage of redemption tokens to the bound implied
+by I, then prevents a malicious verifier from triggering redemptions for
+all servers in the ecosystem.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="extensions">
+<section id="section-10">
+      <h2 id="name-extension-integration-polic">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-extension-integration-polic" class="section-name selfRef">Extension integration policy</a>
+      </h2>
+<p id="section-10-1">The Privacy Pass protocol and ecosystem are both intended to be
+receptive to extensions that expand the current set of functionality. As
+specified in <span>[<a href="#draft-davidson-pp-protocol" class="xref">draft-davidson-pp-protocol</a>]</span>, all extensions to the
+Privacy Pass protocol SHOULD be specified as separate documents that
+modify the content of this document in some way. We provide guidance on
+the type of modifications that are possible in the following.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">Any such extension should also come with a detailed analysis of the
+privacy impacts of the extension, why these impacts are justified, and
+guidelines on changes to the parametrization in <a href="#parametrization" class="xref">Section 9</a>.
+Similarly, extensions MAY also add new server running modes, if
+applicable, to those that are documented in <a href="#running-modes" class="xref">Section 5</a>.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-10-3">Any extension to the Privacy Pass protocol must adhere to the guidelines
+specified in <a href="#key-mgmt" class="xref">Section 4</a> for managing server public key data.<a href="#section-10-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="applications">
+<section id="section-11">
+      <h2 id="name-existing-applications">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-existing-applications" class="section-name selfRef">Existing applications</a>
+      </h2>
+<p id="section-11-1">The following is a non-exhaustive list of applications that currently
+make use of the Privacy Pass protocol, or some variant of the underlying
+functionality.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<div id="cloudflare-challenge-pages">
+<section id="section-11.1">
+        <h3 id="name-cloudflare-challenge-pages">
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-cloudflare-challenge-pages" class="section-name selfRef">Cloudflare challenge pages</a>
+        </h3>
+<p id="section-11.1-1">Cloudflare uses an implementation of the Privacy Pass protocol for
+allowing clients that have previously interacted with their Internet
+challenge protection system to bypass future challenges <span>[<a href="#PPSRV" class="xref">PPSRV</a>]</span>. These
+challenges can be expensive for clients, and there have been cases where
+bugs in the implementations can severely degrade client accessibility.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
+<p id="section-11.1-2">Clients must install a browser extension <span>[<a href="#PPEXT" class="xref">PPEXT</a>]</span> that acts as the
+Privacy Pass client in an exchange with Cloudflare's Privacy Pass
+server, when an initial challenge solution is provided. The client
+extension stores the issued tokens and presents a valid redemption token
+when it sees future Cloudflare challenges. If the redemption token is
+verified by the server, the client passes through the security mechanism
+without completing a challenge.<a href="#section-11.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="trust-token-api">
+<section id="section-11.2">
+        <h3 id="name-trust-token-api">
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-trust-token-api" class="section-name selfRef">Trust Token API</a>
+        </h3>
+<p id="section-11.2-1">The Trust Token API <span>[<a href="#TrustTokenAPI" class="xref">TrustTokenAPI</a>]</span> has been devised as a generic API
+for providing Privacy Pass functionality in the browser setting. The API
+is intended to be implemented directly into browsers so that server's
+can directly trigger the Privacy Pass workflow.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="zero-knowledge-access-passes">
+<section id="section-11.3">
+        <h3 id="name-zero-knowledge-access-passe">
+<a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-zero-knowledge-access-passe" class="section-name selfRef">Zero-knowledge Access Passes</a>
+        </h3>
+<p id="section-11.3-1">The PrivateStorage API developed by Least Authority is a solution for
+uploading and storing end-to-end encrypted data in the cloud. A recent
+addition to the API <span>[<a href="#PrivateStorage" class="xref">PrivateStorage</a>]</span> allows clients to generate
+Zero-knowledge Access Passes (ZKAPs) that the client can use to show
+that it has paid for the storage space that it is using. The ZKAP
+protocol is based heavily on the Privacy Pass redemption mechanism. The
+client receives ZKAPs when it pays for storage space, and redeems the
+passes when it interacts with the PrivateStorage API.<a href="#section-11.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="basic-attention-tokens">
+<section id="section-11.4">
+        <h3 id="name-basic-attention-tokens">
+<a href="#section-11.4" class="section-number selfRef">11.4. </a><a href="#name-basic-attention-tokens" class="section-name selfRef">Basic Attention Tokens</a>
+        </h3>
+<p id="section-11.4-1">The browser Brave uses Basic Attention Tokens (BATs) to provide the
+basis for an anonymity-preserving rewards scheme <span>[<a href="#Brave" class="xref">Brave</a>]</span>. The BATs are
+essentially Privacy Pass redemption tokens that are provided by a
+central Brave server when a client performs some action that triggers a
+reward event (such as watching an advertisement). When the client
+amasses BATs, it can redeem them with the Brave central server for
+rewards.<a href="#section-11.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="token-based-services">
+<section id="section-11.5">
+        <h3 id="name-token-based-services">
+<a href="#section-11.5" class="section-number selfRef">11.5. </a><a href="#name-token-based-services" class="section-name selfRef">Token Based Services</a>
+        </h3>
+<p id="section-11.5-1">Similarly to BATs, a more generic approach for providing anonymous peers
+to purchase resources from anonymous servers has been proposed
+<span>[<a href="#OpenPrivacy" class="xref">OpenPrivacy</a>]</span>. The protocol is based on a variant of Privacy Pass and
+is intended to allow clients purchase (or pre-purchase) services such as
+message hosting, by using Privacy Pass redemption tokens as a form of
+currency. This is also similar to how ZKAPs are used.<a href="#section-11.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<section id="section-12">
+      <h2 id="name-references">
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<section id="section-12.1">
+        <h3 id="name-normative-references">
+<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="draft-davidson-pp-protocol">[draft-davidson-pp-protocol]</dt>
+        <dd>
+<span class="refAuthor">Davidson, A.</span>, <span class="refTitle">"Privacy Pass: The Protocol"</span>, <span>n.d.</span>, <span>&lt;<a href="https://tools.ietf.org/html/draft-davidson-pp-protocol-00">https://tools.ietf.org/html/draft-davidson-pp-protocol-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="draft-svaldez-pp-http-api">[draft-svaldez-pp-http-api]</dt>
+        <dd>
+<span class="refAuthor">Valdez, S.</span>, <span class="refTitle">"Privacy Pass: HTTP API"</span>, <span>n.d.</span>, <span>&lt;<a href="https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-svaldez-pp-http-api">https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-svaldez-pp-http-api</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8446">[RFC8446]</dt>
+      <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8446">https://www.rfc-editor.org/info/rfc8446</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<section id="section-12.2">
+        <h3 id="name-informative-references">
+<a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="Brave">[Brave]</dt>
+        <dd>
+<span class="refTitle">"Brave Rewards"</span>, <span>n.d.</span>, <span>&lt;<a href="https://brave.com/brave-rewards/">https://brave.com/brave-rewards/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="OpenPrivacy">[OpenPrivacy]</dt>
+        <dd>
+<span class="refTitle">"Token Based Services - Differences from PrivacyPass"</span>, <span>n.d.</span>, <span>&lt;<a href="https://openprivacy.ca/assets/towards-anonymous-prepaid-services.pdf">https://openprivacy.ca/assets/towards-anonymous-prepaid-services.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="PPEXT">[PPEXT]</dt>
+        <dd>
+<span class="refTitle">"Privacy Pass Browser Extension"</span>, <span>n.d.</span>, <span>&lt;<a href="https://github.com/privacypass/challenge-bypass-extension">https://github.com/privacypass/challenge-bypass-extension</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="PPSRV">[PPSRV]</dt>
+        <dd>
+<span class="refAuthor">Sullivan, N.</span>, <span class="refTitle">"Cloudflare Supports Privacy Pass"</span>, <span>n.d.</span>, <span>&lt;<a href="https://blog.cloudflare.com/cloudflare-supports-privacy-pass/">https://blog.cloudflare.com/cloudflare-supports-privacy-pass/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="PrivateStorage">[PrivateStorage]</dt>
+        <dd>
+<span class="refAuthor">Steininger, L.</span>, <span class="refTitle">"The Path from S4 to PrivateStorage"</span>, <span>n.d.</span>, <span>&lt;<a href="https://medium.com/least-authority/the-path-from-s4-to-privatestorage-ae9d4a10b2ae">https://medium.com/least-authority/the-path-from-s4-to-privatestorage-ae9d4a10b2ae</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TrustTokenAPI">[TrustTokenAPI]</dt>
+      <dd>
+<span class="refAuthor">Google, .</span>, <span class="refTitle">"Getting started with Trust Tokens"</span>, <span>n.d.</span>, <span>&lt;<a href="https://web.dev/trust-tokens/">https://web.dev/trust-tokens/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</section>
+<div id="contributors">
+<section id="section-appendix.a">
+      <h2 id="name-contributors">
+<a href="#section-appendix.a" class="section-number selfRef">Appendix A. </a><a href="#name-contributors" class="section-name selfRef">Contributors</a>
+      </h2>
+<ul class="normal">
+<li class="normal" id="section-appendix.a-1.1">Alex Davidson (alex.davidson92@gmail.com)<a href="#section-appendix.a-1.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-appendix.a-1.2">Christopher Wood (caw@heapingbits.net)<a href="#section-appendix.a-1.2" class="pilcrow">¶</a>
+</li>
+      </ul>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="section-appendix.b">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Alex Davidson</span></div>
+<div dir="auto" class="left"><span class="org">Cloudflare Portugal</span></div>
+<div dir="auto" class="left"><span class="street-address">Largo Rafael Bordalo Pinheiro 29</span></div>
+<div dir="auto" class="left"><span class="locality">Lisbon</span></div>
+<div dir="auto" class="left"><span class="country-name">Portugal</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:alex.davidson92@gmail.com" class="email">alex.davidson92@gmail.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
