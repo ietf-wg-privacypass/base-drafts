@@ -280,10 +280,10 @@ authorization tokens from the server.
 
                              serverResp = Issue(pkS, skS, req)
 
-                           issueResp
+                           serverResp
                       <-------------------
 
-  tokens = Process(pkS, cInput, issueResp)
+  tokens = Process(pkS, cInput, serverResp)
   store[server.id].push(tokens)
 ~~~
 
@@ -717,8 +717,8 @@ def Generate(m):
   for i in range(m):
     x = random_bytes()
     (token, blindedToken) = Blind(x)
-    token[i] = token
-    blindedToken[i] = blindedToken
+    tokens[i] = token
+    blindedTokens[i] = blindedToken
   return IssuanceInput {
            internal: tokens,
            req: blindedTokens,
