@@ -451,7 +451,7 @@ clients cannot determine if this value is correct or otherwise a tracking
 vector.
 
 Private metadata is that which clients cannot observe as part of the token
-issuance flow. In {{draft-davidson-pp-protocol}}, it is possible to include
+issuance flow. In {{draft-ietf-privacypass-protocol}}, it is possible to include
 private metadata to redemption tokens. The core protocol instantiation that
 is described does not include additional metadata. However, future instantiations
 may use this functionality to provide redemption verifiers with additional
