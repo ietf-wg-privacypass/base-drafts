@@ -457,6 +457,8 @@ is described does not include additional metadata. However, future instantiation
 may use this functionality to provide redemption verifiers with additional
 information about the user.
 
+## Client privacy implications
+
 Note that any metadata bits of information can be used to further
 segment the size of the user's anonymity set. Any server that wanted to
 track a single user could add a single metadata bit to user tokens. For
