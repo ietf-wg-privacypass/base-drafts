@@ -28,18 +28,7 @@ author:
 normative:
   RFC2119:
   RFC8446:
-  draft-davidson-pp-protocol:
-    title: "Privacy Pass: The Protocol"
-    target: https://tools.ietf.org/html/draft-davidson-pp-protocol-00
-    author:
-      ins: A. Davidson
-      org: Cloudflare Portugal
-  draft-svaldez-pp-http-api:
-    title: "Privacy Pass: HTTP API"
-    target: https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-svaldez-pp-http-api
-    author:
-      ins: S. Valdez
-      org: Google LLC
+
 informative:
   TrustTokenAPI:
     title: Getting started with Trust Tokens
@@ -75,6 +64,33 @@ informative:
     author:
       ins: N. Sullivan
       org: Cloudflare
+  HIJK21:
+    title: "PrivateStats: De-Identified Authenticated Logging at Scale"
+    target: https://research.fb.com/wp-content/uploads/2021/01/PrivateStats-De-Identified-Authenticated-Logging-at-Scale_final.pdf
+    date: Jan 2021
+    author:
+      -
+        ins: S. Huang
+      -
+        ins: S. Iyengar
+      -
+        ins: S. Jeyaraman
+      -
+        ins: S. Kushwah
+      -
+        ins: C. K. Lee
+      -
+        ins: Z. Luo
+      -
+        ins: P. Mohassel
+      -
+        ins: A. Raghunathan
+      -
+        ins: S. Shaikh
+      -
+        ins: Y. C. Sung
+      -
+        ins: A. Zhang
 
 --- abstract
 
@@ -90,7 +106,7 @@ of all participating entities.
 
 The Privacy Pass protocol provides an anonymity-preserving mechanism for
 authorization of clients with servers. The protocol is detailed in
-{{draft-davidson-pp-protocol}} and is intended for use in the
+{{?I-D.ietf-privacypass-protocol}} and is intended for use in the
 application-layer.
 
 The way that the ecosystem around the protocol is set up can have
@@ -192,7 +208,7 @@ the roles of servers and clients further in {{ecosystem-servers}} and
 
 Generally, servers in the Privacy Pass ecosystem are entities whose
 primary function is to undertake the role of the `server` in
-{{draft-davidson-pp-protocol}}. To facilitate this, the server MUST hold
+{{?I-D.ietf-privacypass-protocol}}. To facilitate this, the server MUST hold
 a Privacy Pass protocol keypair at any given time. The server public key
 MUST be made available to all clients in such a way that key rotations
 and other updates are publicly visible. The server MAY also require
@@ -200,7 +216,7 @@ additional state for ensuring this. We provide a wider discussion in
 {{key-mgmt}}.
 
 Note that, in the core protocol instantiation from
-{{draft-davidson-pp-protocol}}, the redemption phase is a symmetric
+{{?I-D.ietf-privacypass-protocol}}, the redemption phase is a symmetric
 protocol. This means that the server is the same server that ultimately
 processes token redemptions from clients. However, plausible extensions
 to the protocol specification may allow public verification of tokens by
@@ -215,7 +231,7 @@ consistent identifier.
 
 Clients in the Privacy Pass ecosystem are entities whose primary
 function is to undertake the role of the `Client` in
-{{draft-davidson-pp-protocol}}. Clients are assumed to only store data
+{{?I-D.ietf-privacypass-protocol}}. Clients are assumed to only store data
 related to the tokens that it has been issued by the server. This
 storage is used for constructing redemption requests.
 
@@ -451,11 +467,13 @@ clients cannot determine if this value is correct or otherwise a tracking
 vector.
 
 Private metadata is that which clients cannot observe as part of the token
-issuance flow. In {{draft-ietf-privacypass-protocol}}, it is possible to include
+issuance flow. In {{?I-D.ietf-privacypass-protocol}}, it is possible to include
 private metadata to redemption tokens. The core protocol instantiation that
 is described does not include additional metadata. However, future instantiations
 may use this functionality to provide redemption verifiers with additional
-information about the user.
+information about the user. Such instantiations may be built on the Private
+Metadata Bit construction from Kreuter et al. {{?KLOR20=DOI.10.1007/978-3-030-56784-2_11}}
+or the attribute-based VOPRF from Huang et al. {{HIJK21}}.
 
 ## Client privacy implications
 
@@ -473,7 +491,8 @@ of information that server's may learn about clients otherwise. Since this
 metadata may be useful for practical deployments of Privacy Pass, servers
 must balance this against the reduction in client privacy. In general,
 servers should permit no more than 32 bits of metadata, as this can
-uniquely identify each possible user. We discuss this more in {{parametrization}}.
+uniquely identify each possible user. We discuss this more in
+{{parametrization}}.
 
 # Client-Server trust relationship {#client-server}
 
@@ -504,7 +523,7 @@ This means that these checks do not have to be performed online.
 
 # Privacy considerations {#privacy}
 
-In the Privacy Pass protocol {{draft-davidson-pp-protocol}}, redemption
+In the Privacy Pass protocol {{?I-D.ietf-privacypass-protocol}}, redemption
 tokens intentionally encode very little information beyond which key was
 used to sign them. The protocol intentionally uses components that
 provide cryptographic guarantees of this fact. However, even with these
@@ -637,7 +656,7 @@ In AV, cached SRRs and their associated server public keys have a
 similar tracking potential to first party cookies in the browser
 setting. These considerations will be covered in a separate document,
 detailing Privacy Pass protocol integration into the wider web
-architecture {{draft-svaldez-pp-http-api}}.
+architecture {{?I-D.ietf-privacypass-http-api}}.
 
 ## Client incentives for anonymity reduction
 
@@ -650,7 +669,7 @@ their anonymity. However, a client may judge the "monetary" benefit of
 owning tokens to be greater than their own privacy.
 
 Firstly, a client behaving in this way would not be compliant with the
-protocol, as laid out in {{draft-davidson-pp-protocol}}.
+protocol, as laid out in {{?I-D.ietf-privacypass-protocol}}.
 
 Secondly, acting in this way only affects the privacy of the immediate
 client. There is an exception if a large number of clients colluded to
@@ -771,7 +790,7 @@ Finally, the minimum security parameter size is related to the
 cryptographic security offered by the protocol that is run. This
 parameter corresponds to the number of operations that any adversary has
 in breaking one of the security guarantees in the Privacy Pass protocol
-{{draft-davidson-pp-protocol}}.
+{{?I-D.ietf-privacypass-protocol}}.
 
 ## Example parameterization
 
@@ -797,7 +816,7 @@ all servers in the ecosystem.
 
 The Privacy Pass protocol and ecosystem are both intended to be
 receptive to extensions that expand the current set of functionality. As
-specified in {{draft-davidson-pp-protocol}}, all extensions to the
+specified in {{?I-D.ietf-privacypass-protocol}}, all extensions to the
 Privacy Pass protocol SHOULD be specified as separate documents that
 modify the content of this document in some way. We provide guidance on
 the type of modifications that are possible in the following.
