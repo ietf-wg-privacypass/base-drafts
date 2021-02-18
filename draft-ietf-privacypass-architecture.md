@@ -15,11 +15,15 @@ author:
  -
     ins: A. Davidson
     name: Alex Davidson
-    org: Cloudflare Portugal
-    street: Largo Rafael Bordalo Pinheiro 29
-    city: Lisbon
-    country: Portugal
     email: alex.davidson92@gmail.com
+ -
+    ins: C. A. Wood
+    name: Christopher A. Wood
+    org: Cloudflare
+    street: 101 Townsend St
+    city: San Francisco
+    country: United States of America
+    email: caw@heapingbits.net
 
 normative:
   RFC2119:
@@ -420,11 +424,54 @@ Therefore, we are careful to ensure that the number of servers is kept
 strictly bounded. The actual servers can be replaced with different
 servers as long as the total never exceeds this bound. Moreover, server
 replacements also have an effect on client anonymity that is similar to
-when a key rotation occurs. server so replacement should only be
-permitted at similar intervals.
+when a key rotation occurs.
 
 See {{privacy}} for more details about maintaining privacy with multiple
 servers.
+
+# Metadata
+
+Certain instantiations of Privacy Pass may permit public or private
+metadata to be cryptographically bound to a token. As an example, one
+trivial way to include public metadata is to assign a unique issuer
+public key for each value of metadata, such that N keys yields log2(N)
+bits of metadata. The total amount of metadata bits included in a token
+is the sum of public and private metadata bits. See {{parametrization}}
+for discussion about metadata limits.
+
+Public metadata is that which clients can observe as part of the token
+issuance flow. Public metadata can either be transparent or opaque. For
+example, transparent public metadata is a value that the client either
+generates itself, or the server provides during the issuance flow and
+the client can check for correctness. Opaque public metadata is metadata
+the client can see but cannot check for correctness. As an example, the
+opaque public metadata might be a "fraud detection signal", computed on
+behalf of the server, during token issuance. In normal circumstances,
+clients cannot determine if this value is correct or otherwise a tracking
+vector.
+
+Private metadata is that which clients cannot observe as part of the token
+issuance flow. In {{draft-davidson-pp-protocol}}, it is possible to include
+private metadata to redemption tokens. The core protocol instantiation that
+is described does not include additional metadata. However, future instantiations
+may use this functionality to provide redemption verifiers with additional
+information about the user.
+
+Note that any metadata bits of information can be used to further
+segment the size of the user's anonymity set. Any server that wanted to
+track a single user could add a single metadata bit to user tokens. For
+the tracked user it would set the bit to `1`, and `0` otherwise. Adding
+additional bits provides an exponential increase in tracking granularity
+similarly to introducing more servers (though with more potential
+targeting).
+
+For this reason, the amount of metadata used by an server in creating
+redemption tokens must be taken into account -- together with the bits
+of information that server's may learn about clients otherwise. Since this
+metadata may be useful for practical deployments of Privacy Pass, servers
+must balance this against the reduction in client privacy. In general,
+servers should permit no more than 32 bits of metadata, as this can
+uniquely identify each possible user. We discuss this more in {{parametrization}}.
 
 # Client-Server trust relationship {#client-server}
 
@@ -574,27 +621,6 @@ Key registries should operate independently of server's in the
 ecosystem, and within the guidelines stated in {{key-mgmt}}. Any client
 should follow the recommendations in {{client-server}} for determining
 whether an server and its key material should be trusted.
-
-## Additional token metadata
-
-In {{draft-davidson-pp-protocol}}, it is permissible to add public and
-private metadata bits to redemption tokens. The core protocol
-instantiation that is described does not include additional metadata.
-However, future instantiations may use this functionality to provide
-redemption verifiers with additional information about the user.
-
-Note that any arbitrary bits of information can be used to further
-segment the size of the user's anonymity set. Any server that wanted to
-track a single user could add a single metadata bit to user tokens. For
-the tracked user it would set the bit to `1`, and `0` otherwise. Adding
-additional bits provides an exponential increase in tracking granularity
-similarly to introducing more servers (though with more potential
-targeting).
-
-For this reason, the amount of metadata used by an server in creating
-redemption tokens must be taken into account -- together with the bits
-of information that server's may learn about clients otherwise. We
-discuss this more in {{parametrization}}.
 
 ## Tracking and identity leakage
 
