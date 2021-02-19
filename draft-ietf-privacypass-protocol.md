@@ -286,7 +286,7 @@ server issue a token to the client.
                           commit_resp
                       <-------------------
 
-  cInput = Generate(m, com)
+  cInput = Generate(m, commit_resp)
   req = cInput.req
 
                               req
@@ -303,9 +303,9 @@ server issue a token to the client.
 
 Note that the first round of the protocol is only necessitated for
 certain ciphersuites that require client and servers commit to some
-value. When such commitment `com` is generated and sent to the client,
-the client returns `com` with the `IssuanceRequest` message. The server
-MUST check that the commitment corresponds to `com` that was previously
+value. When such commitment `commit_resp` is generated and sent to the client,
+the client returns `commit_resp` with the `IssuanceRequest` message. The server
+MUST check that the commitment corresponds to `commit_resp` that was previously
 committed. This requires the commitment to either be a reference to some
 commitment on the server, or the commitment be an encrypted (and
 authenticated) blob that the server can use to recover commitment. The
@@ -322,8 +322,8 @@ instead DOES NOT send the `CommitRequest` message, and runs:
 cInput = Generate(m, "")
 ~~~
 
-A server that is expecting some non-empty `com` to be passed must abort
-the protocol on receiving a request containing an empty `com` value.
+A server that is expecting some non-empty `commit_resp` to be passed must abort
+the protocol on receiving a request containing an empty `commit_resp` value.
 
 Note: currently, no ciphersuites are supported that support working with
 empty commitment messages.
