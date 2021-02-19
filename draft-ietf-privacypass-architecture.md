@@ -249,7 +249,7 @@ SHOULD minimize or remove identifying information where possible, e.g.,
 by using anonymity-preserving tools such as Tor to interact with
 servers.
 
-# Key management framework {#key-mgmt}
+# Key management and discovery {#key-mgmt}
 
 The key material and protocol configuration that a server uses to issue
 tokens corresponds to a number of different pieces of information.
@@ -257,63 +257,23 @@ tokens corresponds to a number of different pieces of information.
 - The ciphersuite that the server is using.
 - The public keys that are active for the server.
 
-For reasons that we address later in {{privacy}}, the way that the
-server publishes and maintains this information impacts the effective
-privacy of the clients. In this section, we describe the main policies
-that need to be satisfied for a key management system in a Privacy Pass
-ecosystem.
+The way that the server publishes and maintains this information impacts
+the effective privacy of the clients; see {{privacy}} for more details.
+The fundamental requirement for key management and discovery is that servers
+must be unable to target specific clients with unique keys without detection.
+There are a number of ways in which this might be implemented:
 
-Note that we only specify a set of guidelines and recommendations for
-operating a public key registry in this document. Actual specification
-of such a registry and how it operates will be covered elsewhere.
+- Servers use a verifiable, tamper-free registry from which clients discover
+  keys. Similar to related mechanisms and protocols such as Certificate
+  Transparency {{?RFC6962}}, this may require external auditors or additional
+  client behavior to ensure the registry state is consistent for all clients.
+- Clients use an anonymity-preserving tool such as Tor to discover keys
+  from multiple network vantage points. This is done to ensure consistent
+  keys to seemingly different clients.
+- Clients embed server keys into software.
 
-## Public key registries
-
-Server's must provide their public keys to clients along with details
-about the cryptographic ciphersuite that they are using. In {{privacy}},
-we address the importance of providing clients with sources of truth for
-learning the server's key configuration.
-
-In particular, server key material MUST be publicly available in a
-tamper-proof data structure, which we refer to as a key registry. A
-registry must be globally consistent. Clients using the same registry
-should coordinate in some way to ensure they have a consistent view of
-said registry. This can be done via gossiping or some other mechanism.
-The exact mechanism for this coordination will be described elsewhere.
-It is assumed there will be at least one such mechanism.
-
-It is RECOMMENDED that each key registry is an append-only data
-structure, such as a Merkle Tree. The key registry should be operated
-independently of any server that publishes key material to the registry.
-This ensures that any client can make better judgements on whether to
-trust the registry and, transitively, each server.
-
-~~~
-+--------------------------------------------------------+
-|                                                        |
-| Ecosystem                            +---+             |
-|                                      | C |             |
-|  +--------------+ <------ pkS1 ----> +---+             |
-|  |  Registry 1  |                                      |
-|  ++-------------+ <-------------- pkS1 --------> +---+ |
-|   |                                              | C | |
-|   |   +--------------+ <--------- pkS3 --------> +---+ |
-|   |   |  Registry 2  |                                 |
-|  pkS1 +----^-------^-+ <--------- pkS2 --------> +---+ |
-|   |        |       |                             | C | |
-|   |       pkS2    pkS3                           +---+ |
-|   |        |       |                                   |
-|  ++---+  +-+--+  +-+--+                                |
-|  | S1 |  | S2 |  | S3 |                                |
-|  +----+  +----+  +----+                                |
-|                                                        |
-+--------------------------------------------------------+
-~~~
-
-While there may be multiple key registries for a given ecosystem, a
-server MUST only publish its key material to a single registry. This
-ensures that the server is keeping a consistent view of its key
-material.
+Specific mechanisms for key management and discovery are out of scope for
+this document.
 
 ## Key rotation
 
@@ -324,10 +284,16 @@ Client's access patterns by inspecting which key each token they possess
 has been issued under.
 
 To prevent against this, servers MUST only use one private key for
-issuing tokens at any given time. Servers may use two or more keys for
+issuing tokens at any given time. Servers MAY use one or more keys for
 redemption to allow servers for seamless key rotation.
 
-Key rotations must be limited in frequency for similar reasons. See
+Servers may rotate keys as a means of revoking tokens issued under old
+or otherwise expired keys. Alternatively, servers may include expiration
+information as metadata alongside the token; See {{metadata}} for more
+discussion about metadata constraints. Both techinques are equivalent
+since they cryptographically bind expiration to individual tokens.
+
+Key rotations should be limited in frequency for similar reasons. See
 {{parametrization}} for guidelines on what frequency of key rotations
 are permitted.
 
@@ -445,7 +411,7 @@ when a key rotation occurs.
 See {{privacy}} for more details about maintaining privacy with multiple
 servers.
 
-# Metadata
+# Metadata {#metadata}
 
 Certain instantiations of Privacy Pass may permit public or private
 metadata to be cryptographically bound to a token. As an example, one
@@ -474,6 +440,10 @@ may use this functionality to provide redemption verifiers with additional
 information about the user. Such instantiations may be built on the Private
 Metadata Bit construction from Kreuter et al. {{?KLOR20=DOI.10.1007/978-3-030-56784-2_11}}
 or the attribute-based VOPRF from Huang et al. {{HIJK21}}.
+
+Metadata may also be arbitrarily long or bounded in length. The amount of
+permitted metadata may be determined by application or by the underlying
+cryptographic protocol.
 
 ## Client privacy implications
 
