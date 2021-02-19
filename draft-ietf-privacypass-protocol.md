@@ -1,7 +1,7 @@
 ---
 title: "Privacy Pass Protocol Specification"
 abbrev: PP protocol
-docname: draft-ietf-privacypass-protocol-latest
+docname: draft-ietf-privacypass-protocol-01
 date:
 category: info
 
@@ -303,16 +303,16 @@ server issue a token to the client.
 
 Note that the first round of the protocol is only necessitated for
 certain ciphersuites that require client and servers commit to some
-value. When such commitment `commit_resp` is generated and sent to the client,
-the client returns `commit_resp` with the `IssuanceRequest` message. The server
-MUST check that the commitment corresponds to `commit_resp` that was previously
-committed. This requires the commitment to either be a reference to some
-commitment on the server, or the commitment be an encrypted (and
-authenticated) blob that the server can use to recover commitment. The
-mechanism by which servers handle this commitment is implementation
-specific, and similar to how TLS session resumption state is
-managed; see {{RFC8446}} for details. In addition, the
-`Commit` function is implementation-specific and MUST be
+value. When such commitment `commit_resp` is generated and sent to the
+client, the client returns `commit_resp` with the `IssuanceRequest`
+message. The server MUST check that the commitment corresponds to
+`commit_resp` that was previously committed. This requires the
+commitment to either be a reference to some commitment on the server, or
+the commitment be an encrypted (and authenticated) blob that the server
+can use to recover commitment. The mechanism by which servers handle
+this commitment is implementation specific, and similar to how TLS
+session resumption state is managed; see {{RFC8446}} for details. In
+addition, the `Commit` function is implementation-specific and MUST be
 defined by the underlying ciphersuite.
 
 When the server does not need to generate this commitment, the client
@@ -322,8 +322,9 @@ instead DOES NOT send the `CommitRequest` message, and runs:
 cInput = Generate(m, "")
 ~~~
 
-A server that is expecting some non-empty `commit_resp` to be passed must abort
-the protocol on receiving a request containing an empty `commit_resp` value.
+A server that is expecting some non-empty `commit_resp` to be passed
+must abort the protocol on receiving a request containing an empty
+`commit_resp` value.
 
 Note: currently, no ciphersuites are supported that support working with
 empty commitment messages.
@@ -435,9 +436,9 @@ struct {
 ### CommitResponse {#pp-cli-commit-response}
 
 The `CommitResponse` struct is contains an opaque set of bytes that
-correspond to some commitment that the server has generated. The structure
-and format of this value is implementation specific depending on whether
-the server is stateful.
+correspond to some commitment that the server has generated. The
+structure and format of this value is implementation specific depending
+on whether the server is stateful.
 
 ~~~
 struct {
@@ -861,7 +862,8 @@ inputs to the `Unblind` function for verifying the batched proof object.
 
 ~~~
 Process(pkS, input, resp):
-  unblindedTokens = Unblind(input.data, resp.elements, input.req, pkS, resp.proof)
+  unblindedTokens = Unblind(input.data, resp.elements,
+                              input.req, pkS, resp.proof)
   redemptionTokens = []
   for bt in unblindedTokens:
     rt = RedemptionToken { data: input.data, issued: bt }
