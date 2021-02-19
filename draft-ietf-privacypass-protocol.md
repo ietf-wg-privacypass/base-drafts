@@ -273,15 +273,17 @@ round sees the server generate a commitment. The second round sees the
 server issue a token to the client.
 
 ~~~
-  Client(pkS, m)                              Server(skS, pkS)
+  Client(pkS, m, info)                        Server(skS, pkS)
   ------------------------------------------------------------
 
-                    CommitRequest(server.id)
+  commit_req = Prepare(info)
+
+                           commit_req
                       ------------------->
 
-                            com = GenerateCommitment(skS, pkS)
+                    commit_resp = Commit(skS, pkS, commit_req)
 
-                               com
+                          commit_resp
                       <-------------------
 
   cInput = Generate(m, com)
@@ -310,7 +312,7 @@ authenticated) blob that the server can use to recover commitment. The
 mechanism by which servers handle this commitment is implementation
 specific, and similar to how TLS session resumption state is
 managed; see {{RFC8446}} for details. In addition, the
-`GenerateCommitment` function is implementation-specific and MUST be
+`Commit` function is implementation-specific and MUST be
 defined by the underlying ciphersuite.
 
 When the server does not need to generate this commitment, the client
@@ -421,25 +423,25 @@ opaque PrivateKey<1..2^16-1>
 
 ### CommitRequest {#pp-cli-commit-request}
 
-The `CommitRequest` struct is simply a fixed message corresponding to
-the ID of the server.
+The `CommitRequest` struct is simply a fixed message allowing opaque
+metadata.
 
 ~~~
 struct {
-  opaque server_id<1..2^16-1>
+  opaque info<1..2^16-1>
 } CommitRequest;
 ~~~
 
 ### CommitResponse {#pp-cli-commit-response}
 
 The `CommitResponse` struct is contains an opaque set of bytes that
-correspond to some state that the server has generated. The structure
+correspond to some commitment that the server has generated. The structure
 and format of this value is implementation specific depending on whether
 the server is stateful.
 
 ~~~
 struct {
-  opaque state<1..2^16-1>
+  opaque commitment<1..2^16-1>
 } CommitResponse;
 ~~~
 
@@ -536,6 +538,40 @@ the Privacy Pass protocol. For each of the descriptions, we essentially
 provide the function signature, leaving the actual contents to be
 defined by specific instantiations or extensions of the protocol.
 
+### Prepare
+
+A function run by the client to prepare for a commitment will used
+during the issuance flow of the Privacy Pass protocol.
+
+Inputs:
+
+`info`: An opaque byte application-specific byte string.
+
+Outputs:
+
+`commit_req`: A `CommitRequest` struct.
+
+This function should be implemented by any ciphersuites that require a
+two-phase issuance protocol (`COMMIT=true`).
+
+### Commit
+
+A function run by the server that generates a commitment in the first
+phase of the issuance protocol.
+
+Inputs:
+
+- `skS`: A server `PrivateKey`.
+- `pkS`: A server `PublicKey`.
+- `commit_req`: A `CommitRequest` struct
+
+Outputs:
+
+- `commit_resp`: A `CommitResponse` struct.
+
+This function should be implemented by any ciphersuites that require a
+two-phase issuance protocol (`COMMIT=true`).
+
 ### Generate
 
 A function run by the client to generate the initial data that is used
@@ -564,6 +600,10 @@ Inputs:
 Outputs:
 
 - `resp`: An `IssuanceResponse` struct.
+
+Throws:
+
+- `ERR_FAILED_COMMITMENT` ({{errors}})
 
 ### Process
 
@@ -623,6 +663,9 @@ Outputs:
   verify the proof that is part of the server's response.
 - `ERR_DOUBLE_SPEND`: Error occurred when a client has attempted to
   redeem a token that has already been used for authorization.
+- `ERR_FAILED_COMMITMENT`: Error occurs during issuance phase if
+  non-empty commitment does not match the commitment generated in the
+  first round. 
 
 # Security considerations {#sec-reqs}
 
