@@ -665,7 +665,7 @@ Outputs:
   redeem a token that has already been used for authorization.
 - `ERR_FAILED_COMMITMENT`: Error occurs during issuance phase if
   non-empty commitment does not match the commitment generated in the
-  first round. 
+  first round.
 
 # Security considerations {#sec-reqs}
 
