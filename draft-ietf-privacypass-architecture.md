@@ -15,6 +15,9 @@ author:
  -
     ins: A. Davidson
     name: Alex Davidson
+    org: LIP
+    city: Lisbon
+    country: Portugal
     email: alex.davidson92@gmail.com
  -
     ins: C. A. Wood

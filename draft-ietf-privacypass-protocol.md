@@ -22,6 +22,7 @@ author:
  -
     ins: A. Davidson
     name: Alex Davidson
+    org: LIP
     city: Lisbon
     country: Portugal
     email: alex.davidson92@gmail.com
@@ -266,13 +267,24 @@ consistent across the entire ecosystem.
 
 ## Issuance phase {#issuance-phase}
 
-The issuance phase allows the client to receive `m` anonymous
-authorization tokens from the server.
+The issuance phase is a two-round protocol that allows the client to
+receive `m` anonymous authorization tokens from the server. The first
+round sees the server generate a commitment. The second round sees the
+server issue a token to the client.
 
 ~~~
   Client(pkS, m)                              Server(skS, pkS)
   ------------------------------------------------------------
-  cInput = Generate(m)
+                      
+                    CommitRequest(server.id)
+                      ------------------->
+                                          
+                                  st = GenerateState(skS, pkS)
+
+                               st
+                      <-------------------
+  
+  cInput = Generate(m, st)
   req = cInput.req
 
                               req
@@ -286,6 +298,29 @@ authorization tokens from the server.
   tokens = Process(pkS, cInput, serverResp)
   store[server.id].push(tokens)
 ~~~
+
+Note that the first round of the protocol is only necessitated for
+certain ciphersuites that require prior state generation. When such
+state `st` is generated and sent to the client, the client returns the
+`st` with the `IssuanceRequest` message. The server must check that the
+state corresponds to the `st` that was previously sent state. This
+requires architecture for remaining stateful, or by passing the state as
+an encrypted (and authenticated) blob. Such statefulness must be
+implemented in similar ways to how TLS session resumption is managed
+{{RFC8446}}.
+
+When the server does not need to generate this state, the client instead
+DOES NOT send the CommitRequest message, and runs: 
+
+~~~
+cInput = Generate(m, null)
+~~~
+
+A server that is expecting some non-null `st` to be passed must abort
+the protocol on receiving a request containing a null `st` value.
+
+Note: currently, no ciphersuites are supported that support working with
+non-null state messages.
 
 ## Redemption phase {#redemption-phase}
 
@@ -378,6 +413,30 @@ by the server.
 ~~~
 opaque PublicKey<1..2^16-1>
 opaque PrivateKey<1..2^16-1>
+~~~
+
+### CommitRequest {#pp-cli-commit-request}
+
+The `CommitRequest` struct is simply a fixed message corresponding to
+the ID of the server.
+
+~~~
+struct {
+  opaque server_id<1..2^16-1>
+} CommitRequest;
+~~~
+
+### CommitResponse {#pp-cli-commit-response}
+
+The `CommitResponse` struct is contains an opaque set of bytes that
+correspond to some state that the server has generated. How this
+sequence of bytes is generated corresponds to the ciphersuite and
+whether the server is stateful or not.
+
+~~~
+struct {
+  opaque state<1..2^16-1>
+} CommitResponse;
 ~~~
 
 ### IssuanceInput {#pp-cli-issue-input}
@@ -711,13 +770,18 @@ to {{pp-api}}.
 
 ### Generate
 
+The generate functionality generates an initial set of tokens and
+blinded representation on the client-side. The function also takes an
+optional (possibly `null`) value for a state `st` committed to by the
+server.
+
 ~~~
-def Generate(m):
+def Generate(m, st):
   tokens = []
   blindedTokens = []
   for i in range(m):
     x = random_bytes()
-    (token, blindedToken) = Blind(x)
+    (token, blindedToken) = Blind(x, st)
     tokens[i] = token
     blindedTokens[i] = blindedToken
   return IssuanceInput {
@@ -814,22 +878,30 @@ corresponds to the maximum difficulty of computing a discrete logarithm
 in the group. Note that the actual security level MAY be lower. See the
 security considerations in {{I-D.irtf-cfrg-voprf}} for examples.
 
+The COMMIT parameter refers to whether the first round of the issuance
+phase of the protocol is necessary. When this set to false, the client
+ignores the first message and uses a null value for the state parameter
+sent by the server.
+
 ## PP(OPRF2)
 
 - OPRF2 = OPRF(decaf448, SHA-512)
 - ID = 0x0001
+- COMMIT = false
 - Maximum security provided: 224 bits
 
 ## PP(OPRF4)
 
 - OPRF4 = OPRF(P-384, SHA-512)
 - ID = 0x0002
+- COMMIT = false
 - Maximum security provided: 192 bits
 
 ## PP(OPRF5)
 
 - OPRF5 = OPRF(P-521, SHA-512)
 - ID = 0x0003
+- COMMIT = false
 - Maximum security provided: 256 bits
 
 # Extensions framework policy {#extensions}
