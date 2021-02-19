@@ -275,15 +275,15 @@ server issue a token to the client.
 ~~~
   Client(pkS, m)                              Server(skS, pkS)
   ------------------------------------------------------------
-                      
+
                     CommitRequest(server.id)
                       ------------------->
-                                          
+
                                   st = GenerateState(skS, pkS)
 
                                st
                       <-------------------
-  
+
   cInput = Generate(m, st)
   req = cInput.req
 
@@ -310,7 +310,7 @@ implemented in similar ways to how TLS session resumption is managed
 {{RFC8446}}.
 
 When the server does not need to generate this state, the client instead
-DOES NOT send the CommitRequest message, and runs: 
+DOES NOT send the CommitRequest message, and runs:
 
 ~~~
 cInput = Generate(m, null)
