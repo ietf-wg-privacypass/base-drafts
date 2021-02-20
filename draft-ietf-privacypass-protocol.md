@@ -304,7 +304,7 @@ certain ciphersuites that require client and servers commit to some state. When 
 state `st` is generated and sent to the client, the client returns the
 `st` with the `IssuanceRequest` message. The server MUST check that the
 state corresponds to `st` that was previously committed. This
-requires the commitment to either be a reference to some state on the server, 
+requires the commitment to either be a reference to some state on the server,
 or the commitment be an encrypted (and authenticated) blob that the server can
 use to recover state. The mechanism by which servers handle this state is implementation
 specific, and similar to how TLS session resumption state is managed; see {{RFC8446}}
@@ -373,7 +373,7 @@ than once, the server uses an index, `dsIdx`, to collect valid inputs it
 witnesses. Since this store needs to only be optimized for storage and
 querying, a structure such as a Bloom filter suffices. The storage
 should be parameterized to live as long as the server keypair that is in
-use. See {{sec-reqs} for more details.
+use. See {{sec-reqs}} for more details.
 
 ## Handling errors
 
