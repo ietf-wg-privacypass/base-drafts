@@ -310,7 +310,7 @@ use to recover state. The mechanism by which servers handle this state is implem
 specific, and similar to how TLS session resumption state is managed; see {{RFC8446}}
 for details. In addition, the `GenerateState` function is
 implementation-specific and MUST be defined by the underlying
-ciphersuite. 
+ciphersuite.
 
 When the server does not need to generate this state, the client instead
 DOES NOT send the `CommitRequest` message, and runs:
