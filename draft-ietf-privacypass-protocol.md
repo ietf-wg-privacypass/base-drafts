@@ -300,27 +300,28 @@ server issue a token to the client.
 ~~~
 
 Note that the first round of the protocol is only necessitated for
-certain ciphersuites that require prior state generation. When such
+certain ciphersuites that require client and servers commit to some state. When such
 state `st` is generated and sent to the client, the client returns the
-`st` with the `IssuanceRequest` message. The server must check that the
-state corresponds to the `st` that was previously sent state. This
-requires architecture for remaining stateful, or by passing the state as
-an encrypted (and authenticated) blob. Such statefulness must be
-implemented in similar ways to how TLS session resumption is managed
-{{RFC8446}}.
+`st` with the `IssuanceRequest` message. The server MUST check that the
+state corresponds to `st` that was previously committed. This
+requires the commitment to either be a reference to some state on the server, 
+or the commitment be an encrypted (and authenticated) blob that the server can
+use to recover state. The mechanism by which servers handle this state is implementation
+specific, and similar to how TLS session resumption state is managed; see {{RFC8446}}
+for details.
 
 When the server does not need to generate this state, the client instead
 DOES NOT send the CommitRequest message, and runs:
 
 ~~~
-cInput = Generate(m, null)
+cInput = Generate(m, "")
 ~~~
 
-A server that is expecting some non-null `st` to be passed must abort
-the protocol on receiving a request containing a null `st` value.
+A server that is expecting some non-empty `st` to be passed must abort
+the protocol on receiving a request containing an empty `st` value.
 
 Note: currently, no ciphersuites are supported that support working with
-non-null state messages.
+empty state messages.
 
 ## Redemption phase {#redemption-phase}
 
@@ -429,9 +430,9 @@ struct {
 ### CommitResponse {#pp-cli-commit-response}
 
 The `CommitResponse` struct is contains an opaque set of bytes that
-correspond to some state that the server has generated. How this
-sequence of bytes is generated corresponds to the ciphersuite and
-whether the server is stateful or not.
+correspond to some state that the server has generated. The structure
+and format of this value is implementation specific depending on whether
+the server is stateful.
 
 ~~~
 struct {
@@ -879,9 +880,9 @@ in the group. Note that the actual security level MAY be lower. See the
 security considerations in {{I-D.irtf-cfrg-voprf}} for examples.
 
 The COMMIT parameter refers to whether the first round of the issuance
-phase of the protocol is necessary. When this set to false, the client
-ignores the first message and uses a null value for the state parameter
-sent by the server.
+phase of the protocol is necessary. When this is false, the client
+ignores the first message and uses an empty value for the state parameter
+to `Generate`.
 
 ## PP(OPRF2)
 
