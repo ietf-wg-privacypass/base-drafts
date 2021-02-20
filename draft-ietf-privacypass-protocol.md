@@ -308,10 +308,12 @@ requires the commitment to either be a reference to some state on the server,
 or the commitment be an encrypted (and authenticated) blob that the server can
 use to recover state. The mechanism by which servers handle this state is implementation
 specific, and similar to how TLS session resumption state is managed; see {{RFC8446}}
-for details.
+for details. In addition, the `GenerateState` function is
+implementation-specific and MUST be defined by the underlying
+ciphersuite. 
 
 When the server does not need to generate this state, the client instead
-DOES NOT send the CommitRequest message, and runs:
+DOES NOT send the `CommitRequest` message, and runs:
 
 ~~~
 cInput = Generate(m, "")
