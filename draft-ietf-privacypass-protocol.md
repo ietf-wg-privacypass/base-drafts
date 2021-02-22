@@ -22,6 +22,7 @@ author:
  -
     ins: A. Davidson
     name: Alex Davidson
+    org: LIP
     city: Lisbon
     country: Portugal
     email: alex.davidson92@gmail.com
@@ -266,13 +267,26 @@ consistent across the entire ecosystem.
 
 ## Issuance phase {#issuance-phase}
 
-The issuance phase allows the client to receive `m` anonymous
-authorization tokens from the server.
+The issuance phase is a two-round protocol that allows the client to
+receive `m` anonymous authorization tokens from the server. The first
+round sees the server generate a commitment. The second round sees the
+server issue a token to the client.
 
 ~~~
-  Client(pkS, m)                              Server(skS, pkS)
+  Client(pkS, m, info)                        Server(skS, pkS)
   ------------------------------------------------------------
-  cInput = Generate(m)
+
+  commit_req = Prepare(info)
+
+                           commit_req
+                      ------------------->
+
+                    commit_resp = Commit(skS, pkS, commit_req)
+
+                          commit_resp
+                      <-------------------
+
+  cInput = Generate(m, com)
   req = cInput.req
 
                               req
@@ -286,6 +300,33 @@ authorization tokens from the server.
   tokens = Process(pkS, cInput, serverResp)
   store[server.id].push(tokens)
 ~~~
+
+Note that the first round of the protocol is only necessitated for
+certain ciphersuites that require client and servers commit to some
+value. When such commitment `com` is generated and sent to the client,
+the client returns `com` with the `IssuanceRequest` message. The server
+MUST check that the commitment corresponds to `com` that was previously
+committed. This requires the commitment to either be a reference to some
+commitment on the server, or the commitment be an encrypted (and
+authenticated) blob that the server can use to recover commitment. The
+mechanism by which servers handle this commitment is implementation
+specific, and similar to how TLS session resumption state is
+managed; see {{RFC8446}} for details. In addition, the
+`Commit` function is implementation-specific and MUST be
+defined by the underlying ciphersuite.
+
+When the server does not need to generate this commitment, the client
+instead DOES NOT send the `CommitRequest` message, and runs:
+
+~~~
+cInput = Generate(m, "")
+~~~
+
+A server that is expecting some non-empty `com` to be passed must abort
+the protocol on receiving a request containing an empty `com` value.
+
+Note: currently, no ciphersuites are supported that support working with
+empty commitment messages.
 
 ## Redemption phase {#redemption-phase}
 
@@ -337,7 +378,7 @@ than once, the server uses an index, `dsIdx`, to collect valid inputs it
 witnesses. Since this store needs to only be optimized for storage and
 querying, a structure such as a Bloom filter suffices. The storage
 should be parameterized to live as long as the server keypair that is in
-use. See {{sec-reqs} for more details.
+use. See {{sec-reqs}} for more details.
 
 ## Handling errors
 
@@ -378,6 +419,30 @@ by the server.
 ~~~
 opaque PublicKey<1..2^16-1>
 opaque PrivateKey<1..2^16-1>
+~~~
+
+### CommitRequest {#pp-cli-commit-request}
+
+The `CommitRequest` struct is simply a fixed message allowing opaque
+metadata.
+
+~~~
+struct {
+  opaque info<1..2^16-1>
+} CommitRequest;
+~~~
+
+### CommitResponse {#pp-cli-commit-response}
+
+The `CommitResponse` struct is contains an opaque set of bytes that
+correspond to some commitment that the server has generated. The structure
+and format of this value is implementation specific depending on whether
+the server is stateful.
+
+~~~
+struct {
+  opaque commitment<1..2^16-1>
+} CommitResponse;
 ~~~
 
 ### IssuanceInput {#pp-cli-issue-input}
@@ -473,6 +538,40 @@ the Privacy Pass protocol. For each of the descriptions, we essentially
 provide the function signature, leaving the actual contents to be
 defined by specific instantiations or extensions of the protocol.
 
+### Prepare
+
+A function run by the client to prepare for a commitment will used
+during the issuance flow of the Privacy Pass protocol.
+
+Inputs:
+
+`info`: An opaque byte application-specific byte string.
+
+Outputs:
+
+`commit_req`: A `CommitRequest` struct.
+
+This function should be implemented by any ciphersuites that require a
+two-phase issuance protocol (`COMMIT=true`).
+
+### Commit
+
+A function run by the server that generates a commitment in the first
+phase of the issuance protocol.
+
+Inputs:
+
+- `skS`: A server `PrivateKey`.
+- `pkS`: A server `PublicKey`.
+- `commit_req`: A `CommitRequest` struct
+
+Outputs:
+
+- `commit_resp`: A `CommitResponse` struct.
+
+This function should be implemented by any ciphersuites that require a
+two-phase issuance protocol (`COMMIT=true`).
+
 ### Generate
 
 A function run by the client to generate the initial data that is used
@@ -501,6 +600,10 @@ Inputs:
 Outputs:
 
 - `resp`: An `IssuanceResponse` struct.
+
+Throws:
+
+- `ERR_FAILED_COMMITMENT` ({{errors}})
 
 ### Process
 
@@ -560,6 +663,9 @@ Outputs:
   verify the proof that is part of the server's response.
 - `ERR_DOUBLE_SPEND`: Error occurred when a client has attempted to
   redeem a token that has already been used for authorization.
+- `ERR_FAILED_COMMITMENT`: Error occurs during issuance phase if
+  non-empty commitment does not match the commitment generated in the
+  first round.
 
 # Security considerations {#sec-reqs}
 
@@ -695,9 +801,9 @@ Note that we must run the verifiable version of the protocol in
 {{I-D.irtf-cfrg-voprf}}. Therefore the `server` takes the role of the
 `Server` running in `modeVerifiable`. In other words, the `server` runs
 `ctxtS = SetupVerifiableServer(suite, skS, pkS)`; where `suite` is one
-of the ciphersuites in {{voprf-ciph-recs}}, `skS` and `pkS` is
-the server's secret and public key respectively (generated by calling `KeyGen`).
-It returns `ctxtS`, which is the Server context. Likewise,
+of the ciphersuites in {{voprf-ciph-recs}}, `skS` and `pkS` is the
+server's secret and public key respectively (generated by calling
+`KeyGen`). It returns `ctxtS`, which is the Server context. Likewise,
 run `ctxtC = SetupVerifiableClient(suite, pkS)` to generate the Client
 context.
 
@@ -711,13 +817,18 @@ to {{pp-api}}.
 
 ### Generate
 
+The generate functionality generates an initial set of tokens and
+blinded representation on the client-side. The function also takes an
+optional (possibly empty) value for a commitment `com` committed to by
+the server.
+
 ~~~
-def Generate(m):
+def Generate(m, com):
   tokens = []
   blindedTokens = []
   for i in range(m):
     x = random_bytes()
-    (token, blindedToken) = Blind(x)
+    (token, blindedToken) = Blind(x, com)
     tokens[i] = token
     blindedTokens[i] = blindedToken
   return IssuanceInput {
@@ -814,22 +925,30 @@ corresponds to the maximum difficulty of computing a discrete logarithm
 in the group. Note that the actual security level MAY be lower. See the
 security considerations in {{I-D.irtf-cfrg-voprf}} for examples.
 
+The COMMIT parameter refers to whether the first round of the issuance
+phase of the protocol is necessary. When this is false, the client
+ignores the first message and uses an empty value for the commitment
+parameter to `Generate`.
+
 ## PP(OPRF2)
 
 - OPRF2 = OPRF(decaf448, SHA-512)
 - ID = 0x0001
+- COMMIT = false
 - Maximum security provided: 224 bits
 
 ## PP(OPRF4)
 
 - OPRF4 = OPRF(P-384, SHA-512)
 - ID = 0x0002
+- COMMIT = false
 - Maximum security provided: 192 bits
 
 ## PP(OPRF5)
 
 - OPRF5 = OPRF(P-521, SHA-512)
 - ID = 0x0003
+- COMMIT = false
 - Maximum security provided: 256 bits
 
 # Extensions framework policy {#extensions}
