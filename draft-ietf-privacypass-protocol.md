@@ -1,7 +1,7 @@
 ---
 title: "Privacy Pass Protocol Specification"
 abbrev: PP protocol
-docname: draft-ietf-privacypass-protocol-01
+docname: draft-ietf-privacypass-protocol-latest
 date:
 category: info
 
