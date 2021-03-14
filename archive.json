@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-03-11T00:38:55.443319+00:00",
+  "timestamp": "2021-03-14T00:41:27.722429+00:00",
   "repo": "ietf-wg-privacypass/base-drafts",
   "labels": [
     {
@@ -1024,6 +1024,37 @@
       "updatedAt": "2021-03-09T15:59:47Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 66,
+      "id": "MDU6SXNzdWU4MzAzMTcxMjU=",
+      "title": "Add redemption contexts",
+      "url": "https://github.com/ietf-wg-privacypass/base-drafts/issues/66",
+      "state": "OPEN",
+      "author": "chris-wood",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "As discussed during IETF 110, the architecture document should provide guidance on how redemption contexts can be used and how they impact privacy. This is a bit of the calculus we don't yet have.\r\n\r\ncc @dvorak42, @alxdavids ",
+      "createdAt": "2021-03-12T17:28:51Z",
+      "updatedAt": "2021-03-12T18:01:59Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "dvorak42",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yeah, this likely needs to be embedded both into the Architecture draft for the generic concept of a context, and then an actual instantiation of redemption contexts in the HTTP API doc.",
+          "createdAt": "2021-03-12T17:35:43Z",
+          "updatedAt": "2021-03-12T17:35:43Z"
+        },
+        {
+          "author": "chris-wood",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Yep \ud83d\udc4d should we split out the HTTP work into a separate issue?",
+          "createdAt": "2021-03-12T18:01:58Z",
+          "updatedAt": "2021-03-12T18:01:58Z"
+        }
+      ]
     }
   ],
   "pulls": [
