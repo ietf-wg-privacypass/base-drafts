@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-03-14T00:41:27.722429+00:00",
+  "timestamp": "2021-03-30T00:53:55.794363+00:00",
   "repo": "ietf-wg-privacypass/base-drafts",
   "labels": [
     {
@@ -1033,11 +1033,13 @@
       "state": "OPEN",
       "author": "chris-wood",
       "authorAssociation": "CONTRIBUTOR",
-      "assignees": [],
+      "assignees": [
+        "dvorak42"
+      ],
       "labels": [],
       "body": "As discussed during IETF 110, the architecture document should provide guidance on how redemption contexts can be used and how they impact privacy. This is a bit of the calculus we don't yet have.\r\n\r\ncc @dvorak42, @alxdavids ",
       "createdAt": "2021-03-12T17:28:51Z",
-      "updatedAt": "2021-03-12T18:01:59Z",
+      "updatedAt": "2021-03-29T16:22:26Z",
       "closedAt": null,
       "comments": [
         {
