@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-04-04T00:58:16.916001+00:00",
+  "timestamp": "2021-04-06T00:57:20.837426+00:00",
   "repo": "ietf-wg-privacypass/base-drafts",
   "labels": [
     {
@@ -1070,7 +1070,7 @@
       "labels": [],
       "body": "Currently, RedemptionRequest messages have the following structure:\r\n\r\n```\r\nstruct {\r\n  opaque data<1..2^16-1>; // input to the token issuance flow\r\n  opaque tag<1..2^16-1>;  // output of the token issuance flow\r\n  opaque info<1..2^16-1>; // application information bound to the token\r\n} RedemptionRequest;\r\n```\r\n\r\nThis has a couple of interesting properties. First, anyone with access to `data` can replay it in the issuance flow and compute `tag`. We might be able to address that by making the redemption flow a two round protocol, similar to what we've done for the issuance flow, or by allowing clients to encrypt `data` under the redeemer's public key. Or something else entirely.\r\n\r\nSecond, `tag` effectively authenticates `info`. Is there any reason why we couldn't merge these two fields and encrypt the latter with an AEAD? And if we were to do that, perhaps we could simplify the redemption interface and have it produce a secret that applications use as needed? Specifically, the `Redeem` function might return a secret rather than a `RedemptionRequest`. Turning the redemption API into an Export-like interface might help accommodate different application use cases.\r\n\r\ncc @armfazh, @siyengar, @dvorak42",
       "createdAt": "2021-04-02T16:21:56Z",
-      "updatedAt": "2021-04-02T21:10:06Z",
+      "updatedAt": "2021-04-05T20:18:59Z",
       "closedAt": null,
       "comments": [
         {
@@ -1100,6 +1100,13 @@
           "body": "> I think to get the behavior you want here, the PrivacyPass spec should indicate that the input into the Redeem API can just be the empty string when not used, or just remove the info parameter complretely from Redeem and pass the empty string into the VOPRF Finalize API.\r\n\r\nThis seems to be the crux of the issue here: `info` is no longer present in the VOPRF Finalize API :-)\r\n\r\nSo we can probably drop it from Redeem, and have the token output be returned (as proposed above). This is separate from whether or not we need to account for replay attacks on the token `input` with two rounds or encryption, I think.",
           "createdAt": "2021-04-02T21:10:06Z",
           "updatedAt": "2021-04-02T21:10:06Z"
+        },
+        {
+          "author": "siyengar",
+          "authorAssociation": "NONE",
+          "body": "Ya sorry the last statement was a bit confusing.\r\n\r\nYa I think you're right, getting rid of info should solve the problem. And then call it VOPRF_output rather than a tag.\r\n\r\nIt seems like these 2 apis are out of sync \r\n\r\nhttps://cfrg.github.io/draft-irtf-cfrg-voprf/draft-irtf-cfrg-voprf.html#name-finalize\r\nFinalize(input, blind, evaluatedElement)\r\n\r\nhttps://ietf-wg-privacypass.github.io/base-drafts/draft-ietf-privacypass-protocol.html#name-redeem-2\r\nFinalize(token.data, token.issued, info)\r\n\r\n\r\n\r\n",
+          "createdAt": "2021-04-05T20:18:59Z",
+          "updatedAt": "2021-04-05T20:18:59Z"
         }
       ]
     }
