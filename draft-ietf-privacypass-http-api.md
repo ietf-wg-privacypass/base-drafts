@@ -32,15 +32,15 @@ normative:
       -
         ins: P-H. Kamp
         org: The Varnish Cache Project
-  draft-davidson-pp-protocol:
+  draft-ietf-privacypass-protocol:
     title: "Privacy Pass: The Protocol"
-    target: https://tools.ietf.org/html/draft-davidson-pp-protocol-00
+    target: https://tools.ietf.org/html/draft-ietf-privacypass-protocol-00
     author:
       ins: A. Davidson
       org: Cloudflare Portugal
-  draft-davidson-pp-architecture:
+  draft-ietf-privacypass-architecture:
     title: "Privacy Pass: Architectural Framework"
-    target: https://tools.ietf.org/html/draft-davidson-pp-architecture-00
+    target: https://tools.ietf.org/html/draft-ietf-privacypass-architecture-00
     author:
       ins: A. Davidson
       org: Cloudflare Portugal
@@ -58,7 +58,7 @@ accessed by HTTP-based consumers.
 
 # Introduction
 
-The Privacy Pass protocol as described in {{draft-davidson-pp-protocol}}
+The Privacy Pass protocol as described in {{draft-ietf-privacypass-protocol}}
 can be integrated with a number of different settings, from server to
 server communication to browsing the internet.
 
@@ -69,7 +69,7 @@ responses needed to implement the Privacy Pass protocol.
 ## Terminology
 
 We use the same definition of server and client that is used in
-{{draft-davidson-pp-protocol}} and {{draft-davidson-pp-architecture}}.
+{{draft-ietf-privacypass-protocol}} and {{draft-ietf-privacypass-architecture}}.
 
 We assume that all protocol messages are encoded into raw byte format
 before being sent. We use the TLS presentation language [RFC8446] to
@@ -170,7 +170,7 @@ rotation, the log operator SHOULD enforce limits on how many active
 commitments exist and how quickly the commitments are being rotated.
 Clients SHOULD reject configurations/commitments that violate their
 requirements for avoiding user segregation. These considerations are
-discussed as part of {{draft-davidson-pp-architecture}}.
+discussed as part of {{draft-ietf-privacypass-architecture}}.
 
 
 ## Server Configuration Retrieval {#config-retrieval}
@@ -265,7 +265,7 @@ struct {
    to confirm that the key commitment has been submitted to a trusted
    registry. Once the client receives the ``ciphersuite`` for the
    server, it should implement all Privacy Pass API functions (as
-   detailed in {{draft-davidson-pp-protocol}}) using this ciphersuite.
+   detailed in {{draft-ietf-privacypass-protocol}}) using this ciphersuite.
 
 # Privacy Pass Issuance {#issuance}
 
@@ -329,9 +329,14 @@ endpoint, which would perform its own redemption {{token-redemption}},
 or the client redeeming the token and passing the result along to the
 target endpoint. These two methods are described below.
 
+In the HTTP ecosystem, redemption contexts should generally be keyed
+by the same privacy boundary used for cookies and other local
+storage. Generally this is the top-level origin.
+
 ## Generic Token Redemption {#token-redemption}
 
 Inputs:
+- ``context``: The request context to use.
 - ``server_id``: The server ID to redeem a token against.
 - ``ciphersuite``: The ciphersuite for this token.
 - ``public_key``: The public key associated with this token.
@@ -341,11 +346,15 @@ Inputs:
 Outputs:
 - ``result``: The result of the redemption from the server.
 
+1. The client should check whether the ``server_id`` is present in the
+   ``context``. If it isn't and the size of the ``context`` is beneath
+   the client's limit, it should be added.
+
 1. The client should call the ``Redeem`` function with
    ``redemption_token`` and additional data of ``info`` storing the
    resulting ``data`` and ``tag``.
 
-2. The client makes a POST request to
+1. The client makes a POST request to
    <``server_origin``>/.well-known/privacy-pass with a message of type
    ``token-redemption`` and a body of:
 
@@ -358,11 +367,11 @@ struct {
 }
 ~~~
 
-3. The server, upon receipt of ``request`` should call the ``Verify``
+1. The server, upon receipt of ``request`` should call the ``Verify``
    interface with ``public_key``, ``secret_key`` and the received
    ``data``, ``tag``, ``info`` storing the resulting ``resp``.
 
-4. The server should then respond to the POST request with a message of
+1. The server should then respond to the POST request with a message of
    type ``redemption-result`` and a signed body of:
 
 ~~~
@@ -375,13 +384,14 @@ struct {
 }
 ~~~
 
-4. The client upon receipt of this message should verify the
+1. The client upon receipt of this message should verify the
    ``signature`` using the ``verification_key`` from the configuration
    and return the ``result``.
 
 ## Direct Redemption {#direct-redemption}
 
 Inputs:
+- ``context``: The request context to use.
 - ``server_origin``: The server origin to redeem a token for.
 - ``target``: The target endpoint to send the token to.
 - ``additional_data``: Additional data to bind to this redemption
@@ -422,6 +432,7 @@ the request to ``target``.
 ## Delegated Redemption {#delegated-redemption}
 
 Inputs:
+- ``context``: The request context to use.
 - ``server_origin``: The server origin to redeem a token for.
 - ``target``: The target endpoint to send the token to.
 - ``additional_data``: Additional data to bind to this redemption
@@ -481,7 +492,19 @@ particular request.
 # Security Considerations
 
 Security considerations for Privacy Pass are discussed in
-{{draft-davidson-pp-architecture}}.
+{{draft-ietf-privacypass-architecture}}.
+
+# Privacy considerations {#privacy}
+
+General privacy considerations for Privacy Pass are discussed in
+{{draft-ietf-privacypass-architecture}}.
+
+In order to implement this API with redemption contexts, a client
+needs to maintain strong privacy boundaries between different
+redemption contexts to avoid privacy leakage from redemptions across
+them. Notably in the web/HTTP world, cross-site tracking and
+fingerprinting will need to be considered and mitigated in order to
+maintain these privacy boundaries.
 
 # IANA Considerations
 

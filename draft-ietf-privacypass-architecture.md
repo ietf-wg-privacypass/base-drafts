@@ -603,6 +603,54 @@ Therefore, the selection of servers they possess tokens for is still
 revealing. Understanding this trade-off is important in deciding the
 effective anonymity of each client in the system.
 
+#### Redemption Contexts {#redemption-contexts}
+
+Another option to allow a large number of servers in the ecosystem,
+while preventing the joining of a bunch of different tokens is for the
+client to maintain sharded "redemption contexts", which allows the
+client to redeem the tokens it wishes to use in a particular context,
+while still allowing the client to maintain a large variety of tokens
+from many servers. Within a redemption context, the client limits the
+number of different servers used to a small number to maintain the
+privacy properties the client requires. As long as each redemption
+context maintains a strong privacy boundary with each other, the
+verifier will only be able to learn a number of bits of information up
+to the limits within that "redemption context".
+
+To support this strategy, the client keeps track of a `context` which
+contains the set of servers that redemptions have been attempted
+against and which returns an empty redemption when the limit has been
+hit:
+
+~~~
+  Client(context, server)                     Server(skS, pkS)
+  ------------------------------------------------------------
+  if server not in context {
+    if context.length > REDEEM_LIMIT {
+      Output {}
+      return
+    }
+    context.push(server)
+  }
+  token = store[server.id].pop()
+  req = Redeem(token, info)
+
+                               req
+                        ------------------>
+
+                               if (dsIdx.includes(req.data)) {
+                                 raise ERR_DOUBLE_SPEND
+                               }
+                               resp = Verify(pkS, skS, req)
+                               if (resp.success) {
+                                 dsIdx.push(req.data)
+                               }
+
+                                resp
+                        <------------------
+  Output resp
+~~~
+
 ## Partitioning of server key material {#split-view}
 
 If there are multiple key registries, or if a key registry colludes with
