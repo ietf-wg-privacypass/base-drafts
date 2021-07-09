@@ -448,6 +448,84 @@ Metadata may also be arbitrarily long or bounded in length. The amount of
 permitted metadata may be determined by application or by the underlying
 cryptographic protocol.
 
+## Adding public metadata to the protocol
+
+One instantiation of Privacy Pass allows the addition of public metadata to
+the underlying VOPRF primitive by using the the POPRF construction. In this case,
+either the server or client or both chose the metadata they will like to see
+added at their setup.
+
+The issuance phase looks like this:
+
+~~~
+  Client(pkS, m, cTag, info)                        Server(skS, pkS, sTag)
+  ------------------------------------------------------------
+
+  commit_req = Prepare(info)
+
+                            commit_req
+                      ------------------->
+
+                        commit_resp = Commit(skS, pkS, commit_req)
+
+                            commit_resp
+                      <-------------------
+
+  cInput = Generate(m, Tag, commit_resp)
+  req = cInput.req
+
+                              req, cTag
+                      ------------------->
+
+                              issueResp, sTag  = Issue(pkS, skS, tag, req)
+
+                         issueResp, tag
+                      <-------------------
+
+  tokens = Process(pkS, cInput, issueResp, sTag)
+  store[server.id].push(tokens, tag)
+~~~
+
+Adding this kinda of metadata is useful when trying to prevent hoarding
+attacks or to bound the token to a geographical location.
+
+One abuse of Privacy Pass not prevented by the original design is what we
+refer to as a hoarding attack, also called a farming attack. A malicious user
+can gather a large number of tokens by running the issuance protocol as many
+times as possible over some period of time and getting `m` amount of tokens.
+Later, the malicious user can redeem all the gathered tokens at once in order
+to render the provided service unavailable in a (D)DoS attack (by, for example,
+overwhelming a website with expensive requests).
+
+One potential defense against this attack is to force periodic rotation of the
+server's key as a mean to revoke tokens. Nevertheless, token issuance
+associates all issued tokens with a particular choice of key and, if a server
+issues tokens with many keys, then this may harm the anonymity of the Client,
+as the anonymity set gets diminished.
+
+A solution is to use this construction to add metadata to the issuance phase:
+this metadata should be associated with the timestamp in which a token was
+issued but it MUST not explicitly use it: using an explicit timestamp could
+harm the anonymity of the tokens as a server will be able to link the issuance
+and redemption phases by looking at when the token was generated and later
+redeemed.
+
+The proposed metadata to be used in this case is key rotation epochs (`n`).
+A server will still need to rotate their keys to prevent against key-compromise
+and credential stuffing. Each key rotation will be assigned a number `n`
+starting from the first generated key 0. Every time that a key rotates, this
+number will be increased by 1. This epoch number `n` will be cryptographically
+bounded (added as metadata) to the tokens by the server during the Issue phase,
+and stored by the client alongside with the tokens. During the redemption phase,
+the client will send this stored epoch (the number `n`) alongside the token. The
+server will check if their epoch is smaller than the client's sent one. If it
+is smaller, the token is expired. If it is the same, the token is valid. If it
+is bigger, the client might be trying to trick the server: this attack won't
+work as the Verification procedure executed by the server will fail.
+
+The anonymity set is still reduced depending on the key schedule of the server.
+This metadata is opaque to the client but verifiable by the server.
+
 ## Client privacy implications
 
 Note that any metadata bits of information can be used to further
