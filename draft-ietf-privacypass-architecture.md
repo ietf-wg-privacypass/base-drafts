@@ -607,7 +607,7 @@ effective anonymity of each client in the system.
 
 Another option to allow a large number of servers in the ecosystem,
 while preventing the joining of a number of different tokens is for the
-client to maintain sharded "redemption contexts", which allows the
+client to maintain sharded "redemption contexts". This would allow the
 client to redeem the tokens it wishes to use in a particular context,
 while still allowing the client to maintain a large variety of tokens
 from many servers. Within a redemption context, the client limits the
