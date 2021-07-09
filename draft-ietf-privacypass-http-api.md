@@ -331,7 +331,7 @@ target endpoint. These two methods are described below.
 
 In the HTTP ecosystem, redemption contexts should generally be keyed
 by the same privacy boundary used for cookies and other local
-storage. Generally this is the top-level origin.
+storage. Generally this is the top-level origin. Any redemption context should be built following the principles outlined in {{draft-ietf-privacypass-architecture}} and later in {{privacy}}.
 
 ## Generic Token Redemption {#token-redemption}
 
