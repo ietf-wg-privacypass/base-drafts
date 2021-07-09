@@ -606,7 +606,7 @@ effective anonymity of each client in the system.
 #### Redemption Contexts {#redemption-contexts}
 
 Another option to allow a large number of servers in the ecosystem,
-while preventing the joining of a bunch of different tokens is for the
+while preventing the joining of a number of different tokens is for the
 client to maintain sharded "redemption contexts", which allows the
 client to redeem the tokens it wishes to use in a particular context,
 while still allowing the client to maintain a large variety of tokens
