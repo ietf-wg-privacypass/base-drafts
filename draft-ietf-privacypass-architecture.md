@@ -642,7 +642,7 @@ hit:
                                  raise ERR_DOUBLE_SPEND
                                }
                                resp = Verify(pkS, skS, req)
-                               if (resp.success) {
+                               if resp.success {
                                  dsIdx.push(req.data)
                                }
 
