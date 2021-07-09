@@ -463,14 +463,16 @@ type.
 
 ~~~
 struct {
-  Internal data[m]
-  IssuanceRequest req[m]
+  Internal data[data_bytes]
+  IssuanceRequest req[req_bytes]
 } IssuanceInput;
 ~~~
 
-Note that a `IssuanceInput` contains equal-length arrays of `Internal`
-and `IssuanceRequest` types corresponding to the number of tokens that
-should be issued.
+Note that a `IssuanceInput` contains equal-length size `m` arrays of
+`Internal` and `IssuanceRequest` types corresponding to the number of
+tokens that should be issued. `data_bytes` is the total number of bytes
+that `m` `Internal` elements require, and `req_bytes` is the total
+number of bytes that `m` `IssuanceRequest` elements require.
 
 ### IssuanceResponse {#pp-srv-issue-response}
 
@@ -486,13 +488,14 @@ as well as a sequence of bytes `proof`.
 
 ~~~
 struct {
-  IssuedToken tokens[m]
+  IssuedToken tokens[tokens_bytes]
   opaque proof<1..2^16-1>
 }
 ~~~
 
 The value of `m` is equal to the length of the `IssuanceRequest` vector
-sent by the client.
+sent by the client. `tokens_bytes` is the total number of bytes that `m`
+`IssuedTokens` elements require.
 
 ### RedemptionToken {#pp-redemption-token}
 
