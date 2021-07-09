@@ -619,7 +619,7 @@ to the limits within that "redemption context".
 
 To support this strategy, the client keeps track of a `context` which
 contains the set of servers that redemptions have been attempted
-against and which returns an empty redemption when the limit has been
+against. An empty redemption is returned when the limit has been
 hit:
 
 ~~~
