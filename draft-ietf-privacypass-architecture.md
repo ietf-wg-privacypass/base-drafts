@@ -450,42 +450,9 @@ cryptographic protocol.
 
 ## Adding public metadata to the protocol
 
-One instantiation of Privacy Pass allows the addition of public metadata to
-the underlying VOPRF primitive by using the the POPRF construction. In this case,
-either the server or client or both chose the metadata they will like to see
-added at their setup.
-
-The issuance phase looks like this:
-
-~~~
-  Client(pkS, m, cTag, info)                        Server(skS, pkS, sTag)
-  ------------------------------------------------------------
-
-  commit_req = Prepare(info)
-
-                            commit_req
-                      ------------------->
-
-                        commit_resp = Commit(skS, pkS, commit_req)
-
-                            commit_resp
-                      <-------------------
-
-  cInput = Generate(m, Tag, commit_resp)
-  req = cInput.req
-
-                              req, cTag
-                      ------------------->
-
-                              issueResp, sTag  = Issue(pkS, skS, tag, req)
-
-                         issueResp, tag
-                      <-------------------
-
-  tokens = Process(pkS, cInput, issueResp, sTag)
-  store[server.id].push(tokens, tag)
-~~~
-
+Privacy Pass allows the addition of public metadata to the underlying VOPRF
+primitive by using the the POPRF construction. In this case, either the server
+or client or both chose the metadata they will like to see added at their setup.
 Adding this kinda of metadata is useful when trying to prevent hoarding
 attacks or to bound the token to a geographical location.
 
