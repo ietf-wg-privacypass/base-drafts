@@ -248,11 +248,16 @@ These requirements are covered in {{sec-reqs}}.
 ## Server setup {#server-setup}
 
 Before the protocol takes place, the server chooses a ciphersuite and
-generates a keypair by running `(pkS, skS) = KeyGen()`. This
-configuration must be available to all clients that interact with the
-server (for the purpose of engaging in a Privacy Pass exchange). We
-assume that the server has a public (and unique) identity that the
-client uses to retrieve this configuration.
+generates a keypair by running `(pkS, skS) = KeyGen()`.
+The server and client also determine the public metadata that they will
+like to add, and the server is aware of the client metadata ahead of time.
+Metadata must be of the type `Metadata`, an opaque byte string of
+arbitrary length representing. This configuration must be available to all
+clients that interact with the server (for the purpose of engaging in a
+Privacy Pass exchange). We assume that the server has a public (and unique)
+identity that the client uses to retrieve this configuration.
+In {{draft-davidson-pp-architecture}} we discuss the kind of public
+metadata that is allowed.
 
 ## Client setup {#client-setup}
 
@@ -260,10 +265,14 @@ The client initialises a global storage system `store` that allows it
 store the tokens that are received during issuance. The storage system
 is a map of server identifiers (`server.id`) to arrays of stored tokens.
 We assume that the client knows the server public key `pkS` ahead of
-time. The client picks a value `m` of tokens to receive during the
-issuance phase. In {{draft-davidson-pp-architecture}} we discuss
-mechanisms that the client can use to ensure that this public key is
-consistent across the entire ecosystem.
+time. The server and client also determine the public metadata that they will
+like to add, and the client is aware of the server metadata ahead of time.
+Metadata must be of the type `Metadata`, an opaque byte string of
+arbitrary length representing. The client picks a value `m` of tokens to
+receive during the issuance phase. In {{draft-davidson-pp-architecture}} we
+discuss mechanisms that the client can use to ensure that this public key
+is consistent across the entire ecosystem, and the kind of public metadata
+that is allowed.
 
 ## Issuance phase {#issuance-phase}
 
@@ -420,6 +429,15 @@ by the server.
 ~~~
 opaque PublicKey<1..2^16-1>
 opaque PrivateKey<1..2^16-1>
+~~~
+
+### Public Metadata {#pp-public-metadata}
+
+We use the following type to describe the metadata that can be added
+by the server and/or client.
+
+~~~
+opaque Metadata<1..2^16-1>
 ~~~
 
 ### CommitRequest {#pp-cli-commit-request}
@@ -597,8 +615,8 @@ Inputs:
 - `pkS`: A server `PublicKey`.
 - `skS`: A server `PrivateKey`.
 - `req`: An `IssuanceRequest` struct.
-- `sMetadata`: A optional server metadata.
-- `cMetadata`: A optional client metadata.
+- `sMetadata`: A optional server metadata `Metadata`.
+- `cMetadata`: A optional client metadata `Metadata`.
 
 Outputs:
 
@@ -618,8 +636,8 @@ Inputs:
 - `pkS`: An server `PublicKey`.
 - `input`: An `IssuanceInput` struct.
 - `resp`: An `IssuanceResponse` struct.
-- `sMetadata`: A optional server metadata.
-- `cMetadata`: A optional client metadata.
+- `sMetadata`: A optional server metadata `Metadata`.
+- `cMetadata`: A optional client metadata `Metadata`.
 
 Outputs:
 
@@ -642,8 +660,8 @@ Inputs:
 - `info`: An `opaque<1..2^16-1>` type corresponding to data that is
   linked to the redemption. See {{client-info}} for advice on how to
   construct this.
-- `sMetadata`: A optional server metadata.
-- `cMetadata`: A optional client metadata.
+- `sMetadata`: A optional server metadata `Metadata`.
+- `cMetadata`: A optional client metadata `Metadata`.
 
 Outputs:
 
@@ -659,8 +677,8 @@ Inputs:
 - `pkS`: An server `PublicKey`.
 - `skS`: An server `PrivateKey`.
 - `req`: A `RedemptionRequest` struct.
-- `sMetadata`: A optional server metadata.
-- `cMetadata`: A optional client metadata.
+- `sMetadata`: A optional server metadata `Metadata`.
+- `cMetadata`: A optional client metadata `Metadata`.
 
 Outputs:
 
@@ -765,12 +783,13 @@ the privacy concerns raised above. For more details on the impacts
 associated with segmenting user privacy, see {{draft-davidson-pp-architecture}}.
 
 Any metadata added to tokens will be considered either "public" or
-"private". Public metadata corresponds to unmodifiable bits that a
+"private". This document adds a mechanism to add this public metadata.
+Public metadata corresponds to unmodifiable bits that a
 client can read. Private metadata corresponds to unmodifiable private
 bits that should be obscured to the client.
 
 Note that the instantiation in {{voprf-protocol}} provides randomized
-redemption tokens with no additional metadata for an server with a
+redemption tokens with additional metadata for an server with a
 single key.
 
 ## Maximum number of tokens issued {#max-tokens}
