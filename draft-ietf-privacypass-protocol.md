@@ -273,31 +273,31 @@ round sees the server generate a commitment. The second round sees the
 server issue a token to the client.
 
 ~~~
-  Client(pkS, m, info)                        Server(skS, pkS)
-  ------------------------------------------------------------
+  Client(pkS, m, info, cMetadata)                        Server(skS, pkS, sMetadata)
+  ----------------------------------------------------------------------------------
 
   commit_req = Prepare(info)
 
-                           commit_req
-                      ------------------->
+                                         commit_req
+                                   ------------------->
 
-                    commit_resp = Commit(skS, pkS, commit_req)
+                                           commit_resp = Commit(skS, pkS, commit_req)
 
-                          commit_resp
-                      <-------------------
+                                         commit_resp
+                                   <-------------------
 
   cInput = Generate(m, commit_resp)
   req = cInput.req
 
-                              req
-                      ------------------->
+                                           req
+                                   ------------------->
 
-                              issueResp = Issue(pkS, skS, req)
+                                           issueResp = Issue(pkS, skS, req, sMetadata, cMetadata)
 
-                           serverResp
-                      <-------------------
+                                        serverResp
+                                   <-------------------
 
-  tokens = Process(pkS, cInput, serverResp)
+  tokens = Process(pkS, cInput, serverResp, sMetadata, cMetadata)
   store[server.id].push(tokens)
 ~~~
 
@@ -336,24 +336,24 @@ the server, using data that it has received from a previous issuance
 phase.
 
 ~~~
-  Client(info)                                Server(skS, pkS)
-  ------------------------------------------------------------
+  Client(info, cMetadata)                                Server(skS, pkS, sMetadata)
+  ----------------------------------------------------------------------------------
   token = store[server.id].pop()
-  req = Redeem(token, info)
+  req = Redeem(token, info, sMetadata, cMetadata)
 
-                               req
-                        ------------------>
+                                             req
+                                             ------------------>
 
-                               if (dsIdx.includes(req.data)) {
-                                 raise ERR_DOUBLE_SPEND
-                               }
-                               resp = Verify(pkS, skS, req)
-                               if (resp.success) {
-                                 dsIdx.push(req.data)
-                               }
+                                                    if (dsIdx.includes(req.data)) {
+                                                      raise ERR_DOUBLE_SPEND
+                                                    }
+                                                    resp = Verify(pkS, skS, req, sMetadata, cMetadata)
+                                                    if (resp.success) {
+                                                      dsIdx.push(req.data)
+                                                    }
 
-                                resp
-                        <------------------
+                                                     resp
+                                             <------------------
   Output resp
 ~~~
 
@@ -597,6 +597,8 @@ Inputs:
 - `pkS`: A server `PublicKey`.
 - `skS`: A server `PrivateKey`.
 - `req`: An `IssuanceRequest` struct.
+- `sMetadata`: A optional server metadata.
+- `cMetadata`: A optional client metadata.
 
 Outputs:
 
@@ -616,6 +618,8 @@ Inputs:
 - `pkS`: An server `PublicKey`.
 - `input`: An `IssuanceInput` struct.
 - `resp`: An `IssuanceResponse` struct.
+- `sMetadata`: A optional server metadata.
+- `cMetadata`: A optional client metadata.
 
 Outputs:
 
@@ -638,6 +642,8 @@ Inputs:
 - `info`: An `opaque<1..2^16-1>` type corresponding to data that is
   linked to the redemption. See {{client-info}} for advice on how to
   construct this.
+- `sMetadata`: A optional server metadata.
+- `cMetadata`: A optional client metadata.
 
 Outputs:
 
@@ -653,6 +659,8 @@ Inputs:
 - `pkS`: An server `PublicKey`.
 - `skS`: An server `PrivateKey`.
 - `req`: A `RedemptionRequest` struct.
+- `sMetadata`: A optional server metadata.
+- `cMetadata`: A optional client metadata.
 
 Outputs:
 
@@ -752,11 +760,9 @@ vector to segment the anonymity of the client in the protocol.
 Therefore, it is important that any metadata that is added is heavily
 limited.
 
-Any additional metadata that can be added to redemption tokens should be
-described in the specific protocol instantiation. Note that any
-additional metadata will have to be justified in light of the privacy
-concerns raised above. For more details on the impacts associated with
-segmenting user privacy, see {{draft-davidson-pp-architecture}}.
+Note that any additional metadata will have to be justified in light of
+the privacy concerns raised above. For more details on the impacts
+associated with segmenting user privacy, see {{draft-davidson-pp-architecture}}.
 
 Any metadata added to tokens will be considered either "public" or
 "private". Public metadata corresponds to unmodifiable bits that a
@@ -847,8 +853,8 @@ permits a single input, we follow the advice for providing vectors of
 inputs.
 
 ~~~
-def Issue(pkS, skS, req):
-  elements, proof = Evaluate(skS, pkS, req)
+def Issue(pkS, skS, req, sMetadata, cMetadata):
+  elements, proof = Evaluate(skS, pkS, req, sMetadata, cMetadata)
   return IssuanceResponse {
            tokens: elements,
            proof: proof,
@@ -861,9 +867,10 @@ Similarly to `Issue`, we follow the advice for providing vectors of
 inputs to the `Unblind` function for verifying the batched proof object.
 
 ~~~
-Process(pkS, input, resp):
-  unblindedTokens = Unblind(input.data, resp.elements,
-                              input.req, pkS, resp.proof)
+Process(pkS, input, resp, sMetadata, cMetadata):
+  unblindedTokens = VerifiableUnblind(input.data, resp.elements,
+                                      input.req, pkS, resp.proof, sMetadata
+                                      cMetadata)
   redemptionTokens = []
   for bt in unblindedTokens:
     rt = RedemptionToken { data: input.data, issued: bt }
@@ -875,7 +882,7 @@ Process(pkS, input, resp):
 
 ~~~
 def Redeem(token, info):
-  tag = Finalize(token.data, token.issued, info)
+  tag = VerifiableFinalize(token.data, token.issued, info, sMetadata, cMetadata)
   return RedemptionRequest {
            data: data,
            tag: tag,
@@ -887,7 +894,7 @@ def Redeem(token, info):
 
 ~~~
 def Verify(pkS, skS, req):
-  resp = VerifyFinalize(skS, req.data, req.info, req.tag)
+  resp = VerifyFinalize(skS, req.data, req.info, req.tag, sMetadata, cMetadata)
   Output RedemptionResponse {
            success: resp
          }
