@@ -424,17 +424,6 @@ bits of metadata. The total amount of metadata bits included in a token
 is the sum of public and private metadata bits. See {{parametrization}}
 for discussion about metadata limits.
 
-Public metadata is that which clients can observe as part of the token
-issuance flow. Public metadata can either be transparent or opaque. For
-example, transparent public metadata is a value that the client either
-generates itself, or the server provides during the issuance flow and
-the client can check for correctness. Opaque public metadata is metadata
-the client can see but cannot check for correctness. As an example, the
-opaque public metadata might be a "fraud detection signal", computed on
-behalf of the server, during token issuance. In normal circumstances,
-clients cannot determine if this value is correct or otherwise a tracking
-vector.
-
 Private metadata is that which clients cannot observe as part of the token
 issuance flow. In {{?I-D.ietf-privacypass-protocol}}, it is possible to include
 private metadata to redemption tokens. The core protocol instantiation that
@@ -444,25 +433,25 @@ information about the user. Such instantiations may be built on the Private
 Metadata Bit construction from Kreuter et al. {{?KLOR20=DOI.10.1007/978-3-030-56784-2_11}}
 or the attribute-based VOPRF from Huang et al. {{HIJK21}}.
 
-Metadata may also be arbitrarily long or bounded in length. The amount of
-permitted metadata may be determined by application or by the underlying
-cryptographic protocol.
+Public metadata is that which clients can observe as part of the token
+issuance flow. Public metadata can either be transparent or opaque. For
+example, transparent public metadata is a value that the client either
+generates itself, or the server provides during the issuance flow and
+the client can check for correctness. Opaque public metadata is metadata
+the client can see but cannot check for correctness. As an example, the
+opaque public metadata might be a "fraud detection signal", computed on
+behalf of the server, during token issuance. In normal circumstances,
+clients cannot determine if this value is correct or otherwise a tracking
+vector. A mechanism for adding public metadata is by using the PO-PRF
+construction, by which the server or client chose what kind of public
+metadata to add during setup.
 
-## Adding public metadata to the protocol
-
-Privacy Pass allows the addition of public metadata to the underlying VOPRF
-primitive by using the the POPRF construction. In this case, either the server
-or client or both chose the metadata they will like to see added at their setup.
-Adding this kinda of metadata is useful when trying to prevent hoarding
-attacks or to bound the token to a geographical location.
-
-One abuse of Privacy Pass not prevented by the original design is what we
-refer to as a hoarding attack, also called a farming attack. A malicious user
-can gather a large number of tokens by running the issuance protocol as many
-times as possible over some period of time and getting `m` amount of tokens.
-Later, the malicious user can redeem all the gathered tokens at once in order
-to render the provided service unavailable in a (D)DoS attack (by, for example,
-overwhelming a website with expensive requests).
+Adding this public of metadata is useful when trying to prevent hoarding
+attacks: a malicious user can gather a large number of tokens by running
+the issuance protocol as many times as possible over some period of time
+and getting `m` amount of tokens. Later, the malicious user can redeem all
+the gathered tokens at once in order to render the provided service
+unavailable in a (D)DoS attack.
 
 One potential defense against this attack is to force periodic rotation of the
 server's key as a mean to revoke tokens. Nevertheless, token issuance
@@ -489,9 +478,9 @@ server will check if their epoch is smaller than the client's sent one. If it
 is smaller, the token is expired. If it is the same, the token is valid. If it
 is bigger, the client might be trying to trick the server: this attack won't
 work as the Verification procedure executed by the server will fail.
-
 The anonymity set is still reduced depending on the key schedule of the server.
-This metadata is opaque to the client but verifiable by the server.
+This metadata is opaque to the client but verifiable by the server, and
+will be arbitrarily long or bounded in length, depending on the application.
 
 ## Client privacy implications
 
