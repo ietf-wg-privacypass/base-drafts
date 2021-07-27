@@ -248,16 +248,13 @@ These requirements are covered in {{sec-reqs}}.
 ## Server setup {#server-setup}
 
 Before the protocol takes place, the server chooses a ciphersuite and
-generates a keypair by running `(pkS, skS) = KeyGen()`.
-The server and client also determine the public metadata that they will
-like to add, and the server is aware of the client metadata ahead of time.
-Metadata must be of the type `Metadata`, an opaque byte string of
-arbitrary length representing. This configuration must be available to all
-clients that interact with the server (for the purpose of engaging in a
-Privacy Pass exchange). We assume that the server has a public (and unique)
-identity that the client uses to retrieve this configuration.
-In {{draft-davidson-pp-architecture}} we discuss the kind of public
-metadata that is allowed.
+generates a keypair by running `(pkS, skS) = KeyGen()`. The client and
+server also agree on public metadata values used during the protocol.
+See {{client-setup}} for more information about this metadata. This
+configuration must be available to all clients that interact with
+the server (for the purpose of engaging in a Privacy Pass exchange). We
+assume that the server has a public (and unique) identity that the client
+uses to retrieve this configuration.
 
 ## Client setup {#client-setup}
 
@@ -265,14 +262,12 @@ The client initialises a global storage system `store` that allows it
 store the tokens that are received during issuance. The storage system
 is a map of server identifiers (`server.id`) to arrays of stored tokens.
 We assume that the client knows the server public key `pkS` ahead of
-time. The server and client also determine the public metadata that they will
-like to add, and the client is aware of the server metadata ahead of time.
-Metadata must be of the type `Metadata`, an opaque byte string of
-arbitrary length representing. The client picks a value `m` of tokens to
-receive during the issuance phase. In {{draft-davidson-pp-architecture}} we
-discuss mechanisms that the client can use to ensure that this public key
-is consistent across the entire ecosystem, and the kind of public metadata
-that is allowed.
+time. As above, the client and server also agree on public metadata values
+used during the protocol. Each metadata value is an arbitrary-length byte
+string. The client picks a value `m` of tokens to receive during the
+issuance phase. In {{draft-davidson-pp-architecture}} we discuss mechanisms
+that the client can use to ensure that this public key is consistent across
+the entire ecosystem.
 
 ## Issuance phase {#issuance-phase}
 
@@ -282,31 +277,31 @@ round sees the server generate a commitment. The second round sees the
 server issue a token to the client.
 
 ~~~
-  Client(pkS, m, info, cMetadata)                        Server(skS, pkS, sMetadata)
-  ----------------------------------------------------------------------------------
+  Client(pkS, m, info, clientMetadata, serverMetadata)                        Server(skS, pkS, clientMetadata, serverMetadata)
+  -----------------------------------------------------------------------------------------------------------------------------
 
   commit_req = Prepare(info)
 
                                          commit_req
-                                   ------------------->
+                                                        ------------------->
 
-                                           commit_resp = Commit(skS, pkS, commit_req)
+                                                                              commit_resp = Commit(skS, pkS, commit_req)
 
-                                         commit_resp
-                                   <-------------------
+                                                              commit_resp
+                                                        <-------------------
 
   cInput = Generate(m, commit_resp)
   req = cInput.req
 
-                                           req
-                                   ------------------->
+                                                                req
+                                                        ------------------->
 
-                                           issueResp = Issue(pkS, skS, req, sMetadata, cMetadata)
+                                                                         issueResp = Issue(pkS, skS, req, serverMetadata, clientMetadata)
 
-                                        serverResp
-                                   <-------------------
+                                                             serverResp
+                                                        <-------------------
 
-  tokens = Process(pkS, cInput, serverResp, sMetadata, cMetadata)
+  tokens = Process(pkS, cInput, serverResp, serverMetadata, clientMetadata)
   store[server.id].push(tokens)
 ~~~
 
@@ -345,24 +340,24 @@ the server, using data that it has received from a previous issuance
 phase.
 
 ~~~
-  Client(info, cMetadata)                                Server(skS, pkS, sMetadata)
-  ----------------------------------------------------------------------------------
+  Client(info, clientMetadata, serverMetadata)                                Server(skS, pkS, serverMetadata)
+  ---------------------------------------------------------------------------------------------------------------
   token = store[server.id].pop()
-  req = Redeem(token, info, sMetadata, cMetadata)
+  req = Redeem(token, info, serverMetadata, clientMetadata)
 
-                                             req
-                                             ------------------>
+                                                             req
+                                                             ------------------>
 
-                                                    if (dsIdx.includes(req.data)) {
-                                                      raise ERR_DOUBLE_SPEND
-                                                    }
-                                                    resp = Verify(pkS, skS, req, sMetadata, cMetadata)
-                                                    if (resp.success) {
-                                                      dsIdx.push(req.data)
-                                                    }
+                                                                    if (dsIdx.includes(req.data)) {
+                                                                      raise ERR_DOUBLE_SPEND
+                                                                    }
+                                                                    resp = Verify(pkS, skS, req, serverMetadata, clientMetadata)
+                                                                    if (resp.success) {
+                                                                      dsIdx.push(req.data)
+                                                                    }
 
-                                                     resp
-                                             <------------------
+                                                                     resp
+                                                             <------------------
   Output resp
 ~~~
 
@@ -429,15 +424,6 @@ by the server.
 ~~~
 opaque PublicKey<1..2^16-1>
 opaque PrivateKey<1..2^16-1>
-~~~
-
-### Public Metadata {#pp-public-metadata}
-
-We use the following type to describe the metadata that can be added
-by the server and/or client.
-
-~~~
-opaque Metadata<1..2^16-1>
 ~~~
 
 ### CommitRequest {#pp-cli-commit-request}
@@ -615,8 +601,8 @@ Inputs:
 - `pkS`: A server `PublicKey`.
 - `skS`: A server `PrivateKey`.
 - `req`: An `IssuanceRequest` struct.
-- `sMetadata`: A optional server metadata `Metadata`.
-- `cMetadata`: A optional client metadata `Metadata`.
+- `serverMetadata`: A optional server metadata, an arbitrary-length byte string.
+- `clientMetadata`: A optional client metadata, an arbitrary-length byte string.
 
 Outputs:
 
@@ -636,8 +622,8 @@ Inputs:
 - `pkS`: An server `PublicKey`.
 - `input`: An `IssuanceInput` struct.
 - `resp`: An `IssuanceResponse` struct.
-- `sMetadata`: A optional server metadata `Metadata`.
-- `cMetadata`: A optional client metadata `Metadata`.
+- `serverMetadata`: A optional server metadata, an arbitrary-length byte string.
+- `clientMetadata`: A optional client metadata, an arbitrary-length byte string.
 
 Outputs:
 
@@ -660,8 +646,8 @@ Inputs:
 - `info`: An `opaque<1..2^16-1>` type corresponding to data that is
   linked to the redemption. See {{client-info}} for advice on how to
   construct this.
-- `sMetadata`: A optional server metadata `Metadata`.
-- `cMetadata`: A optional client metadata `Metadata`.
+- `serverMetadata`: A optional server metadata, an arbitrary-length byte string.
+- `clientMetadata`: A optional client metadata, an arbitrary-length byte string.
 
 Outputs:
 
@@ -677,8 +663,8 @@ Inputs:
 - `pkS`: An server `PublicKey`.
 - `skS`: An server `PrivateKey`.
 - `req`: A `RedemptionRequest` struct.
-- `sMetadata`: A optional server metadata `Metadata`.
-- `cMetadata`: A optional client metadata `Metadata`.
+- `serverMetadata`: A optional server metadata, an arbitrary-length byte string.
+- `clientMetadata`: A optional client metadata, an arbitrary-length byte string.
 
 Outputs:
 
@@ -872,8 +858,8 @@ permits a single input, we follow the advice for providing vectors of
 inputs.
 
 ~~~
-def Issue(pkS, skS, req, sMetadata, cMetadata):
-  elements, proof = Evaluate(skS, pkS, req, sMetadata, cMetadata)
+def Issue(pkS, skS, req, serverMetadata, clientMetadata):
+  elements, proof = Evaluate(skS, pkS, req, serverMetadata, clientMetadata)
   return IssuanceResponse {
            tokens: elements,
            proof: proof,
@@ -886,10 +872,10 @@ Similarly to `Issue`, we follow the advice for providing vectors of
 inputs to the `Unblind` function for verifying the batched proof object.
 
 ~~~
-Process(pkS, input, resp, sMetadata, cMetadata):
+Process(pkS, input, resp, serverMetadata, clientMetadata):
   unblindedTokens = VerifiableUnblind(input.data, resp.elements,
-                                      input.req, pkS, resp.proof, sMetadata
-                                      cMetadata)
+                                      input.req, pkS, resp.proof,
+                                      serverMetadata, clientMetadata)
   redemptionTokens = []
   for bt in unblindedTokens:
     rt = RedemptionToken { data: input.data, issued: bt }
@@ -901,7 +887,8 @@ Process(pkS, input, resp, sMetadata, cMetadata):
 
 ~~~
 def Redeem(token, info):
-  tag = VerifiableFinalize(token.data, token.issued, info, sMetadata, cMetadata)
+  tag = VerifiableFinalize(token.data, token.issued, info, serverMetadata,
+                           clientMetadata)
   return RedemptionRequest {
            data: data,
            tag: tag,
@@ -913,7 +900,8 @@ def Redeem(token, info):
 
 ~~~
 def Verify(pkS, skS, req):
-  resp = VerifyFinalize(skS, req.data, req.info, req.tag, sMetadata, cMetadata)
+  resp = VerifyFinalize(skS, req.data, req.info, req.tag, serverMetadata,
+                        clientMetadata)
   Output RedemptionResponse {
            success: resp
          }
