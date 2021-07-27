@@ -282,7 +282,7 @@ server issue a token to the client.
 
   commit_req = Prepare(info)
 
-                                         commit_req
+                                                              commit_req
                                                         ------------------->
 
                                                                               commit_resp = Commit(skS, pkS, commit_req)
