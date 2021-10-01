@@ -63,8 +63,8 @@ created by a given server in the past
 This document provides the necessary integration for building the
 authorization framework, based on existing constructions of oblivious
 pseudorandom function protocols {{I-D.irtf-cfrg-voprf}}. Moreover, we
-show how this integration allows public metadata to be introduced to
-the protocol, that is agreed by both clients and servers.
+show how this integration allows public metadata to be introduced to the
+protocol, that is agreed by both clients and servers.
 
 This document DOES NOT cover the architectural framework required for
 running and maintaining the Privacy Pass protocol in the Internet
@@ -100,9 +100,10 @@ and all algorithms and data types are inherited as such.
 
 ## Initialization phase
 
-The server samples a keypair and publishes
-a key configuration in a way that clients can retrieve it. This configuration consists
-of the server's public key and configuration information for the underlying POPRF.
+The server samples a keypair and publishes a key configuration in a way
+that clients can retrieve it. This configuration consists of the
+server's public key and configuration information for the underlying
+POPRF.
 
 ~~~
 struct {
@@ -121,31 +122,35 @@ to a serialized public key of length `Ne` bytes (denoted as a
 `SerializedElement` in {{I-D.irtf-cfrg-voprf, Section 2}}). In
 
 In order for higher-level applications to indicate which key
-configuration is being used, a common identifier, such as 
+configuration is being used, a common identifier, such as
 `id=SHA256(KeyConfig)`, should be used. Note that the ciphersuite that
 is used is determined entirely by the choice of `suite` in the server
 key configuration.
 
 ## Issuance phase
 
-Let `info` be the agreed upon
-metadata between client and server, and let `config` be the server's
-chosen key configuration.
+Let `info` be the agreed upon metadata between client and server, and
+let `config` be the server's chosen key configuration.
 
 First, a client configures its verifiable context using `config`:
 
 ~~~
-client_context = SetupVerifiableClient(config.suite, config.public_key)
+client_context = SetupVerifiableClient(
+                  config.suite, config.public_key
+                 )
 ~~~
 
 Likewise, the server creates its own context using `config` and the
 corresponding private key `key`:
 
 ~~~
-server_context = SetupVerifiableServer(config.suite, key, config.public_key)
+server_context = SetupVerifiableServer(
+                  config.suite, key, config.public_key
+                 )
 ~~~
 
-The client then creates an issuance request for a random value `nonce` as follows:
+The client then creates an issuance request for a random value `nonce`
+as follows:
 
 ~~~
 nonce = random(32)
@@ -156,7 +161,10 @@ The client then sends `blindedElement` to the server. The server, upon
 receipt, evaluates the request:
 
 ~~~
-evaluatedElement, proof = server_context.Evaluate(key, config.public_key, blindedElement, info)
+evaluatedElement, proof = server_context.Evaluate(
+                           key, config.public_key,
+                           blindedElement, info
+                          )
 ~~~
 
 The server sends both `evaluatedElement` and `proof` to the client.
@@ -166,7 +174,9 @@ is no ambiguity in parsing the result.
 The client then completes issuance as follows:
 
 ~~~
-output = client_context.Finalize(nonce, blind, evaluatedElement, info):
+output = client_context.Finalize(
+          nonce, blind, evaluatedElement, info
+         )
 ~~~
 
 This procedure may fail with an error (`VerifyError` or
@@ -177,17 +187,21 @@ The output of the issuance protocol is the concatenation of `nonce` and
 ~~~
 struct {
    uint8 nonce[32];
-   uint8 output[Nh]; // Nh is as defined in {{I-D.irtf-cfrg-voprf}}
+   uint8 output[Nh];
 } Token;
 ~~~
 
+where `Nh` is as defined in {{I-D.irtf-cfrg-voprf}}.
+
 ## Redemption phase
 
-The client sends the `Token` to the server to
-verify locally. In particular, the server verifies the `Token` as follows:
+The client sends the `Token` to the server to verify locally. In
+particular, the server verifies the `Token` as follows:
 
 ~~~
-valid = server_context.VerifyFinalize(key, token.nonce, token.output, info)
+valid = server_context.VerifyFinalize(
+         key, token.nonce, token.output, info
+        )
 ~~~
 
 Redemption is considered successful if `valid` is true.
@@ -204,8 +218,7 @@ protocol, corresponding to the following ciphersuites detailed in
 - Ciphersuite OPRF(P-384, SHA-384) = XXXX
 - Ciphersuite OPRF(P-521, SHA-512) = XXXX
 
-Change controller: IETF
-Specification document(s): This specification
+Change controller: IETF Specification document(s): This specification
 
 --- back
 
