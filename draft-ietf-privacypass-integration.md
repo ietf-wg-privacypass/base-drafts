@@ -57,7 +57,7 @@ protocol.
 The Privacy Pass protocol provides a privacy-preserving authorization
 mechanism. In essence, the protocol allows clients to provide
 cryptographic tokens that prove nothing other than that they have been
-authorized by a given server in the past
+created by a given server in the past
 {{I-D.ietf-privacypass-architecture}}.
 
 This document provides the necessary integration for building the
