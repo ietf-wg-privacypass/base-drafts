@@ -19,6 +19,19 @@ author:
     city: Lisbon
     country: Portugal
     email: alex.davidson92@gmail.com
+ -
+    ins: S. Valdez
+    name: Steven Valdez
+    org: Google LLC
+    email: svaldez@chromium.org
+ -
+    ins: C. A. Wood
+    name: Christopher A. Wood
+    org: Cloudflare
+    street: 101 Townsend St
+    city: San Francisco
+    country: United States of America
+    email: caw@heapingbits.net
 
 normative:
   RFC2119:
@@ -99,7 +112,7 @@ struct {
 } KeyConfig;
 ~~~
 
-KeyCOnfig.version corresponds to the version of the key configuration
+KeyConfig.version corresponds to the version of the key configuration
 that is being used, this parameter is left generic and may be altered if
 extensions to the protocol or server configurations are made.
 KeyConfig.suite corresponds to a POPRF ciphersuite from
@@ -109,7 +122,9 @@ to a serialized public key of length `Ne` bytes (denoted as a
 
 In order for higher-level applications to indicate which key
 configuration is being used, a common identifier, such as 
-`id=SHA256(KeyConfig)`, should be used.
+`id=SHA256(KeyConfig)`, should be used. Note that the ciphersuite that
+is used is determined entirely by the choice of `suite` in the server
+key configuration.
 
 ## Issuance phase
 
@@ -177,10 +192,20 @@ valid = server_context.VerifyFinalize(key, token.nonce, token.output, info)
 
 Redemption is considered successful if `valid` is true.
 
-# Protocol ciphersuites {#ciphersuites}
+# IANA Considerations
 
-Ciphersuite negotiation is only relevant in terms of negotiating the
-appropriate ciphersuites for the underlying POPRF protocol.
+This specification registers new ciphersuites for the Privacy Pass
+protocol, corresponding to the following ciphersuites detailed in
+{{I-D.irtf-cfrg-voprf}}.
+
+- Ciphersuite OPRF(ristretto255, SHA-512) = XXXX
+- Ciphersuite OPRF(decaf448, SHAKE-256) = XXXX
+- Ciphersuite OPRF(P-256, SHA-256) = XXXX
+- Ciphersuite OPRF(P-384, SHA-384) = XXXX
+- Ciphersuite OPRF(P-521, SHA-512) = XXXX
+
+Change controller: IETF
+Specification document(s): This specification
 
 --- back
 
