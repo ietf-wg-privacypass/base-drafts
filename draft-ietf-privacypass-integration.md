@@ -81,9 +81,13 @@ before being sent across the wire.
 # Privacy Pass flow {#protocol-flow}
 
 There are three phases in the protocol: the initialization phase, the
-issuance phase, and the redemption phase.
+issuance phase, and the redemption phase. We construct each phase based
+on the POPRF protocol construction detailed in {{I-D.irtf-cfrg-voprf}},
+and all algorithms and data types are inherited as such.
 
-In the initialization phase, the server samples a keypair and publishes
+## Initialization phase
+
+The server samples a keypair and publishes
 a key configuration in a way that clients can retrieve it. This configuration consists
 of the server's public key and configuration information for the underlying POPRF.
 
@@ -95,58 +99,83 @@ struct {
 } KeyConfig;
 ~~~
 
-KeyConfig.suite corresponds to a POPRF ciphersuite from {{I-D.irtf-cfrg-voprf, Section 4}},
-and KeyConfig.public_key corresponds to a serialized public key of length `Ne` bytes 
-(denoted as a `SerializedElement` in {{I-D.irtf-cfrg-voprf, Section 2}}).
+KeyCOnfig.version corresponds to the version of the key configuration
+that is being used, this parameter is left generic and may be altered if
+extensions to the protocol or server configurations are made.
+KeyConfig.suite corresponds to a POPRF ciphersuite from
+{{I-D.irtf-cfrg-voprf, Section 4}}, and KeyConfig.public_key corresponds
+to a serialized public key of length `Ne` bytes (denoted as a
+`SerializedElement` in {{I-D.irtf-cfrg-voprf, Section 2}}). In
 
-In the issuance phase:
+In order for higher-level applications to indicate which key
+configuration is being used, a common identifier, such as 
+`id=SHA256(KeyConfig)`, should be used.
 
-- The client and server optionally agree on some public ``metadata``.
-- The client retrieves an servers public key, and generates some initial
-  ``token`` data. The client cryptographically ``blinds`` this data, and
-  sends it to the server.
-- The server ``signs`` the blinded token data (including optional), and
-  produces a proof that it used the committed keypair, and sends the
-  signature and proof back to the client.
-- The client ``verifies`` the proof, ``unblinds`` the signature, and
-  stores an authenticated triple of the token, optional metadata, and
-  unblinded signature.
+## Issuance phase
 
-In the redemption phase:
+Let `info` be the agreed upon
+metadata between client and server, and let `config` be the server's
+chosen key configuration.
 
-- The client retrieves an authenticated token, optional metadata and
-  signature triple, and sends it to the server.
-- The server ``validates`` that the pair is authenticated correctly and
-  authorizes the client.
+First, a client configures its verifiable context using `config`:
 
-# Partially Oblivious Pseudorandom Function Protocol
+~~~
+client_context = SetupVerifiableClient(config.suite, config.public_key)
+~~~
 
-We can instantiate the protocol flow in {{protocol-flow}} using the
-partially oblivious pseudorandom function (POPRF) protocol in
-{{I-D.irtf-cfrg-voprf}}. In summary, the issuance phase corresponds to
-receiving a pseudorandom function evaluation on the blinded data (with
-optional metadata). The redemption phase corresponds to revealing
-`finalized` data back to the original issuing server.
+Likewise, the server creates its own context using `config` and the
+corresponding private key `key`:
 
-Note that this instantiation only provides a symmetric verification
-mechanism, since the verification of redemptions can only be performed
-by the server possessing the secret issuing key. In
-{{I-D.ietf-privacypass-architecture}}, we provide alternative frameworks
-for allowing asynchronous and delegated verification of tokens.
+~~~
+server_context = SetupVerifiableServer(config.suite, key, config.public_key)
+~~~
 
-## Security guarantees
+The client then creates an issuance request for a random value `nonce` as follows:
 
-The privacy of clients is determined by the unlinkability of client
-requests during the POPRF protocol. Moreover, the one-more-forgery
-security of the POPRF prevents clients from forging valid tokens for a
-given server. See {{I-D.irtf-cfrg-voprf}} for more details.
+~~~
+nonce = random(32)
+blind, blindedElement = context.Blind(nonce)
+~~~
 
-## Metadata
+The client then sends `blindedElement` to the server. The server, upon
+receipt, evaluates the request:
 
-The POPRF protocol provides mechanisms for embedding public metadata
-into the function evaluations. Such metadata should be agreed apriori by
-clients and servers, and is regarded as being public to entities that
-are not even included in the explicit issuance and redemption exchanges.
+~~~
+evaluatedElement, proof = server_context.Evaluate(key, config.public_key, blindedElement, info)
+~~~
+
+The server sends both `evaluatedElement` and `proof` to the client.
+These are concatenated together. As the length of both is fixed, there
+is no ambiguity in parsing the result.
+
+The client then completes issuance as follows:
+
+~~~
+output = client_context.Finalize(nonce, blind, evaluatedElement, info):
+~~~
+
+This procedure may fail with an error (`VerifyError` or
+`DeserializeError`), in which case the issuance is said to have failed.
+The output of the issuance protocol is the concatenation of `nonce` and
+`output`, denoted as `token`:
+
+~~~
+struct {
+   uint8 nonce[32];
+   uint8 output[Nh]; // Nh is as defined in {{I-D.irtf-cfrg-voprf}}
+} Token;
+~~~
+
+## Redemption phase
+
+The client sends the `Token` to the server to
+verify locally. In particular, the server verifies the `Token` as follows:
+
+~~~
+valid = server_context.VerifyFinalize(key, token.nonce, token.output, info)
+~~~
+
+Redemption is considered successful if `valid` is true.
 
 # Protocol ciphersuites {#ciphersuites}
 
