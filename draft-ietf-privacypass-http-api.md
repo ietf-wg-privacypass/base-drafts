@@ -141,7 +141,6 @@ struct {
 
 struct {
     opaque server_id<1..2^16-1>;
-    uint16 ciphersuite;
     opaque verification_key<1..2^16-1>;
     KeyCommitment commitments<1..2^16-1>;
 }
@@ -174,14 +173,15 @@ discussed as part of {{draft-ietf-privacypass-architecture}}.
 
 
 ## Server Configuration Retrieval {#config-retrieval}
+
 Inputs:
 - ``server_origin``: The origin to retrieve a server configuration for.
 
 No outputs.
 
 1. The client makes an anonymous GET request to
-   ``CONFIG_ENDPOINT``/.well-known/privacy-pass with a message of type
-   ``fetch-config`` and a body of:
+   ``CONFIG_ENDPOINT``/.well-known/privacy-pass-config with a message of type
+   ``poprf-ristretto255-SHA512`` and a body of:
 
 ~~~
 struct {
@@ -196,7 +196,6 @@ struct {
 ~~~
 struct {
     opaque server_id<1..2^16-1>;
-    uint16 ciphersuite;
     opaque commitment_id<1..2^8-1>;
     opaque verification_key<1..2^16-1>;
 }
@@ -219,12 +218,12 @@ Inputs:
 
 No outputs.
 
-1. The client fetches the configuration state ``server_id``,
-   ``ciphersuite``, ``commitment_id`` associated with ``server_origin``.
+1. The client fetches the configuration state ``server_id`` and
+   ``commitment_id`` associated with ``server_origin``.
 
 2. The client makes an anonymous GET request to
-   ``CONFIG_ENDPOINT``/.well-known/privacy-pass with a message of type
-   ``fetch-commitment`` and a body of:
+   ``CONFIG_ENDPOINT``/.well-known/privacy-pass-commitment with a message of type
+   ``poprf-ristretto255-SHA512`` and a body of:
 
 ~~~
 struct {
@@ -237,8 +236,8 @@ struct {
    of commitments to return, noting whether a key commitment is valid
    for issuance or redemption or both.
 
-4. The server then responds with a message of type ``commitment`` and a
-   body of:
+4. The server then responds with a message of type ``poprf-ristretto255-SHA512`` 
+   and a body of:
 
 ~~~
 struct {
@@ -250,7 +249,6 @@ struct {
 
 struct {
     opaque server_id<1..2^16-1>;
-    uint16 ciphersuite;
     opaque verification_key<1..2^16-1>;
     KeyCommitment commitments<1..2^16-1>;
     opaque inclusion_proofs<1..2^16-1>;
@@ -263,9 +261,7 @@ struct {
    commitments should be fetched for each independent issuance and
    redemption request. The client SHOULD verify the ``inclusion_proofs``
    to confirm that the key commitment has been submitted to a trusted
-   registry. Once the client receives the ``ciphersuite`` for the
-   server, it should implement all Privacy Pass API functions (as
-   detailed in {{draft-ietf-privacypass-protocol}}) using this ciphersuite.
+   registry.
 
 # Privacy Pass Issuance {#issuance}
 
@@ -285,8 +281,8 @@ Outputs:
    ``count`` tokens storing the resulting ``input`` data.
 
 3. The client then makes a POST request to
-   <``server_origin``>/.well-known/privacy-pass with a message of type
-   ``request-issuance`` and a body of:
+   <``server_origin``>/.well-known/privacy-pass-issue with a message of type
+   ``poprf-ristretto255-SHA512`` and a body of:
 
 ~~~
 enum { Normal(0) } IssuanceType;
@@ -338,7 +334,6 @@ storage. Generally this is the top-level origin. Any redemption context should b
 Inputs:
 - ``context``: The request context to use.
 - ``server_id``: The server ID to redeem a token against.
-- ``ciphersuite``: The ciphersuite for this token.
 - ``public_key``: The public key associated with this token.
 - ``redemption_token``: A Privacy Pass token.
 - ``info``: Additional data to bind to this token redemption.
@@ -355,8 +350,8 @@ Outputs:
    resulting ``data`` and ``tag``.
 
 1. The client makes a POST request to
-   <``server_origin``>/.well-known/privacy-pass with a message of type
-   ``token-redemption`` and a body of:
+   <``server_origin``>/.well-known/privacy-pass-redeem with a message of type
+   ``poprf-ristretto255-SHA512`` and a body of:
 
 ~~~
 struct {
@@ -418,7 +413,6 @@ Inputs:
 ~~~
 struct {
     opaque server_id<1..2^16-1> = server_id;
-    uint16 ciphersuite = ciphersuite;
     opaque public_key<1..2^16-1> = public_key;
     RedemptionToken token<1..2^16-1> = redemption_token;
     opaque additional_data<1..2^16-1> = additional_data;
