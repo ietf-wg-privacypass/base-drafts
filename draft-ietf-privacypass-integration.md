@@ -96,7 +96,8 @@ before being sent across the wire.
 There are three phases in the protocol: the initialization phase, the
 issuance phase, and the redemption phase. We construct each phase based
 on the POPRF protocol construction detailed in {{I-D.irtf-cfrg-voprf}},
-and all algorithms and data types are inherited as such.
+and all algorithms and data types are inherited as such. All
+implementations MUST use the `OPRF(P-384, SHA-384)` ciphersuite.
 
 ## Initialization phase
 
@@ -201,20 +202,6 @@ valid = server_context.VerifyFinalize(
 ~~~
 
 Redemption is considered successful if `valid` is true.
-
-# IANA Considerations
-
-This specification registers new ciphersuites for the Privacy Pass
-protocol, corresponding to the following ciphersuites detailed in
-{{I-D.irtf-cfrg-voprf}}.
-
-- Ciphersuite OPRF(ristretto255, SHA-512) = XXXX
-- Ciphersuite OPRF(decaf448, SHAKE-256) = XXXX
-- Ciphersuite OPRF(P-256, SHA-256) = XXXX
-- Ciphersuite OPRF(P-384, SHA-384) = XXXX
-- Ciphersuite OPRF(P-521, SHA-512) = XXXX
-
-Change controller: IETF Specification document(s): This specification
 
 --- back
 
