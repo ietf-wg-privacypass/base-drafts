@@ -107,15 +107,11 @@ POPRF.
 
 ~~~
 struct {
-   uint8 version;
    uint16 suite;
    uint8 public_key[Ne];
 } KeyConfig;
 ~~~
 
-KeyConfig.version corresponds to the version of the key configuration
-that is being used, this parameter is left generic and may be altered if
-extensions to the protocol or server configurations are made.
 KeyConfig.suite corresponds to a POPRF ciphersuite from
 {{I-D.irtf-cfrg-voprf, Section 4}}, and KeyConfig.public_key corresponds
 to a serialized public key of length `Ne` bytes (denoted as a
@@ -154,7 +150,7 @@ as follows:
 
 ~~~
 nonce = random(32)
-blind, blindedElement = context.Blind(nonce)
+blind, blindedElement = client_context.Blind(nonce)
 ~~~
 
 The client then sends `blindedElement` to the server. The server, upon
