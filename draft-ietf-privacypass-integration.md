@@ -205,3 +205,23 @@ Redemption is considered successful if `valid` is true.
 
 --- back
 
+# Security considerations
+
+This document outlines how to instantiate the Privacy Pass protocol
+based on the verifiable oblivious pseudorandom function defined
+{{I-D.irtf-cfrg-voprf}}. All security considerations described in that
+document also apply in the Privacy Pass use-case. Considerations related
+to client-privacy in a multi-client, multi-server ecosystem are deferred
+to the Architecture document {{I-D.ietf-privacypass-architecture}}.
+
+# IANA considerations
+
+Currently there are no IANA considerations associated with this
+document.
+
+# Acknowledgements
+
+The authors of this document would like to acknowledge the helpful
+feedback and discussions from Benjamin Schwartz, Joseph Salowey, Sofía
+Celi, and Tara Whalen.
+
