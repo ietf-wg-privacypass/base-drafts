@@ -91,7 +91,7 @@ state carrying information to servers, e.g., whether or not the client
 is an authorized user or has completed some prior challenge, clients
 present unlinkable proofs that attest to this information.
 
-The original Privacy Pass protocol provides a set of cross-origin
+The most basic Privacy Pass protocol provides a set of cross-origin
 authorization tokens that protect the client's anonymity during interactions
 with a server. This allows clients to communicate an attestation of a
 previously authenticated server action, without having to reauthenticate
