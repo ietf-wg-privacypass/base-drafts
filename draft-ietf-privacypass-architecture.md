@@ -84,7 +84,7 @@ of all participating entities.
 
 Privacy Pass is a protocol for authorization based on anonymous-credential
 authentication mechanisms. Typical approaches for authorizing clients,
-such as through the use of long-term cookies, are not privacy friendly
+such as through the use of long-term cookies, are not privacy-friendly
 since they allow servers to track clients across sessions and interactions.
 Privacy Pass takes a different approach: instead of presenting linkable
 state carrying information to servers, e.g., whether or not the client
