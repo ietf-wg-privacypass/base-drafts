@@ -265,7 +265,7 @@ The mechanism by which clients obtain the Issuer public key is not specified.
 Clients may be configured with this key or they may discover it via some other
 form. See {{?CONSISTENCY=I-D.wood-key-consistency}}.
 
-Depending on the use case, issuance may requrie some form of Client
+Depending on the use case, issuance may require some form of Client
 anonymization service similar to an IP-hiding proxy so that Issuers cannot
 learn information about Clients. This can be provided by an explicit
 participant in the issuance protocol, or it can be provided via external means,
