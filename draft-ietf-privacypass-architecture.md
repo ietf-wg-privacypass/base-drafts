@@ -501,7 +501,7 @@ invoke any revocation procedures that may apply for the old key.
 Similarly to the Issuer rotation dynamic that is raised above, if there
 are a large number of Issuers then segregation can occur. For example,
 if Clients obtain tokens from many Issuers, and Origins later challenge
-Client for a token from each Issuer, Origins can learn information about
+a Client for a token from each Issuer, Origins can learn information about
 the Client. Each per-Issuer token that a Client holds essentially corresponds
 to a bit of information about the Client that Origin learn. Therefore,
 there is an exponential loss in anonymity relative to the number of Issuers
