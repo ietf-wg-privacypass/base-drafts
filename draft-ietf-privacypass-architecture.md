@@ -257,8 +257,8 @@ Issuers MUST NOT issue tokens for Clients through untrusted Attesters. This is
 important because the Attester's role is to vouch for trust in
 privacy-sensitive Client information, such as account identifiers or IP address
 information, to the Issuer. Tokens produced by an Issuer that admits issuance
-for any type of mediation cannot be relied on for any specific property.
-See {{attestation}} for more details.
+for any type of attestation cannot be relied on for any specific property.
+See {{attester-role}} for more details.
 
 ### Attester Role
 
