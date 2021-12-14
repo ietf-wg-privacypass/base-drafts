@@ -426,7 +426,7 @@ cryptographic protocol.
 ### Extensibility {#extensions}
 
 The Privacy Pass protocol and ecosystem are both intended to be
-receptive to extensions that expand the current set of functionality.
+receptive to extensions that expand the current set of functionalities.
 All extensions to the Privacy Pass protocol SHOULD be specified as separate
 documents that modify the content of this document in some way.
 
