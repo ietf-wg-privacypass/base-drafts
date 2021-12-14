@@ -405,8 +405,6 @@ as a valid 4096-bit RSA private key according to [TODO]. The key identifier
 for a keypair (skI, pkI), denoted `key_id`, is computed as SHA256(encoded_key),
 where encoded_key is a DER-encoded SubjectPublicKeyInfo object carrying pkI.
 
---- back
-
 # Security considerations
 
 This document outlines how to instantiate the Privacy Pass protocol
@@ -425,6 +423,8 @@ This document updates the "Token Type" Registry with the following values.
 | 0x0001 | OPRF(P-384, SHA-384)   | N      | Y               | N                | 48  | {{private-flow}} |
 | 0x0002 | Blind RSA, 4096        | Y      | N               | N                | 512 | {{public-flow}}  |
 {: #aeadid-values title="Token Types"}
+
+--- back
 
 # Acknowledgements
 
