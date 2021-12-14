@@ -101,14 +101,16 @@ initially issued.
 
 At a high level, Privacy Pass is composed of two protocols: issuance
 and redemption. Issuance is a protocol between a Client and two functions:
-Attester and Issuer. The Issuer is responsible for issuing tokens in response
-to requests from Clients. The Attester is responsible for attesting properties
-about the Client for which tokens are issued. For example, in the original
-Privacy Pass protocol {{PPSRV}}, tokens were only issued to Clients that solved
-CAPTCHAs. In this context, the Attester attested that some client solved a
-CAPTCHA and the resulting token produced by the Issuer was proof of this fact.
-Depending on the information being attested, Attesters may also store state
-about individual Clients, such as the number of overall tokens issued thus far.
+Attester and Issuer, where the Attester and Issuer can be functions operated
+by the same protocol participant. The Issuer is responsible for issuing tokens
+in response to requests from Clients. The Attester is responsible for attesting
+properties about the Client for which tokens are issued. For example, in the
+original Privacy Pass protocol {{PPSRV}}, tokens were only issued to Clients
+that solved CAPTCHAs. In this context, the Attester attested that some client
+solved a CAPTCHA and the resulting token produced by the Issuer was proof of
+this fact. Depending on the information being attested, Attesters may also
+store state about individual Clients, such as the number of overall tokens
+issued thus far.
 
 The redemption protocol runs between Client and Origin (server). It allows
 Origins to challenge Clients to present one or more tokens for authorization.
