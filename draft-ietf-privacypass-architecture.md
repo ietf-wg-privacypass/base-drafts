@@ -488,9 +488,9 @@ security. Therefore, it is still important that key rotations occur on a
 regular cycle to reduce the harmfulness of an Issuer key
 compromise.
 
-With a large number of Clients, a week gives a fairly large window for
-Clients to participate in the Privacy Pass protocol and thus enjoy the
-anonymity guarantees of being part of a larger group. A low ceiling of
+With a large number of Clients, a minimum of one week gives a large enough window for
+Clients to participate in the Issuance protocol and thus enjoy the
+anonymity guarantees of being part of a larger group. A maximum of
 12 weeks prevents a key compromise from being too destructive. If an Issuer
 realizes that a key compromise has occurred then the Issuer should
 generate a new key and make it available to Clients. If possible, it should
