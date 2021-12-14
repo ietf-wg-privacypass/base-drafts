@@ -101,16 +101,22 @@ initially issued.
 
 At a high level, Privacy Pass is composed of two protocols: issuance
 and redemption. Issuance is a protocol between a Client and two functions:
-Attester and Issuer, where the Attester and Issuer can be functions operated
-by the same protocol participant. The Issuer is responsible for issuing tokens
-in response to requests from Clients. The Attester is responsible for attesting
-properties about the Client for which tokens are issued. For example, in the
-original Privacy Pass protocol {{PPSRV}}, tokens were only issued to Clients
-that solved CAPTCHAs. In this context, the Attester attested that some client
-solved a CAPTCHA and the resulting token produced by the Issuer was proof of
-this fact. Depending on the information being attested, Attesters may also
-store state about individual Clients, such as the number of overall tokens
-issued thus far.
+Attester and Issuer. The Attester and Issuer can be functions operated by the
+same protocol participant, but can also be implemented separately. The Issuer
+is responsible for issuing tokens in response to requests from Clients. The
+Attester is responsible for attesting properties about the Client for which
+tokens are issued. The Issuer needs to be trusted by the server that later
+redeems the token. The Attester needs to either be operated by the Issuer,
+or be operated by an entity the Issuer trusts to perform valid attestation.
+Clients might prefer to select different Attesters, separate from the Issuer,
+to be able to use preferred authentication methods or improve privacy by not
+directly communicating with an Issuer. Depending on the information being
+attested, Attesters may also store state about individual Clients, such as the
+number of overall tokens issued thus far. As an example of an Issuance protocol,
+in the original Privacy Pass protocol {{PPSRV}}, tokens were only issued to
+Clients that solved CAPTCHAs. In this context, the Attester attested that some
+client solved a CAPTCHA and the resulting token produced by the Issuer was
+proof of this fact.
 
 The redemption protocol runs between Client and Origin (server). It allows
 Origins to challenge Clients to present one or more tokens for authorization.
