@@ -491,7 +491,7 @@ compromise.
 With a large number of Clients, a minimum of one week gives a large enough window for
 Clients to participate in the Issuance protocol and thus enjoy the
 anonymity guarantees of being part of a larger group. A maximum of
-12 weeks prevents a key compromise from being too destructive. If an Issuer
+12 weeks limits the damage caused by a key compromise. If an Issuer
 realizes that a key compromise has occurred then the Issuer should
 generate a new key and make it available to Clients. If possible, it should
 invoke any revocation procedures that may apply for the old key.
