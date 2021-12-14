@@ -481,8 +481,8 @@ mechanize this attack strategy, an Issuer could introduce a key rotation
 policy that forces Clients into small key cycles. Thus, reducing the
 size of the anonymity set for these Clients.
 
-It is RECOMMENDED that Issuers should only invoke key rotation for fairly
-large periods of time such as between 1 and 12 weeks. Key rotations
+Issuers SHOULD invoke key rotation for
+a period of time between 1 and 12 weeks. Key rotations
 represent a trade-off between Client privacy and continued Issuer
 security. Therefore, it is still important that key rotations occur on a
 regular cycle to reduce the harmfulness of an Issuer key
