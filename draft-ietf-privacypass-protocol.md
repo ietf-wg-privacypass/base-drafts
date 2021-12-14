@@ -420,11 +420,10 @@ Architecture document {{I-D.ietf-privacypass-architecture}}.
 
 This document updates the "Token Type" Registry with the following values.
 
-| Value  | Name                   | Public | Nk  | Reference        |
-|:-------|:-----------------------|:-------|:----|:-----------------|
-| 0x0000 | (reserved)             | N/A    | N/A | N/A              |
-| 0x0001 | OPRF(P-384, SHA-384)   | N      | 48  | {{private-flow}} |
-| 0x0002 | Blind RSA, 4096        | Y      | 512 | {{public-flow}} |
+| Value  | Name                   | Public | Public Metadata | Private Metadata | Nk  | Reference        |
+|:-------|:-----------------------|:-------|:----------------|:-----------------|:----|:-----------------|
+| 0x0001 | OPRF(P-384, SHA-384)   | N      | Y               | N                | 48  | {{private-flow}} |
+| 0x0002 | Blind RSA, 4096        | Y      | N               | N                | 512 | {{public-flow}}  |
 {: #aeadid-values title="Token Types"}
 
 # Acknowledgements
