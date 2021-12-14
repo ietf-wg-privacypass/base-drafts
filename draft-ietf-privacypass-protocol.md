@@ -64,7 +64,7 @@ This document describes the issuance protocol for Privacy Pass. It specifies
 two variants: one that is privately verifiable based on the oblivious
 pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}, and one that is
 publicly verifiable based on the blind RSA signature scheme
-{{!BLINDRSA=I-D.irtf-cfrg-blind-signatures}}.
+{{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
 
 This document DOES NOT cover the architectural framework required for
 running and maintaining the Privacy Pass protocol in the Internet
