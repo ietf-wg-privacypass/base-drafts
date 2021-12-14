@@ -1,6 +1,6 @@
 ---
 title: "Privacy Pass Issuance Protocol"
-abbrev: PP integration
+abbrev: PP Issuance
 docname: draft-ietf-privacypass-protocol-latest
 date:
 category: info
