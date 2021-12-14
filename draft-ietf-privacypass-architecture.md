@@ -320,7 +320,7 @@ anonymity sets.
 #### Accounting
 
 Another important role of the Mediator is accounting. This is necessary for
-some issunace protocols that enforce rate limits. For example, the Issuer may
+some issuance protocols that enforce rate limits. For example, the Issuer may
 want to limit the number of tokens issued to a single Client over the course
 of a day. If the Issuer does not learn information about the Client, then the
 Issuer cannot enforce this limit on a per-Client basis. The Issuer could,
