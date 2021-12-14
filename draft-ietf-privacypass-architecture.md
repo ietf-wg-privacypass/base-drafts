@@ -288,7 +288,7 @@ more detail below.
 
 #### Attestation
 
-Attestation is the process by which the Client's bear witness, confirm, or
+Attestation is the process by which the Clients bear witness, confirm, or
 authenticate so as to demonstrate a certain property about themselves that are
 used during issuance. Examples of attestation properties include, though are
 not limited to:
