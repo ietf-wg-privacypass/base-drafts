@@ -102,24 +102,22 @@ initially issued.
 At a high level, Privacy Pass is composed of two protocols: issuance
 and redemption.
 
-The issuance protocol runs between a Client and two network functions in the Privacy 
-Pass architecture: Attestation and Issuance. These two network functions can be
-implemented by the
-same protocol participant, but can also be implemented separately. The Issuer
-is responsible for issuing tokens in response to requests from Clients. The
-Attester is responsible for attesting properties about the Client for which
-tokens are issued. The Issuer needs to be trusted by the server that later
-redeems the token. Attestation can be performed by the Issuer or by an
-Attester that is trusted by the Issuer.
+The issuance protocol runs between a Client and two network functions in the
+Privacy Pass architecture: Attestation and Issuance. These two network
+functions can be implemented by the same protocol participant, but can also be
+implemented separately. The Issuer is responsible for issuing tokens in
+response to requests from Clients. The Attester is responsible for attesting
+properties about the Client for which tokens are issued. The Issuer needs to be
+trusted by the server that later redeems the token. Attestation can be
+performed by the Issuer or by an Attester that is trusted by the Issuer.
 Clients might prefer to select different Attesters, separate from the Issuer,
 to be able to use preferred authentication methods or improve privacy by not
 directly communicating with an Issuer. Depending on the attestation,
-Attesters can store state about a Client, such as the
-number of overall tokens issued thus far. As an example of an Issuance protocol,
-in the original Privacy Pass protocol {{PPSRV}}, tokens were only issued to
-Clients that solved CAPTCHAs. In this context, the Attester attested that some
-client solved a CAPTCHA and the resulting token produced by the Issuer was
-proof of this fact.
+Attesters can store state about a Client, such as the number of overall tokens
+issued thus far. As an example of an Issuance protocol, in the original Privacy
+Pass protocol {{PPSRV}}, tokens were only issued to Clients that solved
+CAPTCHAs. In this context, the Attester attested that some client solved a
+CAPTCHA and the resulting token produced by the Issuer was proof of this fact.
 
 The redemption protocol runs between Client and Origin (server). It allows
 Origins to challenge Clients to present one or more tokens for authorization.
@@ -273,9 +271,10 @@ See {{attester-role}} for more details.
 ### Attester Role
 
 Attestation is an important part of the issuance protocol. Attestation is the
-process by which the Clients bear witness, confirm, or authenticate so as to
-demonstrate a certain property about themselves that are used during issuance.
-Examples of attestation properties include, though are not limited to:
+process by which an Attester bears witness to, confirms, or authenticates a
+Client so as to verify a property about the Client that is required for
+Issuance. Examples of attestation properties include, though are not limited
+to:
 
 - Capable of solving a CAPTCHA. Clients that solve CAPTCHA challenges can attest
   to this capability for the purposes of being ruled out as a bot or otherwise
