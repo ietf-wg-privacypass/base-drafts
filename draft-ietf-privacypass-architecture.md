@@ -130,19 +130,17 @@ The issuance and redemption protocols operate in concert as shown in
 the figure below.
 
 ~~~
- Client        Attester          Issuer          Origin
-
-    <---------------------------------------- Challenge \
-                                                        |
-+--------------------------------------------\          |
-| Attest --->                                |          |
-| TokenRequest ------------------>           |          |
-|                                 (validate) | Issuance | Redemption
-|                                 (evaluate) |   Flow   |   Flow
-|           <------------ TokenResponse      |          |
----------------------------------------------/          |
-                                                        |
-      Response -------------------------------------- > /
+      Origin          Client        Attester          Issuer
+  /-----------------------------------------------------------------------
+  |                 /--------------------------------------------\
+  |   Challenge ----> Attest --->                                |
+  |                 | TokenRequest ------------------>           |
+  |   Redemption    |                                 (validate) | Issuance
+  |      Flow       |                                 (evaluate) |   Flow
+  |                 |     <----------------------  TokenResponse |
+  |   <--- Response |                                            |
+  |                 \--------------------------------------------/
+  \-----------------------------------------------------------------------
 ~~~
 {: #fig-overview title=" Privacy Pass Architectural Components"}
 
@@ -297,7 +295,7 @@ might be lesser than the number of users that can solve CAPTCHAs. Similarly,
 requiring a conjunction of attestation types could decrease the overall
 anonymity set size. For example, the number of Clients that have solved a
 CAPTCHA in the past day, have a valid account, and are running on a trusted
-device is lesser thant he number of Clients that have solved a CAPTCHA in the
+device is lesser than the number of Clients that have solved a CAPTCHA in the
 past day. Attesters should not admit attestation types that result in small
 anonymity sets.
 
