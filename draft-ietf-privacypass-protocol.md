@@ -424,6 +424,158 @@ This document updates the "Token Type" Registry with the following values.
 | 0x0002 | Blind RSA, 4096        | Y                   | N               | N                | 512 | {{public-flow}}  |
 {: #aeadid-values title="Token Types"}
 
+## Media Types
+
+This specification defines the following protocol messages, along with their
+corresponding media types:
+
+- TokenRequest: "message/token-request"
+- TokenResponse: "message/token-response"
+
+The definition for each media type is in the following subsections.
+
+### "message/token-request" media type
+
+Type name:
+
+: message
+
+Subtype name:
+
+: token-request
+
+Required parameters:
+
+: N/A
+
+Optional parameters:
+
+: None
+
+Encoding considerations:
+
+: only "8bit" or "binary" is permitted
+
+Security considerations:
+
+: see {{issuance}}
+
+Interoperability considerations:
+
+: N/A
+
+Published specification:
+
+: this specification
+
+Applications that use this media type:
+
+: N/A
+
+Fragment identifier considerations:
+
+: N/A
+
+Additional information:
+
+: <dl>
+  <dt>Magic number(s):</dt><dd>N/A</dd>
+  <dt>Deprecated alias names for this type:</dt><dd>N/A</dd>
+  <dt>File extension(s):</dt><dd>N/A</dd>
+  <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
+  </dl>
+
+Person and email address to contact for further information:
+
+: see Authors' Addresses section
+
+Intended usage:
+
+: COMMON
+
+Restrictions on usage:
+
+: N/A
+
+Author:
+
+: see Authors' Addresses section
+
+Change controller:
+
+: IESG
+
+### "message/token-response" media type
+
+Type name:
+
+: message
+
+Subtype name:
+
+: access-token-response
+
+Required parameters:
+
+: N/A
+
+Optional parameters:
+
+: None
+
+Encoding considerations:
+
+: only "8bit" or "binary" is permitted
+
+Security considerations:
+
+: see {{issuance}}
+
+Interoperability considerations:
+
+: N/A
+
+Published specification:
+
+: this specification
+
+Applications that use this media type:
+
+: N/A
+
+Fragment identifier considerations:
+
+: N/A
+
+Additional information:
+
+: <dl>
+  <dt>Magic number(s):</dt><dd>N/A</dd>
+  <dt>Deprecated alias names for this type:</dt><dd>N/A</dd>
+  <dt>File extension(s):</dt><dd>N/A</dd>
+  <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
+  </dl>
+
+Person and email address to contact for further information:
+
+: see Authors' Addresses section
+
+Intended usage:
+
+: COMMON
+
+Restrictions on usage:
+
+: N/A
+
+Author:
+
+: see Authors' Addresses section
+
+Change controller:
+
+: IESG
+
 --- back
 
 # Acknowledgements
