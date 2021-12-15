@@ -113,8 +113,8 @@ redeems the token. Attestation can be performed by the Issuer or by an
 Attester that is trusted by the Issuer.
 Clients might prefer to select different Attesters, separate from the Issuer,
 to be able to use preferred authentication methods or improve privacy by not
-directly communicating with an Issuer. Depending on the information being
-attested, Attesters may also store state about individual Clients, such as the
+directly communicating with an Issuer. Depending on the attestation,
+Attesters can store state about a Client, such as the
 number of overall tokens issued thus far. As an example of an Issuance protocol,
 in the original Privacy Pass protocol {{PPSRV}}, tokens were only issued to
 Clients that solved CAPTCHAs. In this context, the Attester attested that some
