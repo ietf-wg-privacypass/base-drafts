@@ -529,7 +529,7 @@ Encoding considerations:
 
 Security considerations:
 
-: see {{issuance}}
+: see {{security-considerations}}
 
 Interoperability considerations:
 
