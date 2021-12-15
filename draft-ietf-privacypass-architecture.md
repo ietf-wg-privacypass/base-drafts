@@ -161,7 +161,7 @@ The following terms are used throughout this document.
 - Client: An entity that seeks authorization to an Origin.
 - Origin: An entity that challenges Clients for tokens.
 - Issuer: An entity that issues tokens to Clients for properties
-  attested by the Attester.
+  attested to by the Attester.
 - Attester: An entity that attests to properties of Client for the
   purposes of token issuance.
 
