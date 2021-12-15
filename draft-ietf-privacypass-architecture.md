@@ -109,8 +109,8 @@ same protocol participant, but can also be implemented separately. The Issuer
 is responsible for issuing tokens in response to requests from Clients. The
 Attester is responsible for attesting properties about the Client for which
 tokens are issued. The Issuer needs to be trusted by the server that later
-redeems the token. The Attester needs to either be operated by the Issuer,
-or be operated by an entity the Issuer trusts to perform valid attestation.
+redeems the token. Attestation can be performed by the Issuer or by an
+Attester that is trusted by the Issuer.
 Clients might prefer to select different Attesters, separate from the Issuer,
 to be able to use preferred authentication methods or improve privacy by not
 directly communicating with an Issuer. Depending on the information being
