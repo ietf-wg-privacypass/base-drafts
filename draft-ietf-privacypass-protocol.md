@@ -147,7 +147,7 @@ The Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
-   uint8_t token_type;
+   uint16_t token_type = 0x0001;
    uint8_t token_key_id;
    uint8_t blinded_msg[Nk];
 } TokenRequest;
@@ -155,8 +155,7 @@ struct {
 
 The structure fields are defined as follows:
 
-- "version" is a 1-octet integer, which matches the version in the challenge.
-This document defines version 1.
+- "token_type" is a 2-octet integer, which matches the type in the challenge.
 
 - "token_key_id" is the least significant byte of the `key_id`.
 
@@ -310,7 +309,7 @@ The Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
-   uint8_t token_type;
+   uint16_t token_type = 0x0002
    uint8_t token_key_id;
    uint8_t blinded_msg[Nk];
 } TokenRequest;
@@ -318,8 +317,7 @@ struct {
 
 The structure fields are defined as follows:
 
-- "version" is a 1-octet integer, which matches the version in the challenge.
-This document defines version 1.
+- "version" is a 2-octet integer, which matches the type in the challenge.
 
 - "token_key_id" is the least significant byte of the `key_id`.
 
@@ -408,20 +406,20 @@ where encoded_key is a DER-encoded SubjectPublicKeyInfo object carrying pkI.
 # Security considerations
 
 This document outlines how to instantiate the Issuance protocol
-based on the VOPRF defined in {{I-D.irtf-cfrg-voprf}}. All security
-considerations described in the VOPRF document also apply in the Privacy
-Pass use-case. Considerations related to broader privacy and security
-concerns in a multi-Client and multi-Issuer setting are deferred to the
-Architecture document {{I-D.ietf-privacypass-architecture}}.
+based on the VOPRF defined in {{OPRF}} and blind RSA protocol defnied in
+{{BLINDRSA}}. All security considerations described in the VOPRF document also
+apply in the Privacy Pass use-case. Considerations related to broader privacy
+and security concerns in a multi-Client and multi-Issuer setting are deferred
+to the Architecture document {{I-D.ietf-privacypass-architecture}}.
 
 # IANA considerations
 
 This document updates the "Token Type" Registry with the following values.
 
-| Value  | Name                   | Public | Public Metadata | Private Metadata | Nk  | Reference        |
-|:-------|:-----------------------|:-------|:----------------|:-----------------|:----|:-----------------|
-| 0x0001 | OPRF(P-384, SHA-384)   | N      | Y               | N                | 48  | {{private-flow}} |
-| 0x0002 | Blind RSA, 4096        | Y      | N               | N                | 512 | {{public-flow}}  |
+| Value  | Name                   | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
+|:-------|:-----------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
+| 0x0001 | OPRF(P-384, SHA-384)   | N                   | Y               | N                | 48  | {{private-flow}} |
+| 0x0002 | Blind RSA, 4096        | Y                   | N               | N                | 512 | {{public-flow}}  |
 {: #aeadid-values title="Token Types"}
 
 --- back
