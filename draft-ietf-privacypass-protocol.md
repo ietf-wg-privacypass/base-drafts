@@ -407,7 +407,7 @@ where encoded_key is a DER-encoded SubjectPublicKeyInfo object carrying pkI.
 
 # Security considerations
 
-This document outlines how to instantiate the Privacy Pass protocol
+This document outlines how to instantiate the Issuance protocol
 based on the VOPRF defined in {{I-D.irtf-cfrg-voprf}}. All security
 considerations described in the VOPRF document also apply in the Privacy
 Pass use-case. Considerations related to broader privacy and security
