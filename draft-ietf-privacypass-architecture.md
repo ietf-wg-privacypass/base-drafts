@@ -100,8 +100,11 @@ revealing them cannot be linked back to the session where they were
 initially issued.
 
 At a high level, Privacy Pass is composed of two protocols: issuance
-and redemption. Issuance is a protocol between a Client and two functions:
-Attester and Issuer. The Attester and Issuer can be functions operated by the
+and redemption.
+
+The issuance protocol runs between a Client and two network functions in the Privacy 
+Pass architecture: Attestation and Issuance. These two network functions can be
+implemented by the
 same protocol participant, but can also be implemented separately. The Issuer
 is responsible for issuing tokens in response to requests from Clients. The
 Attester is responsible for attesting properties about the Client for which
