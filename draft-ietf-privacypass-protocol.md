@@ -309,7 +309,7 @@ The Client then creates a TokenRequest structured as follows:
 ~~~
 struct {
    uint16_t token_type = 0x0002
-   uint8_t token_key_id;
+   uint8_t issuer_key_id;
    uint8_t blinded_msg[Nk];
 } TokenRequest;
 ~~~
