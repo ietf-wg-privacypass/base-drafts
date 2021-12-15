@@ -343,10 +343,9 @@ content-length = 514
 
 Upon receipt of the request, the Issuer validates the following conditions:
 
-- The TokenRequest contains a supported version.
-- For version 1, the TokenRequest.token_key_id corresponds to a key ID
-  of a Public Key owned by the issuer.
-- For version 1, the TokenRequest.blinded_msg is of the correct size.
+- The TokenRequest contains a supported token_type.
+- The TokenRequest.issuer_key_id corresponds to a key ID of a Public Key owned by the issuer.
+- The TokenRequest.blinded_msg is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
 to the Client, which will forward the error to the client.
