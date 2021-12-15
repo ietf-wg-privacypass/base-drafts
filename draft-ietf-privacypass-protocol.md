@@ -414,6 +414,8 @@ to the Architecture document {{I-D.ietf-privacypass-architecture}}.
 
 # IANA considerations
 
+## Token Type
+
 This document updates the "Token Type" Registry with the following values.
 
 | Value  | Name                   | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
