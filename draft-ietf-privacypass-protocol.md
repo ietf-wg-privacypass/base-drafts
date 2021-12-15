@@ -411,7 +411,7 @@ This document outlines how to instantiate the Issuance protocol
 based on the VOPRF defined in {{I-D.irtf-cfrg-voprf}}. All security
 considerations described in the VOPRF document also apply in the Privacy
 Pass use-case. Considerations related to broader privacy and security
-concerns in a multi-client and multi-server setting are deferred to the
+concerns in a multi-Client and multi-Issuer setting are deferred to the
 Architecture document {{I-D.ietf-privacypass-architecture}}.
 
 # IANA considerations
