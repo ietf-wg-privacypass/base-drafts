@@ -136,16 +136,16 @@ the figure below.
 
 ~~~
       Origin          Client        Attester          Issuer
-  /-----------------------------------------------------------------------
-  |                 /--------------------------------------------\
-  |   Challenge ----> Attest --->                                |
-  |                 | TokenRequest ------------------>           |
-  |   Redemption    |                                 (validate) | Issuance
-  |      Flow       |                                 (evaluate) |   Flow
-  |                 |     <----------------------  TokenResponse |
-  |   <--- Response |                                            |
-  |                 \--------------------------------------------/
-  \-----------------------------------------------------------------------
+  /--------------------------------------------------------------------
+  |                 /-----------------------------------------\
+  |   Challenge ----> Attest --->                             |
+  |                 | TokenRequest --------------->           |
+  |   Redemption    |                              (validate) | Issuance
+  |      Flow       |                              (evaluate) |   Flow
+  |                 |     <-------------------  TokenResponse |
+  |   <--- Response |                                         |
+  |                 \-----------------------------------------/
+  \--------------------------------------------------------------------
 ~~~
 {: #fig-overview title=" Privacy Pass Architectural Components"}
 
@@ -282,7 +282,7 @@ to:
 - Capable of solving a CAPTCHA. Clients that solve CAPTCHA challenges can attest
   to this capability for the purposes of being ruled out as a bot or otherwise
   automated Client.
-- Client state. Clients can be associated with state and the attestor can
+- Client state. Clients can be associated with state and the attester can
   attest to this state. Examples of state include the number of issuance
   protocol invocations, the client's geographic region, and whether the
   client has a valid application-layer account.
@@ -360,7 +360,7 @@ redemption to allow Issuers for seamless key rotation.
 Servers may rotate keys as a means of revoking tokens issued under old
 or otherwise expired keys. Alternatively, Issuers may include expiration
 information as metadata alongside the token; See {{metadata}} for more
-discussion about metadata constraints. Both techinques are equivalent
+discussion about metadata constraints. Both techniques are equivalent
 since they cryptographically bind expiration to individual tokens.
 
 Key rotations should be limited in frequency for similar reasons. See
