@@ -20,6 +20,11 @@ author:
     country: Portugal
     email: alex.davidson92@gmail.com
  -
+    ins: J. Iyengar
+    name: Jana Iyengar
+    org: Fastly
+    email: jri@fastly.com
+ -
     ins: C. A. Wood
     name: Christopher A. Wood
     org: Cloudflare
