@@ -468,7 +468,7 @@ invoke any revocation procedures that may apply for the old key.
 ## Large numbers of Issuers {#servers}
 
 Similarly to the Issuer rotation dynamic that is raised above, if there
-are a large number of Issuers and origins accept all of them segregation 
+are a large number of Issuers and Origins accept all of them segregation 
 can occur. For example, if Clients obtain tokens from many Issuers, and
 Origins later challenge a Client for a token from each Issuer, Origins
 can learn information about the Client. Each per-Issuer token that a 
