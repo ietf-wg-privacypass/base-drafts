@@ -316,7 +316,7 @@ The Client first creates an issuance request message for a random value
 nonce = random(32)
 context = SHA256(challenge)
 token_input = concat(0x0002, nonce, context, key_id)
-blinded_msg, blind_inv = rsabssa_blind(pkI, message)
+blinded_msg, blind_inv = rsabssa_blind(pkI, token_input)
 ~~~
 
 The Client then creates a TokenRequest structured as follows:
