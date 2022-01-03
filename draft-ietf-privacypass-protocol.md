@@ -300,7 +300,7 @@ Clients provide the following as input to the issuance protocol:
 - Issuer name, identifying the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
 - Issuer Public Key pkI, with a key identifier `key_id` computed as
-  described in {{issuer-configuration}}.
+  described in {{public-issuer-configuration}}.
 - Challenge value `challenge`, an opaque byte string provided by the
   corresponding redemption protocol [http-auth-doc].
 
