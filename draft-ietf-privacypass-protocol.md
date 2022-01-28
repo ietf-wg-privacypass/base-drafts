@@ -333,7 +333,7 @@ The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-- "issuer_key_id" is the least significant byte of the `key_id`.
+- "token_key_id" is the least significant byte of the `key_id`.
 
 - "blinded_msg" is the Nk-octet request defined above.
 
