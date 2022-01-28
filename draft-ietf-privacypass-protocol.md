@@ -276,7 +276,7 @@ The key identifier for this specific key pair, denoted `key_id`, is computed
 as follows:
 
 ~~~
-key_id = SHA256(0x0004 || SerializeElement(pkI))
+key_id = SHA256(0x0001 || SerializeElement(pkI))
 ~~~
 
 # Issuance Protocol for Publicly Verifiable Tokens {#public-flow}
