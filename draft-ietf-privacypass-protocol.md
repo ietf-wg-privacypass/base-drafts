@@ -177,7 +177,7 @@ The structure fields are defined as follows:
 - "blinded_request" is the Ne-octet blinded message defined above, computed as
   `SerializeElement(blinded_msg)`. Ne is as defined in {{OPRF, Section 4}}.
 
-The value `tweaked_key` is stored locally and used later as described in {{finalizaton}}.
+The value `tweaked_key` is stored locally and used later as described in {{finalization}}.
 The Client then generates an HTTP POST request to send to the Issuer,
 with the TokenRequest as the body. The media type for this request
 is "message/token-request". An example request is shown below.
