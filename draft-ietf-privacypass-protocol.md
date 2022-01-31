@@ -138,7 +138,7 @@ SerializeScalar and DeserializeScalar, and DeriveKeyPair.
 
 ## Client-to-Issuer Request {#client-to-issuer}
 
-The Client first creates an OPRF context as follows:
+The Client first creates a context as follows:
 
 ~~~
 client_context = SetupPOPRFClient(0x0004, pkI)
