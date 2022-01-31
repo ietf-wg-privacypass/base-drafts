@@ -36,6 +36,9 @@ author:
 normative:
   RFC2119:
   RFC8446:
+  HTTP-Authentication:
+    title: The Privacy Pass HTTP Authentication Scheme
+    target: https://datatracker.ietf.org/doc/html/draft-pauly-privacypass-auth-scheme-00
 
 informative:
   PPEXT:
@@ -180,7 +183,7 @@ The redemption protocol is a simple challenge-response based authorization
 protocol between Client and Origin. Origins prompt Clients with a token
 challenge and, if possible, Clients present a valid token for the challenge
 in response. The challenge controls the type of token that the Origin will
-accept for the given resource. As described in [http-auth-doc], there are
+accept for the given resource. As described in {{HTTP-Authentication}}, there are
 a number of ways in which the token may vary, including:
 
 - Issuance protocol. The token identifies the type of issuance protocol
