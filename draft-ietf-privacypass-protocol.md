@@ -51,6 +51,9 @@ author:
 normative:
   RFC2119:
   RFC8446:
+  HTTP-Authentication:
+    title: The Privacy Pass HTTP Authentication Scheme
+    target: https://datatracker.ietf.org/doc/html/draft-pauly-privacypass-auth-scheme-00
   I-D.irtf-cfrg-voprf:
   I-D.ietf-privacypass-architecture:
   I-D.ietf-privacypass-http-api:
@@ -130,7 +133,7 @@ Clients provide the following as input to the issuance protocol:
 - Issuer Public Key pkI, with a key identifier `key_id` computed as
   described in {{issuer-configuration}}.
 - Challenge value `challenge`, an opaque byte string. For example, this might
-  be provided by the redemption protocol in [http-auth-doc].
+  be provided by the redemption protocol in {{HTTP-Authentication}}.
 
 Both Client and Issuer also share a common public string called `info`.
 
@@ -301,7 +304,7 @@ Clients provide the following as input to the issuance protocol:
 - Issuer Public Key pkI, with a key identifier `key_id` computed as
   described in {{public-issuer-configuration}}.
 - Challenge value `challenge`, an opaque byte string. For example, this might
-  be provided by the redemption protocol in [http-auth-doc].
+  be provided by the redemption protocol in {{HTTP-Authentication}}.
 
 Given this configuration and these inputs, the two messages exchanged in
 this protocol are described below.
@@ -393,7 +396,7 @@ authenticator = rsabssa_finalize(pkI, nonce, blind_sig, blind_inv)
 ~~~
 
 If this succeeds, the Client then constructs a Token as described in
-[http-auth-doc] as follows:
+{{HTTP-Authentication}} as follows:
 
 ~~~
 struct {
