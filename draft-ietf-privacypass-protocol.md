@@ -129,8 +129,8 @@ Clients provide the following as input to the issuance protocol:
   can be used to construct HTTP requests to the Issuer.
 - Issuer Public Key pkI, with a key identifier `key_id` computed as
   described in {{issuer-configuration}}.
-- Challenge value `challenge`, an opaque byte string provided by the
-  corresponding redemption protocol [http-auth-doc].
+- Challenge value `challenge`, an opaque byte string. For example, this might
+  be provided by the redemption protocol in [http-auth-doc].
 
 Both Client and Issuer also share a common public string called `info`.
 
@@ -247,8 +247,7 @@ authenticator = client_context.Finalize(context, blind, pkI,
   evaluated_msg, blinded_msg, info)
 ~~~
 
-If this succeeds, the Client then constructs a Token as described in
-[http-auth-doc] as follows:
+If this succeeds, the Client then constructs a Token as follows:
 
 ~~~
 struct {
@@ -301,8 +300,8 @@ Clients provide the following as input to the issuance protocol:
   can be used to construct HTTP requests to the Issuer.
 - Issuer Public Key pkI, with a key identifier `key_id` computed as
   described in {{public-issuer-configuration}}.
-- Challenge value `challenge`, an opaque byte string provided by the
-  corresponding redemption protocol [http-auth-doc].
+- Challenge value `challenge`, an opaque byte string. For example, this might
+  be provided by the redemption protocol in [http-auth-doc].
 
 Given this configuration and these inputs, the two messages exchanged in
 this protocol are described below.
