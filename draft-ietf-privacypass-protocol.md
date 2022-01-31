@@ -132,14 +132,16 @@ Clients provide the following as input to the issuance protocol:
 Both Client and Issuer also share a common public string called `info`.
 
 Given this configuration and these inputs, the two messages exchanged in
-this protocol are described below.
+this protocol are described below. This section uses notation described in
+{{OPRF, Section 4}}, including SerializeElement and DeserializeElement,
+SerializeScalar and DeserializeScalar, and DeriveKeyPair.
 
 ## Client-to-Issuer Request {#client-to-issuer}
 
-The Client first creates a verifiable context as follows:
+The Client first creates a context as follows:
 
 ~~~
-client_context = SetupVerifiableClient(0x0004, pkI)
+client_context = SetupPOPRFClient(0x0004, pkI)
 ~~~
 
 Here, 0x0004 is the two-octet identifier corresponding to
@@ -152,16 +154,17 @@ using the input challenge and Issuer key identifier as follows:
 nonce = random(32)
 context = SHA256(challenge)
 token_input = concat(0x0001, nonce, context, key_id)
-blind, blinded_message = client_context.Blind(nonce)
+blind, blinded_msg, tweaked_key = client_context.Blind(nonce, info)
 ~~~
 
-The Client then creates a TokenRequest structured as follows:
+If the Blind step fails, the Client aborts the protocol. Otherwise,
+the Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
    uint16_t token_type = 0x0001;
    uint8_t token_key_id;
-   uint8_t blinded_msg[Nk];
+   uint8_t blinded_request[Ne];
 } TokenRequest;
 ~~~
 
@@ -171,12 +174,13 @@ The structure fields are defined as follows:
 
 - "token_key_id" is the least significant byte of the `key_id`.
 
-- "blinded_msg" is the Nk-octet request defined above.
+- "blinded_request" is the Ne-octet blinded message defined above, computed as
+  `SerializeElement(blinded_msg)`. Ne is as defined in {{OPRF, Section 4}}.
 
+The value `tweaked_key` is stored locally and used later as described in {{finalization}}.
 The Client then generates an HTTP POST request to send to the Issuer,
 with the TokenRequest as the body. The media type for this request
-is "message/token-request". An example request is shown below, where
-Nk = 48.
+is "message/token-request". An example request is shown below.
 
 ~~~
 :method = POST
@@ -186,16 +190,16 @@ Nk = 48.
 accept = message/token-response
 cache-control = no-cache, no-store
 content-type = message/token-request
-content-length = 50
+content-length = <Length of TokenRequest>
 
 <Bytes containing the TokenRequest>
 ~~~
 
 Upon receipt of the request, the Issuer validates the following conditions:
 
-- The TokenRequest contains a supported token_type
+- The TokenRequest contains a supported token_type.
 - The TokenRequest.token_key_id corresponds to a key ID of a Public Key owned by the issuer.
-- The TokenRequest.blinded_msg is of the correct size
+- The TokenRequest.blinded_msg is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
 to the Client, which will forward the error to the client.
@@ -206,8 +210,8 @@ If the Issuer is willing to produce a token token to the Client, the Issuer
 completes the issuance flow by computing a blinded response as follows:
 
 ~~~
-server_context = SetupVerifiableServer(0x0004, skI, pkI)
-evaluated_msg, proof = server_context.Evaluate(skI,
+server_context = SetupPOPRFServer(0x0004, skI, pkI)
+evaluate_msg, proof = server_context.Evaluate(skI,
     TokenRequest.blinded_message, info)
 ~~~
 
@@ -215,13 +219,19 @@ The Issuer then creates a TokenResponse structured as follows:
 
 ~~~
 struct {
-   uint8_t evaluated_msg[Nk];
-   uint8_t proof[Ns+Ns];
+   uint8_t evaluate_response[Nk];
+   uint8_t evaluate_proof[Ns+Ns];
 } TokenResponse;
 ~~~
 
-The structure fields "evaluated_msg" and "proof" are as computed above,
-where Ns is as defined in {{OPRF, Section 4}}.
+The structure fields are defined as follows:
+
+- "evaluate_response" is the Ne-octet evaluated messaged, computed as
+  `SerializeElement(evaluated_msg)`.
+
+- "evaluate_proof" is the (Ns+Ns)-octet serialized proof, which is a pair of Scalar values,
+  computed as `concat(SerializeScalar(proof[0]), SerializeScalar(proof[1]))`,
+  where Ns is as defined in {{OPRF, Section 4}}.
 
 The Issuer generates an HTTP response with status code 200 whose body consists
 of TokenResponse, with the content type set as "message/token-response".
@@ -229,19 +239,22 @@ of TokenResponse, with the content type set as "message/token-response".
 ~~~
 :status = 200
 content-type = message/token-response
-content-length = 144
+content-length = <Length of TokenResponse>
 
 <Bytes containing the TokenResponse>
 ~~~
 
 ## Finalization
 
-Upon receipt, the Client handles the response and, if successful, processes the
-body as follows:
+Upon receipt, the Client handles the response and, if successful, deserializes
+the body values TokenResponse.evaluate_response and TokenResponse.evaluate_proof.
+If deserialization of any value fails, the Client aborts the protocol.
+Otherwise, when deserialization yields `evaluated_msg` and `proof`, the Client
+processes the response as follows:
 
 ~~~
 authenticator = client_context.Finalize(context, blind, pkI,
-  evaluated_msg, blinded_msg, info)
+  evaluated_msg, blinded_msg, info, tweaked_key)
 ~~~
 
 If this succeeds, the Client then constructs a Token as follows:
@@ -265,7 +278,8 @@ pkI, respectively, used to produce tokens. Each key pair MUST be generated as
 follows:
 
 ~~~
-(skI, pkI) = GenerateKeyPair()
+seed = random(Ns)
+(skI, pkI) = DeriveKeyPair(seed, "PrivacyPass")
 ~~~
 
 The key identifier for this specific key pair, denoted `key_id`, is computed
@@ -346,7 +360,7 @@ Nk = 512.
 accept = message/token-response
 cache-control = no-cache, no-store
 content-type = message/token-request
-content-length = 514
+content-length = <Length of TokenRequest>
 
 <Bytes containing the TokenRequest>
 ~~~
@@ -375,7 +389,7 @@ of `blind_sig`, with the content type set as "message/token-response".
 ~~~
 :status = 200
 content-type = message/token-response
-content-length = 512
+content-length = <Length of TokenResponse>
 
 <Bytes containing the TokenResponse>
 ~~~
