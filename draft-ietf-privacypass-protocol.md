@@ -50,16 +50,10 @@ author:
 
 normative:
   RFC2119:
-  RFC8446:
   HTTP-Authentication:
     title: The Privacy Pass HTTP Authentication Scheme
     target: https://datatracker.ietf.org/doc/html/draft-pauly-privacypass-auth-scheme-00
-  I-D.irtf-cfrg-voprf:
   I-D.ietf-privacypass-architecture:
-  I-D.ietf-privacypass-http-api:
-informative:
-  RFC7049:
-  RFC7159:
 
 --- abstract
 
