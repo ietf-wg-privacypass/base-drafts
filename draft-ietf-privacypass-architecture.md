@@ -425,7 +425,53 @@ their position to try and reduce the anonymity sets that Clients belong
 to (or, user segregation). For each case, we provide mitigations that
 the Privacy Pass ecosystem must implement to prevent these actions.
 
-## Metadata Privacy Implications
+## Correlation attacks
+
+One of the requirements of the issuance protocol as described in {{issuance-protocol}}
+is that it provide unconditional input secrecy. This means that an issuance
+and its corresponding redemption events are unlinkable using the contents of
+a token. However, there are other ways in which these two events could be linked
+together, which we refer to as correlation.
+
+Correlation can problematic from a privacy perspective. To demonstrate why,
+consider the lifecycle of a cross-origin token. Clients may invoke the issuance
+protocol in one context, e.g., when visiting site foo.example, but redeem the
+token in another context, e.g., when visiting site bar.example. If an attacker
+can correlate these two events, then they know that visits to foo.example and
+bar.example are related. In contrast, per-origin token contexts are the same,
+so correlating issuance and redemption only allows an attacker to learn when
+issuance and redemption correspond to the same context.
+
+In general, each issuance and redemption event is associated with some Client
+and context. For example, an issuance event might represent Client C running
+the issuance protocol to produce a token for website foo.example at time T.
+Let cI and sI be the Client and context pair associated with an issuance event.
+Similarly, let cR and sR be the Client and context pair associated with a
+redemption event. Correlation is possible if sI = sR or cI = cR.
+
+Context correlation is possible through a number of different ways. The following
+list covers some examples:
+
+- The timestamps of issuance and redemption events for interactive tokens may be
+  sufficiently unique that an attacker can link the two by their timestamp. However,
+  even if these timestamps are not close, a small number of issuance and redemption
+  events can let an attacker link two events. For example, if there is only ever
+  a single issuance and redemption event in a day, then an attacker can link based
+  based solely on the presence of the events.
+- The origin for an issuance and redemption event can be unique for a given Client,
+  allowing an attacker to link both events.
+
+Depending on the Client identifiers used, context correlation may not constitute
+a privacy violation. In particular, because tokens are not bound to a single Client
+and therefore transferrable, an attacker cannot distinguish the scenarios where
+the same Client ran the issuance protocol and redemption protocol, or where one
+Client ran the issuance protocol and another client ran the redemption protocol.
+
+Moreover, clients can control whether or not correlation occurs by separating their
+Client identifiers presented to servers, e.g., by using an attester or other proxy
+service to relay token requests or hide their identity from the issuer (or origin).
+
+## Metadata privacy implications
 
 Any metadata bits of information can be used to further segment the
 size of the Client's anonymity set. Any Issuer that wanted to
