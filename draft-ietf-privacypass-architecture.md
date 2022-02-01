@@ -433,7 +433,7 @@ and its corresponding redemption events are unlinkable using the contents of
 a token. However, there are other ways in which these two events could be linked
 together, which we refer to as correlation.
 
-Correlation can problematic from a privacy perspective. To demonstrate why,
+Correlation can be problematic from a privacy perspective. To demonstrate why,
 consider the lifecycle of a cross-origin token. Clients may invoke the issuance
 protocol in one context, e.g., when visiting site foo.example, but redeem the
 token in another context, e.g., when visiting site bar.example. If an attacker
@@ -447,7 +447,8 @@ and context. For example, an issuance event might represent Client C running
 the issuance protocol to produce a token for website foo.example at time T.
 Let cI and sI be the Client and context pair associated with an issuance event.
 Similarly, let cR and sR be the Client and context pair associated with a
-redemption event. Correlation is possible if sI = sR or cI = cR.
+redemption event. We refer to context correlation as the case where cI = cR,
+and source correlation as the case where sI = sR.
 
 Context correlation is possible through a number of different ways. The following
 list covers some examples:
@@ -467,9 +468,9 @@ and therefore transferrable, an attacker cannot distinguish the scenarios where
 the same Client ran the issuance protocol and redemption protocol, or where one
 Client ran the issuance protocol and another client ran the redemption protocol.
 
-Moreover, clients can control whether or not correlation occurs by separating their
-Client identifiers presented to servers, e.g., by using an attester or other proxy
-service to relay token requests or hide their identity from the issuer (or origin).
+Moreover, clients can control source correlation by separating their Client identifiers
+presented to servers, e.g., by using an attester or other proxy service to relay token
+requests or hide their identity from the issuer (or origin).
 
 ## Metadata privacy implications
 
