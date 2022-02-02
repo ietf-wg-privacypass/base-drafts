@@ -429,7 +429,7 @@ the Privacy Pass ecosystem must implement to prevent these actions.
 
 One of the requirements of the issuance protocol as described in {{issuance-protocol}}
 is that it needs to provide unconditional input secrecy. This means that an issuance event
-and its corresponding redemption events are unlinkable using the contents of
+and its corresponding redemption event are unlinkable using the contents of
 a token. However, there are other ways in which these two events could be linked
 together, which we refer to as correlation.
 
