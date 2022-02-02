@@ -461,6 +461,9 @@ list covers some examples:
   based solely on the presence of the events.
 - The origin for an issuance and redemption event can be unique for a given Client,
   allowing an attacker to link both events.
+- State associated with an issuance protocol. In the event that issuance protocols
+  are stateful, e.g., by limiting the number of issuance events allowed by any one
+  Client, this state could be used to correlate issuance and redemption.
 
 Depending on the Client identifiers used, context correlation may not constitute
 a privacy violation. In particular, because tokens are not bound to a single Client
