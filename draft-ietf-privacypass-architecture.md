@@ -438,7 +438,7 @@ consider the lifecycle of a cross-origin token. Clients may invoke the issuance
 protocol in one context, e.g., when visiting site foo.example, but redeem the
 token in another context, e.g., when visiting site bar.example. If an attacker
 can correlate these two events, then they know that visits to foo.example and
-bar.example are related. In contrast, per-origin token contexts are the same,
+bar.example are related. In contrast, per-origin token contexts are limited a single origin,
 so correlating issuance and redemption only allows an attacker to learn when
 issuance and redemption correspond to the same context.
 
