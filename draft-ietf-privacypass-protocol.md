@@ -144,8 +144,9 @@ The Client first creates a context as follows:
 client_context = SetupPOPRFClient(0x0004, pkI)
 ~~~
 
-Here, 0x0004 is the two-octet identifier corresponding to
-the OPRF(P-384, SHA-384) ciphersuite in {{OPRF}}.
+Here, 0x0004 is the two-octet identifier corresponding to the
+OPRF(P-384, SHA-384) ciphersuite in {{OPRF}}. SetupPOPRFClient
+is defined in {{OPRF, Section 3.2}}.
 
 The Client then creates an issuance request message for a random value `nonce`
 using the input challenge and Issuer key identifier as follows:
@@ -157,7 +158,8 @@ token_input = concat(0x0001, nonce, context, key_id)
 blind, blinded_msg, tweaked_key = client_context.Blind(nonce, info)
 ~~~
 
-If the Blind step fails, the Client aborts the protocol. Otherwise,
+The Blind function is defined in {{OPRF, Section 3.3.3}}.
+If the Blind function fails, the Client aborts the protocol. Otherwise,
 the Client then creates a TokenRequest structured as follows:
 
 ~~~
@@ -215,7 +217,9 @@ evaluate_msg, proof = server_context.Evaluate(skI,
     TokenRequest.blinded_message, info)
 ~~~
 
-The Issuer then creates a TokenResponse structured as follows:
+SetupPOPRFServer is in {{OPRF, Section 3.2}} and Evaluate is
+defined in {{OPRF, Section 3.3.3}}. The Issuer then creates
+a TokenResponse structured as follows:
 
 ~~~
 struct {
@@ -257,7 +261,8 @@ authenticator = client_context.Finalize(context, blind, pkI,
   evaluated_msg, blinded_msg, info, tweaked_key)
 ~~~
 
-If this succeeds, the Client then constructs a Token as follows:
+The Finalize function is defined in {{OPRF, Section 3.3.3}}. If this
+succeeds, the Client then constructs a Token as follows:
 
 ~~~
 struct {
@@ -329,6 +334,7 @@ token_input = concat(0x0002, nonce, context, key_id)
 blinded_msg, blind_inv = rsabssa_blind(pkI, token_input)
 ~~~
 
+The rsabssa_blind function is defined in {{BLINDRSA, Section 5.1.1.}}.
 The Client then creates a TokenRequest structured as follows:
 
 ~~~
@@ -383,6 +389,7 @@ completes the issuance flow by computing a blinded response as follows:
 blind_sig = rsabssa_blind_sign(skI, TokenRequest.blinded_rmsg)
 ~~~
 
+The rsabssa_blind_sign function is defined in {{BLINDRSA, Section 5.1.2.}}.
 The Issuer generates an HTTP response with status code 200 whose body consists
 of `blind_sig`, with the content type set as "message/token-response".
 
@@ -403,6 +410,7 @@ body as follows:
 authenticator = rsabssa_finalize(pkI, nonce, blind_sig, blind_inv)
 ~~~
 
+The rsabssa_finalize function is defined in {{BLINDRSA, Section 5.1.3.}}.
 If this succeeds, the Client then constructs a Token as described in
 {{HTTP-Authentication}} as follows:
 
