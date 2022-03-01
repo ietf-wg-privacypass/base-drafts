@@ -128,7 +128,7 @@ and are located at the well-known location /.well-known/token-issuer-directory.
 
 # Token Challenge Requirements
 
-Clients receive challenges for tokens, as described in {{AUTHSCHEME}}.
+Clients receive challenges for tokens, as described in {{!AUTHSCHEME=I-D.pauly-privacypass-auth-scheme}}.
 The basic token issuance protocols described in this document can be
 interactive or non-interactive, and per-origin or cross-origin.
 
