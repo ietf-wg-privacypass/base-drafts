@@ -100,6 +100,38 @@ The following terms are used throughout this document.
 We assume that all protocol messages are encoded into raw byte format
 before being sent across the wire.
 
+# Configuration {#setup}
+
+Issuers MUST provide one parameter for configuration:
+
+1. Issuer Request URI: a token request URL for generating access tokens.
+   For example, an Issuer URL might be https://issuer.example.net/example-token-request.
+   This parameter uses resource media type "text/plain".
+
+The Issuer parameters can be obtained from an Issuer via a directory object, which is a JSON
+object whose field names and values are raw values and URLs for the parameters.
+
+| Field Name           | Value                                            |
+|:---------------------|:-------------------------------------------------|
+| issuer-request-uri   | Issuer Request URI resource URL as a JSON string |
+
+As an example, the Issuer's JSON directory could look like:
+
+~~~
+ {
+    "issuer-request-uri": "https://issuer.example.net/example-token-request"
+ }
+~~~
+
+Issuer directory resources have the media type "application/json"
+and are located at the well-known location /.well-known/token-issuer-directory.
+
+# Token Challenge Requirements
+
+Clients receive challenges for tokens, as described in {{AUTHSCHEME}}.
+The basic token issuance protocols described in this document can be
+interactive or non-interactive, and per-origin or cross-origin.
+
 # Issuance Protocol for Privately Verifiable Tokens with Public Metadata {#private-flow}
 
 The Privacy Pass issuance protocol is a two message protocol that takes
@@ -187,8 +219,8 @@ is "message/token-request". An example request is shown below.
 ~~~
 :method = POST
 :scheme = https
-:authority = issuer.net
-:path = /token-request
+:authority = issuer.example.net
+:path = /example-token-request
 accept = message/token-response
 cache-control = no-cache, no-store
 content-type = message/token-request
@@ -361,8 +393,8 @@ Nk = 512.
 ~~~
 :method = POST
 :scheme = https
-:authority = issuer.net
-:path = /token-request
+:authority = issuer.example.net
+:path = /example-token-request
 accept = message/token-response
 cache-control = no-cache, no-store
 content-type = message/token-request
