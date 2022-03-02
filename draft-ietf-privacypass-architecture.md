@@ -433,7 +433,8 @@ The Origin, Attester, and Issuer portrayed in {{fig-overview}} can be instantiat
 and deployed in a number of different ways. This section covers some expected
 deployment models and their corresponding security and privacy considerations.
 The discussion below assumes non-collusion between entities when operated by
-separate parties.
+separate parties. Mechanisms for enforcing non-collusion are out of scope
+for this architecture.
 
 ## Shared Origin, Attester, Issuer {#deploy-shared}
 
@@ -545,9 +546,12 @@ observed during the token redemption, such as Client IP addresses.
 
 In this model, attestation and redemption contexts are separate. As a result,
 any type of attestation is suitable in this model. Moreover, any type of token
-challenge is suitable assuming Client redemption unlinkability, since no single
-party will have access to the identifying Client information and unique Origin
-information.
+challenge is suitable assuming there is more than one Origin involved, since no
+single party will have access to the identifying Client information and unique
+Origin information. If there is only a single Origin, then per-Origin tokens
+are not appropriate in this model, since the Attester can learn the redemption
+context. (Note, however, that the Attester does not learn whether a token is
+per-Origin or cross-Origin.)
 
 ## Split Origin, Attester, Issuer {#deploy-split}
 
@@ -591,7 +595,9 @@ sees only the information necessary for Issuance, and the Origin sees
 token challenges, corresponding tokens, and Client source information,
 such as their IP address. As a result, attestation and redemption contexts
 are separate, and therefore any type of token challenge is suitable in
-this model.
+this model assuming there is more than a single Origin. As in the
+Joint Origin and Issuer model in {{deploy-joint-origin}}, if there is
+only a single Origin, then per-Origin tokens are not appropriate.
 
 # Privacy Considerations {#privacy}
 
