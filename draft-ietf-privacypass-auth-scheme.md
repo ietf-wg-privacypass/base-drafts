@@ -284,7 +284,7 @@ nonce, context, and token_key_id fields.
 
 When used for client authorization, the "PrivateToken" authentication
 scheme defines one parameter, "token", which contains the base64url-encoded
-Token struct. Since the length of the Token struct is not fixed, the base64url 
+Token struct. Since the length of the Token struct is not fixed, the base64url
 data MUST include padding. All unknown or unsupported parameters to "PrivateToken"
 authentication credentials MUST be ignored.
 
