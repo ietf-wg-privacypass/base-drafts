@@ -389,7 +389,7 @@ completes the issuance flow by computing a blinded response as follows:
 blind_sig = rsabssa_blind_sign(skI, TokenRequest.blinded_rmsg)
 ~~~
 
-This is encoded an transmitted to the client in the following TokenResponse structure:
+This is encoded and transmitted to the client in the following TokenResponse structure:
 
 ~~~
 struct {
