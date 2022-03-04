@@ -641,7 +641,7 @@ The test vector below lists the following values:
 - challenge: A random challenge, represented as a hexadecimal string.
 - nonce: The 32-byte client nonce generated according to {{private-request}}, represented as a
   hexadecimal string.
-- blind: The blind used when computing the OPRF blinded message, serialized using SerializeScalar 
+- blind: The blind used when computing the OPRF blinded message, serialized using SerializeScalar
   from {{Section 2.1 of OPRF}} and represented as a hexadecimal string.
 - token_request: The TokenRequest message constructed according to {{private-request}}, represented
   as a hexadecimal string.
