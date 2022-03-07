@@ -23,20 +23,27 @@ jobs:
         mkdir -p "$HOME"/.cache/xml2rfc
         echo "::set-output name=path::$HOME/.cache/xml2rfc"
         date -u "+::set-output name=date::%FT%T"
-
     - name: "Cache References"
       uses: actions/cache@v2
       with:
-        path: ${{ steps.cache-setup.outputs.path }}
+        path: |
+          ${{ steps.cache-setup.outputs.path }}
+          .targets.mk
         key: refcache-${{ steps.date.outputs.date }}
         restore-keys: |
           refcache-${{ steps.date.outputs.date }}
           refcache-
-
     - name: "Build Drafts"
       uses: martinthomson/i-d-template@v1
+      with:
+        token: ${{ github.token }}
 
     - name: "Upload to Datatracker"
       uses: martinthomson/i-d-template@v1
       with:
         make: upload
+
+    - name: "Archive Submitted Drafts"
+      uses: actions/upload-artifact@v2
+      with:
+        path: "draft-*-[0-9][0-9].xml"
