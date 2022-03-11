@@ -300,8 +300,8 @@ succeeds, the Client then constructs a Token as follows:
 struct {
     uint16_t token_type = 0x0001
     uint8_t nonce[32];
-    uint8_t context[32];
-    uint8_t key_id[32];
+    uint8_t challenge_digest[32];
+    uint8_t token_key_id[32];
     uint8_t authenticator[Nk];
 } Token;
 ~~~
@@ -458,8 +458,8 @@ If this succeeds, the Client then constructs a Token as described in
 struct {
     uint16_t token_type = 0x0002
     uint8_t nonce[32];
-    uint8_t context[32];
-    uint8_t key_id[32];
+    uint8_t challenge_digest[32];
+    uint8_t token_key_id[32];
     uint8_t authenticator[Nk];
 } Token;
 ~~~
