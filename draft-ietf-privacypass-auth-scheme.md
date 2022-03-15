@@ -201,7 +201,7 @@ If a Client fetches a batch of multiple tokens for future use that are bound
 to a specific redemption context (the redemption_context in the TokenChallenge
 was not empty), Clients SHOULD discard these tokens upon flushing state such as
 HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or changing networks.
-Using these tokens in a context that otherwise would not be linkable to the 
+Using these tokens in a context that otherwise would not be linkable to the
 original context could allow the Origin to recognize a Client.
 
 ## Token Redemption {#redemption}
