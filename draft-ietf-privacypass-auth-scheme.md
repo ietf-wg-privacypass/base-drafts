@@ -199,6 +199,13 @@ WWW-Authenticate: PrivateToken challenge=abc..., token-key=123...,
 PrivateToken challenge=def..., token-key=234...
 ~~~
 
+If a Client fetches a batch of multiple tokens for future use that are bound
+to a specific redemption context (the redemption_context in the TokenChallenge
+was not empty), Clients SHOULD discard these tokens upon flushing state such as
+HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or changing networks.
+Using these tokens in a context that otherwise would not be linkable to the
+original context could allow the Origin to recognize a Client.
+
 ## Token Redemption {#redemption}
 
 The output of the issuance protocol is a token that corresponds to the origin's
@@ -336,15 +343,20 @@ party by another, as shown below.
 {: #fig-replay title="Token Architectural Components"}
 
 Context-bound token challenges require clients to obtain matching tokens when challenged,
-rather than presenting a token that was obtained in the past. This can make it more likely
-that issuance and redemption events will occur at approximately the same time. For example, if
-a client is challenged for a token with a unique context at time T1 and then subsequently obtains
-a token at time T2, a colluding issuer and origin can link this to the same client if
-T2 is unique to the client. This linkability is less feasible as the number of issuance
-events at time T2 increases. Depending on the "max-age" token challenge attribute,
-clients MAY try to augment the time between getting challenged then redeeming a token
-so as to make this sort of linkability more difficult. For more discussion on correlation risks between
-token issuance and redemption, see {{?I-D.ietf-privacypass-architecture}}.
+rather than presenting a token that was obtained from a different context in the past. This
+can make it more likely that issuance and redemption events will occur at approximately the
+same time. For example, if a client is challenged for a token with a unique context at
+time T1 and then subsequently obtains a token at time T2, a colluding issuer and origin can
+link this to the same client if T2 is unique to the client. This linkability is less
+feasible as the number of issuance events at time T2 increases. Depending on the "max-age"
+token challenge attribute, clients MAY try to augment the time between getting challenged
+then redeeming a token so as to make this sort of linkability more difficult. For more
+discussion on correlation risks between token issuance and redemption, see
+{{?I-D.ietf-privacypass-architecture}}.
+
+As discussed in {{challenge}}, clients SHOULD discard any context-bound tokens upon flushing
+cookies or changing networks, to prevent an Origin using the redemption context state as
+a cookie to recognize clients.
 
 Applications SHOULD constrain tokens to a single origin unless the use case can
 accommodate such replay attacks.
