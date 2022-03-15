@@ -153,7 +153,7 @@ Challenges with redemption_context values of invalid lengths MUST be ignored.
 - "origin_name" is an optional string containing the name of the origin, which
 allows a token to be scoped to a specific origin. The string is prefixed with a
 2-octet integer indicating the length, in network byte order. If empty, any
-non-origin-specific token can be redeemed. 
+non-origin-specific token can be redeemed.
 
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following attributes:
