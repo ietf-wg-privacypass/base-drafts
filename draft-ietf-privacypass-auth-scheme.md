@@ -191,7 +191,7 @@ respond to the challenge. If the TokenChallenge contains a non-empty
 origin_info field, the client SHOULD validate that the name of the origin
 that issued the authentication challenge is included in the list of origin
 names. Clients MAY have further restrictions and requirements around
-validating when a challenge is considered acceptable or valid. 
+validating when a challenge is considered acceptable or valid.
 
 Note that it is possible for the WWW-Authenticate header to include multiple
 challenges, in order to allow the client to fetch a batch of multiple tokens
