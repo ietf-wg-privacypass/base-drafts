@@ -113,7 +113,7 @@ token to the origin ({{redemption}}).
 
 ## Token Challenge {#challenge}
 
-Origins send a token challenge to Clients in an "WWW-Authenticate" header with
+Origins send a token challenge to clients in an "WWW-Authenticate" header with
 the "PrivateToken" scheme. This challenge includes a TokenChallenge message,
 along with information about what keys to use when requesting a token from
 the issuer.
@@ -125,7 +125,7 @@ struct {
     uint16_t token_type;
     opaque issuer_name<1..2^16-1>;
     opaque redemption_context<0..32>;
-    opaque origin_name<0..2^16-1>;
+    opaque origin_info<0..2^16-1>;
 } TokenChallenge;
 ~~~
 
@@ -150,10 +150,11 @@ either 0 or 32 bytes. The field is prefixed with a single octet indicating the
 length. Challenges with redemption_context values of invalid lengths MUST be
 ignored.
 
-- "origin_name" is an optional string containing the name of the origin, which
-allows a token to be scoped to a specific origin. The string is prefixed with a
-2-octet integer indicating the length, in network byte order. If empty, any
-non-origin-specific token can be redeemed.
+- "origin_info" is an optional string containing one or more origin names, which
+allows a token to be scoped to a specific set of origins. The string is prefixed
+with a 2-octet integer indicating the length, in network byte order. If empty, any
+non-origin-specific token can be redeemed. If the string contains multiple
+origin names, they are delimited with commas "," without any whitespace.
 
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following attributes:
@@ -170,11 +171,11 @@ be omitted in deployments where clients are able to retrieve the issuer key usin
 an out-of-band mechanism.
 
 - "max-age", an optional attribute that consists of the number of seconds for which
-the challenge will be accepted by the Origin.
+the challenge will be accepted by the origin.
 
 Clients can ignore the challenge if the token-key is invalid or otherwise untrusted.
 
-Origins MAY also include the standard "realm" attribute, if desired. Issuance protocols
+The header MAY also include the standard "realm" attribute, if desired. Issuance protocols
 MAY require other attributes.
 
 As an example, the WWW-Authenticate header could look like this:
@@ -186,10 +187,16 @@ WWW-Authenticate: PrivateToken challenge=abc..., token-key=123...
 Upon receipt of this challenge, a client uses the message and keys in the
 issuance protocol indicated by the token_type. If the TokenChallenge has a
 token_type the client does not recognize or support, it MUST NOT parse or
-respond to the challenge.
+respond to the challenge. If the TokenChallenge contains a non-empty
+origin_info field, the client MUST validate that the name of the origin
+that issued the authentication challenge is included in the list of origin
+names. Clients MAY have further restrictions and requirements around
+validating when a challenge is considered acceptable or valid. For example,
+clients can choose to reject challenges that list origin names for which
+current connection is not authoritative (according to the TLS certificate).
 
 Note that it is possible for the WWW-Authenticate header to include multiple
-challenges, in order to allow the Client to fetch a batch of multiple tokens
+challenges, in order to allow the client to fetch a batch of multiple tokens
 for future use.
 
 For example, the WWW-Authenticate header could look like this:
@@ -199,12 +206,12 @@ WWW-Authenticate: PrivateToken challenge=abc..., token-key=123...,
 PrivateToken challenge=def..., token-key=234...
 ~~~
 
-If a Client fetches a batch of multiple tokens for future use that are bound
+If a client fetches a batch of multiple tokens for future use that are bound
 to a specific redemption context (the redemption_context in the TokenChallenge
-was not empty), Clients SHOULD discard these tokens upon flushing state such as
+was not empty), clients SHOULD discard these tokens upon flushing state such as
 HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or changing networks.
 Using these tokens in a context that otherwise would not be linkable to the
-original context could allow the Origin to recognize a Client.
+original context could allow the origin to recognize a client.
 
 ### Redemption Context Construction {#context-construction}
 
@@ -268,7 +275,7 @@ Token struct. Since the length of the Token struct is not fixed, the base64url
 data MUST include padding. All unknown or unsupported parameters to "PrivateToken"
 authentication credentials MUST be ignored.
 
-Clients present this Token structure to Origins in a new HTTP request using
+Clients present this Token structure to origins in a new HTTP request using
 the Authorization header as follows:
 
 ~~~
@@ -359,6 +366,18 @@ party by another, as shown below.
 ~~~
 {: #fig-replay title="Token Architectural Components"}
 
+Token challenges that include non-empty origin_info bind tokens to one or more specific
+origins. As described in {{challenge}}, clients only accept such challenges from
+origin names listed in the origin_info string. Even if multiple origins are listed, a
+token can only be redeemed for an origin if the challenge has an exact match for
+the origin_info. For example, if "a.example.com" issues a challenge with an origin_info
+string of "a.example.com,b.example.com", a client could redeem a token fetched for this
+challenge if and only if "b.example.com" also included an origin_info string of
+"a.example.com,b.example.com". On the other hand, if "b.example.com" had an origin_info
+string of "b.example.com" or "b.example.com,a.example.com" or
+"a.example.com,b.example.com,c.example.com", the string would not match and the client
+would need to use a different token.
+
 Context-bound token challenges require clients to obtain matching tokens when challenged,
 rather than presenting a token that was obtained from a different context in the past. This
 can make it more likely that issuance and redemption events will occur at approximately the
@@ -372,7 +391,7 @@ discussion on correlation risks between token issuance and redemption, see
 {{?I-D.ietf-privacypass-architecture}}.
 
 As discussed in {{challenge}}, clients SHOULD discard any context-bound tokens upon flushing
-cookies or changing networks, to prevent an Origin using the redemption context state as
+cookies or changing networks, to prevent an origin using the redemption context state as
 a cookie to recognize clients.
 
 Applications SHOULD constrain tokens to a single origin unless the use case can
