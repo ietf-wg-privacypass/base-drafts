@@ -218,7 +218,7 @@ for constructing the corresponding context are below. This list is not exhaustiv
   SHA256(current time window).
 - Context bound to a client location: Construct redemption context as
   SHA256(client IP address prefix).
-- Context bound to a given time window and location: Construct reemption
+- Context bound to a given time window and location: Construct redemption
   context as SHA256(current time window, client IP address prefix).
 
 An empty redemption context is not bound to any property of the client session.
