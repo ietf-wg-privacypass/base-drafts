@@ -192,7 +192,7 @@ origin_info field, the client MUST validate that the name of the origin
 that issued the authentication challenge is included in the list of origin
 names. Clients MAY have further restrictions and requirements around
 validating when a challenge is considered acceptable or valid. For example,
-clients can choose to reject challenges that list origin names for which 
+clients can choose to reject challenges that list origin names for which
 current connection is not authoritative (according to the TLS certificate).
 
 Note that it is possible for the WWW-Authenticate header to include multiple
@@ -348,6 +348,18 @@ party by another, as shown below.
                        Redemption ----------> /
 ~~~
 {: #fig-replay title="Token Architectural Components"}
+
+Token challenges that include non-empty origin_info bind tokens to one or more specific
+origins. As described in {{challenge}}, clients only accept such challenges from
+origin names listed in the origin_info string. Even if multiple origins are listed, a
+token can only be redeemed for an origin if the challenge has an exact match for
+the origin_info. For example, if "a.example.com" issues a challenge with an origin_info
+string of "a.example.com,b.example.com", a client could redeem a token fetched for this
+challenge if and only if "b.example.com" also included an origin_info string of
+"a.example.com,b.example.com". On the other hand, if "b.example.com" had an origin_info
+string of "b.example.com" or "b.example.com,a.example.com" or
+"a.example.com,b.example.com,c.example.com", the string would not match and the client
+would need to use a different token.
 
 Context-bound token challenges require clients to obtain matching tokens when challenged,
 rather than presenting a token that was obtained from a different context in the past. This
