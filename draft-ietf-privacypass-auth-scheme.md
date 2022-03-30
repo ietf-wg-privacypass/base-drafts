@@ -214,7 +214,7 @@ nonce, constructed from 32 freshly generated random bytes. It can also represent
 state or properties of the client session. Some example properties and methods
 for constructing the corresponding context are below. This list is not exhaustive.
 
-- Context bound to a given time window: Construct reemption context as
+- Context bound to a given time window: Construct redemption context as
   SHA256(current time window).
 - Context bound to a client location: Construct reemption context as
   SHA256(client IP address prefix).
