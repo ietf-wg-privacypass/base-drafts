@@ -188,10 +188,12 @@ Upon receipt of this challenge, a client uses the message and keys in the
 issuance protocol indicated by the token_type. If the TokenChallenge has a
 token_type the client does not recognize or support, it MUST NOT parse or
 respond to the challenge. If the TokenChallenge contains a non-empty
-origin_info field, the client SHOULD validate that the name of the origin
+origin_info field, the client MUST validate that the name of the origin
 that issued the authentication challenge is included in the list of origin
 names. Clients MAY have further restrictions and requirements around
-validating when a challenge is considered acceptable or valid.
+validating when a challenge is considered acceptable or valid. For example,
+clients can choose to reject challenges that list origin names for which 
+current connection is not authoritative (according to the TLS certificate).
 
 Note that it is possible for the WWW-Authenticate header to include multiple
 challenges, in order to allow the client to fetch a batch of multiple tokens
