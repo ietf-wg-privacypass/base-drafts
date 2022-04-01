@@ -1,6 +1,6 @@
 ---
 title: "Privacy Pass Architectural Framework"
-abbrev: PP architecture
+abbrev: Privacy Pass Architecture
 docname: draft-ietf-privacypass-architecture-latest
 date:
 category: info
