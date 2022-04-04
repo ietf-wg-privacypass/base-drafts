@@ -118,6 +118,19 @@ the "PrivateToken" scheme. This challenge includes a TokenChallenge message,
 along with information about what keys to use when requesting a token from
 the issuer.
 
+Origins that support this authentication scheme need to handle the following
+tasks:
+
+1. Select which issuer to use, and configure the issuer name and token-key to
+include in WWW-Authenticate challenges.
+
+1. Determine a redemption context construction to include in the TokenChallenge, as
+discussed in {{context-construction}}.
+
+1. Select the origin information to include in the TokenChallenge. This can
+be empty to allow fully cross-origin tokens, a single origin name that
+matches the origin itself, or a list of origin names containing the origin.
+
 The TokenChallenge message has the following structure:
 
 ~~~
@@ -195,23 +208,17 @@ validating when a challenge is considered acceptable or valid. For example,
 clients can choose to reject challenges that list origin names for which
 current connection is not authoritative (according to the TLS certificate).
 
-Note that it is possible for the WWW-Authenticate header to include multiple
-challenges, in order to allow the client to fetch a batch of multiple tokens
-for future use.
+Caching and pre-fetching of tokens is discussed in {{caching}}.
 
-For example, the WWW-Authenticate header could look like this:
+Note that it is possible for the WWW-Authenticate header to include multiple
+challenges. This allows the origin to indicate support for different token
+types, issuers, or to include multiple redemption contexts. For example,
+the WWW-Authenticate header could look like this:
 
 ~~~
 WWW-Authenticate: PrivateToken challenge=abc..., token-key=123...,
 PrivateToken challenge=def..., token-key=234...
 ~~~
-
-If a client fetches a batch of multiple tokens for future use that are bound
-to a specific redemption context (the redemption_context in the TokenChallenge
-was not empty), clients SHOULD discard these tokens upon flushing state such as
-HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or changing networks.
-Using these tokens in a context that otherwise would not be linkable to the
-original context could allow the origin to recognize a client.
 
 ### Redemption Context Construction {#context-construction}
 
@@ -229,6 +236,32 @@ for constructing the corresponding context are below. This list is not exhaustiv
   context as SHA256(current time window, client IP address prefix).
 
 An empty redemption context is not bound to any property of the client session.
+Preventing double spending on tokens requires the origin to keep state associated
+with the redemption context. The size of this state varies based on the size of the
+redemption context. For example, double spend state for unique, per-request redemption
+contexts does only needs to exist within the scope of the request connection or session.
+In contrast, double spend state for empty redemption contexts must be stored and shared
+across all requests until token-key expiration or rotation.
+
+### Token Caching {#caching}
+
+Clients can generate multiple tokens from a single TokenChallenge, and cache
+them for future use. This improves privacy by separating the time of token
+issuance from the time of token redemption, and also allows clients to avoid
+any overhead of receiving new tokens via the issuance protocol.
+
+Cached tokens can only be redeemed when they match all of the fields in the
+TokenChallenge: token_type, issuer_name, redemption_context, and origin_info.
+Clients ought to store cached tokens based on all of these fields, to
+avoid trying to redeem a token that does not match. Note that each token
+has a unique client nonce, which is sent in token redemption ({{redemption}}).
+
+If a client fetches a batch of multiple tokens for future use that are bound
+to a specific redemption context (the redemption_context in the TokenChallenge
+was not empty), clients SHOULD discard these tokens upon flushing state such as
+HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or changing networks.
+Using these tokens in a context that otherwise would not be linkable to the
+original context could allow the origin to recognize a client.
 
 ## Token Redemption {#redemption}
 
