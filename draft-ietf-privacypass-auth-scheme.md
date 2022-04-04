@@ -121,10 +121,10 @@ the issuer.
 Origins that support this authentication scheme need to handle the following
 tasks:
 
-1. Select which issuer to use, and fetch the issuer name and token-key to
+1. Select which issuer to use, and configure the issuer name and token-key to
 include in WWW-Authenticate challenges.
 
-1. Select a redemption context to include in the TokenChallenge, as
+1. Determine a redemption context construction to include in the TokenChallenge, as
 discussed in {{context-construction}}.
 
 1. Select the origin information to include in the TokenChallenge. This can
@@ -236,8 +236,12 @@ for constructing the corresponding context are below. This list is not exhaustiv
   context as SHA256(current time window, client IP address prefix).
 
 An empty redemption context is not bound to any property of the client session.
-Preventing double spending on tokens without any redemption context requires
-the origin to keep more state and check against a larger set of tokens.
+Preventing double spending on tokens requires the origin to keep state associated
+with the redemption context. The size of this state varies based on the size of the
+redemption context. For example, double spend state for unique, per-request redemption
+contexts does only needs to exist within the scope of the request connection or session.
+In contrast, double spend state for empty redemption contexts must be stored and shared
+across all requests until token-key expiration or rotation.
 
 ### Token Caching {#caching}
 
