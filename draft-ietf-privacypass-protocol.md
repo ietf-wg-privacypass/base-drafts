@@ -140,7 +140,7 @@ as shown in the figure below.
 
 ~~~
    Origin          Client                   Issuer
-                (pkI, info)            (skI, pkI, info)
+                    (pkI)                 (skI, pkI)
                   +------------------------------------\
   Challenge   ----> TokenRequest ------------->        |
                   |                       (evaluate)   |
@@ -161,8 +161,6 @@ Clients provide the following as input to the issuance protocol:
 - Challenge value `challenge`, an opaque byte string. For example, this might
   be provided by the redemption protocol in {{HTTP-Authentication}}.
 
-Both Client and Issuer also share a common public string called `info`.
-
 Given this configuration and these inputs, the two messages exchanged in
 this protocol are described below. This section uses notation described in
 {{OPRF, Section 4}}, including SerializeElement and DeserializeElement,
@@ -173,11 +171,11 @@ SerializeScalar and DeserializeScalar, and DeriveKeyPair.
 The Client first creates a context as follows:
 
 ~~~
-client_context = SetupPOPRFClient(0x0004, pkI)
+client_context = SetupVOPRFClient(0x0004, pkI)
 ~~~
 
 Here, 0x0004 is the two-octet identifier corresponding to the
-OPRF(P-384, SHA-384) ciphersuite in {{OPRF}}. SetupPOPRFClient
+OPRF(P-384, SHA-384) ciphersuite in {{OPRF}}. SetupVOPRFClient
 is defined in {{OPRF, Section 3.2}}.
 
 The Client then creates an issuance request message for a random value `nonce`
@@ -187,10 +185,10 @@ using the input challenge and Issuer key identifier as follows:
 nonce = random(32)
 context = SHA256(challenge)
 token_input = concat(0x0001, nonce, context, key_id)
-blind, blinded_msg, tweaked_key = client_context.Blind(nonce, info)
+blind, blinded_element = client_context.Blind(token_input)
 ~~~
 
-The Blind function is defined in {{OPRF, Section 3.3.3}}.
+The Blind function is defined in {{OPRF, Section 3.3.2}}.
 If the Blind function fails, the Client aborts the protocol. Otherwise,
 the Client then creates a TokenRequest structured as follows:
 
@@ -198,7 +196,7 @@ the Client then creates a TokenRequest structured as follows:
 struct {
    uint16_t token_type = 0x0001;
    uint8_t token_key_id;
-   uint8_t blinded_request[Ne];
+   uint8_t blinded_msg[Ne];
 } TokenRequest;
 ~~~
 
@@ -208,13 +206,13 @@ The structure fields are defined as follows:
 
 - "token_key_id" is the least significant byte of the `key_id`.
 
-- "blinded_request" is the Ne-octet blinded message defined above, computed as
-  `SerializeElement(blinded_msg)`. Ne is as defined in {{OPRF, Section 4}}.
+- "blinded_msg" is the Ne-octet blinded message defined above, computed as
+  `SerializeElement(blinded_element)`. Ne is as defined in {{OPRF, Section 4}}.
 
-The value `tweaked_key` is stored locally and used later as described in {{finalization}}.
-The Client then generates an HTTP POST request to send to the Issuer,
-with the TokenRequest as the body. The media type for this request
-is "message/token-request". An example request is shown below.
+The values `token_input` and `blinded_element` are stored locally and used later
+as described in {{finalization}}. The Client then generates an HTTP POST request
+to send to the Issuer, with the TokenRequest as the body. The media type for
+this request is "message/token-request". An example request is shown below.
 
 ~~~
 :method = POST
@@ -233,37 +231,39 @@ Upon receipt of the request, the Issuer validates the following conditions:
 
 - The TokenRequest contains a supported token_type.
 - The TokenRequest.token_key_id corresponds to a key ID of a Public Key owned by the issuer.
-- The TokenRequest.blinded_msg is of the correct size.
+- The TokenRequest.blinded_request is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
-to the Client, which will forward the error to the client.
+to the client.
 
 ## Issuer-to-Client Response {#private-response}
 
-If the Issuer is willing to produce a token token to the Client, the Issuer
-completes the issuance flow by computing a blinded response as follows:
+Upon receipt of a TokenRequest, the Issuer tries to deseralize TokenRequest.blinded_msg
+using DeserializeElement from {{Section 2.1 of OPRF}}, yielding `blinded_element`.
+If this fails, the Issuer MUST return an HTTP 400 error to the client. Otherwise, if the
+Issuer is willing to produce a token token to the Client, the Issuer completes the issuance
+flow by computing a blinded response as follows:
 
 ~~~
-server_context = SetupPOPRFServer(0x0004, skI, pkI)
-evaluate_msg, proof = server_context.Evaluate(skI,
-    TokenRequest.blinded_message, info)
+server_context = SetupVOPRFServer(0x0004, skI, pkI)
+evaluate_element, proof = server_context.Evaluate(skI, blinded_element)
 ~~~
 
-SetupPOPRFServer is in {{OPRF, Section 3.2}} and Evaluate is
-defined in {{OPRF, Section 3.3.3}}. The Issuer then creates
-a TokenResponse structured as follows:
+SetupVOPRFServer is in {{OPRF, Section 3.2}} and Evaluate is defined in
+{{OPRF, Section 3.3.2}}. The Issuer then creates a TokenResponse structured
+as follows:
 
 ~~~
 struct {
-   uint8_t evaluate_response[Nk];
+   uint8_t evaluate_msg[Nk];
    uint8_t evaluate_proof[Ns+Ns];
 } TokenResponse;
 ~~~
 
 The structure fields are defined as follows:
 
-- "evaluate_response" is the Ne-octet evaluated messaged, computed as
-  `SerializeElement(evaluated_msg)`.
+- "evaluate_msg" is the Ne-octet evaluated messaged, computed as
+  `SerializeElement(evaluate_element)`.
 
 - "evaluate_proof" is the (Ns+Ns)-octet serialized proof, which is a pair of Scalar values,
   computed as `concat(SerializeScalar(proof[0]), SerializeScalar(proof[1]))`,
@@ -283,17 +283,16 @@ content-length = <Length of TokenResponse>
 ## Finalization
 
 Upon receipt, the Client handles the response and, if successful, deserializes
-the body values TokenResponse.evaluate_response and TokenResponse.evaluate_proof.
-If deserialization of any value fails, the Client aborts the protocol.
-Otherwise, when deserialization yields `evaluated_msg` and `proof`, the Client
-processes the response as follows:
+the body values TokenResponse.evaluate_response and TokenResponse.evaluate_proof,
+yielding `evaluated_element` and `proof`. If deserialization of either value fails,
+the Client aborts the protocol. Otherwise, the Client processes the response as
+follows:
 
 ~~~
-authenticator = client_context.Finalize(context, blind, pkI,
-  evaluated_msg, blinded_msg, info, tweaked_key)
+authenticator = client_context.Finalize(token_input, blind, evaluated_element, blinded_element, proof)
 ~~~
 
-The Finalize function is defined in {{OPRF, Section 3.3.3}}. If this
+The Finalize function is defined in {{OPRF, Section 3.3.2}}. If this
 succeeds, the Client then constructs a Token as follows:
 
 ~~~
@@ -491,7 +490,7 @@ This document updates the "Token Type" Registry with the following values.
 
 | Value  | Name                   | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
 |:-------|:-----------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
-| 0x0001 | OPRF(P-384, SHA-384)   | N                   | Y               | N                | 48  | {{private-flow}} |
+| 0x0001 | VOPRF(P-384, SHA-384)  | N                   | N               | N                | 48  | {{private-flow}} |
 | 0x0002 | Blind RSA, 4096        | Y                   | N               | N                | 512 | {{public-flow}}  |
 {: #aeadid-values title="Token Types"}
 
@@ -662,7 +661,7 @@ specified in this document. {{test-vectors-poprf}} contains test vectors
 for token issuance protocol 1 (0x0001), and {{test-vectors-rsa}} contains
 test vectors for token issuance protocol 2 (0x0002).
 
-## Issuance Protocol 1 (POPRF) {#test-vectors-poprf}
+## Issuance Protocol 1 - VOPRF(P-384, SHA-384) {#test-vectors-poprf}
 
 The test vector below lists the following values:
 
@@ -681,33 +680,31 @@ The test vector below lists the following values:
   as a hexadecimal string.
 - token: The output Token from the protocol, represented as a hexadecimal string.
 
-The `info` parameter used when computing the token is the ASCII string "Privacy Pass".
-
 ~~~
-skS: accb1467936ba0c06500acc592633dd19c7d8cd752fc3975f6fd3123b993a703a84
-f0a7d88949bd41ec9c655459c9b47
-pkS: 03fa7bb43a5223538e3bfd06e817af754d6a950a86eb88a134dacbb3f5c4cff47e4
-a8a8f4cea5eb2cf162a913a985167f8
+skS: 0177781aeced893dccdf80713d318a801e2a0498240fdcf650304bbbfd0f8d3b5c0
+cf6cfee457aaa983ec02ff283b7a9
+pkS: 022c63f79ac59c0ba3d204245f676a2133bd6120c90d67afa05cd6f8614294b7366
+c252c6458300551b79a4911c2590a36
 challenge:
-f7e31518291770916d2164b7ec4a7a32698588fdaef0428812069b54dbc70bca
-nonce: ae576e03963659fe07badeccb21967ad5d893e09a1ad71635367d87fb932ca39
-blind: 4a13636159a6769241dcb439d7e2ff604ce971d217edb20f1f8ad7b28faf841e5
-1688a95e722554d2ea796f40c010c4c
-token_request: 000178036e06b416f09c58bd9ca0a6c5d60391e0d993fc2ffdea33963
-f3c7d6c421a8c36d9b1d2f1164fd94a4be70651d1745e01
-token_response: 036544d94b1e2b3518bcbf6a80e85779f516406c5b41d1c2d35e6f22
-dc7d61708736f0768a3bc7313f42e06be5674db27cc2af138521a9dc979ea2ca4636bec9
-0d21258aba98e4f322ec4a443bf8976fe5529dd92dd60c2e6f3c9030fcdb2621bf0e25c5
-0d9deb319df250a9ec40ec121e1852f2365007ca0b330cb9edbff46daa89087fc3d8cf2f
-d33979c2a6d8f64fed
-token: 0001ae576e03963659fe07badeccb21967ad5d893e09a1ad71635367d87fb932c
-a39ebecc2a0a1a2beef6f8457a256501ff3d943f9a18a507f21069bd960542420b178d37
-692bdb29cedf2e6c44adc55d7b8909584e5a9096005aeb5b8913a69c681e7a5d48fd687f
-fb181512ba16d6472489b363ad84047b4e1701d50f30fa03516eae4ca715698f37c68d16
-0c7ffb0dbd4
+a5d46383359ef34e3c4a7b8d1b3165778bffc9b70c9e6a60dd14143e4c9c9fbd
+nonce: 5d4799f8338ddc50a6685f83b8ecd264b2f157015229d12b3384c0f199efe7b8
+blind: 0322fec505230992256296063d989b59cc03e83184eb6187076d264137622d202
+48e4e525bdc007b80d1560e0a6f49d9
+token_request: 00011a02861fd50d14be873611cff0131d2c872c79d0260c6763498a2
+a3f14ca926009c0f247653406e1d52b68d61b7ed2bac9ea
+token_response: 038e3625b6a769668a99680e46cf9479f5dc1e86d57164ab3b4a569d
+dfc486bf1485d4916a5194fdc0518d3e8444968421ba36e8144aa7902705ff0f3cf40586
+3d69451a2a7ba210cc45760c2f1a6045134d877b39e8bcbbf920e5de4a3372557debf211
+765cd969976860bc039f9082d6a3e03f8e891246240173d2cf3d69a4613b0f8415979029
+22e74c7a1f2e4639e4
+token: 00015d4799f8338ddc50a6685f83b8ecd264b2f157015229d12b3384c0f199efe
+7b8742cdfb0ed756ea680868ef109a280a393e001d2fa56b1be46ecb31fa25e76731a5b1
+d698ea7ab843b8e8a71ed9b2fffa70457a43a8fc687939424b29a7554b40fde130ab7a82
+2715909cb73f99a45b640ca1c85180ba9ca1a40bab8b664406a34bcbc63b5e2e5c455cea
+00001a968f7
 ~~~
 
-## Issuance Protocol 2 (Blind RSA) {#test-vectors-rsa}
+## Issuance Protocol 2 - Blind RSA, 4096 {#test-vectors-rsa}
 
 The test vector below lists the following values:
 
