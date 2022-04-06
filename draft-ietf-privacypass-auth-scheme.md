@@ -331,24 +331,6 @@ the context can be used to verify token uniqueness.
 If a client is unable to fetch a token, it MUST react to the challenge as
 if it could not produce a valid Authorization response.
 
-# Issuance Protocol Requirements
-
-Clients initiate the issuance protocol using a challenge, a randomly
-generated nonce, and a public key for the issuer. The issuance protocol
-itself can be any interactive protocol between client, issuer, or other
-parties that produces a valid authenticator over the client's input, subject
-to the following security requirements.
-
-1. Unconditional input secrecy. The issuance protocol MUST NOT reveal anything
-about the client's private input, including the challenge and nonce. The issuance
-protocol can reveal the issuer public key for the purposes of determining which
-private key to use in producing the issuance protocol. A result of this property
-is that the redemption flow is unlinkable from the issuance flow.
-1. One-more forgery security. The issuance protocol MUST NOT allow malicious
-clients to forge tokens without interacting with the issuer directly.
-1. Concurrent security. The issuance protocol MUST be safe to run concurrently
-with arbitrarily many clients.
-
 # User Interaction
 
 When used in contexts like websites, origins that challenge clients for
