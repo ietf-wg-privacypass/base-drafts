@@ -475,7 +475,8 @@ The initial contents for this registry are defined in the table below.
 This section includes test vectors for the challenge and redemption functionalities
 described in {{challenge}} and {{redemption}}. Each test vector lists the following values:
 
-- token_type: The type of token issuance protocol, a value from {{token-types}}.
+- token_type: The type of token issuance protocol, a value from {{token-types}}. For these test vectors,
+  token_type is 0x0002, corresponding to the issuance protocol in {{?ISSUANCE=I-D.ietf-privacypass-protocol}}.
 - issuer_name: The name of the issuer in the TokenChallenge structure, represented as a hexadecimal string.
 - redemption_context: The redemption context in the TokenChallenge structure, represented as a hexadecimal string.
 - origin_info: The origin info in the TokenChallenge structure, represented as a hexadecimal string.
