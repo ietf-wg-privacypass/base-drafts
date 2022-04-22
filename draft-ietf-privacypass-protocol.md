@@ -468,10 +468,14 @@ Otherwise, the Client aborts the protocol.
 ## Issuer Configuration {#public-issuer-configuration}
 
 Issuers are configured with Private and Public Key pairs, each denoted skI and
-pkI, respectively, used to produce tokens. Each key pair MUST be generated as
-as a valid 4096-bit RSA private key according to [TODO]. The key identifier
-for a keypair (skI, pkI), denoted `key_id`, is computed as SHA256(encoded_key),
-where encoded_key is a DER-encoded SubjectPublicKeyInfo object carrying pkI.
+pkI, respectively, used to produce tokens. Each key pair SHALL be generated as
+as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}.
+
+The key identifier for a keypair (skI, pkI), denoted `key_id`, is computed as
+SHA256(encoded_key), where encoded_key is a DER-encoded SubjectPublicKeyInfo
+(SPKI) object carrying pkI. The SPKI object MUST use the RSASSA-PSS OID {{RFC5756}},
+which specifies the hash algorithm and salt size. The salt size MUST match the
+output size of the hash function associated with the public key and token type.
 
 # Security considerations
 
@@ -488,10 +492,13 @@ to the Architecture document {{I-D.ietf-privacypass-architecture}}.
 
 This document updates the "Token Type" Registry with the following values.
 
-| Value  | Name                   | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
-|:-------|:-----------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
-| 0x0001 | VOPRF(P-384, SHA-384)  | N                   | N               | N                | 48  | {{private-flow}} |
-| 0x0002 | Blind RSA, 4096        | Y                   | N               | N                | 512 | {{public-flow}}  |
+| Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
+|:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
+| 0x0001 | VOPRF (P-384, SHA-384)         | N                   | N               | N                | 48  | {{private-flow}} |
+| 0x0001 | VOPRF (P-521, SHA-512)         | N                   | N               | N                | 64  | {{private-flow}} |
+| 0x0011 | Blind RSA (SHA-256, 4096-bit)  | Y                   | N               | N                | 512 | {{public-flow}}  |
+| 0x0012 | Blind RSA (SHA-384, 4096-bit)  | Y                   | N               | N                | 512 | {{public-flow}}  |
+| 0x0013 | Blind RSA (SHA-512, 4096-bit)  | Y                   | N               | N                | 512 | {{public-flow}}  |
 {: #aeadid-values title="Token Types"}
 
 ## Media Types
