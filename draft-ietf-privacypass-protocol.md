@@ -495,10 +495,7 @@ This document updates the "Token Type" Registry with the following values.
 | Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
 |:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
 | 0x0001 | VOPRF (P-384, SHA-384)         | N                   | N               | N                | 48  | {{private-flow}} |
-| 0x0001 | VOPRF (P-521, SHA-512)         | N                   | N               | N                | 64  | {{private-flow}} |
-| 0x0011 | Blind RSA (SHA-256, 4096-bit)  | Y                   | N               | N                | 512 | {{public-flow}}  |
-| 0x0012 | Blind RSA (SHA-384, 4096-bit)  | Y                   | N               | N                | 512 | {{public-flow}}  |
-| 0x0013 | Blind RSA (SHA-512, 4096-bit)  | Y                   | N               | N                | 512 | {{public-flow}}  |
+| 0x0002 | Blind RSA (SHA-384, 4096-bit)  | Y                   | N               | N                | 512 | {{public-flow}}  |
 {: #aeadid-values title="Token Types"}
 
 ## Media Types
