@@ -204,7 +204,7 @@ The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-- "token_key_id" is the least significant byte of the `key_id`.
+- "token_key_id" is the least significant byte of the `key_id` in network byte order.
 
 - "blinded_msg" is the Ne-octet blinded message defined above, computed as
   `SerializeElement(blinded_element)`. Ne is as defined in {{OPRF, Section 4}}.
@@ -380,7 +380,7 @@ The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-- "token_key_id" is the least significant byte of the `key_id`.
+- "token_key_id" is the least significant byte of the `key_id` in network byte order.
 
 - "blinded_msg" is the Nk-octet request defined above.
 
