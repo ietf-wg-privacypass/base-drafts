@@ -473,7 +473,7 @@ as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}.
 
 The key identifier for a keypair (skI, pkI), denoted `key_id`, is computed as
 SHA256(encoded_key), where encoded_key is a DER-encoded SubjectPublicKeyInfo
-(SPKI) object carrying pkI. The SPKI object MUST use the RSASSA-PSS OID {{RFC5756}},
+(SPKI) object carrying pkI. The SPKI object MUST use the RSASSA-PSS OID {{!RFC5756}},
 which specifies the hash algorithm and salt size. The salt size MUST match the
 output size of the hash function associated with the public key and token type.
 
