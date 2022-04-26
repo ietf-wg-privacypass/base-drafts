@@ -132,7 +132,7 @@ Clients receive challenges for tokens, as described in {{!AUTHSCHEME=I-D.pauly-p
 The basic token issuance protocols described in this document can be
 interactive or non-interactive, and per-origin or cross-origin.
 
-# Issuance Protocol for Privately Verifiable Tokens with Public Metadata {#private-flow}
+# Issuance Protocol for Privately Verifiable Tokens {#private-flow}
 
 The Privacy Pass issuance protocol is a two message protocol that takes
 as input a challenge from the redemption protocol and produces a token,
