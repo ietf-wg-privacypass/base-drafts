@@ -458,22 +458,22 @@ The initial contents for this registry are defined in the table below.
 | Value  | Name                   | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Nid | Reference     |
 |:-------|:-----------------------|:--------------------|:----------------|:-----------------|:----|:----|:--------------|
 | 0x0000 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x0A0A | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x1A1A | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x2A2A | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x3A3A | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x4A4A | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x5A5A | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x6A6A | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x7A7A | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x8A8A | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x9A9A | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xAAAA | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xBABA | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xCACA | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xDADA | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xEAEA | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xFAFA | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x02AA | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x1132 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x2E96 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x3CD3 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x4473 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x5A63 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x6D32 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x7F3F | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x8D07 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x916B | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xA6A4 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xBEAB | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xC3F3 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xDA42 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xE944 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xF057 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
 {: #aeadid-values title="Token Types"}
 
 --- back
