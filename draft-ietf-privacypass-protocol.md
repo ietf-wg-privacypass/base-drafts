@@ -125,7 +125,9 @@ Each "token-keys" JSON object contains the following fields and corresponding ra
 | token-key    | The base64url encoding of the public key for use with the issuance protocol, including padding, as a JSON string |
 
 Issuers MAY advertise multiple token-keys for the same token-type to
-support key rotation.
+support key rotation. In this case, Issuers indicate preference for which
+token key to use based on the order of keys in the list, with preference
+given to keys earlier in the list.
 
 Altogether, the Issuer's JSON directory could look like:
 
@@ -136,12 +138,10 @@ Altogether, the Issuer's JSON directory could look like:
       {
         "token-type": 2,
         "token-key": "MI...AB",
-        "version": 1,
       },
       {
         "token-type": 2,
         "token-key": "MI...AQ",
-        "version": 2,
       }
     ]
  }
