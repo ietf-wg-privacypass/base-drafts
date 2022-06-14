@@ -124,14 +124,25 @@ Each "token-keys" JSON object contains the following fields and corresponding ra
 | token-type   | Integer value of the Token Type, as defined in {{token-type}}, as a JSON number |
 | token-key    | The base64url encoding of the public key for use with the issuance protocol, including padding, as a JSON string |
 
-As an example, the Issuer's JSON directory could look like:
+Issuers MAY advertise multiple token-keys for the same token-type to
+support key rotation.
+
+Altogether, the Issuer's JSON directory could look like:
 
 ~~~
  {
     "issuer-request-uri": "https://issuer.example.net/example-token-request",
     "token-keys": [
-      "token-type": 2,
-      "token-key": "MI...AB",
+      {
+        "token-type": 2,
+        "token-key": "MI...AB",
+        "version": 1,
+      },
+      {
+        "token-type": 2,
+        "token-key": "MI...AQ",
+        "version": 2,
+      }
     ]
  }
 ~~~
