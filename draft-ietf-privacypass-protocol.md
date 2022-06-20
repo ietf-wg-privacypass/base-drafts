@@ -102,24 +102,48 @@ before being sent across the wire.
 
 # Configuration {#setup}
 
-Issuers MUST provide one parameter for configuration:
+Issuers MUST provide two parameters for configuration:
 
 1. Issuer Request URI: a token request URL for generating access tokens.
    For example, an Issuer URL might be https://issuer.example.net/example-token-request.
    This parameter uses resource media type "text/plain".
+2. Issuer Public Key values: an Issuer Public Key for an issuance protocol.
 
 The Issuer parameters can be obtained from an Issuer via a directory object, which is a JSON
-object whose field names and values are raw values and URLs for the parameters.
+object whose values are other JSON objects and URLs for the parameters.
 
-| Field Name           | Value                                            |
-|:---------------------|:-------------------------------------------------|
-| issuer-request-uri   | Issuer Request URI resource URL as a JSON string |
+| Field Name           | Value                                                  |
+|:---------------------|:-------------------------------------------------------|
+| issuer-request-uri   | Issuer Request URI resource URL as a JSON string       |
+| token-keys           | List of Issuer Public Key values, each as JSON objects |
 
-As an example, the Issuer's JSON directory could look like:
+Each "token-keys" JSON object contains the following fields and corresponding raw values.
+
+| Field Name   | Value                                                  |
+|:-------------|:-------------------------------------------------------|
+| token-type   | Integer value of the Token Type, as defined in {{token-type}}, as a JSON number |
+| token-key    | The base64url encoding of the public key for use with the issuance protocol, including padding, as a JSON string |
+
+Issuers MAY advertise multiple token-keys for the same token-type to
+support key rotation. In this case, Issuers indicate preference for which
+token key to use based on the order of keys in the list, with preference
+given to keys earlier in the list.
+
+Altogether, the Issuer's JSON directory could look like:
 
 ~~~
  {
-    "issuer-request-uri": "https://issuer.example.net/example-token-request"
+    "issuer-request-uri": "https://issuer.example.net/example-token-request",
+    "token-keys": [
+      {
+        "token-type": 2,
+        "token-key": "MI...AB",
+      },
+      {
+        "token-type": 2,
+        "token-key": "MI...AQ",
+      }
+    ]
  }
 ~~~
 
