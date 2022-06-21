@@ -443,11 +443,37 @@ Template:
 * Nid: The length of the token key identifier
 * Reference: Where this algorithm is defined
 
+This document defines several Reserved values, which can be used by clients and servers
+to send "greased" values in token challenges and responses to ensure that implementations
+remain able to handle unknown token types gracefully (this technique is inspired by
+{{?RFC8701}}). Implemenations SHOULD select reserved values at random when including
+them in greased messages. Servers can include these in TokenChallenge structures, either
+as the only challenge when no real token type is desired, or as one challenge in a list
+of challenges that include real values. Clients can include these in Token structures
+when they are not able to present a real token response. The contents of the Token
+structure SHOULD be filled with random bytes when using greased values.
+
 The initial contents for this registry are defined in the table below.
 
-| Value  | Name                   | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Nid | Reference    |
-|:-------|:-----------------------|:--------------------|:----------------|:-----------------|:----|:----|:-------------|
-| 0x0000 | (reserved)             | N/A                 | N/A             | N/A              | N/A | N/A | N/A          |
+| Value  | Name                   | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Nid | Reference     |
+|:-------|:-----------------------|:--------------------|:----------------|:-----------------|:----|:----|:--------------|
+| 0x0000 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x02AA | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x1132 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x2E96 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x3CD3 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x4473 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x5A63 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x6D32 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x7F3F | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x8D07 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0x916B | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xA6A4 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xBEAB | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xC3F3 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xDA42 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xE944 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xF057 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
 {: #aeadid-values title="Token Types"}
 
 --- back
