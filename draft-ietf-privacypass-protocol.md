@@ -360,8 +360,8 @@ in two important ways:
 1. The issuance protocol does not admit public or private metadata to bind
    additional context to tokens.
 
-The former property means that any Origin can select the Issuer to produce tokens provided
-the Origin has the Issuer public key, without explicit coordination or permission
+The first property means that any Origin can select a given Issuer to produce tokens, as long
+as the Origin has the Issuer public key, without explicit coordination or permission
 from the Issuer. This is because the Issuer does not learn the Origin that requested
 the token during the issuance protocol.
 
