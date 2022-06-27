@@ -36,9 +36,6 @@ author:
 normative:
   RFC2119:
   RFC8446:
-  HTTP-Authentication:
-    title: The Privacy Pass HTTP Authentication Scheme
-    target: https://datatracker.ietf.org/doc/html/draft-pauly-privacypass-auth-scheme-00
 
 informative:
   PPEXT:
@@ -188,8 +185,8 @@ associated with the redemption event, such as the timestamp of the event,
 Client visible information (including the IP address), and the Origin name.
 
 The challenge controls the type of token that the Origin will accept for the
-given resource. As described in {{HTTP-Authentication}}, there are a number
-of ways in which the token may vary, including:
+given resource. As described in {{?HTTP-Authentication=I-D.ietf-privacypass-auth-scheme}},
+there are a number of ways in which the token may vary, including:
 
 - Issuance protocol. The token identifies the type of issuance protocol
   required for producing the token. Different issuance protocols have different
@@ -268,9 +265,12 @@ Each Issuance protocol MUST come with a detailed analysis of the privacy impacts
 of the protocol, why these impacts are justified, and guidelines on changes to
 the parametrization in {{parametrization}}.
 
-The mechanism by which clients obtain the Issuer public key is not specified.
-Clients may be configured with this key or they may discover it via some other
-form. See {{?CONSISTENCY=I-D.wood-key-consistency}}.
+Clients obtain the Issuer public key directly from the Origin using the process
+described in {{HTTP-Authentication}}. Clients MAY apply some form of key consistency
+check to determine if this public key is consistency and correct for the specified
+Issuer. See {{?CONSISTENCY=I-D.wood-key-consistency}} for example mechanisms.
+Depending on the deployment, the Attester may be able to assist the Client in applying
+these consistency checks across clients.
 
 Depending on the use case, issuance may require some form of Client
 anonymization service similar to an IP-hiding proxy so that Issuers cannot
@@ -505,8 +505,8 @@ context for the Client, which can be separate from the Origin's redemption conte
 
 For certain types of issuance protocols, this model separates attestation and redemption
 contexts. However, Issuance protocols that require the Issuer to learn information about
-the Origin, such as that which is described in [rate-limited], are not appropriate
-since they could link attestation and redemption contexts through the Origin name.
+the Origin, such as that which is described in {{?RATE-LIMITED=I-D.privacypass-rate-limit-tokens}},
+are not appropriate since they could link attestation and redemption contexts through the Origin name.
 
 ## Joint Origin and Issuer {#deploy-joint-origin}
 
@@ -587,7 +587,7 @@ as shown in the figure below.
 
 This is the most general deployment model, and is necessary for some
 types of issuance protocols where the Attester plays a role in token
-issuance; see [rate-limited] for one such type of issuance protocol.
+issuance; see {{RATE-LIMITED}} for one such type of issuance protocol.
 In this model, the Attester, Issuer, and Origin have a separate view
 of the Client: the Attester sees potentially sensitive Client identifying
 information, such as account identifiers or IP addresses, the Issuer
