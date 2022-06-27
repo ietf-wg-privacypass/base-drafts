@@ -197,7 +197,7 @@ there are a number of ways in which the token may vary, including:
 - Redemption context. Tokens can be redeemed for a given redemption context.
   An empty redemption context effectively means tokens can be issued and redeemed
   non-interactively, whereas a fresh and random redemption context means that
-  the redeemed token must be issued interactively. See {{Section 2.1.1 of HTTP-Authentcation}}
+  the redeemed token must be issued interactively. See {{Section 2.1.1 of HTTP-Authentication}}
   for more details.
 - Per-origin or cross-origin. Tokens can be constrained to the Origin for
   which the challenge originated, or can be used across Origins.
