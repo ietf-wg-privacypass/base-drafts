@@ -356,13 +356,19 @@ for producing publicly verifiable tokens. It differs from the previous variant
 in two important ways:
 
 1. The output tokens are publicly verifiable by anyone with the Issuer public
-   key; and
+   key.
 1. The issuance protocol does not admit public or private metadata to bind
    additional context to tokens.
 
-Otherwise, this variant is nearly identical. In particular, Issuers provide a
-Private and Public Key, denoted skI and pkI, respectively, used to produce tokens
-as input to the protocol. See {{public-issuer-configuration}} for how this key
+The first property means that any Origin can select a given Issuer to produce tokens, as long
+as the Origin has the Issuer public key, without explicit coordination or permission
+from the Issuer. This is because the Issuer does not learn the Origin that requested
+the token during the issuance protocol.
+
+Beyond these differences, the publicly verifiable issuance protocol variant is nearly
+identical to the privately verifiable issuance protocol variant. In particular, Issuers
+provide a Private and Public Key, denoted skI and pkI, respectively, used to produce
+tokens as input to the protocol. See {{public-issuer-configuration}} for how this key
 pair is generated.
 
 Clients provide the following as input to the issuance protocol:
