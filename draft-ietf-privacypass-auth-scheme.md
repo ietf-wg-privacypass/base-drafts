@@ -243,6 +243,14 @@ contexts does only needs to exist within the scope of the request connection or 
 In contrast, double spend state for empty redemption contexts must be stored and shared
 across all requests until token-key expiration or rotation.
 
+Origins that share redemption contexts, i.e., by using the same redemption context,
+choosing the same issuer, and providing the same origin_info field in the TokenChallenge,
+must necessarily share state required to enforce double spend prevention. Origins
+should consider the operational complexity of this shared state before choosing
+to share redemption contexts. Failure to successfully synchronize this state and use
+it for double spend prevention can allow Clients to redeem tokens to one Origin that
+were issued after an interaction with another Origin that shares the context.
+
 ### Token Caching {#caching}
 
 Clients can generate multiple tokens from a single TokenChallenge, and cache

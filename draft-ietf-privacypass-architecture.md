@@ -194,18 +194,20 @@ there are a number of ways in which the token may vary, including:
   are publicly verifiable, whereas others may not have this property.
 - Issuer identity. Tokens identify which issuers are trusted for a given
   issuance protocol.
-- Interactive or non-interactive. Tokens can either be interactive or not.
-  An interactive token is one which requires a freshly issued token based
-  on the challenge, whereas a non-interactive token can be issued proactively
-  and cached for future use.
+- Redemption context. Tokens can be redeemed for a given redemption context.
+  An empty redemption context effectively means tokens can be issued and redeemed
+  non-interactively, whereas a fresh and random redemption context means that
+  the redeemed token must be issued interactively. See {{Section 2.1.1 of HTTP-Authentcation}}
+  for more details.
 - Per-origin or cross-origin. Tokens can be constrained to the Origin for
   which the challenge originated, or can be used across Origins.
 
 Depending on the use case, Origins may need to maintain state to track
-redeemed tokens. For example, Origins that accept non-interactive,
-cross-origin tokens SHOULD track which tokens have been redeemed already,
-since these tokens can be issued and then spent multiple times in
-response to any such challenge. See {{double-spend}} for discussion.
+redeemed tokens. For example, Origins that accept cross-origin
+across shared redemption contexts tokens SHOULD track which tokens
+have been redeemed already in those redemption contexts, since these
+tokens can be issued and then spent multiple times in response to any
+such challenge. See {{Section 2.1.1 of HTTP-Authentication}} for discussion.
 
 Origins that admit cross-origin tokens bear some risk of allowing tokens
 issued for one Origin to be spent in an interaction with another Origin.
@@ -466,9 +468,8 @@ that Clients authenticate with some type of application-layer account, are not a
 as they could be used to learn or reconstruct a Client's browsing history.
 
 Attestation and redemption context unlinkability requires that these events be separated
-over time, e.g., through the use of non-interactive tokens that can be issued without
-a fresh Origin challenge, or over space, e.g., through the use of an anonymizing proxy
-when connecting to the Origin.
+over time, e.g., through the use of tokens with an empty redemption context,
+or over space, e.g., through the use of an anonymizing proxy when connecting to the Origin.
 
 ## Joint Attester and Issuer {#deploy-joint-issuer}
 
@@ -786,17 +787,6 @@ more opportunities to switch between attestation participants.
 
 We present a number of security considerations that prevent malicious
 Clients from abusing the protocol.
-
-## Double-spend Protection {#double-spend}
-
-When applicable for non-interactive tokens, all Origins SHOULD implement a
-robust storage-query mechanism for checking that tokens sent by clients have
-not been spent before. Such tokens only need to be checked for each Origin
-individually. But all Origins must perform global double-spend checks to avoid
-clients from exploiting the possibility of spending tokens more than once
-against distributed token checking systems. For the same reason, the global
-data storage must have quick update times. While an update is occurring it
-may be possible for a malicious client to spend a token more than once.
 
 ## Token Exhaustion
 
