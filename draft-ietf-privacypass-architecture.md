@@ -197,11 +197,12 @@ of ways in which the token may vary, including:
   are publicly verifiable, whereas others may not have this property.
 - Issuer identity. Tokens identify which issuers are trusted for a given
   issuance protocol.
-- Redemption context. Tokens can be redeemed for a given redemption context.
-  An empty redemption context effectively means tokens can be issued and redeemed
-  non-interactively, whereas a fresh and random redemption context means that
-  the redeemed token must be issued interactively. See 2.1.1 of {{HTTP-Authentication}}
-  for more details.
+- Redemption context. Tokens can be bound to a given redemption context, which
+  influences a client's ability to pre-fetch and cache tokens. For example,
+  an empty redemption context always allows tokens to be issued and redeemed
+  non-interactively, whereas a a fresh and random redemption context means
+  that the redeeme token must be issued only after the client receives the challenge.
+  See Section 2.1.1 of {{HTTP-Authentication}} for more details.
 - Per-origin or cross-origin. Tokens can be constrained to the Origin for
   which the challenge originated, or can be used across Origins.
 
@@ -210,7 +211,7 @@ redeemed tokens. For example, Origins that accept cross-origin
 across shared redemption contexts tokens SHOULD track which tokens
 have been redeemed already in those redemption contexts, since these
 tokens can be issued and then spent multiple times in response to any
-such challenge. See {{Section 2.1.1 of HTTP-Authentication}} for discussion.
+such challenge. See Section 2.1.1 of {{HTTP-Authentication}} for discussion.
 
 Origins that admit cross-origin tokens bear some risk of allowing tokens
 issued for one Origin to be spent in an interaction with another Origin.
