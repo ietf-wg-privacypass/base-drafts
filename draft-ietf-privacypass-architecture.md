@@ -764,6 +764,24 @@ hit:
   Output resp
 ~~~
 
+## Centralization
+
+A consequence of limiting the number of participants (Attesters or Issuers)
+in Privacy Pass deployments for meaningful privacy is that it forces
+concentrated centralization amongst those participants.
+{{?CENTRALIZATION=I-D.nottingham-avoiding-internet-centralization}} discusses
+several ways in which this might be mitigated. For example, a multi-stakeholder
+governance model could be established to determine what participants are
+fit to operate as participants in a Privacy Pass deployment. This is precisely
+the model used to control the Web's trust model.
+
+Alternatively, Privacy Pass deployments might mitigate this problem through
+implementation. For example, rather than centralize the role of attestation
+in one or few entities, attestation could be a distributed function performed
+by a quorum of many parties, provided that neither Issuers nor Origins learn
+which attester implementations were chosen. As a result, clients could have
+more opportunities to switch between attestation participants.
+
 # Security Considerations {#security}
 
 We present a number of security considerations that prevent malicious
