@@ -265,8 +265,8 @@ without interacting with the Issuer directly.
 with arbitrarily many Clients.
 
 Each Issuance protocol MUST come with a detailed analysis of the privacy impacts
-of the protocol, why these impacts are justified, and guidelines on changes to
-the parametrization in {{parametrization}}.
+of the protocol, why these impacts are justified, and guidelines on how to deploy
+the protocol to minimize any privacy impacts.
 
 Clients obtain the Issuer public key directly from the Origin using the process
 described in {{HTTP-Authentication}}. Clients MAY apply some form of key consistency
@@ -381,10 +381,7 @@ or otherwise expired keys. Alternatively, Issuers may include expiration
 information as metadata alongside the token; See {{metadata}} for more
 discussion about metadata constraints. Both techniques are equivalent
 since they cryptographically bind expiration to individual tokens.
-
-Key rotations should be limited in frequency for similar reasons. See
-{{parametrization}} for guidelines on what frequency of key rotations
-are permitted.
+Key rotations should be limited in frequency for similar reasons.
 
 ### Metadata {#metadata}
 
@@ -393,8 +390,7 @@ metadata to be cryptographically bound to a token. As an example, one
 trivial way to include public metadata is to assign a unique issuer
 public key for each value of metadata, such that N keys yields log2(N)
 bits of metadata. The total amount of metadata bits included in a token
-is the sum of public and private metadata bits. See {{parametrization}}
-for discussion about metadata limits.
+is the sum of public and private metadata bits.
 
 Public metadata is that which clients can observe as part of the token
 issuance flow. Public metadata can either be transparent or opaque. For
@@ -422,7 +418,7 @@ The Privacy Pass protocol and ecosystem are both intended to be receptive to
 extensions that expand the current set of functionalities through new issuance
 protocols. Each issuance protocol SHOULD come with a detailed analysis of the
 privacy impacts of the extension, why these impacts are justified, and
-guidelines on changes to the parametrization in {{parametrization}}.
+guidelines on how to deploy the protocol to minimize any privacy impacts.
 Any extension to the Privacy Pass protocol MUST adhere to the guidelines
 specified in {{issuer-role}} for managing Issuer public key data.
 
@@ -630,9 +626,8 @@ redemption tokens must be taken into account -- together with the bits
 of information that Issuer's may learn about Clients otherwise. Since this
 metadata may be useful for practical deployments of Privacy Pass, Issuers
 must balance this against the reduction in Client privacy. In general,
-Issuers should permit no more than 32 bits of metadata, as this can
-uniquely identify each possible user. We discuss this more in
-{{parametrization}}.
+Issuers should bound the metadata permitted so as to not allow it to uniquely
+identify each possible user.
 
 ## Issuer Key Rotation
 
@@ -681,9 +676,8 @@ In cases where clients can hold tokens for all Issuers at any given
 time, a strict bound SHOULD be applied to the active number of Issuers
 in the ecosystem. We propose that allowing no more than 4 Issuers at any
 one time is highly preferable (leading to a maximum of 64 possible user
-segregations). However, as highlighted in {{parametrization}}, having a
-very large user base (> 5 million users), could potentially allow for
-larger values. Issuer replacements should only occur with the same
+segregations). However, having a very large user base could potentially
+allow for larger values. Issuer replacements should only occur with the same
 frequency as config rotations as they can lead to similar losses in
 anonymity if clients still hold redemption tokens for previously active
 Issuers.
@@ -802,95 +796,6 @@ If tokens are cross-Origin, Clients should use alternate methods to prevent
 many tokens from being redeemed at once. For example, if the Origin requests
 an excess of tokens, the Client could choose to not present any tokens for
 verification if a redemption had already occurred in a given time window.
-
-# Protocol Parameterization {#parametrization}
-
-This section provides a summary of the parameters used in the Privacy Pass
-protocol ecosystem. These parameters are informed by both
-privacy and security considerations that are highlighted in {{privacy}}
-and {{security}}, respectively. These parameters are intended as a single
-reference point for those implementing the protocol.
-
-Firstly, let U be the total number of Clients (or users), I be the total number
-of Issuers. We let M be the total number of metadata bits that are allowed
-to be added by any given Issuer. Assuming that each user accept tokens
-from a uniform sampling of all the possible Issuers, as a worst-case
-analysis, this segregates Clients into a total of 2^I buckets. As such, we
-see an exponential reduction in the size of the anonymity set for any
-given user. This allows us to specify the privacy constraints of the
-protocol below, relative to the setting of A.
-
-| parameter | value |
-|---|---|
-| Minimum anonymity set size (A) | 5000 |
-| Recommended key lifetime (L) | 2 - 24 weeks |
-| Recommended key rotation frequency (F) | L/2 |
-| Maximum additional metadata bits (M) | 1 |
-| Maximum allowed Issuers (I) | (log_2(U/A)-1)/2 |
-| Maximum active issuance keys | 1 |
-| Maximum active redemption keys | 2 |
-| Minimum cryptographic security parameter | 128 bits |
-
-## Justification
-
-We make the following assumptions in these parameter choices.
-
-- Inferring the identity of a user in a 5000-strong anonymity set is
-  difficult.
-- After 2 weeks, all Clients in a system will have rotated to the new
-  key.
-
-In terms of additional metadata, the only concrete applications of
-Privacy Pass that use additional metadata require just a single bit.
-Therefore, we set the ceiling of permitted metadata to 1 bit for now,
-this may be revisited in future revisions.
-
-The maximum choice of I is based on the equation 1/2 * U/2^(2I) = A.
-This is derived from the fact that permitting I Issuers lead to 2^I
-segregations of the total user-base U. Moreover, if we permit M = 1,
-then this effectively halves the anonymity set for each Issuer, and thus
-we incur a factor of 2I in the exponent. By reducing I, we limit the
-possibility of performing the attacks mentioned in {{privacy}}.
-
-We must also account for each user holding issued data for more then one
-possible active keys. While this may also be a vector for monitoring the
-access patterns of Clients, it is likely to unavoidable that Clients
-hold valid issuance data for the previous key epoch. This also means
-that the Issuer can continue to verify redemption data for a previously
-used key. This makes the rotation period much smoother for Clients.
-
-For privacy reasons, it is recommended that key epochs are chosen that
-limit Clients to holding issuance data for a maximum of two keys. By
-choosing F = L/2 then the minimum value of F is a week, since the
-minimum recommended value of L is 2 weeks. Therefore, by the initial
-assumption, then all users should only have access to only two keys at
-any given time. This reduces the anonymity set by another half at most.
-
-Finally, the minimum security parameter size is related to the
-cryptographic security offered by the protocol that is run. This
-parameter corresponds to the number of operations that any adversary has
-in breaking one of the security guarantees in the Privacy Pass protocol
-{{?I-D.ietf-privacypass-protocol}}.
-
-## Example parameterization
-
-Using the specification above, we can give some example
-parameterizations. For example, the current Privacy Pass browser
-extension {{PPEXT}} has nearly 300000 active users (from Chrome and
-Firefox). As a result, log_2(U/A) is approximately 6 and so the maximum
-value of I should be 3.
-
-If the value of U is much bigger (e.g. 5 million) then this would permit
-I = (log_2(5000000/5000)-1)/2 ~= 4 Issuers.
-
-## Allowing more Issuers
-
-Using the recommendations in {{more-servers}}, it is possible to
-tolerate larger number of Issuers if Clients in the ecosystem ensure
-that they only store tokens for a small number of them. In particular,
-if Clients limit their storage of redemption tokens to the bound implied
-by I, then prevents a malicious verifier from triggering redemptions for
-all Issuers in the ecosystem.
 
 --- back
 
