@@ -220,6 +220,13 @@ WWW-Authenticate: PrivateToken challenge=abc..., token-key=123...,
 PrivateToken challenge=def..., token-key=234...
 ~~~
 
+Origins should only include challenges for different types of issuance protocols with
+functionally equivalent properties. For instance, both issuance protocols in {{ISSUANCE}}
+have the same functional properties, albeit with different mechanisms for verifying the
+resulting tokens during redemption. Since clients are free to choose which challenge they want
+to consume when presented with options, mixing multiple challenges with different functional
+properties for one use case is nonsensical.
+
 ### Redemption Context Construction {#context-construction}
 
 The TokenChallenge redemption context allows the origin to determine the context
