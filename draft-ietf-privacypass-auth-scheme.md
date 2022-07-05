@@ -225,7 +225,7 @@ functionally equivalent properties. For instance, both issuance protocols in {{I
 have the same functional properties, albeit with different mechanisms for verifying the
 resulting tokens during redemption. Since clients are free to choose which challenge they want
 to consume when presented with options, mixing multiple challenges with different functional
-properties for one use case is non-sensical.
+properties for one use case is nonsensical.
 
 ### Redemption Context Construction {#context-construction}
 
