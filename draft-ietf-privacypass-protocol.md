@@ -15,10 +15,8 @@ author:
  -
     ins: S. Celi
     name: Sofía Celi
-    org: Cloudflare
-    city: Lisbon
-    country: Portugal
-    email: sceli@cloudflare.com
+    org: Brave
+    email: cherenkov@riseup.net
  -
     ins: A. Davidson
     name: Alex Davidson
