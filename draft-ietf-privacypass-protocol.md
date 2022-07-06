@@ -331,6 +331,22 @@ struct {
 
 Otherwise, the Client aborts the protocol.
 
+## Token Verification
+
+To verify a token, a verifier creates a VOPRF context, evaluates the token contents,
+and compares the result against the token authenticator value, as follows:
+
+~~~
+server_context = SetupVOPRFServer(0x0004, skI, pkI)
+token_authenticator_input =
+  concat(Token.token_type,
+         Token.nonce,
+         Token.challenge_digest,
+         Token.token_key_id)
+token_authenticator = server_context.Evaluate(token_authenticator_input)
+valid = (token_authenticator == Token.authenticator)
+~~~
+
 ## Issuer Configuration
 
 Issuers are configured with Private and Public Key pairs, each denoted skI and
@@ -346,7 +362,7 @@ The key identifier for this specific key pair, denoted `key_id`, is computed
 as follows:
 
 ~~~
-key_id = SHA256(0x0001 || SerializeElement(pkI))
+key_id = SHA256(concat(0x0001, SerializeElement(pkI)))
 ~~~
 
 # Issuance Protocol for Publicly Verifiable Tokens {#public-flow}
@@ -494,6 +510,23 @@ struct {
 ~~~
 
 Otherwise, the Client aborts the protocol.
+
+## Token Verification
+
+To verify a token, a verifier checks that Token.authenticator is a valid
+signature over the remainder of the token input as described below. The
+function `RSA-Verify(msg, pk, sig)` is a procedure to verify a signature `sig`
+over message `msg` using the public key `pk`. Its implementation is not
+specified in this document.
+
+~~~
+token_authenticator_input =
+  concat(Token.token_type,
+         Token.nonce,
+         Token.challenge_digest,
+         Token.token_key_id)
+valid = RSA-Verify(token_authenticator_input, pkI, Token.authenticator)
+~~~
 
 ## Issuer Configuration {#public-issuer-configuration}
 
