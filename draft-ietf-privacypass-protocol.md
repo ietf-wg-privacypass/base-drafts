@@ -15,7 +15,9 @@ author:
  -
     ins: S. Celi
     name: Sofía Celi
-    org: Brave
+    org: Brave Software
+    city: Lisbon
+    country: Portugal
     email: cherenkov@riseup.net
  -
     ins: A. Davidson
