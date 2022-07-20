@@ -203,18 +203,22 @@ OPRF(P-384, SHA-384) ciphersuite in {{OPRF}}. SetupVOPRFClient
 is defined in {{OPRF, Section 3.2}}.
 
 The Client then creates an issuance request message for a random value `nonce`
-using the input challenge and Issuer key identifier as follows:
+with the input challenge and Issuer key identifier as described below:
 
 ~~~
 nonce = random(32)
-context = SHA256(challenge)
-token_input = concat(0x0001, nonce, context, key_id)
+challenge_digest = SHA256(challenge)
+token_input = concat(0x0001, nonce, challenge_digest, key_id)
 blind, blinded_element = client_context.Blind(token_input)
 ~~~
 
 The Blind function is defined in {{OPRF, Section 3.3.2}}.
-If the Blind function fails, the Client aborts the protocol. Otherwise,
-the Client then creates a TokenRequest structured as follows:
+If the Blind function fails, the Client aborts the protocol.
+The Client stores the nonce and challenge_digest values locally
+for use when finalizing the issuance protocol to produce a token
+(as described in {{private-finalize}}).
+
+The Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
@@ -234,7 +238,7 @@ The structure fields are defined as follows:
   `SerializeElement(blinded_element)`. Ne is as defined in {{OPRF, Section 4}}.
 
 The values `token_input` and `blinded_element` are stored locally and used later
-as described in {{finalization}}. The Client then generates an HTTP POST request
+as described in {{private-finalize}}. The Client then generates an HTTP POST request
 to send to the Issuer, with the TokenRequest as the body. The media type for
 this request is "message/token-request". An example request is shown below.
 
@@ -304,7 +308,7 @@ content-length = <Length of TokenResponse>
 <Bytes containing the TokenResponse>
 ~~~
 
-## Finalization
+## Finalization {#private-finalize}
 
 Upon receipt, the Client handles the response and, if successful, deserializes
 the body values TokenResponse.evaluate_response and TokenResponse.evaluate_proof,
@@ -329,7 +333,8 @@ struct {
 } Token;
 ~~~
 
-Otherwise, the Client aborts the protocol.
+The Token.nonce value is that which was sampled in {{private-request}}.
+If the Finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
 
@@ -406,12 +411,16 @@ The Client first creates an issuance request message for a random value
 
 ~~~
 nonce = random(32)
-context = SHA256(challenge)
-token_input = concat(0x0002, nonce, context, key_id)
+challenge_digest = SHA256(challenge)
+token_input = concat(0x0002, nonce, challenge_digest, key_id)
 blinded_msg, blind_inv = rsabssa_blind(pkI, token_input)
 ~~~
 
 The rsabssa_blind function is defined in {{BLINDRSA, Section 5.1.1.}}.
+The Client stores the nonce and challenge_digest values locally for use
+when finalizing the issuance protocol to produce a token (as described
+in {{public-finalize}}).
+
 The Client then creates a TokenRequest structured as follows:
 
 ~~~
@@ -486,7 +495,7 @@ content-length = <Length of TokenResponse>
 <Bytes containing the TokenResponse>
 ~~~
 
-## Finalization
+## Finalization {#public-finalize}
 
 Upon receipt, the Client handles the response and, if successful, processes the
 body as follows:
@@ -509,7 +518,8 @@ struct {
 } Token;
 ~~~
 
-Otherwise, the Client aborts the protocol.
+The Token.nonce value is that which was sampled in {{private-request}}.
+If the rsabssa_finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
 
