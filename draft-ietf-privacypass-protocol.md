@@ -463,7 +463,7 @@ If the Issuer is willing to produce a token token to the Client, the Issuer
 completes the issuance flow by computing a blinded response as follows:
 
 ~~~
-blind_sig = rsabssa_blind_sign(skI, TokenRequest.blinded_rmsg)
+blind_sig = rsabssa_blind_sign(skI, TokenRequest.blinded_msg)
 ~~~
 
 This is encoded and transmitted to the client in the following TokenResponse structure:
