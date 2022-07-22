@@ -771,7 +771,7 @@ d698ea7ab843b8e8a71ed9b2fffa70457a43a8fc687939424b29a7554b40fde130ab7a82
 00001a968f7
 ~~~
 
-## Issuance Protocol 2 - Blind RSA, 4096 {#test-vectors-rsa}
+## Issuance Protocol 2 - Blind RSA, 2048 {#test-vectors-rsa}
 
 The test vector below lists the following values:
 
