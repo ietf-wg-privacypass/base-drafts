@@ -462,11 +462,11 @@ Template:
 New entries in this registry are subject to the Specification Required registration policy
 ({{!RFC8126, Section 4.6}}). Designated experts need to ensure that the token type
 is sufficiently clearly defined to be used for both token issuance and redemption,
-and meets the common security requirements for issuance protocols defined
+and meets the common security and privacy requirements for issuance protocols defined
 in {{Section 3.2 of ARCHITECTURE}}.
 
 This registry also will also allow provisional registrations to allow for experimentation
-with protocols being developed. Designated experts review and approve provisional
+with protocols being developed. Designated experts review, approve, and revoke provisional
 registrations.
 
 This document defines several Reserved values, which can be used by clients and servers
