@@ -327,6 +327,16 @@ device is lesser than the number of Clients that have solved a CAPTCHA in the
 past day. Attesters should not admit attestation types that result in small
 anonymity sets.
 
+The trustworthiness of attesters depends on their ability to correctly and
+reliably perform attestation during the issuance protocol. However, in practice,
+certain types of attestation can vary in value over time, e.g., if the
+attestation process is compromised or maliciously automated. These are
+considered exceptional events and require configuration changes to address
+the underlying cause. For example, if attestation is compromised because
+of a zero-day exploit on compliant devices, then the corresponding attestation
+format should be untrusted until the exploit is patched. Addressing changes in
+attestation quality is therefore a deployment specific task.
+
 ### Issuer Role
 
 Issuers MUST be uniquely identifiable by all Clients with a consistent
