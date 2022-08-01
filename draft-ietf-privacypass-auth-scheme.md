@@ -382,7 +382,7 @@ or issuer is unavailable, or clients might simply not support the requested toke
 Origins SHOULD account for such operational or interoperability failures by offering
 clients an alternative type of challenge such as CAPTCHA for accessing a resource.
 
-To mitigate ossification around token dependencies, clients and servers SHOULD grease
+To mitigate the risk of deployments becoming dependent on tokens, clients and servers SHOULD grease
 their behavior unless otherwise configured to do so. In particular, clients SHOULD
 ignore token challenges with some non-zero probability. Likewise, origins SHOULD
 randomly choose to not challenge clients for tokens with some non-zero probability.
