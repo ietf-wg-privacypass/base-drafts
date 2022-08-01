@@ -377,7 +377,7 @@ Origins MAY include multiple challenges, where each challenge refers to a differ
 or a different token type, to allow clients to choose a preferred issuer or type.
 
 An origin MUST NOT assume that token challenges will always yield a valid token.
-Clients may experience issues running the issuance protocol, e.g., because the attester
+Clients might experience issues running the issuance protocol, e.g., because the attester
 or issuer is unavailable, or clients may simply not support the requested token type.
 Origins SHOULD account for such operational or interoperability failures by offering
 clients an alternative type of challenge such as CAPTCHA for accessing a resource.
