@@ -335,7 +335,8 @@ considered exceptional events and require configuration changes to address
 the underlying cause. For example, if attestation is compromised because
 of a zero-day exploit on compliant devices, then the corresponding attestation
 format should be untrusted until the exploit is patched. Addressing changes in
-attestation quality is therefore a deployment specific task.
+attestation quality is therefore a deployment-specific task. In Split Attester and Issuer deployments, Issuers can choose to remove compromised Attesters from their trusted
+set until the compromise is patched, without needing to modify Origin allow-lists. 
 
 ### Issuer Role
 
