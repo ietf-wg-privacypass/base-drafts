@@ -376,6 +376,19 @@ the same request and SHOULD alert the user if possible.
 Origins MAY include multiple challenges, where each challenge refers to a different issuer
 or a different token type, to allow clients to choose a preferred issuer or type.
 
+An origin MUST NOT assume that token challenges will always yield a valid token.
+Clients might experience issues running the issuance protocol, e.g., because the attester
+or issuer is unavailable, or clients might simply not support the requested token type.
+Origins SHOULD account for such operational or interoperability failures by offering
+clients an alternative type of challenge such as CAPTCHA for accessing a resource.
+
+To mitigate the risk of deployments becoming dependent on tokens, clients and servers SHOULD grease
+their behavior unless explicitly configured not to. In particular, clients SHOULD
+ignore token challenges with some non-zero probability. Likewise, origins SHOULD
+randomly choose to not challenge clients for tokens with some non-zero probability.
+Moreover, origins SHOULD include random token types in token challenges with some
+non-zero probability.
+
 # Security Considerations {#sec-considerations}
 
 The security properties of token challenges vary depending on whether the challenge
