@@ -719,9 +719,9 @@ Change controller:
 
 # Acknowledgements
 
-The authors of this document would like to acknowledge the helpful
-feedback and discussions from Benjamin Schwartz, Joseph Salowey, Sofía
-Celi, and Tara Whalen.
+The authors of this document would like to acknowledge the contributions
+of Armando Faz-Hernandez, and the helpful feedback and discussions from
+Benjamin Schwartz, Joseph Salowey, Sofía Celi, and Tara Whalen.
 
 # Test Vectors
 
