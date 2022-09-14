@@ -355,7 +355,7 @@ To facilitate issuance, the Issuer MUST hold an Issuance key pair at any
 given time. The Issuer public key MUST be made available to all Clients in
 such a way that key rotations and other updates are publicly visible.
 The key material and protocol configuration that an Issuer uses to produce
-tokens corresponds to a number of different pieces of information.
+tokens corresponds to two different pieces of information:
 
 - The issuance protocol in use; and
 - The public keys that are active for the Issuer.
@@ -414,10 +414,10 @@ the client can check for correctness. Opaque public metadata is metadata
 the client can see but cannot check for correctness. As an example, the
 opaque public metadata might be a "fraud detection signal", computed on
 behalf of the Issuer, during token issuance. In normal circumstances,
-clients cannot determine if this value is correct or otherwise a tracking
+Clients cannot determine if this value is correct or otherwise a tracking
 vector.
 
-Private metadata is that which clients cannot observe as part of the token
+Private metadata is that which Clients cannot observe as part of the token
 issuance flow. Such instantiations may be built on the Private Metadata Bit
 construction from Kreuter et al. {{?KLOR20=DOI.10.1007/978-3-030-56784-2_11}}
 or the attribute-based VOPRF from Huang et al. {{HIJK21}}.
@@ -619,8 +619,8 @@ A Client uses Privacy Pass to separate attestation context and redemption
 context. Depending on the deployment model, this can take different forms.
 For example, any Client can only remain private relative to the entire
 space of other Clients using the protocol. Moreover, by owning tokens for
-a given set of keys, the Client's anonymity set shrinks to the total number
-of clients controlling tokens for the same keys.
+a given set of keys, the Clients' anonymity set shrinks to the total number
+of Clients controlling tokens for the same keys.
 
 In the following, we consider the possible ways that Issuers can leverage their
 position to try and reduce the size of the anonymity sets to which Clients
@@ -796,8 +796,9 @@ more opportunities to switch between attestation participants.
 
 # Security Considerations {#security}
 
-We present a number of security considerations that prevent malicious
-Clients from abusing the protocol.
+Beyond the aforementioned security gaols for the Issuance protocol
+({{issuance-protocol}}), it is important for Privacy Pass deployments to
+mitigate the risk of abuse by malicious Clients.
 
 ## Token Exhaustion
 
@@ -806,7 +807,7 @@ verifier to cause that client to redeem tokens for that Issuer. This
 can lead to an attack where a malicious verifier can force a Client to
 spend all of their tokens from a given Issuer. To prevent this from
 happening, tokens can be scoped to single Origins such that they can only
-be redeemed within for a single Origin.
+be redeemed for a single Origin.
 
 If tokens are cross-Origin, Clients should use alternate methods to prevent
 many tokens from being redeemed at once. For example, if the Origin requests
