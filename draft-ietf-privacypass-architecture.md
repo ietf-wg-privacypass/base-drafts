@@ -303,7 +303,7 @@ Issuance. Examples of attestation properties include, though are not limited
 to:
 
 - Capable of solving a CAPTCHA. Clients that solve CAPTCHA challenges can attest
-  to this capability for the purposes of being ruled out as a bot or otherwise
+  to this capability for the purpose of being ruled out as a bot or otherwise
   automated Client.
 - Client state. Clients can be associated with state and the attester can
   attest to this state. Examples of state include the number of issuance
@@ -312,14 +312,14 @@ to:
 - Trusted device. Some Clients run on trusted hardware that are capable of
   producing device-level attestation statements.
 
-Each of these attestation types have different security properties. For
-example, attesting to having a valid account is different from attesting to be
-running on trusted hardware. In general, Attesters should accept a limited form
-of attestation formats.
+Each of these attestation types has different security properties. For example,
+attesting to having a valid account is different from attesting to code being
+run on trusted hardware. In general, Attesters should accept a limited form of
+attestation formats.
 
 Each attestation format also has an impact on the overall system privacy. For
-example, the number of users in possession of a single class of trusted device
-might be lesser than the number of users that can solve CAPTCHAs. Similarly,
+example, the number of users in possession of a single class of trusted devices
+might be less than the number of users that can solve CAPTCHAs. Similarly,
 requiring a conjunction of attestation types could decrease the overall
 anonymity set size. For example, the number of Clients that have solved a
 CAPTCHA in the past day, have a valid account, and are running on a trusted
@@ -336,8 +336,9 @@ the underlying cause. For example, if attestation is compromised because
 of a zero-day exploit on compliant devices, then the corresponding attestation
 format should be untrusted until the exploit is patched. Addressing changes in
 attestation quality is therefore a deployment-specific task. In Split Attester and
-Issuer deployments, Issuers can choose to remove compromised Attesters from their trusted
-set until the compromise is patched, without needing to modify Origin allow-lists.
+Issuer deployments (see {{deploy-split}}), Issuers can choose to remove
+compromised Attesters from their trusted set until the compromise is patched,
+without needing to modify Origin allow-lists.
 
 ### Issuer Role
 
@@ -357,7 +358,7 @@ To facilitate issuance, the Issuer MUST hold an Issuance key pair at any
 given time. The Issuer public key MUST be made available to all Clients in
 such a way that key rotations and other updates are publicly visible.
 The key material and protocol configuration that an Issuer uses to produce
-tokens corresponds to a number of different pieces of information.
+tokens corresponds to two different pieces of information:
 
 - The issuance protocol in use; and
 - The public keys that are active for the Issuer.
@@ -416,10 +417,10 @@ the client can check for correctness. Opaque public metadata is metadata
 the client can see but cannot check for correctness. As an example, the
 opaque public metadata might be a "fraud detection signal", computed on
 behalf of the Issuer, during token issuance. In normal circumstances,
-clients cannot determine if this value is correct or otherwise a tracking
+Clients cannot determine if this value is correct or otherwise a tracking
 vector.
 
-Private metadata is that which clients cannot observe as part of the token
+Private metadata is that which Clients cannot observe as part of the token
 issuance flow. Such instantiations may be built on the Private Metadata Bit
 construction from Kreuter et al. {{?KLOR20=DOI.10.1007/978-3-030-56784-2_11}}
 or the attribute-based VOPRF from Huang et al. {{HIJK21}}.
@@ -619,8 +620,8 @@ Client uses Private Pass to separate attestation context and redemption
 context. Depending on the deployment model, this can take different forms.
 For example, any Client can only remain private relative to the entire
 space of other Clients using the protocol. Moreover, by owning tokens for
-a given set of keys, the Client's anonymity set shrinks to the total number
-of clients controlling tokens for the same keys.
+a given set of keys, the Clients' anonymity set shrinks to the total number
+of Clients controlling tokens for the same keys.
 
 In the following, we consider the possible ways that Issuers can leverage
 their position to try and reduce the anonymity sets that Clients belong
@@ -639,7 +640,7 @@ targeting).
 
 For this reason, the amount of metadata used by an Issuer in creating
 redemption tokens must be taken into account -- together with the bits
-of information that Issuer's may learn about Clients otherwise. Since this
+of information that Issuers may learn about Clients otherwise. Since this
 metadata may be useful for practical deployments of Privacy Pass, Issuers
 must balance this against the reduction in Client privacy. In general,
 Issuers should bound the metadata permitted so as to not allow it to uniquely
@@ -738,9 +739,9 @@ while still allowing the Client to maintain a large variety of tokens
 from many Issuers. Within a redemption partition, the Client limits the
 number of different Issuers used to a small number to maintain the
 privacy properties the Client requires. As long as each redemption
-partition maintains a strong privacy boundary with each other, the
-verifier will only be able to learn a number of bits of information up
-to the limits within that "redemption partitions".
+partition maintains a strong privacy boundary with the others, the
+number of bits of information the verifier can learn is bounded by the
+number of "redemption partitions".
 
 To support this strategy, the client keeps track of a `partition` which
 contains the set of Issuers that redemptions have been attempted
@@ -796,8 +797,9 @@ more opportunities to switch between attestation participants.
 
 # Security Considerations {#security}
 
-We present a number of security considerations that prevent malicious
-Clients from abusing the protocol.
+Beyond the aforementioned security gaols for the Issuance protocol
+({{issuance-protocol}}), it is important for Privacy Pass deployments to
+mitigate the risk of abuse by malicious Clients.
 
 ## Token Exhaustion
 
@@ -806,7 +808,7 @@ verifier to invoke that client to redeem tokens for that Issuer. This
 can lead to an attack where a malicious verifier can force a Client to
 spend all of their tokens from a given Issuer. To prevent this from
 happening, tokens can be scoped to single Origins such that they can only
-be redeemed within for a single Origin.
+be redeemed for a single Origin.
 
 If tokens are cross-Origin, Clients should use alternate methods to prevent
 many tokens from being redeemed at once. For example, if the Origin requests
