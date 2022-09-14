@@ -92,16 +92,11 @@ authentication mechanisms. Typical approaches for authorizing clients,
 such as through the use of long-term cookies, are not privacy-friendly
 since they allow servers to track clients across sessions and interactions.
 Privacy Pass takes a different approach: instead of presenting linkable
-state carrying information to servers, e.g., whether or not the client
-is an authorized user or has completed some prior challenge, clients
-present unlinkable proofs that attest to this information.
-
-The most basic Privacy Pass protocol provides a set of cross-origin
-authorization tokens that protect the Clients' anonymity during interactions
-with a server. This allows clients to communicate an attestation of a
-previously authenticated server action without having to reauthenticate
-manually. The tokens retain anonymity in the sense that posession of a token
-cannot be linked to the session in which that token was initially issued.
+state carrying information to servers, e.g., a cookie indicating whether
+or not the client is an authorized user or has completed some prior
+challenge, clients present unlinkable proofs that attest to this information.
+These proofs, or tokens, are anonymous in the sense that a given token cannot
+be linked to the protocol instance in which that token was initially issued.
 
 At a high level, the Privacy Pass architecture consists of two protocols:
 issuance and redemption.
