@@ -620,7 +620,7 @@ of Clients controlling tokens for the same keys.
 
 In the following, we consider the possible ways that Issuers can leverage their
 position to try and reduce the size of the anonymity sets to which Clients
-belong, often by segregating users. For each case, we provide mitigations that
+belong, often by segregating Clients. For each case, we provide mitigations that
 the Privacy Pass ecosystem must implement to prevent these actions.
 
 ## Metadata Privacy Implications
@@ -678,15 +678,15 @@ For example, if there are 32 Issuers, then Origins learn 32 bits of
 information about the Client if a valid token is presented for each Issuer.
 If the distribution of Issuer trust is anything close to a uniform
 distribution, then this is likely to uniquely identify any Client amongst
-all other Internet users. Assuming a uniform distribution is clearly the
+all other Clients. Assuming a uniform distribution is clearly the
 worst-case scenario, and is unlikely to be accurate, but it provides a stark
 warning against allowing too many Issuers at any one time.
 
 In cases where clients can hold tokens for all Issuers at any given
 time, a strict bound SHOULD be applied to the active number of Issuers
 in the ecosystem. We propose that allowing no more than 4 Issuers at any
-one time is highly preferable (leading to a maximum of 64 possible user
-segregations). However, having a very large user base could potentially
+one time is highly preferable (leading to a maximum of 64 possible Client
+segregations). However, having a very large Client base could potentially
 allow for larger values. Issuer replacements should only occur with the same
 frequency as config rotations as they can lead to similar losses in
 anonymity if clients still hold redemption tokens for previously active
