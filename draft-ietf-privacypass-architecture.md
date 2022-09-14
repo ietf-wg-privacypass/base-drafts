@@ -77,10 +77,11 @@ informative:
 
 --- abstract
 
-This document specifies the Privacy Pass architecture and its constituent
-protocols for constructing anonymous-credential authentication mechanisms.
-It provides recommendations on how the protocol ecosystem should be constructed
-to ensure the privacy of clients and the security of all participating entities.
+This document specifies the Privacy Pass architecture and requirements for
+its constituent protocols used for constructing anonymous-credential
+authentication mechanisms. It provides recommendations on how the architecture
+should be deployed to ensure the privacy of clients and the security of all
+participating entities.
 
 --- middle
 
@@ -148,8 +149,9 @@ the figure below.
 {: #fig-overview title="Privacy Pass Architectural Components"}
 
 This document describes requirements for both issuance and redemption
-protocols. This document also describes ecosystem considerations that
-impact the stated privacy and security guarantees of the protocol.
+protocols. It also provides recommendations on how the architecture
+should be deployed to ensure the privacy of clients and the security of
+all participating entities.
 
 # Terminology
 
