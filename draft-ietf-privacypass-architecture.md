@@ -214,9 +214,6 @@ redeemed already in those redemption contexts, since these tokens can
 be issued and then spent multiple times in response to any such challenge.
 See Section 2.1.1 of {{HTTP-Authentication}} for discussion.
 
-If tokens protected with resources are unique to a single Origin, then
-said Origin MUST NOT admit cross-Origin tokens for authorization.
-
 ## Issuance Protocol
 
 The issuance protocol embodies the core of Privacy Pass. It takes as input
@@ -227,12 +224,11 @@ in the figure below.
   Origin          Client        Attester          Issuer
 
                   +--------------------------------------\
-    Challenge ----> TokenRequest --->                    |
-                  |             (attest)                 |
-                  |                TokenRequest --->     |
+    Challenge ----> Attest ------->                      |
+                  | TokenRequest ------------------>     |
+                  |                            (validate)|
                   |                            (evaluate)|
-                  |                   <--- TokenResponse |
-      Token  <----+ TokenResponse <---                   |
+      Token  <----+  <-------------------  TokenResponse |
                   |--------------------------------------/
 ~~~
 {: #fig-issuance title="Issuance Overview"}
