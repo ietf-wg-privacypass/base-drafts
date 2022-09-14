@@ -204,6 +204,8 @@ there are a number of ways in which the token may vary, including:
 - Per-Origin or cross-Origin. Tokens can be constrained to the Origin for
   which the challenge originated (referred to as per-Origin tokens), or
   can be used across multiple Origins (referred to as cross-Origin tokens).
+  The set of Origins for which a cross-Origin token is applicable is referred
+  to as the cross-Origin set.
 
 Origins that admit cross-Origin tokens bear some risk of allowing tokens
 issued for one Origin to be spent in an interaction with another Origin.
@@ -788,26 +790,23 @@ more opportunities to switch between attestation participants.
 
 # Security Considerations {#security}
 
-Beyond the aforementioned security gaols for the issuance protocol
+Beyond the aforementioned security goals for the issuance protocol
 ({{issuance-protocol}}), it is important for Privacy Pass deployments to
-mitigate the risk of abuse by malicious Clients.
+mitigate the risk of abuse by malicious Origins.
 
-When a Client holds tokens for an Issuer, it is possible for any
-verifier to cause that client to redeem tokens for that Issuer. This
-can lead to an attack where a malicious verifier can force a Client to
-spend all of their tokens from a given Issuer. To prevent this from
-happening, tokens can be scoped to single Origins such that they can only
-be redeemed for a single Origin.
-
-If tokens are cross-Origin, Clients should use alternate methods to prevent
-many tokens from being redeemed at once. For example, if the Origin requests
-an excess of tokens, the Client could choose to not present any tokens for
-verification if a redemption had already occurred in a given time window.
+For example, when a Client holds cross-Origin tokens for an Origin, it
+is possible for any Origin in the cross-Origin set to deplete that Client
+set of tokens. To prevent this from happening, tokens can be scoped to single
+Origins such that they can only be redeemed for a single Origin.
+Alternatively, if tokens are cross-Origin, Clients can use alternate methods
+to prevent many tokens from being redeemed at once. For example,
+if the Origin requests an excess of tokens, the Client could choose to
+not present any tokens for verification if a redemption had already
+occurred in a given time window.
 
 --- back
 
 # Acknowledgements
 
-The authors would like to thank Scott Hendrickson, Tommy Pauly, Benjamin Schwartz,
-Steven Valdez and other members of the Privacy Pass Working Group for many helpful
-contributions to this document.
+The authors would like to thank Eric Kinnear, Scott Hendrickson, Tommy Pauly, Christopher Patton, Benjamin Schwartz,
+Steven Valdez and other members of the Privacy Pass Working Group for many helpful contributions to this document.
