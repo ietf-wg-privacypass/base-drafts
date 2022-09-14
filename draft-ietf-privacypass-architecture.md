@@ -309,15 +309,15 @@ to:
 
 Each of these attestation types has different security properties. For example,
 attesting to having a valid account is different from attesting to running on
-trusted hardware. In general, Attesters should accept a limited form of
-attestation formats.
+trusted hardware. In general, minimizing the set of attestation formats helps
+minimize the amount of information leaked through a token.
 
 Each attestation format also has an impact on the overall system privacy.
 Requiring a conjunction of attestation types could decrease the overall
 anonymity set size. For example, the number of Clients that have solved a
 CAPTCHA in the past day, that have a valid account, and that are running on a
 trusted device is less than the number of Clients that have solved a CAPTCHA in
-the past day. Attesters should not admit attestation types that result in small
+the past day. Attesters SHOULD not admit attestation types that result in small
 anonymity sets.
 
 The trustworthiness of attesters depends on their ability to correctly and
@@ -638,8 +638,8 @@ redemption tokens must be taken into account -- together with the bits
 of information that Issuers may learn about Clients otherwise. Since this
 metadata may be useful for practical deployments of Privacy Pass, Issuers
 must balance this against the reduction in Client privacy. In general,
-Issuers should bound the metadata permitted so as to not allow it to uniquely
-identify each possible user.
+bounding the metadata permitted ensures that it cannot uniquely identify individual
+Clients.
 
 ## Issuer Key Rotation
 
