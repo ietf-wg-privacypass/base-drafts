@@ -346,11 +346,11 @@ about maintaining privacy with multiple Issuers.
 
 #### Key Management
 
-To facilitate issuance, the Issuer MUST hold an issuance key pair at any
-given time. The Issuer public key MUST be made available to all Clients in
-such a way that key rotations and other updates are publicly visible.
-The key material and protocol configuration that an Issuer uses to produce
-tokens corresponds to two different pieces of information.
+Issuers maintain an issuance key pair for the issuance protocol.
+The Issuer public key is made available to all Clients in such
+a way that key rotations and other updates are publicly visible.
+The key material and protocol configuration that an Issuer uses
+to produce tokens corresponds to two different pieces of information.
 
 - The issuance protocol in use; and
 - The public keys that are active for the Issuer.
@@ -358,8 +358,8 @@ tokens corresponds to two different pieces of information.
 The way that the Issuer publishes and maintains this information impacts
 the effective privacy of the clients; see {{privacy}} for more details.
 The fundamental requirement for key management and discovery is that Issuers
-must be unable to target specific clients with unique keys without detection.
-There are a number of ways in which this might be implemented:
+cannot target specific clients with unique keys without detection. There
+are a number of ways in which this might be implemented:
 
 - Servers use a verifiable, tamper-free registry from which clients discover
   keys. Similar to related mechanisms and protocols such as Certificate
