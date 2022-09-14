@@ -733,7 +733,7 @@ from many Issuers. Within a redemption partition, the Client limits the
 number of different Issuers used to a small number to maintain the
 privacy properties the Client requires. As long as each redemption
 partition maintains a strong privacy boundary with the others, the
-number of bits of information the verifier can learn is bounded by the
+number of bits of information the Origin can learn is bounded by the
 number of "redemption partitions".
 
 To support this strategy, the client keeps track of a `partition` which
