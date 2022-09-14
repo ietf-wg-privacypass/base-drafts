@@ -154,7 +154,7 @@ all participating entities.
 The following terms are used throughout this document.
 
 - Client: An entity that seeks authorization to an Origin.
-- Origin: An entity that challenges Clients for tokens.
+- Origin: An entity that redeems tokens presented by Clients.
 - Issuer: An entity that issues tokens to Clients for properties
   attested to by the Attester.
 - Attester: An entity that attests to properties of Client for the
@@ -170,13 +170,16 @@ and the requirements therein on the relevant participants.
 
 ## Redemption Protocol
 
-The redemption protocol is a simple challenge-response based authorization
-protocol between Client and Origin. Origins prompt Clients with a token
-challenge and, if possible, Clients present a valid token for the challenge
-in response. The context in which an Origin challenges a Client for a token
-is referred to as the redemption context. This context includes all information
-associated with the redemption event, such as the timestamp of the event,
-Client visible information (including the IP address), and the Origin name.
+The redemption protocol is an authorization protocol wherein Clients present tokens
+to Origins for authorization. Normally, redemption follows a challenge-response flow,
+wherein the Origin challenges Clients for a token and, if possible, Clients present
+a valid token for the challenge in response. Alternatively, when configured to do so,
+Clients may opportunistically present tokens to Origins without a corresponding challenge.
+
+The context in which an Origin challenges a Client for a token is referred to
+as the redemption context. This context includes all information associated with
+the redemption event, such as the timestamp of the event, Client visible information
+(including the IP address), and the Origin name.
 
 The challenge controls the type of token that the Origin will accept for the
 given resource. As described in {{?HTTP-Authentication=I-D.ietf-privacypass-auth-scheme}},
