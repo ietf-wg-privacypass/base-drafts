@@ -262,9 +262,8 @@ without interacting with the Issuer directly.
 1. Concurrent security. The issuance protocol MUST be safe to run concurrently
 with arbitrarily many Clients, Attesters and Issuers.
 
-Each issuance protocol MUST include a detailed analysis of the privacy impacts
-of the protocol, why these impacts are justified, and guidelines on how to
-deploy the protocol to minimize any privacy impacts.
+See {{extensions}} for requirements on new issuance protocol variants and related
+extensions.
 
 Clients obtain the Issuer public key directly from the Origin using the process
 described in {{HTTP-Authentication}}. Clients MAY apply some form of key
@@ -425,7 +424,7 @@ cryptographic protocol.
 
 The Privacy Pass architecture and ecosystem are both intended to be receptive to
 extensions that expand the current set of functionalities through new issuance
-protocols. Each issuance protocol SHOULD include a detailed analysis of the
+protocols. Each issuance protocol MUST include a detailed analysis of the
 privacy impacts of the extension, why these impacts are justified, and
 guidelines on how to deploy the protocol to minimize any privacy impacts.
 Any extension to the Privacy Pass protocol MUST adhere to the guidelines
