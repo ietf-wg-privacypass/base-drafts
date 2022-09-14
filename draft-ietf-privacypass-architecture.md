@@ -259,7 +259,7 @@ from the issuance flow.
 Clients or Attesters (acting as Clients) to forge tokens offline or otherwise
 without interacting with the Issuer directly.
 1. Concurrent security. The issuance protocol MUST be safe to run concurrently
-with arbitrarily many Clients.
+with arbitrarily many Clients, Attesters and Issuers.
 
 Each issuance protocol MUST include a detailed analysis of the privacy impacts
 of the protocol, why these impacts are justified, and guidelines on how to
