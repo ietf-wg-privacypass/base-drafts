@@ -99,12 +99,14 @@ These proofs, or tokens, are anonymous in the sense that a given token cannot
 be linked to the protocol instance in which that token was initially issued.
 
 At a high level, the Privacy Pass architecture consists of two protocols:
-issuance and redemption. The issuance protocol runs between a Client and two network functions in the
-Privacy Pass architecture: Attestation and Issuance. These two network
-functions can be implemented by the same protocol participant, but can also be
-implemented separately. The Issuer is responsible for issuing tokens in
-response to requests from Clients. The Attester is responsible for attesting to
-properties about the Client for which tokens are issued. The Issuer needs to be
+issuance and redemption. The issuance protocol runs between an endpoint referred
+to as a Client and two functions in the Privacy Pass architecture:
+Attestation and Issuance. These two network functions can be implemented by the
+same protocol participant, but can also be implemented separately. The entity that
+implements Issuance, referred to as the Issuer, is responsible for issuing tokens in
+response to requests from Clients. The entity that implements Attestation, referred to
+as the Attester, is responsible for attesting to properties about
+the Client for which tokens are issued. The Issuer needs to be
 trusted by the server that later redeems the token. Attestation can be
 performed by the Issuer or by an Attester that is trusted by the Issuer.
 Clients might prefer to select different Attesters, separate from the Issuer,
@@ -118,10 +120,9 @@ CAPTCHA and the resulting token produced by the Issuer was proof of this fact.
 
 The redemption protocol runs between Client and Origin (server). It allows
 Origins to challenge Clients to present one or more tokens for authorization.
-Depending on the type of token, e.g., whether or not it is cross-origin
-or per-origin, and whether or not it can be cached, the Client either presents
-a previously obtained token or invokes the issuance protocol to acquire one
-for authorization.
+Depending on the type of token, e.g., whether or not it can be cached, the
+Client either presents a previously obtained token or invokes the issuance
+protocol to acquire one for authorization.
 
 The issuance and redemption protocols operate in concert as shown in
 the figure below.
@@ -197,20 +198,21 @@ there are a number of ways in which the token may vary, including:
   non-interactively, whereas a fresh and random redemption context means
   that the redeemed token must be issued only after the client receives the challenge.
   See Section 2.1.1 of {{HTTP-Authentication}} for more details.
-- Per-origin or cross-origin. Tokens can be constrained to the Origin for
-  which the challenge originated, or can be used across Origins.
+- Per-Origin or cross-Origin. Tokens can be constrained to the Origin for
+  which the challenge originated (referred to as per-Origin tokens), or
+  can be used across multiple Origins (referred to as cross-Origin tokens).
 
 Depending on the use case, Origins may need to maintain state to track
-redeemed tokens. For example, Origins that accept cross-origin
+redeemed tokens. For example, Origins that accept cross-Origin
 across shared redemption contexts tokens SHOULD track which tokens
 have been redeemed already in those redemption contexts, since these
 tokens can be issued and then spent multiple times in response to any
 such challenge. See Section 2.1.1 of {{HTTP-Authentication}} for discussion.
 
-Origins that admit cross-origin tokens bear some risk of allowing tokens
+Origins that admit cross-Origin tokens bear some risk of allowing tokens
 issued for one Origin to be spent in an interaction with another Origin.
 If tokens protected with resources are unique to a single Origin, then
-said Origin MUST NOT admit cross-origin tokens for authorization.
+said Origin MUST NOT admit cross-Origin tokens for authorization.
 
 ## Issuance Protocol
 
