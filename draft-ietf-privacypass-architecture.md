@@ -1,5 +1,5 @@
 ---
-title: "Privacy Pass Architectural Framework"
+title: "The Privacy Pass Architecture"
 abbrev: Privacy Pass Architecture
 docname: draft-ietf-privacypass-architecture-latest
 date:
@@ -77,17 +77,16 @@ informative:
 
 --- abstract
 
-This document specifies the architectural framework for constructing
-secure and anonymity-preserving instantiations of the Privacy Pass
-protocol. It provides recommendations on how the protocol ecosystem
-should be constructed to ensure the privacy of clients and the security
-of all participating entities.
+This document specifies the Privacy Pass architecture and its constituent
+protocols for constructing anonymous-credential authentication mechanisms.
+It provides recommendations on how the protocol ecosystem should be constructed
+to ensure the privacy of clients and the security of all participating entities.
 
 --- middle
 
 # Introduction
 
-Privacy Pass is a protocol for authorization based on anonymous-credential
+Privacy Pass is an architecture for authorization based on anonymous-credential
 authentication mechanisms. Typical approaches for authorizing clients,
 such as through the use of long-term cookies, are not privacy-friendly
 since they allow servers to track clients across sessions and interactions.
@@ -103,8 +102,8 @@ previously authenticated server action without having to reauthenticate
 manually. The tokens retain anonymity in the sense that posession of a token
 cannot be linked to the session in which that token was initially issued.
 
-At a high level, Privacy Pass is composed of two protocols: issuance
-and redemption.
+At a high level, the Privacy Pass architecture consists of two protocols:
+issuance and redemption.
 
 The issuance protocol runs between a Client and two network functions in the
 Privacy Pass architecture: Attestation and Issuance. These two network
