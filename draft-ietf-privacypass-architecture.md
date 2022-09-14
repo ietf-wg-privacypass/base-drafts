@@ -663,7 +663,7 @@ realizes that a key compromise has occurred then the Issuer should
 generate a new key and make it available to Clients. If possible, it should
 invoke any revocation procedures that may apply for the old key.
 
-## Large Number of Issuers {#servers}
+## Issuer Selection {#servers}
 
 Similarly to the Issuer rotation dynamic discussed above, if there are a large
 number of Issuers, and Origins accept all of them, segregation can occur. If
@@ -671,58 +671,31 @@ Clients obtain tokens from many Issuers, and Origins later challenge a Client
 for a token from each Issuer, Origins can learn information about the Client.
 Each per-Issuer token that a Client holds essentially corresponds to a bit of
 information about the Client that Origin learns. Therefore, there is an
-exponential loss in anonymity relative to the number of Issuers that there
-are.
+exponential loss in anonymity relative to the number of Issuers.
 
 For example, if there are 32 Issuers, then Origins learn 32 bits of
 information about the Client if a valid token is presented for each Issuer.
-If the distribution of Issuer trust is anything close to a uniform
-distribution, then this is likely to uniquely identify any Client amongst
-all other Clients. Assuming a uniform distribution is clearly the
-worst-case scenario, and is unlikely to be accurate, but it provides a stark
-warning against allowing too many Issuers at any one time.
-
-In cases where clients can hold tokens for all Issuers at any given
-time, a strict bound SHOULD be applied to the active number of Issuers
-in the ecosystem. We propose that allowing no more than 4 Issuers at any
-one time is highly preferable (leading to a maximum of 64 possible Client
-segregations). However, having a very large Client base could potentially
-allow for larger values. Issuer replacements should only occur with the same
-frequency as config rotations as they can lead to similar losses in
-anonymity if clients still hold redemption tokens for previously active
-Issuers.
-
-In addition, we RECOMMEND that trusted registries indicate at all times
-which Issuers are deemed to be active. If a Client is asked to invoke
-any Privacy Pass exchange for an Issuer that is not declared active,
-then the client SHOULD refuse to retrieve the Issuer public key
-during the protocol.
-
-### Allowing More Issuers {#more-servers}
-
-The bounds on the numbers of Issuers that this document proposes above are
-very restrictive. This is because this document considers a situation where
-a Client could be challenged (and asked to redeem) tokens for any Issuer.
-
-An alternative system is to ensure a robust strategy for ensuring that
-Clients only possess redemption tokens for a similarly small number of
-Issuers at any one time. This prevents a malicious verifier from being
-able to invoke redemptions for many Issuers since the Client would only
-be holding redemption tokens for a small set of Issuers. When a Client
-is issued tokens from a new Issuer and already has tokens from the
-maximum number of Issuers, it simply deletes the oldest set of
-redemption tokens in storage and then stores the newly acquired tokens.
-
-For example, if Clients ensure that they only hold redemption tokens for
+As a contrasting example, if Clients ensure that they only hold tokens issued from
 4 Issuers, then this increases the potential size of the anonymity sets
 that the Client belongs to. However, this doesn't protect Clients
 completely as it would if only 4 Issuers were permitted across the whole
 system. For example, these 4 Issuers could be different for each Client.
 Therefore, the selection of Issuers for which a Client possesses tokens is still
-revealing. Understanding this trade-off is important in deciding the
-effective anonymity of each Client in the system.
+revealing. This trade-off is important in deciding the effective anonymity
+of each Client in the system.
 
-#### Redemption Partitions {#redemption-partitions}
+Clients SHOULD bound the number of Issuers they are willing to request tokens
+from at any given time. The exact bound depends on the deployment model and
+number of Clients, i.e., having a very large Client base could potentially
+allow for larger values. Issuer replacements should only occur with the same
+frequency as config rotations as they can lead to similar losses in
+anonymity if clients still hold redemption tokens for previously active
+Issuers.
+
+Alternatively, when applicable, trusted registries can indicate which Issuers
+are deemed to be active. If a Client is asked to invoke the issuance protocol
+for an Issuer that is not declared active, then the client can refuse to run the
+protocol and obtain a token.
 
 Another option to allow a large number of Issuers in the ecosystem,
 while preventing the joining of a number of different tokens, is for the
