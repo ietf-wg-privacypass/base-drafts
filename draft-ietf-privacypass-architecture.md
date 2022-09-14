@@ -641,19 +641,17 @@ identify each possible user.
 
 ## Issuer Key Rotation
 
-Techniques to introduce Client "segregation" can be used to reduce
-Client anonymity. Such techniques are closely linked to the type of key
-schedule that is used by the Issuer. When an Issuer rotates their key,
-any Client that invokes the issuance protocol in this key cycle will be
-part of a group of possible Clients owning valid tokens for this key. To
-mechanize this attack strategy, an Issuer could introduce a key rotation
-policy that forces Clients into small key cycles, reducing the
-size of the anonymity set for these Clients.
+Issuer key rotation is important to hedge against long-term private key
+compromise. However, key rotation can also be used to segment Client anonymity
+sets. In particular, when an Issuer rotates their key, any Client that
+invokes the issuance protocol in this key cycle will be part of a group
+of possible Clients owning valid tokens for this key. To mechanize this
+attack strategy, an Issuer could introduce a key rotation policy that forces
+Clients into small key cycles, reducing the size of the anonymity set for these Clients.
 
-Issuers SHOULD invoke key rotation for a period of time between 1 and 12 weeks.
-Key rotations represent a trade-off between Client privacy and continued Issuer
-security. Therefore, it is still important that key rotations occur on a
-regular cycle to reduce the harmfulness of an Issuer key compromise.
+In general, key rotations represent a trade-off between Client privacy and
+continued Issuer security. Therefore, it is still important that key rotations
+occur on a regular cycle to reduce the harmfulness of an Issuer key compromise.
 
 With a large number of Clients, a minimum of one week gives a large enough
 window for Clients to participate in the issuance protocol and thus enjoy the
