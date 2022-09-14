@@ -205,15 +205,15 @@ there are a number of ways in which the token may vary, including:
   which the challenge originated (referred to as per-Origin tokens), or
   can be used across multiple Origins (referred to as cross-Origin tokens).
 
-Depending on the use case, Origins may need to maintain state to track
-redeemed tokens. For example, Origins that accept cross-Origin
-across shared redemption contexts tokens SHOULD track which tokens
-have been redeemed already in those redemption contexts, since these
-tokens can be issued and then spent multiple times in response to any
-such challenge. See Section 2.1.1 of {{HTTP-Authentication}} for discussion.
-
 Origins that admit cross-Origin tokens bear some risk of allowing tokens
 issued for one Origin to be spent in an interaction with another Origin.
+In particular, depending on the use case, Origins may need to maintain
+state to track redeemed tokens. For example, Origins that accept cross-Origin
+tokens across shared redemption contexts SHOULD track which tokens have been
+redeemed already in those redemption contexts, since these tokens can
+be issued and then spent multiple times in response to any such challenge.
+See Section 2.1.1 of {{HTTP-Authentication}} for discussion.
+
 If tokens protected with resources are unique to a single Origin, then
 said Origin MUST NOT admit cross-Origin tokens for authorization.
 
