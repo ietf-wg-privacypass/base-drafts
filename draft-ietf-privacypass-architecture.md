@@ -99,9 +99,7 @@ These proofs, or tokens, are anonymous in the sense that a given token cannot
 be linked to the protocol instance in which that token was initially issued.
 
 At a high level, the Privacy Pass architecture consists of two protocols:
-issuance and redemption.
-
-The issuance protocol runs between a Client and two network functions in the
+issuance and redemption. The issuance protocol runs between a Client and two network functions in the
 Privacy Pass architecture: Attestation and Issuance. These two network
 functions can be implemented by the same protocol participant, but can also be
 implemented separately. The Issuer is responsible for issuing tokens in
@@ -113,7 +111,7 @@ Clients might prefer to select different Attesters, separate from the Issuer,
 to be able to use preferred authentication methods or to improve privacy by not
 directly communicating with an Issuer. Depending on the attestation,
 Attesters can store state about a Client, such as the number of overall tokens
-issued thus far. As an example of an Issuance protocol, in the original Privacy
+issued thus far. As an example of an issuance protocol, in the original Privacy
 Pass protocol {{PPSRV}}, tokens were only issued to Clients that solved
 CAPTCHAs. In this context, the Attester attested that some client solved a
 CAPTCHA and the resulting token produced by the Issuer was proof of this fact.
@@ -263,7 +261,7 @@ without interacting with the Issuer directly.
 1. Concurrent security. The issuance protocol MUST be safe to run concurrently
 with arbitrarily many Clients.
 
-Each Issuance protocol MUST include a detailed analysis of the privacy impacts
+Each issuance protocol MUST include a detailed analysis of the privacy impacts
 of the protocol, why these impacts are justified, and guidelines on how to
 deploy the protocol to minimize any privacy impacts.
 
@@ -347,7 +345,7 @@ about maintaining privacy with multiple Issuers.
 
 #### Key Management
 
-To facilitate issuance, the Issuer MUST hold an Issuance key pair at any
+To facilitate issuance, the Issuer MUST hold an issuance key pair at any
 given time. The Issuer public key MUST be made available to all Clients in
 such a way that key rotations and other updates are publicly visible.
 The key material and protocol configuration that an Issuer uses to produce
@@ -514,7 +512,7 @@ context for the Client, which can be separate from the Origin's redemption
 context.
 
 For certain types of issuance protocols, this model separates attestation and redemption
-contexts. However, Issuance protocols that require the Issuer to learn information about
+contexts. However, issuance protocols that require the Issuer to learn information about
 the Origin, such as that which is described in {{?RATE-LIMITED=I-D.privacypass-rate-limit-tokens}},
 are not appropriate since they could link attestation and redemption contexts through the Origin name.
 
@@ -601,7 +599,7 @@ issuance; see {{RATE-LIMITED}} for one such type of issuance protocol.
 In this model, the Attester, Issuer, and Origin have a separate view
 of the Client: the Attester sees potentially sensitive Client identifying
 information, such as account identifiers or IP addresses, the Issuer
-sees only the information necessary for Issuance, and the Origin sees
+sees only the information necessary for issuance, and the Origin sees
 token challenges, corresponding tokens, and Client source information,
 such as their IP address. As a result, attestation and redemption contexts
 are separate, and therefore any type of token challenge is suitable in
@@ -792,7 +790,7 @@ more opportunities to switch between attestation participants.
 
 # Security Considerations {#security}
 
-Beyond the aforementioned security gaols for the Issuance protocol
+Beyond the aforementioned security gaols for the issuance protocol
 ({{issuance-protocol}}), it is important for Privacy Pass deployments to
 mitigate the risk of abuse by malicious Clients.
 
