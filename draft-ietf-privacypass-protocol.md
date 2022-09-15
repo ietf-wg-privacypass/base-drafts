@@ -223,7 +223,7 @@ The Client then creates a TokenRequest structured as follows:
 ~~~
 struct {
    uint16_t token_type = 0x0001;
-   uint8_t token_key_id;
+   uint8_t truncated_token_key_id;
    uint8_t blinded_msg[Ne];
 } TokenRequest;
 ~~~
@@ -232,7 +232,7 @@ The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-- "token_key_id" is the least significant byte of the `key_id` in network byte order (in other words, the last 8 bits of `key_id`).
+- "truncated_token_key_id" is the least significant byte of the `token_key_id` in network byte order (in other words, the last 8 bits of `key_id`).
 
 - "blinded_msg" is the Ne-octet blinded message defined above, computed as
   `SerializeElement(blinded_element)`. Ne is as defined in {{OPRF, Section 4}}.
@@ -258,7 +258,7 @@ content-length = <Length of TokenRequest>
 Upon receipt of the request, the Issuer validates the following conditions:
 
 - The TokenRequest contains a supported token_type.
-- The TokenRequest.token_key_id corresponds to a key ID of a Public Key owned by the issuer.
+- The TokenRequest.truncated_token_key_id corresponds to the truncated key ID of a Public Key owned by the issuer.
 - The TokenRequest.blinded_request is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
@@ -426,7 +426,7 @@ The Client then creates a TokenRequest structured as follows:
 ~~~
 struct {
    uint16_t token_type = 0x0002
-   uint8_t token_key_id;
+   uint8_t truncated_token_key_id;
    uint8_t blinded_msg[Nk];
 } TokenRequest;
 ~~~
@@ -435,7 +435,7 @@ The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-- "token_key_id" is the least significant byte of the `key_id` in network byte order (in other words, the last 8 bits of `key_id`).
+- "truncated_token_key_id" is the least significant byte of the `token_key_id` in network byte order (in other words, the last 8 bits of `key_id`).
 
 - "blinded_msg" is the Nk-octet request defined above.
 
@@ -460,7 +460,7 @@ content-length = <Length of TokenRequest>
 Upon receipt of the request, the Issuer validates the following conditions:
 
 - The TokenRequest contains a supported token_type.
-- The TokenRequest.token_key_id corresponds to a key ID of a Public Key owned by the issuer.
+- The TokenRequest.truncated_token_key_id corresponds to the truncated key ID of a Public Key owned by the issuer.
 - The TokenRequest.blinded_msg is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
