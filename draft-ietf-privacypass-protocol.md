@@ -180,7 +180,7 @@ Clients provide the following as input to the issuance protocol:
 
 - Issuer name, identifying the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
-- Issuer Public Key pkI, with a key identifier `key_id` computed as
+- Issuer Public Key pkI, with a key identifier `token_key_id` computed as
   described in {{issuer-configuration}}.
 - Challenge value `challenge`, an opaque byte string. For example, this might
   be provided by the redemption protocol in {{HTTP-Authentication}}.
@@ -208,7 +208,7 @@ with the input challenge and Issuer key identifier as described below:
 ~~~
 nonce = random(32)
 challenge_digest = SHA256(challenge)
-token_input = concat(0x0001, nonce, challenge_digest, key_id)
+token_input = concat(0x0001, nonce, challenge_digest, token_key_id)
 blind, blinded_element = client_context.Blind(token_input)
 ~~~
 
@@ -232,7 +232,7 @@ The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-- "truncated_token_key_id" is the least significant byte of the `token_key_id` in network byte order (in other words, the last 8 bits of `key_id`).
+- "truncated_token_key_id" is the least significant byte of the `token_key_id` in network byte order (in other words, the last 8 bits of `token_key_id`).
 
 - "blinded_msg" is the Ne-octet blinded message defined above, computed as
   `SerializeElement(blinded_element)`. Ne is as defined in {{OPRF, Section 4}}.
@@ -363,11 +363,11 @@ seed = random(Ns)
 (skI, pkI) = DeriveKeyPair(seed, "PrivacyPass")
 ~~~
 
-The key identifier for this specific key pair, denoted `key_id`, is computed
+The key identifier for this specific key pair, denoted `token_key_id`, is computed
 as follows:
 
 ~~~
-key_id = SHA256(concat(0x0001, SerializeElement(pkI)))
+token_key_id = SHA256(concat(0x0001, SerializeElement(pkI)))
 ~~~
 
 # Issuance Protocol for Publicly Verifiable Tokens {#public-flow}
@@ -396,7 +396,7 @@ Clients provide the following as input to the issuance protocol:
 
 - Issuer name, identifying the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
-- Issuer Public Key pkI, with a key identifier `key_id` computed as
+- Issuer Public Key pkI, with a key identifier `token_key_id` computed as
   described in {{public-issuer-configuration}}.
 - Challenge value `challenge`, an opaque byte string. For example, this might
   be provided by the redemption protocol in {{HTTP-Authentication}}.
@@ -412,7 +412,7 @@ The Client first creates an issuance request message for a random value
 ~~~
 nonce = random(32)
 challenge_digest = SHA256(challenge)
-token_input = concat(0x0002, nonce, challenge_digest, key_id)
+token_input = concat(0x0002, nonce, challenge_digest, token_key_id)
 blinded_msg, blind_inv = rsabssa_blind(pkI, token_input)
 ~~~
 
@@ -435,7 +435,7 @@ The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-- "truncated_token_key_id" is the least significant byte of the `token_key_id` in network byte order (in other words, the last 8 bits of `key_id`).
+- "truncated_token_key_id" is the least significant byte of the `token_key_id` in network byte order (in other words, the last 8 bits of `token_key_id`).
 
 - "blinded_msg" is the Nk-octet request defined above.
 
@@ -544,7 +544,7 @@ Issuers are configured with Private and Public Key pairs, each denoted skI and
 pkI, respectively, used to produce tokens. Each key pair SHALL be generated as
 as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}.
 
-The key identifier for a keypair (skI, pkI), denoted `key_id`, is computed as
+The key identifier for a keypair (skI, pkI), denoted `token_key_id`, is computed as
 SHA256(encoded_key), where encoded_key is a DER-encoded SubjectPublicKeyInfo
 (SPKI) object carrying pkI. The SPKI object MUST use the RSASSA-PSS OID {{!RFC5756}},
 which specifies the hash algorithm and salt size. The salt size MUST match the
@@ -553,11 +553,11 @@ output size of the hash function associated with the public key and token type.
 # Security considerations
 
 This document outlines how to instantiate the Issuance protocol
-based on the VOPRF defined in {{OPRF}} and blind RSA protocol defnied in
-{{BLINDRSA}}. All security considerations described in the VOPRF document also
-apply in the Privacy Pass use-case. Considerations related to broader privacy
-and security concerns in a multi-Client and multi-Issuer setting are deferred
-to the Architecture document {{I-D.ietf-privacypass-architecture}}.
+based on the VOPRF defined in {{OPRF}} and blind RSA protocol defined in
+{{BLINDRSA}}. All security considerations described in the VOPRF and blind RSA
+documents also apply in the Privacy Pass use-case. Considerations related to
+broader privacy and security concerns in a multi-Client and multi-Issuer
+setting are deferred to the Architecture document {{I-D.ietf-privacypass-architecture}}.
 
 # IANA considerations
 
