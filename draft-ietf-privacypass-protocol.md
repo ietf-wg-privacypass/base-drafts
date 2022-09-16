@@ -370,6 +370,10 @@ as follows:
 token_key_id = SHA256(concat(0x0001, SerializeElement(pkI)))
 ~~~
 
+Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers should ensure
+that the truncated form of new key IDs do not collide with other truncated key IDs
+in rotation.
+
 # Issuance Protocol for Publicly Verifiable Tokens {#public-flow}
 
 This section describes a variant of the issuance protocol in {{private-flow}}
@@ -550,6 +554,10 @@ SHA256(encoded_key), where encoded_key is a DER-encoded SubjectPublicKeyInfo
 which specifies the hash algorithm and salt size. The salt size MUST match the
 output size of the hash function associated with the public key and token type.
 
+Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers should ensure
+that the truncated form of new key IDs do not collide with other truncated key IDs
+in rotation.
+
 # Security considerations
 
 This document outlines how to instantiate the Issuance protocol
@@ -558,6 +566,14 @@ based on the VOPRF defined in {{OPRF}} and blind RSA protocol defined in
 documents also apply in the Privacy Pass use-case. Considerations related to
 broader privacy and security concerns in a multi-Client and multi-Issuer
 setting are deferred to the Architecture document {{I-D.ietf-privacypass-architecture}}.
+
+Beyond these considerations, it is worth highlighting the fact that Client TokenRequest
+messages contain truncated token key IDs. This is done to minimize the chance that an Issuer
+can use distinct keys for targeting specific users. Since the key ID is truncated
+to a single byte, an Issuer can partition the set of Clients into at most 256 different
+anonymity sets. On top of this key ID space, Clients SHOULD apply some form of key
+consistency mechanism to help ensure they are not being given unique keys; see
+{{?CONSISTENCY=I-D.wood-key-consistency}} for more details.
 
 # IANA considerations
 
