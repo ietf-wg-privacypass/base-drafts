@@ -250,7 +250,7 @@ Clients initiate the issuance protocol using the challenge, a randomly
 generated nonce, and public key for the Issuer, all of which are the Client's
 private input to the protocol and ultimately bound to an output Token;
 see Section 2.2. of {{HTTP-Authentication}} for details. Future specifications
-may change or exten the Client's input to the issuance protocol to produce
+may change or extend the Client's input to the issuance protocol to produce
 Tokens with a different structure.
 
 The issuance protocol itself can be any interactive protocol between Client,
