@@ -350,8 +350,10 @@ about maintaining privacy with multiple Issuers.
 Issuers maintain an issuance key pair for the issuance protocol.
 The Issuer public key is made available to all Clients in such
 a way that key rotations and other updates are publicly visible.
-The key material and protocol configuration that an Issuer uses
-to produce tokens corresponds to two different pieces of information.
+See {{key-rotation-privacy}} for more considerations around
+Issuer key rotation. The key material and protocol configuration
+that an Issuer uses to produce tokens corresponds to two different
+pieces of information.
 
 - The issuance protocol in use; and
 - The public keys that are active for the Issuer.
@@ -373,25 +375,6 @@ are a number of ways in which this might be implemented:
 
 As above, specific mechanisms for key management and discovery are out of scope
 for this document.
-
-#### Key Rotation
-
-Token issuance associates all issued tokens with a particular choice of
-key. If an Issuer issues tokens with many keys, then this may harm the
-anonymity of the Client. For example, they would be able to map the
-Client's access patterns by inspecting which key each token they possess
-has been issued under.
-
-To prevent against this, Issuers MUST only use one private key for
-issuing tokens at any given time. Servers MAY use one or more keys for
-redemption to allow Issuers for seamless key rotation.
-
-Servers may rotate keys as a means of revoking tokens issued under old
-or otherwise expired keys. Alternatively, Issuers may include expiration
-information as metadata alongside the token; See {{metadata}} for more
-discussion about metadata constraints. Both techniques are equivalent
-since they cryptographically bind expiration to individual tokens.
-Key rotations should be limited in frequency for similar reasons.
 
 ### Metadata {#metadata}
 
@@ -641,27 +624,28 @@ must balance this against the reduction in Client privacy. In general,
 bounding the metadata permitted ensures that it cannot uniquely identify individual
 Clients.
 
-## Issuer Key Rotation
+## Issuer Key Rotation {#key-rotation-privacy}
 
 Issuer key rotation is important to hedge against long-term private key
-compromise. However, key rotation can also be used to segment Client anonymity
-sets. In particular, when an Issuer rotates their key, any Client that
-invokes the issuance protocol in this key cycle will be part of a group
-of possible Clients owning valid tokens for this key. To mechanize this
-attack strategy, an Issuer could introduce a key rotation policy that forces
-Clients into small key cycles, reducing the size of the anonymity set for these Clients.
+compromise. If an Issuer realizes that a key compromise has occurred then the
+Issuer should generate a new key and make it available to Clients. If
+possible, it should invoke any revocation procedures that may apply for
+the old key.
+
+Key rotation can also be used to segment Client anonymity sets. In
+particular, when an Issuer rotates their key, any Client that invokes the
+issuance protocol in this key cycle will be part of a group of possible Clients
+owning valid tokens for this key. To mechanize this attack strategy, an Issuer
+could introduce a key rotation policy that forces Clients into small key cycles,
+reducing the size of the anonymity set for these Clients.
 
 In general, key rotations represent a trade-off between Client privacy and
-continued Issuer security. Therefore, it is still important that key rotations
-occur on a regular cycle to reduce the harmfulness of an Issuer key compromise.
-
-With a large number of Clients, a minimum of one week gives a large enough
-window for Clients to participate in the issuance protocol and thus enjoy the
-anonymity guarantees of being part of a larger group. A maximum of
-12 weeks limits the damage caused by a key compromise. If an Issuer
-realizes that a key compromise has occurred then the Issuer should
-generate a new key and make it available to Clients. If possible, it should
-invoke any revocation procedures that may apply for the old key.
+Issuer security. Therefore, it is still important that key rotations occur on
+a regular cycle to reduce the harmfulness of an Issuer key compromise. If there
+are multiple Issuer keys in rotation, Clients can apply some form of consistency
+mechanism {{CONSISTENCY}} to ensure that they receive the same key as other Clients.
+Likewise, Origins can use one or more public keys for redemption to support Issuer
+key rotation.
 
 ## Issuer Selection {#servers}
 
