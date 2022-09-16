@@ -427,7 +427,7 @@ and deployed in a number of ways. This section covers some expected deployment
 models and their corresponding security and privacy considerations.
 
 The discussion below assumes non-collusion between entities that have access to
-the attestation context and redemption context, as collusion between such entities
+the attestation context and entities that have access to the redemption context, as collusion between such entities
 would enable linking of these contexts. Generally, this means that entities operated
 by separate parties do not collude. Mechanisms for enforcing non-collusion are out of
 scope for this architecture.
