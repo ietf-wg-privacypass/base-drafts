@@ -254,9 +254,10 @@ to the following security requirements.
 
 1. Unconditional input secrecy. The issuance protocol MUST NOT reveal anything
 about the Client's private input, including the challenge and nonce, to the
-Attester or Issuer. The issuance protocol can reveal the Issuer public key for
-the purposes of determining which private key to use in producing the token.
-A result of this property is that the redemption flow is unlinkable
+Attester or Issuer, regardless of the hardness assumptions of the underlying
+cryptographic protocol(s). The issuance protocol can reveal the Issuer public
+key for the purposes of determining which private key to use in producing the
+token. A result of this property is that the redemption flow is unlinkable
 from the issuance flow.
 1. One-more forgery security. The issuance protocol MUST NOT allow malicious
 Clients or Attesters (acting as Clients) to forge tokens offline or otherwise
