@@ -728,7 +728,20 @@ hit:
   Output resp
 ~~~
 
-## Centralization
+## Side-Channel Attacks
+
+Side-channel attacks, such as those based on timing correlation, could be
+used to link attestation and redemption contexts together. In particular,
+for interactive tokens that are bound to a Client-specific redemption
+context, the anonymity set of Clients during the issuance protocol consists
+of those Clients that started issuance between the time of the Origin's
+challenge and the corresponding token redemption. Depending on the number
+of Clients using a particular Issuer during that time window, the set can
+be small. Appliations should take such side channels into consideration before
+choosing a particular deployment model and type of token challenge and redemption
+context.
+
+# Centralization
 
 A consequence of limiting the number of participants (Attesters or Issuers) in
 Privacy Pass deployments for meaningful privacy is that it forces concentrated
