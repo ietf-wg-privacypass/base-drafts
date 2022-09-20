@@ -246,11 +246,16 @@ Each issuance protocol may be different, e.g., in the number and types of
 participants, underlying cryptographic constructions used when issuing tokens,
 and even privacy properties.
 
-Clients initiate the Token issuance protocol using the challenge, a randomly
-generated nonce, and public key for the Issuer. The Token issuance protocol
-itself can be any interactive protocol between Client, Issuer, or other
-parties that produces a valid authenticator over the Client's input, subject
-to the following security requirements.
+Clients initiate the issuance protocol using the challenge, a randomly
+generated nonce, and public key for the Issuer, all of which are the Client's
+private input to the protocol and ultimately bound to an output Token;
+see Section 2.2. of {{HTTP-Authentication}} for details. Future specifications
+may change or extend the Client's input to the issuance protocol to produce
+Tokens with a different structure.
+
+The issuance protocol itself can be any interactive protocol between Client,
+Issuer, or other parties that produces a valid authenticator over the Client's
+private input, subject to the following security requirements.
 
 1. Unconditional input secrecy. The issuance protocol MUST NOT reveal anything
 about the Client's private input, including the challenge and nonce, to the
