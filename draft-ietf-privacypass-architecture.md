@@ -424,10 +424,13 @@ about the Client, including their identity or browsing history. Depending on
 the deployment model, separating these contexts can take different forms. The
 Origin, Attester, and Issuer portrayed in {{fig-overview}} can be instantiated
 and deployed in a number of ways. This section covers some expected deployment
-models and their corresponding security and privacy considerations. The
-discussion below assumes non-collusion between entities when operated by
-separate parties. Mechanisms for enforcing non-collusion are out of scope for
-this architecture.
+models and their corresponding security and privacy considerations.
+
+The discussion below assumes non-collusion between entities that have access to
+the attestation context and entities that have access to the redemption context, as collusion between such entities
+would enable linking of these contexts. Generally, this means that entities operated
+by separate parties do not collude. Mechanisms for enforcing non-collusion are out of
+scope for this architecture.
 
 ## Shared Origin, Attester, Issuer {#deploy-shared}
 
