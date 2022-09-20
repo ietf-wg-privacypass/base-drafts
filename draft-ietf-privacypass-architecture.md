@@ -190,11 +190,14 @@ there are a number of ways in which the token may vary, including:
   security properties, e.g., some issuance protocols may produce tokens that
   are publicly verifiable, whereas others may not have this property.
 - Issuer identity. Tokens identify which Issuers are trusted for a given
-  issuance protocol. The selected Issuer transitively determines what types
-  of attestation the Origin is willing to accept. For example, if a given Issuer
-  `issuer.example` has two trusted Attesters, then any Origin choosing `issuer.example`
-  as its Issuer is willing to accept attestation checks done by either of these
-  two Attesters.
+  issuance protocol. Each Issuer, in turn, determines which Attesters it is
+  willing to accept in the issuance protocol. This means that if an Origin
+  origin.example accepts tokens issued by Issuer issuer.example, and that
+  Issuer in turn accepts different types of attestation from more than one
+  trusted Attester, then a Client may use either of these trusted Attesters
+  to issue and redeem tokens for origin.example. However, origin.example neither
+  explicitly specifies nor learns the Attesters or their attestation formats
+  used for token issuance.
 - Redemption context. Tokens can be bound to a given redemption context, which
   influences a client's ability to pre-fetch and cache tokens. For example,
   an empty redemption context always allows tokens to be issued and redeemed
