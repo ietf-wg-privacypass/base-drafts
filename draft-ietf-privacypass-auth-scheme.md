@@ -482,6 +482,9 @@ This registry also will also allow provisional registrations to allow for experi
 with protocols being developed. Designated experts review, approve, and revoke provisional
 registrations.
 
+Values 0xFF00-0xFFFF are reserved for private use, to enable proprietary uses and
+limited experimentation.
+
 This document defines several Reserved values, which can be used by clients and servers
 to send "greased" values in token challenges and responses to ensure that implementations
 remain able to handle unknown token types gracefully (this technique is inspired by
@@ -513,6 +516,7 @@ The initial contents for this registry are defined in the table below.
 | 0xDA42 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
 | 0xE944 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
 | 0xF057 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| 0xFF00-0xFFFF | Private Use     | N/A                 | N/A             | N/A              | N/A | N/A | This document |
 {: #aeadid-values title="Token Types"}
 
 --- back
