@@ -114,7 +114,7 @@ to be able to use preferred authentication methods or to improve privacy by not
 directly communicating with an Issuer. Depending on the attestation,
 Attesters can store state about a Client, such as the number of overall tokens
 issued thus far. As an example of an issuance protocol, in the original Privacy
-Pass protocol {{PPSRV}}, tokens were only issued to Clients that solved
+Pass protocol {{PPSRV}}{{PPEXT}}, tokens were only issued to Clients that solved
 CAPTCHAs. In this context, the Attester attested that some client solved a
 CAPTCHA and the resulting token produced by the Issuer was proof of this fact.
 
