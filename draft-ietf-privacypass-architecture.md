@@ -147,6 +147,11 @@ protocols. It also provides recommendations on how the architecture
 should be deployed to ensure the privacy of clients and the security of
 all participating entities.
 
+The privacypass working group is working on 
+{{?HTTP-Authentication=I-D.ietf-privacypass-auth-scheme}} as an instantiation 
+of a redemption protocol and {{?ISSUANCE=I-D.ietf-privacypass-protocol}} as an 
+instantiation of the issuance protocol. 
+
 # Terminology
 
 {::boilerplate bcp14}
