@@ -35,7 +35,6 @@ author:
 
 normative:
   RFC2119:
-  RFC8446:
 
 informative:
   PPEXT:
