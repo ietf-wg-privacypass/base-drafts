@@ -48,7 +48,7 @@ informative:
       org: Cloudflare
   HIJK21:
     title: "PrivateStats: De-Identified Authenticated Logging at Scale"
-    target: https://research.fb.com/wp-content/uploads/2021/01/PrivateStats-De-Identified-Authenticated-Logging-at-Scale_final.pdf
+    target: https://research.fb.com/privatestats
     date: Jan 2021
     author:
       -
@@ -342,8 +342,7 @@ on compliant devices, then the corresponding attestation format should be
 untrusted until the exploit is patched. Addressing changes in attestation
 quality is therefore a deployment-specific task. In Split Attester and Issuer
 deployments (see {{deploy-split}}), Issuers can choose to remove compromised
-Attesters from their trusted set until the compromise is patched, without
-needing to modify Origin allow-lists.
+Attesters from their trusted set until the compromise is patched.
 
 ### Issuer Role
 
@@ -519,7 +518,10 @@ are not appropriate since they could link attestation and redemption contexts th
 ## Joint Origin and Issuer {#deploy-joint-origin}
 
 In this model, the Origin and Issuer are operated by the same entity, separate from
-the Attester, as shown in the figure below.
+the Attester, as shown in the figure below. The Issuer accepts token requests that come
+from trusted Attesters. Depending on the issuance protocol, the Attester may relay these
+requests between Client and Issuer over an authenticated channel, or trust may be established
+in some other manner.
 
 ~~~
                                     +--------------------------+
@@ -564,7 +566,9 @@ cross-Origin.
 ## Split Origin, Attester, Issuer {#deploy-split}
 
 In this model, the Origin, Attester, and Issuer are all operated by different entities,
-as shown in the figure below.
+as shown in the figure below. As with the joint Origin and Issuer model, the Issuer
+accepts token requests that come from trusted Attesters, and the details of that
+trust establishment depend on the issuance protocol.
 
 ~~~
                                                    +-----------+
@@ -759,8 +763,8 @@ context.
 
 A consequence of limiting the number of participants (Attesters or Issuers) in
 Privacy Pass deployments for meaningful privacy is that it forces concentrated
-centralization amongst those participants.{
-{?CENTRALIZATION=I-D.nottingham-avoiding-internet-centralization}} discusses
+centralization amongst those participants.
+{{?CENTRALIZATION=I-D.nottingham-avoiding-internet-centralization}} discusses
 several ways in which this might be mitigated. For example, a multi-stakeholder
 governance model could be established to determine what candidate participants
 are fit to operate as participants in a Privacy Pass deployment. This is
