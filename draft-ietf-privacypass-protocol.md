@@ -240,16 +240,16 @@ The structure fields are defined as follows:
 The values `token_input` and `blinded_element` are stored locally and used later
 as described in {{private-finalize}}. The Client then generates an HTTP POST request
 to send to the Issuer, with the TokenRequest as the body. The media type for
-this request is "message/token-request". An example request is shown below.
+this request is "application/private-token-request". An example request is shown below.
 
 ~~~
 :method = POST
 :scheme = https
 :authority = issuer.example.net
 :path = /example-token-request
-accept = message/token-response
+accept = application/private-token-response
 cache-control = no-cache, no-store
-content-type = message/token-request
+content-type = application/private-token-request
 content-length = <Length of TokenRequest>
 
 <Bytes containing the TokenRequest>
@@ -298,11 +298,11 @@ The structure fields are defined as follows:
   where Ns is as defined in {{OPRF, Section 4}}.
 
 The Issuer generates an HTTP response with status code 200 whose body consists
-of TokenResponse, with the content type set as "message/token-response".
+of TokenResponse, with the content type set as "application/private-token-response".
 
 ~~~
 :status = 200
-content-type = message/token-response
+content-type = application/private-token-response
 content-length = <Length of TokenResponse>
 
 <Bytes containing the TokenResponse>
@@ -445,7 +445,7 @@ The structure fields are defined as follows:
 
 The Client then generates an HTTP POST request to send to the Issuer,
 with the TokenRequest as the body. The media type for this request
-is "message/token-request". An example request is shown below, where
+is "application/private-token-request". An example request is shown below, where
 Nk = 512.
 
 ~~~
@@ -453,9 +453,9 @@ Nk = 512.
 :scheme = https
 :authority = issuer.example.net
 :path = /example-token-request
-accept = message/token-response
+accept = application/private-token-response
 cache-control = no-cache, no-store
-content-type = message/token-request
+content-type = application/private-token-request
 content-length = <Length of TokenRequest>
 
 <Bytes containing the TokenRequest>
@@ -489,11 +489,11 @@ struct {
 
 The rsabssa_blind_sign function is defined in {{BLINDRSA, Section 5.1.2.}}.
 The Issuer generates an HTTP response with status code 200 whose body consists
-of TokenResponse, with the content type set as "message/token-response".
+of TokenResponse, with the content type set as "application/private-token-response".
 
 ~~~
 :status = 200
-content-type = message/token-response
+content-type = application/private-token-response
 content-length = <Length of TokenResponse>
 
 <Bytes containing the TokenResponse>
@@ -592,20 +592,20 @@ This document updates the "Token Type" Registry with the following values.
 This specification defines the following protocol messages, along with their
 corresponding media types:
 
-- TokenRequest: "message/token-request"
-- TokenResponse: "message/token-response"
+- TokenRequest: "application/private-token-request"
+- TokenResponse: "application/private-token-response"
 
 The definition for each media type is in the following subsections.
 
-### "message/token-request" media type
+### "application/private-token-request" media type
 
 Type name:
 
-: message
+: application
 
 Subtype name:
 
-: token-request
+: private-token-request
 
 Required parameters:
 
@@ -668,15 +668,15 @@ Change controller:
 
 : IESG
 
-### "message/token-response" media type
+### "application/private-token-response" media type
 
 Type name:
 
-: message
+: application
 
 Subtype name:
 
-: access-token-response
+: private-token-response
 
 Required parameters:
 
