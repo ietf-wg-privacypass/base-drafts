@@ -324,10 +324,13 @@ The authenticator value in the Token structure is computed over the token_type,
 nonce, context, and token_key_id fields.
 
 When used for client authorization, the "PrivateToken" authentication
-scheme defines one parameter, "token", which is a quoted string containing
-the base64url-encoded Token struct. Since the length of the Token struct is not
-fixed, the base64url data MUST include padding. All unknown or unsupported
-parameters to "PrivateToken" authentication credentials MUST be ignored.
+scheme defines one parameter, "token", which contains the base64url-encoded
+Token struct. Since the length of the Token struct is not fixed, the base64url
+value MUST include padding. As an Authentication Parameter (`auth-param` from
+{{!RFC9110}}), the value can be either a token or a quoted-string, and might be
+required to be a quoted-string if the base64url string includes "=" characters.
+All unknown or unsupported parameters to "PrivateToken" authentication credentials
+MUST be ignored.
 
 Clients present this Token structure to origins in a new HTTP request using
 the Authorization header as follows:
