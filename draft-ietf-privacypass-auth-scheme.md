@@ -438,7 +438,12 @@ cookies or changing networks, to prevent an origin using the redemption context 
 a cookie to recognize clients.
 
 Applications SHOULD constrain tokens to a single origin unless the use case can
-accommodate such replay attacks.
+accommodate such replay attacks. Replays are also possible if the client redeems a
+token sent as part of 0-RTT data. If successful token redemption produces side
+effects, origins SHOULD implement an anti-replay mechanism to mitigate the harm of
+such replays. See {{?RFC8446, Section 8}} and {{?RFC9001, Section 9.2}} for details
+about anti-replay mechanisms, as well as {{?RFC8470, Section 3}} for discussion about
+safety considerations for 0-RTT HTTP data.
 
 All random values in the challenge and token MUST be generated using a cryptographically
 secure source of randomness.
