@@ -50,7 +50,7 @@ redeeming the client's token (the origin) to link it with issuance flow.
 Different types of authenticators, using different token issuance protocols, can
 be used as Privacy Pass tokens.
 
-This document defines a common HTTP authentication scheme ({{!RFC7235}}),
+This document defines a common HTTP authentication scheme ({{!RFC9110}}),
 PrivateToken, that allows clients to redeem various kinds of Privacy Pass
 tokens.
 
@@ -105,7 +105,7 @@ using the "Authorization" HTTP header.
 
 # HTTP Authentication Scheme {#challenge-redemption}
 
-Token redemption is performed using HTTP Authentication ({{!RFC7235}}), with
+Token redemption is performed using HTTP Authentication ({{!RFC9110}}), with
 the scheme "PrivateToken". Origins challenge clients to present a token
 from a specific issuer ({{challenge}}). Once a client has received a token
 from that issuer, or already has a valid token available, it presents the
@@ -448,7 +448,7 @@ secure source of randomness.
 ## Authentication Scheme
 
 This document registers the "PrivateToken" authentication scheme in the "Hypertext
-Transfer Protocol (HTTP) Authentication Scheme Registry" established by {{!RFC7235}}.
+Transfer Protocol (HTTP) Authentication Scheme Registry" defined in {{!RFC9110}}.
 
 Authentication Scheme Name: PrivateToken
 
