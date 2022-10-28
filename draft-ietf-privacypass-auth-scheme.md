@@ -172,13 +172,13 @@ origin names, they are delimited with commas "," without any whitespace.
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following attributes:
 
-- "challenge", which contains a base64url-encoded {{!RFC4648}} TokenChallenge
-value. Since the length of the challenge is not fixed, the base64url data MUST
-include padding. This MUST be unique for every 401 HTTP response to prevent
+- "challenge", which is a quoted string containing a base64url-encoded {{!RFC4648}}
+TokenChallenge value. Since the length of the challenge is not fixed, the base64url
+data MUST include padding. This MUST be unique for every 401 HTTP response to prevent
 replay attacks. This attribute is required for all challenges.
 
-- "token-key", which contains a base64url encoding of the public key for
-use with the issuance protocol indicated by the challenge. Since the length of
+- "token-key", which is a quoted string containing a base64url encoding of the public
+key for use with the issuance protocol indicated by the challenge. Since the length of
 the key is not fixed, the base64url data MUST include padding. This attribute MAY
 be omitted in deployments where clients are able to retrieve the issuer key using
 an out-of-band mechanism.
@@ -194,7 +194,7 @@ MAY require other attributes.
 As an example, the WWW-Authenticate header could look like this:
 
 ~~~
-WWW-Authenticate: PrivateToken challenge=abc..., token-key=123...
+WWW-Authenticate: PrivateToken challenge="abc...", token-key="123..."
 ~~~
 
 Upon receipt of this challenge, a client uses the message and keys in the
@@ -216,8 +216,8 @@ types, issuers, or to include multiple redemption contexts. For example,
 the WWW-Authenticate header could look like this:
 
 ~~~
-WWW-Authenticate: PrivateToken challenge=abc..., token-key=123...,
-PrivateToken challenge=def..., token-key=234...
+WWW-Authenticate: PrivateToken challenge="abc...", token-key="123...",
+PrivateToken challenge="def...", token-key="234..."
 ~~~
 
 Origins should only include challenges for different types of issuance protocols with
@@ -318,16 +318,16 @@ The authenticator value in the Token structure is computed over the token_type,
 nonce, context, and token_key_id fields.
 
 When used for client authorization, the "PrivateToken" authentication
-scheme defines one parameter, "token", which contains the base64url-encoded
-Token struct. Since the length of the Token struct is not fixed, the base64url
-data MUST include padding. All unknown or unsupported parameters to "PrivateToken"
-authentication credentials MUST be ignored.
+scheme defines one parameter, "token", which is a quoted string containing
+the base64url-encoded Token struct. Since the length of the Token struct is not
+fixed, the base64url data MUST include padding. All unknown or unsupported
+parameters to "PrivateToken" authentication credentials MUST be ignored.
 
 Clients present this Token structure to origins in a new HTTP request using
 the Authorization header as follows:
 
 ~~~
-Authorization: PrivateToken token=abc...
+Authorization: PrivateToken token="abc..."
 ~~~
 
 For token types that support public verifiability, origins verify the token
