@@ -172,16 +172,22 @@ origin names, they are delimited with commas "," without any whitespace.
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following attributes:
 
-- "challenge", which is a quoted string containing a base64url-encoded {{!RFC4648}}
-TokenChallenge value. Since the length of the challenge is not fixed, the base64url
-data MUST include padding. This MUST be unique for every 401 HTTP response to prevent
-replay attacks. This attribute is required for all challenges.
+- "challenge", which contains a base64url-encoded {{!RFC4648}} TokenChallenge
+ value. Since the length of the challenge is not fixed, the base64url value MUST
+ include padding. As an Authentication Parameter (`auth-param` from {{!RFC9110}}),
+ the value can be either a token or a quoted-string, and might be required to be a
+ quoted-string if the base64url string includes "=" characters. This challenge value
+ MUST be unique for every 401 HTTP response to prevent replay attacks. This attribute
+ is required for all challenges.
 
-- "token-key", which is a quoted string containing a base64url encoding of the public
-key for use with the issuance protocol indicated by the challenge. Since the length of
-the key is not fixed, the base64url data MUST include padding. This attribute MAY
-be omitted in deployments where clients are able to retrieve the issuer key using
-an out-of-band mechanism.
+- "token-key", which contains a base64url encoding of the public key for
+use with the issuance protocol indicated by the challenge. Since the length of
+the key is not fixed, the base64url value MUST include padding. As an
+Authentication Parameter (`auth-param` from {{!RFC9110}}), the value can be
+either a token or a quoted-string, and might be required to be a
+quoted-string if the base64url string includes "=" characters. This attribute
+MAY be omitted in deployments where clients are able to retrieve the issuer key
+using an out-of-band mechanism.
 
 - "max-age", an optional attribute that consists of the number of seconds for which
 the challenge will be accepted by the origin.
