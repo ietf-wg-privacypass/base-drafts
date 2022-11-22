@@ -395,8 +395,8 @@ To mitigate the risk of deployments becoming dependent on tokens, clients and se
 their behavior unless explicitly configured not to. In particular, clients SHOULD
 ignore token challenges with some non-zero probability. Likewise, origins SHOULD
 randomly choose to not challenge clients for tokens with some non-zero probability.
-Moreover, origins SHOULD include random token types in token challenges with some
-non-zero probability.
+Moreover, origins SHOULD include random token types, from the Reserved list of "greased"
+types (defined in {{token-types}}), with some non-zero probability.
 
 # Security Considerations {#sec-considerations}
 
