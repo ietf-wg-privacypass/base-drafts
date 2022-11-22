@@ -129,7 +129,7 @@ discussed in {{context-construction}}.
 
 1. Select the origin information to include in the TokenChallenge. This can
 be empty to allow fully cross-origin tokens, a single origin name that
-matches the origin itself, or a list of origin names containing the origin.
+matches the origin itself, or a list of origin names containing the origin itself.
 
 The TokenChallenge message has the following structure:
 
@@ -167,7 +167,9 @@ ignored.
 allows a token to be scoped to a specific set of origins. The string is prefixed
 with a 2-octet integer indicating the length, in network byte order. If empty, any
 non-origin-specific token can be redeemed. If the string contains multiple
-origin names, they are delimited with commas "," without any whitespace.
+origin names, they are delimited with commas "," without any whitespace. If this
+field is not empty, the Origin MUST include its own name as one of the names in
+the list.
 
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following attributes:
