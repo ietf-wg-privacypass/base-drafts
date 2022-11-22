@@ -321,7 +321,7 @@ the token. The value of this field is defined by the token_type and correspondin
 issuance protocol.
 
 The authenticator value in the Token structure is computed over the token_type,
-nonce, context, and token_key_id fields.
+nonce, challenge_digest, and token_key_id fields.
 
 When used for client authorization, the "PrivateToken" authentication
 scheme defines one parameter, "token", which contains the base64url-encoded
