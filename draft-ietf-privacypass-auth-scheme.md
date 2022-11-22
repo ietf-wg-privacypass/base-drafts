@@ -50,7 +50,7 @@ redeeming the client's token (the origin) to link it with issuance flow.
 Different types of authenticators, using different token issuance protocols, can
 be used as Privacy Pass tokens.
 
-This document defines a common HTTP authentication scheme ({{!RFC9110}}),
+This document defines a common HTTP authentication scheme ({{!RFC9110, Section 11}}),
 PrivateToken, that allows clients to redeem various kinds of Privacy Pass
 tokens.
 
@@ -105,7 +105,7 @@ using the "Authorization" HTTP header field.
 
 # HTTP Authentication Scheme {#challenge-redemption}
 
-Token redemption is performed using HTTP Authentication ({{!RFC9110}}), with
+Token redemption is performed using HTTP Authentication ({{!RFC9110, Section 11}}), with
 the scheme "PrivateToken". Origins challenge clients to present a token
 from a specific issuer ({{challenge}}). Once a client has received a token
 from that issuer, or already has a valid token available, it presents the
@@ -174,7 +174,7 @@ following attributes:
 
 - "challenge", which contains a base64url-encoded {{!RFC4648}} TokenChallenge
  value. Since the length of the challenge is not fixed, the base64url value MUST
- include padding. As an Authentication Parameter (`auth-param` from {{!RFC9110}}),
+ include padding. As an Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}),
  the value can be either a token or a quoted-string, and might be required to be a
  quoted-string if the base64url string includes "=" characters. This challenge value
  MUST be unique for every 401 HTTP response to prevent replay attacks. This attribute
@@ -183,7 +183,7 @@ following attributes:
 - "token-key", which contains a base64url encoding of the public key for
 use with the issuance protocol indicated by the challenge. Since the length of
 the key is not fixed, the base64url value MUST include padding. As an
-Authentication Parameter (`auth-param` from {{!RFC9110}}), the value can be
+Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}), the value can be
 either a token or a quoted-string, and might be required to be a
 quoted-string if the base64url string includes "=" characters. This attribute
 MAY be omitted in deployments where clients are able to retrieve the issuer key
@@ -327,7 +327,7 @@ When used for client authorization, the "PrivateToken" authentication
 scheme defines one parameter, "token", which contains the base64url-encoded
 Token struct. Since the length of the Token struct is not fixed, the base64url
 value MUST include padding. As an Authentication Parameter (`auth-param` from
-{{!RFC9110}}), the value can be either a token or a quoted-string, and might be
+{{!RFC9110, Section 11.2}}), the value can be either a token or a quoted-string, and might be
 required to be a quoted-string if the base64url string includes "=" characters.
 All unknown or unsupported parameters to "PrivateToken" authentication credentials
 MUST be ignored.
@@ -462,7 +462,7 @@ secure source of randomness.
 ## Authentication Scheme
 
 This document registers the "PrivateToken" authentication scheme in the "Hypertext
-Transfer Protocol (HTTP) Authentication Scheme Registry" defined in {{!RFC9110}}.
+Transfer Protocol (HTTP) Authentication Scheme Registry" defined in {{!RFC9110, Section 16.4}}.
 
 Authentication Scheme Name: PrivateToken
 
