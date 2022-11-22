@@ -97,11 +97,11 @@ uses the following terms in more specific ways:
 to create a signed token.
 
 - Token challenge: A requirement for tokens sent from an origin to a client, using
-the "WWW-Authenticate" HTTP header. This challenge is bound to a specific token
+the "WWW-Authenticate" HTTP header field. This challenge is bound to a specific token
 issuer and issuance protocol, and may be additionally bound to a specific context or origin name.
 
 - Token redemption: An action by which a client presents a token to an origin,
-using the "Authorization" HTTP header.
+using the "Authorization" HTTP header field.
 
 # HTTP Authentication Scheme {#challenge-redemption}
 
@@ -113,7 +113,7 @@ token to the origin ({{redemption}}).
 
 ## Token Challenge {#challenge}
 
-Origins send a token challenge to clients in an "WWW-Authenticate" header with
+Origins send a token challenge to clients in an "WWW-Authenticate" header field with
 the "PrivateToken" scheme. This challenge includes a TokenChallenge message,
 along with information about what keys to use when requesting a token from
 the issuer.
@@ -194,10 +194,10 @@ the challenge will be accepted by the origin.
 
 Clients can ignore the challenge if the token-key is invalid or otherwise untrusted.
 
-The header MAY also include the standard "realm" attribute, if desired. Issuance protocols
+The header field MAY also include the standard "realm" attribute, if desired. Issuance protocols
 MAY require other attributes.
 
-As an example, the WWW-Authenticate header could look like this:
+As an example, the WWW-Authenticate header field could look like this:
 
 ~~~
 WWW-Authenticate: PrivateToken challenge="abc...", token-key="123..."
@@ -216,10 +216,10 @@ current connection is not authoritative (according to the TLS certificate).
 
 Caching and pre-fetching of tokens is discussed in {{caching}}.
 
-Note that it is possible for the WWW-Authenticate header to include multiple
+Note that it is possible for the WWW-Authenticate header field to include multiple
 challenges. This allows the origin to indicate support for different token
 types, issuers, or to include multiple redemption contexts. For example,
-the WWW-Authenticate header could look like this:
+the WWW-Authenticate header field could look like this:
 
 ~~~
 WWW-Authenticate: PrivateToken challenge="abc...", token-key="123...",
@@ -333,7 +333,7 @@ All unknown or unsupported parameters to "PrivateToken" authentication credentia
 MUST be ignored.
 
 Clients present this Token structure to origins in a new HTTP request using
-the Authorization header as follows:
+the Authorization header field as follows:
 
 ~~~
 Authorization: PrivateToken token="abc..."
