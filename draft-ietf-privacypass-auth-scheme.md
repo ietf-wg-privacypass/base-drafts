@@ -209,9 +209,10 @@ token_type the client does not recognize or support, it MUST NOT parse or
 respond to the challenge. If the TokenChallenge contains a non-empty
 origin_info field, the client MUST validate that the name of the origin
 that issued the authentication challenge is included in the list of origin
-names. Clients MAY have further restrictions and requirements around
+names; if validation fails, the client MUST NOT process or respond to the
+challenge. Clients MAY have further restrictions and requirements around
 validating when a challenge is considered acceptable or valid. For example,
-clients can choose to reject challenges that list origin names for which
+clients can choose to ignore challenges that list origin names for which
 current connection is not authoritative (according to the TLS certificate).
 
 Caching and pre-fetching of tokens is discussed in {{caching}}.
