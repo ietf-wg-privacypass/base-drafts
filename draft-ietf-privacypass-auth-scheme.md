@@ -112,6 +112,13 @@ from a specific issuer ({{challenge}}). Once a client has received a token
 from that issuer, or already has a valid token available, it presents the
 token to the origin ({{redemption}}).
 
+Unlike many authentication schemes in which a client will present the same credentials
+across multiple requests, tokens used with the "PrivateToken" scheme are generally
+single-use credentials, and are not reused. Specific token issuance protocols MAY
+define behavior that allows token reuse, however. In deployment scenarios where origins send
+token challenges to request tokens, origins ought to expect at most one request containing
+a token from the client in reaction to a particular challenge.
+
 ## Token Challenge {#challenge}
 
 Origins send a token challenge to clients in an "WWW-Authenticate" header field with
