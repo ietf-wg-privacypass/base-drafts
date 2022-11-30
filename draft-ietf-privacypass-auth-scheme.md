@@ -173,14 +173,14 @@ field is not empty, the Origin MUST include its own name as one of the names in
 the list.
 
 When used in an authentication challenge, the "PrivateToken" scheme uses the
-following attributes:
+following parameters:
 
 - "challenge", which contains a base64url-encoded {{!RFC4648}} TokenChallenge
  value. Since the length of the challenge is not fixed, the base64url value MUST
  include padding. As an Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}),
  the value can be either a token or a quoted-string, and might be required to be a
  quoted-string if the base64url string includes "=" characters. This challenge value
- MUST be unique for every 401 HTTP response to prevent replay attacks. This attribute
+ MUST be unique for every 401 HTTP response to prevent replay attacks. This parameter
  is required for all challenges.
 
 - "token-key", which contains a base64url encoding of the public key for
@@ -188,17 +188,18 @@ use with the issuance protocol indicated by the challenge. Since the length of
 the key is not fixed, the base64url value MUST include padding. As an
 Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}), the value can be
 either a token or a quoted-string, and might be required to be a
-quoted-string if the base64url string includes "=" characters. This attribute
+quoted-string if the base64url string includes "=" characters. This parameter
 MAY be omitted in deployments where clients are able to retrieve the issuer key
 using an out-of-band mechanism.
 
-- "max-age", an optional attribute that consists of the number of seconds for which
+- "max-age", an optional parameter that consists of the number of seconds for which
 the challenge will be accepted by the origin.
 
 Clients can ignore the challenge if the token-key is invalid or otherwise untrusted.
 
-The header field MAY also include the standard "realm" attribute, if desired. Issuance protocols
-MAY require other attributes.
+The header field MAY also include the standard "realm" parameter, if desired. Issuance
+protocols MAY require other parameters. Clients SHOULD ignore unknown parameters
+in challenges, except if otherwise specified by issuance protocols.
 
 As an example, the WWW-Authenticate header field could look like this:
 
@@ -441,7 +442,7 @@ same time. For example, if a client is challenged for a token with a unique cont
 time T1 and then subsequently obtains a token at time T2, a colluding issuer and origin can
 link this to the same client if T2 is unique to the client. This linkability is less
 feasible as the number of issuance events at time T2 increases. Depending on the "max-age"
-token challenge attribute, clients MAY try to augment the time between getting challenged
+token challenge parameter, clients MAY try to augment the time between getting challenged
 then redeeming a token so as to make this sort of linkability more difficult. For more
 discussion on correlation risks between token issuance and redemption, see
 {{?I-D.ietf-privacypass-architecture}}.
