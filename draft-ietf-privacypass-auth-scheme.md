@@ -75,8 +75,8 @@ tokens to redeem.
 {: #fig-overview title="Token Architectural Components"}
 
 In addition to working with different token issuance protocols, this scheme
-supports optionally associating tokens with origin-chosen contexts and
-specific origin names. Relying parties that request and redeem tokens can choose
+optionally supports use of tokens that are associated with origin-chosen contexts
+and specific origin names. Relying parties that request and redeem tokens can choose
 a specific kind of token, as appropriate for its use case. These options allow
 for different deployment models to prevent double-spending, and allow for both
 interactive (online challenges) and non-interactive (pre-fetched) tokens.
