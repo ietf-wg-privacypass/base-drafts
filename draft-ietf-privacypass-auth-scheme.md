@@ -349,7 +349,7 @@ authenticator using the public key of the issuer, and validate that the signed
 message matches the concatenation of the client nonce and the hash of a
 valid TokenChallenge. For context-bound tokens, origins store or reconstruct the
 contexts of previous TokenChallenge structures in order to validate the token.
-A TokenChallenge MAY be bound to a specific HTTP session with client, but
+A TokenChallenge MAY be bound to a specific TLS session with a client, but
 origins can also accept tokens for valid challenges in new sessions.
 Origins SHOULD implement some form of double-spend prevention that prevents
 a token with the same nonce from being redeemed twice. This prevents clients
