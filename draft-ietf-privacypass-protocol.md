@@ -110,26 +110,26 @@ Issuers MUST provide two parameters for configuration:
 2. Issuer Public Key values: an Issuer Public Key for an issuance protocol.
 
 The Issuer parameters can be obtained from an Issuer via a directory object, which is a JSON
-object whose values are other JSON objects and URLs for the parameters.
+object {{!RFC8259, Section 4}} whose values are other JSON values {{RFC8259, Section 3}} for the parameters.
 
 | Field Name           | Value                                                  |
 |:---------------------|:-------------------------------------------------------|
-| issuer-request-uri   | Issuer Request URI resource URL as a JSON string       |
-| token-keys           | List of Issuer Public Key values, each as JSON objects |
+| issuer-request-uri   | Issuer Request URI resource percent-encoded URL string, represented as a JSON string {{RFC8259, Section 7}} |
+| token-keys           | List of Issuer Public Key values, each represented as JSON objects {{RFC8259, Section 4}} |
 
 Each "token-keys" JSON object contains the following fields and corresponding raw values.
 
 | Field Name   | Value                                                  |
 |:-------------|:-------------------------------------------------------|
-| token-type   | Integer value of the Token Type, as defined in {{token-type}}, as a JSON number |
-| token-key    | The base64url encoding of the public key for use with the issuance protocol, including padding, as a JSON string |
+| token-type   | Integer value of the Token Type, as defined in {{token-type}}, represented as a JSON number {{RFC8259, Section 6}} |
+| token-key    | The base64url encoding of the public key for use with the issuance protocol, including padding, represented as a JSON string {{RFC8259, Section 7}} |
 
 Issuers MAY advertise multiple token-keys for the same token-type to
 support key rotation. In this case, Issuers indicate preference for which
 token key to use based on the order of keys in the list, with preference
 given to keys earlier in the list.
 
-Altogether, the Issuer's JSON directory could look like:
+Altogether, the Issuer's directory could look like:
 
 ~~~
  {
