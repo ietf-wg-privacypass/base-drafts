@@ -79,7 +79,7 @@ publicly verifiable based on the blind RSA signature scheme
 
 This document does not cover the Privacy Pass architecture, including
 choices that are necessary for ensuring that client privacy leaks.
-Both of these considerations are covered in {{ARCHITECTURE}}.
+This information is covered in {{ARCHITECTURE}}.
 
 # Terminology
 
