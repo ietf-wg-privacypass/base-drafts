@@ -355,15 +355,15 @@ valid = (token_authenticator == Token.authenticator)
 ## Issuer Configuration
 
 Issuers are configured with Private and Public Key pairs, each denoted skI and
-pkI, respectively, used to produce tokens. Each key pair MUST be generated as
-follows:
+pkI, respectively, used to produce tokens. A RECOMMENDED method for generating
+key pairs is as follows:
 
 ~~~
 seed = random(Ns)
 (skI, pkI) = DeriveKeyPair(seed, "PrivacyPass")
 ~~~
 
-The key identifier for this specific key pair, denoted `token_key_id`, is computed
+The key identifier for a public key `pkI`, denoted `token_key_id`, is computed
 as follows:
 
 ~~~
