@@ -408,7 +408,7 @@ is a real human user. The origin would send clients a 401 HTTP response that con
 token challenge in a "WWW-Authenticate" header field along with content that contains
 the puzzle to display to the user. Clients that are able to respond with a token will
 be able to automatically return the token and not show the puzzle, while clients that
-either do not support tokens or are unable to fetch tokens at a particular time will
+either do not support tokens or are unable to fetch tokens at a particular time can
 present the user with the puzzle.
 
 To mitigate the risk of deployments becoming dependent on tokens, clients and servers SHOULD grease
