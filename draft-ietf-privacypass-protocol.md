@@ -97,8 +97,8 @@ The following terms are used throughout this document.
 - Public Key: The public key used by the Issuer for issuing and verifying
   tokens.
 
-We assume that all protocol messages are encoded into raw byte format
-before being sent across the wire.
+Unless otherwise specified, this document encodes protocol messages in TLS
+notation from {{!TLS13=RFC8446}}, Section 3.
 
 # Configuration {#setup}
 
