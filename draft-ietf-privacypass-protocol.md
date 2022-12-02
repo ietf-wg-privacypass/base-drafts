@@ -78,9 +78,9 @@ pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}, and one that is
 publicly verifiable based on the blind RSA signature scheme
 {{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
 
-This document DOES NOT cover the architectural framework required for
+This document does not cover the architectural framework required for
 running and maintaining the Privacy Pass protocol in the Internet
-setting. In addition, it DOES NOT cover the choices that are necessary
+setting. In addition, it does not cover the choices that are necessary
 for ensuring that client privacy leaks do not occur. Both of these
 considerations are covered in {{I-D.ietf-privacypass-architecture}}.
 
