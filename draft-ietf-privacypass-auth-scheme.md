@@ -490,6 +490,7 @@ Template:
 * Nk: The length in bytes of an output authenticator
 * Nid: The length of the token key identifier
 * Reference: Where this algorithm is defined
+* Notes: Any notes associated with the entry
 
 New entries in this registry are subject to the Specification Required registration policy
 ({{!RFC8126, Section 4.6}}). Designated experts need to ensure that the token type
@@ -516,26 +517,26 @@ structure SHOULD be filled with random bytes when using greased values.
 
 The initial contents for this registry are defined in the table below.
 
-| Value  | Name                   | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Nid | Reference     |
-|:-------|:-----------------------|:--------------------|:----------------|:-----------------|:----|:----|:--------------|
-| 0x0000 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x02AA | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x1132 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x2E96 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x3CD3 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x4473 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x5A63 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x6D32 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x7F3F | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x8D07 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0x916B | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xA6A4 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xBEAB | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xC3F3 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xDA42 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xE944 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xF057 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document |
-| 0xFF00-0xFFFF | Private Use     | N/A                 | N/A             | N/A              | N/A | N/A | This document |
+| Value  | Name                   | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Nid | Reference     | Notes |
+|:-------|:-----------------------|:--------------------|:----------------|:-----------------|:----|:----|:--------------|:------|
+| 0x0000 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0x02AA | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0x1132 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0x2E96 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0x3CD3 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0x4473 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0x5A63 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0x6D32 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0x7F3F | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0x8D07 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0x916B | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0xA6A4 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0xBEAB | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0xC3F3 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0xDA42 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0xE944 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0xF057 | RESERVED               | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
+| 0xFF00-0xFFFF | Private Use     | N/A                 | N/A             | N/A              | N/A | N/A | This document | None  |
 {: #aeadid-values title="Token Types"}
 
 --- back
