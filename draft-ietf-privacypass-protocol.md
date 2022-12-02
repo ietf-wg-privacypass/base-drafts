@@ -283,7 +283,7 @@ as follows:
 
 ~~~
 struct {
-   uint8_t evaluate_msg[Nk];
+   uint8_t evaluate_msg[Ne];
    uint8_t evaluate_proof[Ns+Ns];
 } TokenResponse;
 ~~~
