@@ -591,10 +591,10 @@ This document updates the "Well-Known URIs" Registry {{WellKnownURIs}} with the 
 
 This document updates the "Token Type" Registry from {{AUTHSCHEME, Section 5.2}} with the following values.
 
-| Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
-|:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
-| 0x0001 | VOPRF (P-384, SHA-384)         | N                   | N               | N                | 48  | {{private-flow}} |
-| 0x0002 | Blind RSA (SHA-384, 2048-bit)  | Y                   | N               | N                | 256 | {{public-flow}}  |
+| Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Nid | Reference        |
+|:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:----|:-----------------|
+| 0x0001 | VOPRF (P-384, SHA-384)         | N                   | N               | N                | 48  | 32  | {{private-flow}} |
+| 0x0002 | Blind RSA (SHA-384, 2048-bit)  | Y                   | N               | N                | 256 | 32  | {{public-flow}}  |
 {: #tokentype-values title="Token Types"}
 
 ## Media Types
