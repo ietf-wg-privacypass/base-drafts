@@ -114,10 +114,9 @@ token to the origin ({{redemption}}).
 
 Unlike many authentication schemes in which a client will present the same credentials
 across multiple requests, tokens used with the "PrivateToken" scheme are
-single-use credentials, and are not reused. Specific token issuance protocols MAY
-define behavior that allows token reuse, however. In deployment scenarios where origins send
-token challenges to request tokens, origins ought to expect at most one request containing
-a token from the client in reaction to a particular challenge.
+single-use credentials, and are not reused. Spending the same token value more than once allows the origin to link multiple transactions to the same client. In deployment scenarios
+where origins send token challenges to request tokens, origins ought to expect at most one
+request containing a token from the client in reaction to a particular challenge.
 
 ## Token Challenge {#challenge}
 
