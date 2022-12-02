@@ -402,6 +402,15 @@ or issuer is unavailable, or clients might simply not support the requested toke
 Origins SHOULD account for such operational or interoperability failures by offering
 clients an alternative type of challenge such as CAPTCHA for accessing a resource.
 
+For example, consider a scenario in which the client is a web browser, and the origin
+can accept either a token or a solution to a puzzle intended to determine if the client
+is a real human user. The origin would send clients a 401 HTTP response that contains a
+token challenge in a "WWW-Authenticate" header field along with content that contains
+the puzzle to display to the user. Clients that are able to respond with a token will
+be able to automatically return the token and not show the puzzle, while clients that
+either do not support tokens or are unable to fetch tokens at a particular time will
+present the user with the puzzle.
+
 To mitigate the risk of deployments becoming dependent on tokens, clients and servers SHOULD grease
 their behavior unless explicitly configured not to. In particular, clients SHOULD
 ignore token challenges with some non-zero probability. Likewise, origins SHOULD
