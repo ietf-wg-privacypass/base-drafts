@@ -53,7 +53,6 @@ normative:
   HTTP-Authentication:
     title: The Privacy Pass HTTP Authentication Scheme
     target: https://datatracker.ietf.org/doc/html/draft-pauly-privacypass-auth-scheme-00
-  I-D.ietf-privacypass-architecture:
 
 --- abstract
 
@@ -70,7 +69,7 @@ metadata during the issuance flow.
 The Privacy Pass protocol provides a privacy-preserving authorization
 mechanism. In essence, the protocol allows clients to provide
 cryptographic tokens that prove nothing other than that they have been
-created by a given server in the past {{I-D.ietf-privacypass-architecture}}.
+created by a given server in the past {{?ARCHITECTURE=I-D.ietf-privacypass-architecture}}.
 
 This document describes the issuance protocol for Privacy Pass. It specifies
 two variants: one that is privately verifiable based on the oblivious
@@ -78,11 +77,9 @@ pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}, and one that is
 publicly verifiable based on the blind RSA signature scheme
 {{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
 
-This document does not cover the architectural framework required for
-running and maintaining the Privacy Pass protocol in the Internet
-setting. In addition, it does not cover the choices that are necessary
-for ensuring that client privacy leaks do not occur. Both of these
-considerations are covered in {{I-D.ietf-privacypass-architecture}}.
+This document does not cover the Privacy Pass architecture, including
+choices that are necessary for ensuring that client privacy leaks.
+Both of these considerations are covered in {{ARCHITECTURE}}.
 
 # Terminology
 
@@ -565,7 +562,7 @@ based on the VOPRF defined in {{OPRF}} and blind RSA protocol defined in
 {{BLINDRSA}}. All security considerations described in the VOPRF and blind RSA
 documents also apply in the Privacy Pass use-case. Considerations related to
 broader privacy and security concerns in a multi-Client and multi-Issuer
-setting are deferred to the Architecture document {{I-D.ietf-privacypass-architecture}}.
+setting are deferred to the Architecture document {{ARCHITECTURE}}.
 
 Beyond these considerations, it is worth highlighting the fact that Client TokenRequest
 messages contain truncated token key IDs. This is done to minimize the chance that an Issuer
