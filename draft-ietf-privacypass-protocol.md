@@ -311,7 +311,7 @@ content-length = <Length of TokenResponse>
 ## Finalization {#private-finalize}
 
 Upon receipt, the Client handles the response and, if successful, deserializes
-the body values TokenResponse.evaluate_response and TokenResponse.evaluate_proof,
+the body values TokenResponse.evaluate_msg and TokenResponse.evaluate_proof,
 yielding `evaluated_element` and `proof`. If deserialization of either value fails,
 the Client aborts the protocol. Otherwise, the Client processes the response as
 follows:
