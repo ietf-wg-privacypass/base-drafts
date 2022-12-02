@@ -589,7 +589,7 @@ This document updates the "Well-Known URIs" Registry {{WellKnownURIs}} with the 
 
 ## Token Type
 
-This document updates the "Token Type" Registry with the following values.
+This document updates the "Token Type" Registry from {{HTTP-Authentication, Section 5.2}} with the following values.
 
 | Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
 |:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
