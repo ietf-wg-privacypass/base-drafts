@@ -184,7 +184,7 @@ Clients provide the following as input to the issuance protocol:
 - Issuer Public Key pkI, with a key identifier `token_key_id` computed as
   described in {{issuer-configuration}}.
 - Challenge value `challenge`, an opaque byte string. For example, this might
-  be provided by the redemption protocol in {{HTTP-Authentication}}.
+  be provided by the redemption protocol in {{AUTHSCHEME}}.
 
 Given this configuration and these inputs, the two messages exchanged in
 this protocol are described below. This section uses notation described in
@@ -404,7 +404,7 @@ Clients provide the following as input to the issuance protocol:
 - Issuer Public Key pkI, with a key identifier `token_key_id` computed as
   described in {{public-issuer-configuration}}.
 - Challenge value `challenge`, an opaque byte string. For example, this might
-  be provided by the redemption protocol in {{HTTP-Authentication}}.
+  be provided by the redemption protocol in {{AUTHSCHEME}}.
 
 Given this configuration and these inputs, the two messages exchanged in
 this protocol are described below.
@@ -511,7 +511,7 @@ authenticator = rsabssa_finalize(pkI, nonce, blind_sig, blind_inv)
 
 The rsabssa_finalize function is defined in {{BLINDRSA, Section 5.1.3.}}.
 If this succeeds, the Client then constructs a Token as described in
-{{HTTP-Authentication}} as follows:
+{{AUTHSCHEME}} as follows:
 
 ~~~
 struct {
@@ -589,7 +589,7 @@ This document updates the "Well-Known URIs" Registry {{WellKnownURIs}} with the 
 
 ## Token Type
 
-This document updates the "Token Type" Registry from {{HTTP-Authentication, Section 5.2}} with the following values.
+This document updates the "Token Type" Registry from {{AUTHSCHEME, Section 5.2}} with the following values.
 
 | Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
 |:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
