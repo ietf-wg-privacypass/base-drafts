@@ -160,17 +160,17 @@ interactive or non-interactive, and per-origin or cross-origin.
 # Issuance Protocol for Privately Verifiable Tokens {#private-flow}
 
 The Privacy Pass issuance protocol is a two message protocol that takes
-as input a challenge from the redemption protocol and produces a token,
-as shown in the figure below.
+as input a TokenChallenge from the redemption protocol {{AUTHSCHEME, Section 2.1}}
+and produces a Token {{AUTHSCHEME, Section 2.2}}, as shown in the figure below.
 
 ~~~
-   Origin          Client                   Issuer
-                    (pkI)                 (skI, pkI)
-                  +------------------------------------\
-  Challenge   ----> TokenRequest ------------->        |
-                  |                       (evaluate)   |
-    Token    <----+     <--------------- TokenResponse |
-                  \------------------------------------/
+   Origin            Client                   Issuer
+                      (pkI)                 (skI, pkI)
+                   +------------------------------------\
+TokenChallenge ----> TokenRequest ------------->        |
+                   |                       (evaluate)   |
+     Token    <----+     <--------------- TokenResponse |
+                   \------------------------------------/
 ~~~
 
 Issuers provide a Private and Public Key, denoted skI and pkI, respectively,
