@@ -92,7 +92,7 @@ The following terms are used throughout this document.
 
 - Client: An entity that provides authorization tokens to services
   across the Internet, in return for authorization.
-- Issuer: A service produces Privacy Pass tokens to clients.
+- Issuer: A service that produces Privacy Pass tokens to clients.
 - Private Key: The secret key used by the Issuer for issuing tokens.
 - Public Key: The public key used by the Issuer for issuing and verifying
   tokens.
