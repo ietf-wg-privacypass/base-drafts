@@ -97,7 +97,7 @@ The following terms are used throughout this document.
   tokens.
 
 Unless otherwise specified, this document encodes protocol messages in TLS
-notation from {{!TLS13=RFC8446}}, Section 3.
+notation from {{!TLS13=RFC8446}}, Section 3. Moreover, all constants are in network byte order.
 
 # Configuration {#setup}
 
