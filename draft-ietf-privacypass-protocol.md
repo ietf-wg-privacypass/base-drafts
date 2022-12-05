@@ -61,7 +61,8 @@ normative:
 
 This document specifies two variants of the the two-message issuance protocol
 for Privacy Pass tokens: one that produces tokens that are privately
-verifiable, and another that produces tokens that are publicly verifiable.
+verifiable using the issuance private key, and another that produces tokens
+that are publicly verifiable using the issuance public key.
 
 --- middle
 
@@ -73,10 +74,10 @@ cryptographic tokens that prove nothing other than that they have been
 created by a given server in the past {{?ARCHITECTURE=I-D.ietf-privacypass-architecture}}.
 
 This document describes the issuance protocol for Privacy Pass built on {{?HTTP=RFC9110}}. It specifies
-two variants: one that is privately verifiable based on the oblivious
-pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}, and one that is
-publicly verifiable based on the blind RSA signature scheme
-{{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
+two variants: one that is privately verifiable using the issuance private key
+based on the oblivious pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}},
+and one that is publicly verifiable using the issuance public key based on
+the blind RSA signature scheme {{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
 
 This document does not cover the Privacy Pass architecture, including
 choices that are necessary for ensuring that client privacy leaks.
@@ -96,16 +97,16 @@ The following terms are used throughout this document.
   tokens.
 
 Unless otherwise specified, this document encodes protocol messages in TLS
-notation from {{!TLS13=RFC8446}}, Section 3.
+notation from {{!TLS13=RFC8446}}, Section 3. Moreover, all constants are in network byte order.
 
 # Configuration {#setup}
 
 Issuers MUST provide two parameters for configuration:
 
-1. Issuer Request URI: a token request URL for generating access tokens.
+1. Issuer Request URI: A token request URL for generating access tokens.
    For example, an Issuer URL might be https://issuer.example.net/example-token-request.
    This parameter uses resource media type "text/plain".
-2. Issuer Public Key values: an Issuer Public Key for an issuance protocol.
+2. Issuer Public Key values: An Issuer Public Key for an issuance protocol.
 
 The Issuer parameters can be obtained from an Issuer via a directory object, which is a JSON
 object {{!RFC8259, Section 4}} whose values are other JSON values {{RFC8259, Section 3}} for the parameters.
@@ -221,7 +222,7 @@ The Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
-   uint16_t token_type = 0x0001;
+   uint16_t token_type = 0x0001; /* Token type VOPRF(P-384, SHA-384) */
    uint8_t truncated_token_key_id;
    uint8_t blinded_msg[Ne];
 } TokenRequest;
@@ -324,7 +325,7 @@ succeeds, the Client then constructs a Token as follows:
 
 ~~~
 struct {
-    uint16_t token_type = 0x0001
+    uint16_t token_type = 0x0001; /* Token type VOPRF(P-384, SHA-384) */
     uint8_t nonce[32];
     uint8_t challenge_digest[32];
     uint8_t token_key_id[32];
@@ -337,8 +338,9 @@ If the Finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
 
-To verify a token, a verifier creates a VOPRF context, evaluates the token contents,
-and compares the result against the token authenticator value, as follows:
+To verify a token, a verifier creates a VOPRF context using the Issuer Private Key,
+evaluates the token contents, and compares the result against the token authenticator
+value, as follows:
 
 ~~~
 server_context = SetupVOPRFServer(0x0004, skI, pkI)
@@ -424,7 +426,7 @@ The Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
-   uint16_t token_type = 0x0002
+   uint16_t token_type = 0x0002; /* Token type Blind RSA (2048-bit) */
    uint8_t truncated_token_key_id;
    uint8_t blinded_msg[Nk];
 } TokenRequest;
@@ -509,7 +511,7 @@ If this succeeds, the Client then constructs a Token as described in
 
 ~~~
 struct {
-    uint16_t token_type = 0x0002
+    uint16_t token_type = 0x0002; /* Token type Blind RSA (2048-bit) */
     uint8_t nonce[32];
     uint8_t challenge_digest[32];
     uint8_t token_key_id[32];
@@ -523,7 +525,7 @@ If the rsabssa_finalize function fails, the Client aborts the protocol.
 ## Token Verification
 
 To verify a token, a verifier checks that Token.authenticator is a valid
-signature over the remainder of the token input as described below. The
+signature over the remainder of the token input using the Issuer Public Key. The
 function `RSASSA-PSS-VERIFY` is defined in {{Section 8.1.2 of !RFC8017}},
 using SHA-384 as the Hash function, MGF1 with SHA-384 as the PSS mask
 generation function (MGF), and a 48-byte salt length (sLen).
@@ -568,7 +570,7 @@ can use distinct keys for targeting specific users. Since the key ID is truncate
 to a single byte, an Issuer can partition the set of Clients into at most 256 different
 anonymity sets. On top of this key ID space, Clients SHOULD apply some form of key
 consistency mechanism to help ensure they are not being given unique keys; see
-{{?CONSISTENCY=I-D.wood-key-consistency}} for more details.
+{{?CONSISTENCY=I-D.privacypass-key-consistency}} for more details.
 
 # IANA considerations
 
