@@ -74,7 +74,7 @@ mechanism. In essence, the protocol allows clients to provide
 cryptographic tokens that prove nothing other than that they have been
 created by a given server in the past {{?ARCHITECTURE=I-D.ietf-privacypass-architecture}}.
 
-This document describes the issuance protocol for Privacy Pass. It specifies
+This document describes the issuance protocol for Privacy Pass built on {{?HTTP=RFC9110}}. It specifies
 two variants: one that is privately verifiable based on the oblivious
 pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}, and one that is
 publicly verifiable based on the blind RSA signature scheme
@@ -240,7 +240,7 @@ The structure fields are defined as follows:
 
 The values `token_input` and `blinded_element` are stored locally and used later
 as described in {{private-finalize}}. The Client then generates an HTTP POST request
-to send to the Issuer, with the TokenRequest as the body. The media type for
+to send to the Issuer, with the TokenRequest as the content. The media type for
 this request is "application/private-token-request". An example request is shown below.
 
 ~~~
@@ -298,7 +298,7 @@ The structure fields are defined as follows:
   computed as `concat(SerializeScalar(proof[0]), SerializeScalar(proof[1]))`,
   where Ns is as defined in {{OPRF, Section 4}}.
 
-The Issuer generates an HTTP response with status code 200 whose body consists
+The Issuer generates an HTTP response with status code 200 whose content consists
 of TokenResponse, with the content type set as "application/private-token-response".
 
 ~~~
@@ -312,7 +312,7 @@ content-length = <Length of TokenResponse>
 ## Finalization {#private-finalize}
 
 Upon receipt, the Client handles the response and, if successful, deserializes
-the body values TokenResponse.evaluate_msg and TokenResponse.evaluate_proof,
+the content values TokenResponse.evaluate_msg and TokenResponse.evaluate_proof,
 yielding `evaluated_element` and `proof`. If deserialization of either value fails,
 the Client aborts the protocol. Otherwise, the Client processes the response as
 follows:
@@ -445,7 +445,7 @@ The structure fields are defined as follows:
 - "blinded_msg" is the Nk-octet request defined above.
 
 The Client then generates an HTTP POST request to send to the Issuer,
-with the TokenRequest as the body. The media type for this request
+with the TokenRequest as the content. The media type for this request
 is "application/private-token-request". An example request is shown below, where
 Nk = 512.
 
@@ -489,7 +489,7 @@ struct {
 ~~~
 
 The rsabssa_blind_sign function is defined in {{BLINDRSA, Section 5.1.2.}}.
-The Issuer generates an HTTP response with status code 200 whose body consists
+The Issuer generates an HTTP response with status code 200 whose content consists
 of TokenResponse, with the content type set as "application/private-token-response".
 
 ~~~
@@ -503,7 +503,7 @@ content-length = <Length of TokenResponse>
 ## Finalization {#public-finalize}
 
 Upon receipt, the Client handles the response and, if successful, processes the
-body as follows:
+content as follows:
 
 ~~~
 authenticator = rsabssa_finalize(pkI, nonce, blind_sig, blind_inv)
