@@ -222,7 +222,7 @@ The Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
-   uint16_t token_type = 0x0001;
+   uint16_t token_type = 0x0001; /* Token type VOPRF(P-384, SHA-384) */
    uint8_t truncated_token_key_id;
    uint8_t blinded_msg[Ne];
 } TokenRequest;
@@ -515,7 +515,7 @@ If this succeeds, the Client then constructs a Token as described in
 
 ~~~
 struct {
-    uint16_t token_type = 0x0002
+    uint16_t token_type = 0x0002; /* Token type Blind RSA (2048-bit) */
     uint8_t nonce[32];
     uint8_t challenge_digest[32];
     uint8_t token_key_id[32];
