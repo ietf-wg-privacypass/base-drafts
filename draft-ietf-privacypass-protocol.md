@@ -529,9 +529,9 @@ If the rsabssa_finalize function fails, the Client aborts the protocol.
 
 To verify a token, a verifier checks that Token.authenticator is a valid
 signature over the remainder of the token input as described below. The
-function `RSA-Verify(msg, pk, sig)` is a procedure to verify a signature `sig`
-over message `msg` using the public key `pk`. Its implementation is not
-specified in this document.
+function `RSASSA-PSS-VERIFY` is defined in {{Section 8.1.2 of !RFC8017}},
+using SHA-384 as the Hash function, MGF1 with SHA-384 as the PSS mask
+generation function (MGF), and a 48-byte salt length (sLen).
 
 ~~~
 token_authenticator_input =
@@ -539,7 +539,7 @@ token_authenticator_input =
          Token.nonce,
          Token.challenge_digest,
          Token.token_key_id)
-valid = RSA-Verify(token_authenticator_input, pkI, Token.authenticator)
+valid = RSASSA-PSS-VERIFY(pkI, token_authenticator_input, Token.authenticator)
 ~~~
 
 ## Issuer Configuration {#public-issuer-configuration}
