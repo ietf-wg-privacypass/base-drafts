@@ -53,7 +53,6 @@ normative:
   HTTP-Authentication:
     title: The Privacy Pass HTTP Authentication Scheme
     target: https://datatracker.ietf.org/doc/html/draft-pauly-privacypass-auth-scheme-00
-  I-D.ietf-privacypass-architecture:
   WellKnownURIs:
     title: Well-Known URIs
     target: https://www.iana.org/assignments/well-known-uris/well-known-uris.xhtml
@@ -73,7 +72,7 @@ metadata during the issuance flow.
 The Privacy Pass protocol provides a privacy-preserving authorization
 mechanism. In essence, the protocol allows clients to provide
 cryptographic tokens that prove nothing other than that they have been
-created by a given server in the past {{I-D.ietf-privacypass-architecture}}.
+created by a given server in the past {{?ARCHITECTURE=I-D.ietf-privacypass-architecture}}.
 
 This document describes the issuance protocol for Privacy Pass. It specifies
 two variants: one that is privately verifiable based on the oblivious
@@ -81,11 +80,9 @@ pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}, and one that is
 publicly verifiable based on the blind RSA signature scheme
 {{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
 
-This document DOES NOT cover the architectural framework required for
-running and maintaining the Privacy Pass protocol in the Internet
-setting. In addition, it DOES NOT cover the choices that are necessary
-for ensuring that client privacy leaks do not occur. Both of these
-considerations are covered in {{I-D.ietf-privacypass-architecture}}.
+This document does not cover the Privacy Pass architecture, including
+choices that are necessary for ensuring that client privacy leaks.
+This information is covered in {{ARCHITECTURE}}.
 
 # Terminology
 
@@ -100,8 +97,8 @@ The following terms are used throughout this document.
 - Public Key: The public key used by the Issuer for issuing and verifying
   tokens.
 
-We assume that all protocol messages are encoded into raw byte format
-before being sent across the wire.
+Unless otherwise specified, this document encodes protocol messages in TLS
+notation from {{!TLS13=RFC8446}}, Section 3.
 
 # Configuration {#setup}
 
@@ -263,7 +260,7 @@ Upon receipt of the request, the Issuer validates the following conditions:
 
 - The TokenRequest contains a supported token_type.
 - The TokenRequest.truncated_token_key_id corresponds to the truncated key ID of a Public Key owned by the issuer.
-- The TokenRequest.blinded_request is of the correct size.
+- The TokenRequest.blinded_msg is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
 to the client.
@@ -287,7 +284,7 @@ as follows:
 
 ~~~
 struct {
-   uint8_t evaluate_msg[Nk];
+   uint8_t evaluate_msg[Ne];
    uint8_t evaluate_proof[Ns+Ns];
 } TokenResponse;
 ~~~
@@ -315,7 +312,7 @@ content-length = <Length of TokenResponse>
 ## Finalization {#private-finalize}
 
 Upon receipt, the Client handles the response and, if successful, deserializes
-the body values TokenResponse.evaluate_response and TokenResponse.evaluate_proof,
+the body values TokenResponse.evaluate_msg and TokenResponse.evaluate_proof,
 yielding `evaluated_element` and `proof`. If deserialization of either value fails,
 the Client aborts the protocol. Otherwise, the Client processes the response as
 follows:
@@ -569,7 +566,7 @@ based on the VOPRF defined in {{OPRF}} and blind RSA protocol defined in
 {{BLINDRSA}}. All security considerations described in the VOPRF and blind RSA
 documents also apply in the Privacy Pass use-case. Considerations related to
 broader privacy and security concerns in a multi-Client and multi-Issuer
-setting are deferred to the Architecture document {{I-D.ietf-privacypass-architecture}}.
+setting are deferred to the Architecture document {{ARCHITECTURE}}.
 
 Beyond these considerations, it is worth highlighting the fact that Client TokenRequest
 messages contain truncated token key IDs. This is done to minimize the chance that an Issuer
