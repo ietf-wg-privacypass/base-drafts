@@ -55,22 +55,28 @@ This document defines a common HTTP authentication scheme ({{!RFC9110, Section 1
 PrivateToken, that allows clients to redeem various kinds of Privacy Pass
 tokens.
 
-Clients and relying parties interact using this scheme to perform the token challenge
-and token redemption flow. Clients use a token issuance protocol to actually fetch
-tokens to redeem.
+Clients and relying parties (origins) interact using this scheme to perform the
+token challenge and token redemption flow. In particular, origins challenge clients
+for a token with an HTTP Authentication challenge (using the WWW-Authenticate response
+header field). Clients then respond to that challenge with an HTTP authentiation response
+(using the Authorization request header field). Clients produce an authentication response
+based on the origin's token challenge by running the token issuance protocol {{?ISSUANCE=I-D.ietf-privacypass-protocol}}.
+The act of presenting a token in an Authorization request header is referred to as token
+redemption. This interaction between client and origin is shown below.
 
 ~~~
  Client                             Relying Party (Origin)
 
-    <------------------------------ Challenge \
-                                              |
+    <---------------------- WWW-Authenticate  \  Challenge
+                            (TokenChallenge)  |
 +----------------------------------\          |
 |                                  |          |
 |  Issuance Protocol               |          |
 |                                  |          |
 +----------------------------------/          |
                                               |
-     Redemption -------------------------- >  /
+  Authorization --------------------------->  /  Response (redemption)
+     (Token)
 ~~~
 {: #fig-overview title="Token Architectural Components"}
 
@@ -84,8 +90,6 @@ interactive (online challenges) and non-interactive (pre-fetched) tokens.
 ## Terminology
 
 {::boilerplate bcp14}
-
-<!-- TODO: Remove duplicates that occur in Architecture doc -->
 
 Unless otherwise specified, this document encodes protocol messages in TLS
 notation from {{!TLS13=RFC8446}}, Section 3.
@@ -101,7 +105,7 @@ to create a signed token.
 the "WWW-Authenticate" HTTP header field. This challenge is bound to a specific token
 issuer and issuance protocol, and may be additionally bound to a specific context or origin name.
 
-- Token redemption: An action by which a client presents a token to an origin,
+- Token redemption: An action by which a client presents a token to an origin in an HTTP request,
 using the "Authorization" HTTP header field.
 
 # HTTP Authentication Scheme {#challenge-redemption}
