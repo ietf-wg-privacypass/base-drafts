@@ -591,10 +591,10 @@ This document updates the "Well-Known URIs" Registry {{WellKnownURIs}} with the 
 
 This document updates the "Token Type" Registry from {{AUTHSCHEME, Section 5.2}} with the following values.
 
-| Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Nid | Reference        |
-|:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:----|:-----------------|
-| 0x0001 | VOPRF (P-384, SHA-384)         | N                   | N               | N                | 48  | 32  | {{private-flow}} |
-| 0x0002 | Blind RSA (SHA-384, 2048-bit)  | Y                   | N               | N                | 256 | 32  | {{public-flow}}  |
+| Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Nid | Reference        | Notes |
+|:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:----|:-----------------|:------|
+| 0x0001 | VOPRF (P-384, SHA-384)         | N                   | N               | N                | 48  | 32  | {{private-flow}} | None  |
+| 0x0002 | Blind RSA (2048-bit)           | Y                   | N               | N                | 256 | 32  | {{public-flow}}  | The RSABSSA-SHA384-PSS-Deterministic and RSABSSA-SHA384-PSSZERO-Deterministic variants are supported |
 {: #tokentype-values title="Token Types"}
 
 ## Media Types
