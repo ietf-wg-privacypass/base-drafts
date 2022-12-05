@@ -379,19 +379,15 @@ in rotation.
 
 This section describes a variant of the issuance protocol in {{private-flow}}
 for producing publicly verifiable tokens. It differs from the previous variant
-in two important ways:
+in that the output tokens are publicly verifiable by anyone with the Issuer public
+key.
 
-1. The output tokens are publicly verifiable by anyone with the Issuer public
-   key.
-1. The issuance protocol does not admit public or private metadata to bind
-   additional context to tokens.
+This means any Origin can select a given Issuer to produce tokens, as long as the
+Origin has the Issuer public key, without explicit coordination or permission from
+the Issuer. This is because the Issuer does not learn the Origin that requested the
+token during the issuance protocol.
 
-The first property means that any Origin can select a given Issuer to produce tokens, as long
-as the Origin has the Issuer public key, without explicit coordination or permission
-from the Issuer. This is because the Issuer does not learn the Origin that requested
-the token during the issuance protocol.
-
-Beyond these differences, the publicly verifiable issuance protocol variant is nearly
+Beyond this difference, the publicly verifiable issuance protocol variant is nearly
 identical to the privately verifiable issuance protocol variant. In particular, Issuers
 provide a Private and Public Key, denoted skI and pkI, respectively, used to produce
 tokens as input to the protocol. See {{public-issuer-configuration}} for how this key
@@ -530,9 +526,9 @@ If the rsabssa_finalize function fails, the Client aborts the protocol.
 
 To verify a token, a verifier checks that Token.authenticator is a valid
 signature over the remainder of the token input using the Issuer Public Key. The
-function `RSA-Verify(msg, pk, sig)` is a procedure to verify a signature `sig`
-over message `msg` using the public key `pk`. Its implementation is not
-specified in this document.
+function `RSASSA-PSS-VERIFY` is defined in {{Section 8.1.2 of !RFC8017}},
+using SHA-384 as the Hash function, MGF1 with SHA-384 as the PSS mask
+generation function (MGF), and a 48-byte salt length (sLen).
 
 ~~~
 token_authenticator_input =
@@ -540,7 +536,7 @@ token_authenticator_input =
          Token.nonce,
          Token.challenge_digest,
          Token.token_key_id)
-valid = RSA-Verify(token_authenticator_input, pkI, Token.authenticator)
+valid = RSASSA-PSS-VERIFY(pkI, token_authenticator_input, Token.authenticator)
 ~~~
 
 ## Issuer Configuration {#public-issuer-configuration}
