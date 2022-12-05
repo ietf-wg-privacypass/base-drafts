@@ -53,6 +53,9 @@ normative:
   HTTP-Authentication:
     title: The Privacy Pass HTTP Authentication Scheme
     target: https://datatracker.ietf.org/doc/html/draft-pauly-privacypass-auth-scheme-00
+  WellKnownURIs:
+    title: Well-Known URIs
+    target: https://www.iana.org/assignments/well-known-uris/well-known-uris.xhtml
 
 --- abstract
 
@@ -145,7 +148,8 @@ Altogether, the Issuer's JSON directory could look like:
 ~~~
 
 Issuer directory resources have the media type "application/json"
-and are located at the well-known location /.well-known/token-issuer-directory.
+and are located at the well-known location /.well-known/token-issuer-directory;
+see {{wkuri-reg}} for the registration information for this well-known URI.
 
 # Token Challenge Requirements
 
@@ -574,6 +578,15 @@ consistency mechanism to help ensure they are not being given unique keys; see
 
 # IANA considerations
 
+## Well-Known 'token-issuer-directory' URI {#wkuri-reg}
+
+This document updates the "Well-Known URIs" Registry {{WellKnownURIs}} with the following values.
+
+| URI Suffix  | Change Controller  | Reference | Status | Related information |
+|:------------|:-------------------|:----------|:-------|:--------------------|
+| token-issuer-directory | IETF | [this document] | permanent | None |
+{: #wellknownuri-values title="'xxx' Well-Known URI"}
+
 ## Token Type
 
 This document updates the "Token Type" Registry with the following values.
@@ -582,7 +595,7 @@ This document updates the "Token Type" Registry with the following values.
 |:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
 | 0x0001 | VOPRF (P-384, SHA-384)         | N                   | N               | N                | 48  | {{private-flow}} |
 | 0x0002 | Blind RSA (SHA-384, 2048-bit)  | Y                   | N               | N                | 256 | {{public-flow}}  |
-{: #aeadid-values title="Token Types"}
+{: #tokentype-values title="Token Types"}
 
 ## Media Types
 
