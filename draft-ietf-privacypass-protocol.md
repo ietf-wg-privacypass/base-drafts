@@ -160,17 +160,17 @@ interactive or non-interactive, and per-origin or cross-origin.
 # Issuance Protocol for Privately Verifiable Tokens {#private-flow}
 
 The Privacy Pass issuance protocol is a two message protocol that takes
-as input a challenge from the redemption protocol and produces a token,
-as shown in the figure below.
+as input a TokenChallenge from the redemption protocol {{AUTHSCHEME, Section 2.1}}
+and produces a Token {{AUTHSCHEME, Section 2.2}}, as shown in the figure below.
 
 ~~~
-   Origin          Client                   Issuer
-                    (pkI)                 (skI, pkI)
-                  +------------------------------------\
-  Challenge   ----> TokenRequest ------------->        |
-                  |                       (evaluate)   |
-    Token    <----+     <--------------- TokenResponse |
-                  \------------------------------------/
+   Origin            Client                   Issuer
+                      (pkI)                 (skI, pkI)
+                   +------------------------------------\
+TokenChallenge ----> TokenRequest ------------->        |
+                   |                       (evaluate)   |
+     Token    <----+     <--------------- TokenResponse |
+                   \------------------------------------/
 ~~~
 
 Issuers provide a Private and Public Key, denoted skI and pkI, respectively,
@@ -184,7 +184,7 @@ Clients provide the following as input to the issuance protocol:
 - Issuer Public Key pkI, with a key identifier `token_key_id` computed as
   described in {{issuer-configuration}}.
 - Challenge value `challenge`, an opaque byte string. For example, this might
-  be provided by the redemption protocol in {{HTTP-Authentication}}.
+  be provided by the redemption protocol in {{AUTHSCHEME}}.
 
 Given this configuration and these inputs, the two messages exchanged in
 this protocol are described below. This section uses notation described in
@@ -404,7 +404,7 @@ Clients provide the following as input to the issuance protocol:
 - Issuer Public Key pkI, with a key identifier `token_key_id` computed as
   described in {{public-issuer-configuration}}.
 - Challenge value `challenge`, an opaque byte string. For example, this might
-  be provided by the redemption protocol in {{HTTP-Authentication}}.
+  be provided by the redemption protocol in {{AUTHSCHEME}}.
 
 Given this configuration and these inputs, the two messages exchanged in
 this protocol are described below.
@@ -511,7 +511,7 @@ authenticator = rsabssa_finalize(pkI, nonce, blind_sig, blind_inv)
 
 The rsabssa_finalize function is defined in {{BLINDRSA, Section 5.1.3.}}.
 If this succeeds, the Client then constructs a Token as described in
-{{HTTP-Authentication}} as follows:
+{{AUTHSCHEME}} as follows:
 
 ~~~
 struct {
@@ -589,12 +589,12 @@ This document updates the "Well-Known URIs" Registry {{WellKnownURIs}} with the 
 
 ## Token Type
 
-This document updates the "Token Type" Registry with the following values.
+This document updates the "Token Type" Registry from {{AUTHSCHEME, Section 5.2}} with the following values.
 
-| Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
-|:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
-| 0x0001 | VOPRF (P-384, SHA-384)         | N                   | N               | N                | 48  | {{private-flow}} |
-| 0x0002 | Blind RSA (SHA-384, 2048-bit)  | Y                   | N               | N                | 256 | {{public-flow}}  |
+| Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Nid | Reference        |
+|:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:----|:-----------------|
+| 0x0001 | VOPRF (P-384, SHA-384)         | N                   | N               | N                | 48  | 32  | {{private-flow}} |
+| 0x0002 | Blind RSA (SHA-384, 2048-bit)  | Y                   | N               | N                | 256 | 32  | {{public-flow}}  |
 {: #tokentype-values title="Token Types"}
 
 ## Media Types
