@@ -234,7 +234,7 @@ The structure fields are defined as follows:
 - "truncated_token_key_id" is the least significant byte of the `token_key_id` ({{issuer-configuration}}) in network byte order (in other words, the last 8 bits of `token_key_id`).
 
 - "blinded_msg" is the Ne-octet blinded message defined above, computed as
-  `SerializeElement(blinded_element)`. 
+  `SerializeElement(blinded_element)`.
 
 The values `token_input` and `blinded_element` are stored locally and used later
 as described in {{private-finalize}}. The Client then generates an HTTP POST request
