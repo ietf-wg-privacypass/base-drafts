@@ -162,14 +162,14 @@ The Privacy Pass issuance protocol is a two message protocol that takes
 as input a TokenChallenge from the redemption protocol {{AUTHSCHEME, Section 2.1}}
 and produces a Token {{AUTHSCHEME, Section 2.2}}, as shown in the figure below.
 
-~~~
+~~~ aasvg
    Origin            Client                   Issuer
                       (pkI)                 (skI, pkI)
-                   +------------------------------------\
-TokenChallenge ----> TokenRequest ------------->        |
+                   +-----------------------------------.
+TokenChallenge --->| TokenRequest ------------->        |
                    |                       (evaluate)   |
      Token    <----+     <--------------- TokenResponse |
-                   \------------------------------------/
+                    `----------------------------------'
 ~~~
 
 Issuers provide a Private and Public Key, denoted skI and pkI, respectively,
