@@ -336,7 +336,7 @@ If the Finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
 
-Tokens are verified by creating a VOPRF context using the Issuer Private Key and Public Key,
+Verifying a Token requires creating a VOPRF context using the Issuer Private Key and Public Key,
 evaluating the token contents, and comparing the result against the token authenticator
 value:
 
