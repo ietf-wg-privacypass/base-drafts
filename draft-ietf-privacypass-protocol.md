@@ -50,16 +50,13 @@ author:
 
 normative:
   RFC2119:
-  HTTP-Authentication:
-    title: The Privacy Pass HTTP Authentication Scheme
-    target: https://datatracker.ietf.org/doc/html/draft-pauly-privacypass-auth-scheme-00
   WellKnownURIs:
     title: Well-Known URIs
     target: https://www.iana.org/assignments/well-known-uris/well-known-uris.xhtml
 
 --- abstract
 
-This document specifies two variants of the the two-message issuance protocol
+This document specifies two variants of the two-message issuance protocol
 for Privacy Pass tokens: one that produces tokens that are privately
 verifiable using the issuance private key, and another that produces tokens
 that are publicly verifiable using the issuance public key.
@@ -87,14 +84,14 @@ This information is covered in {{ARCHITECTURE}}.
 
 {::boilerplate bcp14}
 
-The following terms are used throughout this document.
+The following terms are used throughout this document. 
 
-- Client: An entity that provides authorization tokens to services
-  across the Internet, in return for authorization.
-- Issuer: A service that produces Privacy Pass tokens to clients.
-- Private Key: The secret key used by the Issuer for issuing tokens.
-- Public Key: The public key used by the Issuer for issuing and verifying
-  tokens.
+- Client: Clients obtain Tokens from an Issuer and redeem them for authorization.
+- Issuer: A service that provides Tokens to Clients.
+- Issuer Public Key: The public key (from a private-public key pair) used by the Issuer for issuing and verifying Tokens.
+- Issuer Private Key: The private key (from a private-public key pair) used by the Issuer for issuing and verifying Tokens.
+
+This document additionally uses the terms "Origin" and "Token" as defined in {{ARCHITECTURE}}.
 
 Unless otherwise specified, this document encodes protocol messages in TLS
 notation from {{!TLS13=RFC8446}}, Section 3. Moreover, all constants are in network byte order.
@@ -106,22 +103,22 @@ Issuers MUST provide two parameters for configuration:
 1. Issuer Request URI: A token request URL for generating access tokens.
    For example, an Issuer URL might be https://issuer.example.net/example-token-request.
    This parameter uses resource media type "text/plain".
-2. Issuer Public Key values: An Issuer Public Key for an issuance protocol.
+2. Issuer Public Key values: A list of Issuer Public Keys for the issuance protocol.
 
 The Issuer parameters can be obtained from an Issuer via a directory object, which is a JSON
-object {{!RFC8259, Section 4}} whose values are other JSON values {{RFC8259, Section 3}} for the parameters.
+object ({{!RFC8259, Section 4}}) whose values are other JSON values ({{RFC8259, Section 3}}) for the parameters.
 
 | Field Name           | Value                                                  |
 |:---------------------|:-------------------------------------------------------|
-| issuer-request-uri   | Issuer Request URI resource percent-encoded URL string, represented as a JSON string {{RFC8259, Section 7}} |
-| token-keys           | List of Issuer Public Key values, each represented as JSON objects {{RFC8259, Section 4}} |
+| issuer-request-uri   | Issuer Request URI resource percent-encoded URL string, represented as a JSON string ({{RFC8259, Section 7}}) |
+| token-keys           | List of Issuer Public Key values, each represented as JSON objects ({{RFC8259, Section 4}}) |
 
 Each "token-keys" JSON object contains the following fields and corresponding raw values.
 
 | Field Name   | Value                                                  |
 |:-------------|:-------------------------------------------------------|
-| token-type   | Integer value of the Token Type, as defined in {{token-type}}, represented as a JSON number {{RFC8259, Section 6}} |
-| token-key    | The base64url encoding of the public key for use with the issuance protocol, including padding, represented as a JSON string {{RFC8259, Section 7}} |
+| token-type   | Integer value of the Token Type, as defined in {{token-type}}, represented as a JSON number ({{RFC8259, Section 6}}) |
+| token-key    | The base64url encoding of the Public Key for use with the issuance protocol, including padding, represented as a JSON string ({{RFC8259, Section 7}}) |
 
 Issuers MAY advertise multiple token-keys for the same token-type to
 support key rotation. In this case, Issuers indicate preference for which
@@ -152,15 +149,15 @@ see {{wkuri-reg}} for the registration information for this well-known URI.
 
 # Token Challenge Requirements
 
-Clients receive challenges for tokens, as described in {{!AUTHSCHEME=I-D.pauly-privacypass-auth-scheme}}.
+Clients receive challenges for tokens, as described in {{!AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}.
 The basic token issuance protocols described in this document can be
 interactive or non-interactive, and per-origin or cross-origin.
 
 # Issuance Protocol for Privately Verifiable Tokens {#private-flow}
 
-The Privacy Pass issuance protocol is a two message protocol that takes
-as input a TokenChallenge from the redemption protocol {{AUTHSCHEME, Section 2.1}}
-and produces a Token {{AUTHSCHEME, Section 2.2}}, as shown in the figure below.
+The Privacy Pass issuance protocol is a two-message protocol that takes
+as input a TokenChallenge from the redemption protocol ({{AUTHSCHEME, Section 2.1}})
+and produces a Token ({{AUTHSCHEME, Section 2.2}}), as shown in the figure below.
 
 ~~~
    Origin            Client                   Issuer
@@ -172,23 +169,25 @@ TokenChallenge ----> TokenRequest ------------->        |
                    \------------------------------------/
 ~~~
 
-Issuers provide a Private and Public Key, denoted skI and pkI, respectively,
+Issuers provide a Private and Public Key, denoted `skI` and `pkI` respectively,
 used to produce tokens as input to the protocol. See {{issuer-configuration}}
-for how this key pair is generated.
+for how this key-pair is generated.
 
 Clients provide the following as input to the issuance protocol:
 
-- Issuer name, identifying the Issuer. This is typically a host name that
+- Issuer name: identifies the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
-- Issuer Public Key pkI, with a key identifier `token_key_id` computed as
+- Issuer Public Key: `pkI`, with a key identifier `token_key_id` computed as
   described in {{issuer-configuration}}.
-- Challenge value `challenge`, an opaque byte string. For example, this might
+- Challenge value: `challenge`, an opaque byte string. For example, this might
   be provided by the redemption protocol in {{AUTHSCHEME}}.
 
 Given this configuration and these inputs, the two messages exchanged in
 this protocol are described below. This section uses notation described in
 {{OPRF, Section 4}}, including SerializeElement and DeserializeElement,
 SerializeScalar and DeserializeScalar, and DeriveKeyPair.
+
+`Ne` and `Ns` are as defined in {{OPRF, Section 4}} for OPRF(P-384, SHA-384).
 
 ## Client-to-Issuer Request {#private-request}
 
@@ -214,7 +213,7 @@ blind, blinded_element = client_context.Blind(token_input)
 
 The Blind function is defined in {{OPRF, Section 3.3.2}}.
 If the Blind function fails, the Client aborts the protocol.
-The Client stores the nonce and challenge_digest values locally
+The Client stores the `nonce` and `challenge_digest` values locally
 for use when finalizing the issuance protocol to produce a token
 (as described in {{private-finalize}}).
 
@@ -232,10 +231,10 @@ The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-- "truncated_token_key_id" is the least significant byte of the `token_key_id` in network byte order (in other words, the last 8 bits of `token_key_id`).
+- "truncated_token_key_id" is the least significant byte of the `token_key_id` ({{issuer-configuration}}) in network byte order (in other words, the last 8 bits of `token_key_id`).
 
 - "blinded_msg" is the Ne-octet blinded message defined above, computed as
-  `SerializeElement(blinded_element)`. Ne is as defined in {{OPRF, Section 4}}.
+  `SerializeElement(blinded_element)`. 
 
 The values `token_input` and `blinded_element` are stored locally and used later
 as described in {{private-finalize}}. The Client then generates an HTTP POST request
@@ -290,12 +289,11 @@ struct {
 
 The structure fields are defined as follows:
 
-- "evaluate_msg" is the Ne-octet evaluated messaged, computed as
+- "evaluate_msg" is the Ne-octet evaluated message, computed as
   `SerializeElement(evaluate_element)`.
 
 - "evaluate_proof" is the (Ns+Ns)-octet serialized proof, which is a pair of Scalar values,
-  computed as `concat(SerializeScalar(proof[0]), SerializeScalar(proof[1]))`,
-  where Ns is as defined in {{OPRF, Section 4}}.
+  computed as `concat(SerializeScalar(proof[0]), SerializeScalar(proof[1]))`.
 
 The Issuer generates an HTTP response with status code 200 whose content consists
 of TokenResponse, with the content type set as "application/private-token-response".
@@ -338,9 +336,9 @@ If the Finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
 
-To verify a token, a verifier creates a VOPRF context using the Issuer Private Key,
-evaluates the token contents, and compares the result against the token authenticator
-value, as follows:
+Tokens are verified by creating a VOPRF context using the Issuer Private Key and Public Key,
+evaluating the token contents, and comparing the result against the token authenticator
+value:
 
 ~~~
 server_context = SetupVOPRFServer(0x0004, skI, pkI)
@@ -355,8 +353,8 @@ valid = (token_authenticator == Token.authenticator)
 
 ## Issuer Configuration
 
-Issuers are configured with Private and Public Key pairs, each denoted skI and
-pkI, respectively, used to produce tokens. A RECOMMENDED method for generating
+Issuers are configured with Private and Public Key pairs, each denoted `skI` and
+`pkI`, respectively, used to produce tokens. A RECOMMENDED method for generating
 key pairs is as follows:
 
 ~~~
@@ -395,11 +393,11 @@ pair is generated.
 
 Clients provide the following as input to the issuance protocol:
 
-- Issuer name, identifying the Issuer. This is typically a host name that
+- Issuer name: identifies the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
-- Issuer Public Key pkI, with a key identifier `token_key_id` computed as
+- Issuer Public Key: `pkI`, with a key identifier `token_key_id` computed as
   described in {{public-issuer-configuration}}.
-- Challenge value `challenge`, an opaque byte string. For example, this might
+- Challenge value: `challenge`, an opaque byte string. For example, this might
   be provided by the redemption protocol in {{AUTHSCHEME}}.
 
 Given this configuration and these inputs, the two messages exchanged in
@@ -436,14 +434,13 @@ The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-- "truncated_token_key_id" is the least significant byte of the `token_key_id` in network byte order (in other words, the last 8 bits of `token_key_id`).
+- "truncated_token_key_id" is the least significant byte of the `token_key_id` ({{public-issuer-configuration}}) in network byte order (in other words, the last 8 bits of `token_key_id`).
 
 - "blinded_msg" is the Nk-octet request defined above.
 
 The Client then generates an HTTP POST request to send to the Issuer,
 with the TokenRequest as the content. The media type for this request
-is "application/private-token-request". An example request is shown below, where
-Nk = 512.
+is "application/private-token-request". An example request is shown below:
 
 ~~~
 :method = POST
@@ -524,7 +521,7 @@ If the rsabssa_finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
 
-To verify a token, a verifier checks that Token.authenticator is a valid
+Tokens are verified by checking that Token.authenticator is a valid
 signature over the remainder of the token input using the Issuer Public Key. The
 function `RSASSA-PSS-VERIFY` is defined in {{Section 8.1.2 of !RFC8017}},
 using SHA-384 as the Hash function, MGF1 with SHA-384 as the PSS mask
