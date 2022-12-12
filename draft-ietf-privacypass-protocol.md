@@ -187,7 +187,7 @@ this protocol are described below. This section uses notation described in
 {{OPRF, Section 4}}, including SerializeElement and DeserializeElement,
 SerializeScalar and DeserializeScalar, and DeriveKeyPair.
 
-`Ne` and `Ns` are as defined in {{OPRF, Section 4}} for OPRF(P-384, SHA-384).
+The constants `Ne` and `Ns` are as defined in {{OPRF, Section 4}} for OPRF(P-384, SHA-384).
 
 ## Client-to-Issuer Request {#private-request}
 
