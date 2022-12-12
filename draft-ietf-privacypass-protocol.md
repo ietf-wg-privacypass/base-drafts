@@ -393,7 +393,7 @@ pair is generated.
 
 Clients provide the following as input to the issuance protocol:
 
-- Issuer name: identifies the Issuer. This is typically a host name that
+- Issuer name: An identifier for the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
 - Issuer Public Key: `pkI`, with a key identifier `token_key_id` computed as
   described in {{public-issuer-configuration}}.
