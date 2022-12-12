@@ -521,7 +521,7 @@ If the rsabssa_finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
 
-Tokens are verified by checking that Token.authenticator is a valid
+Verifying a Token requires checking that Token.authenticator is a valid
 signature over the remainder of the token input using the Issuer Public Key. The
 function `RSASSA-PSS-VERIFY` is defined in {{Section 8.1.2 of !RFC8017}},
 using SHA-384 as the Hash function, MGF1 with SHA-384 as the PSS mask
