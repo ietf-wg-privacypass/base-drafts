@@ -86,7 +86,7 @@ This information is covered in {{ARCHITECTURE}}.
 
 The following terms are used throughout this document. 
 
-- Client: Clients obtain Tokens from an Issuer and redeem them for authorization.
+- Client: An entity that runs the Issuance protocol with an Issuer to produce Tokens that can be later used for redemption (see {{Section 2.2 of AUTHSCHEME}}).
 - Issuer: A service that provides Tokens to Clients.
 - Issuer Public Key: The public key (from a private-public key pair) used by the Issuer for issuing and verifying Tokens.
 - Issuer Private Key: The private key (from a private-public key pair) used by the Issuer for issuing and verifying Tokens.
