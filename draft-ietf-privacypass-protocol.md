@@ -84,7 +84,7 @@ This information is covered in {{ARCHITECTURE}}.
 
 {::boilerplate bcp14}
 
-The following terms are used throughout this document. 
+The following terms are used throughout this document.
 
 - Client: An entity that runs the Issuance protocol with an Issuer to produce Tokens that can be later used for redemption (see {{Section 2.2 of AUTHSCHEME}}).
 - Issuer: A service that provides Tokens to Clients.
