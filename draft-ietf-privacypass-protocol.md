@@ -740,6 +740,7 @@ Author:
 Change controller:
 
 : IESG
+{: spacing="compact"}
 
 ### "application/private-token-request" media type
 
