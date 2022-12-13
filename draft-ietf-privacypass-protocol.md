@@ -201,7 +201,7 @@ this protocol are described below. This section uses notation described in
 SerializeScalar and DeserializeScalar, and DeriveKeyPair.
 
 The constants `Ne` and `Ns` are as defined in {{OPRF, Section 4}} for
-OPRF(P-384, SHA-384).
+OPRF(P-384, SHA-384). The constant `Nk` is defined by {{private-token-type}}.
 
 ## Client-to-Issuer Request {#private-request}
 
@@ -430,7 +430,8 @@ Clients provide the following as input to the issuance protocol:
   be provided by the redemption protocol in {{AUTHSCHEME}}.
 
 Given this configuration and these inputs, the two messages exchanged in
-this protocol are described below.
+this protocol are described below. The constant `Nk` is defined by
+{{public-token-type}}.
 
 ## Client-to-Issuer Request {#public-request}
 
@@ -628,7 +629,7 @@ following values.
 This document updates the "Token Type" Registry from
 {{AUTHSCHEME, Section 5.2}} with the following entries.
 
-### Token Type VOPRF (P-384, SHA-384)
+### Token Type VOPRF (P-384, SHA-384) {#private-token-type}
 
 * Value: 0x0001
 * Name: VOPRF (P-384, SHA-384)
@@ -640,7 +641,7 @@ This document updates the "Token Type" Registry from
 * Reference: {{private-flow}}
 * Notes: None
 
-### Token Type Blind RSA (2048-bit)
+### Token Type Blind RSA (2048-bit) {#public-token-type}
 
 * Value: 0x0002
 * Name: Blind RSA (2048-bit)
