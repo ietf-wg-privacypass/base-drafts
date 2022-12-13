@@ -714,7 +714,7 @@ Fragment identifier considerations:
 
 Additional information:
 
-: <dl>
+: <dl spacing="compact">
   <dt>Magic number(s):</dt><dd>N/A</dd>
   <dt>Deprecated alias names for this type:</dt><dd>N/A</dd>
   <dt>File extension(s):</dt><dd>N/A</dd>
