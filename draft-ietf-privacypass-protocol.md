@@ -383,8 +383,9 @@ valid = (token_authenticator == Token.authenticator)
 ## Issuer Configuration
 
 Issuers are configured with Private and Public Key pairs, each denoted `skI`
-and `pkI`, respectively, used to produce tokens. A RECOMMENDED method for
-generating key pairs is as follows:
+and `pkI`, respectively, used to produce tokens. These keys MUST NOT be reused
+in other protocols. A RECOMMENDED method for generating key pairs is as
+follows:
 
 ~~~
 seed = random(Ns)
@@ -395,7 +396,7 @@ The key identifier for a public key `pkI`, denoted `token_key_id`, is computed
 as follows:
 
 ~~~
-token_key_id = SHA256(concat(0x0001, SerializeElement(pkI)))
+token_key_id = SHA256(SerializeElement(pkI))
 ~~~
 
 Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers should
@@ -580,7 +581,8 @@ valid = RSASSA-PSS-VERIFY(pkI,
 
 Issuers are configured with Private and Public Key pairs, each denoted skI and
 pkI, respectively, used to produce tokens. Each key pair SHALL be generated as
-as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}.
+as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}. These key
+pairs MUST NOT be reused in other protocols.
 
 The key identifier for a keypair (skI, pkI), denoted `token_key_id`, is
 computed as SHA256(encoded_key), where encoded_key is a DER-encoded
