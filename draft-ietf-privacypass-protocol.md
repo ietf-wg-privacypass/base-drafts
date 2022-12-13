@@ -145,10 +145,9 @@ based on the blind RSA signature scheme
 
 Issuers MUST provide two parameters for configuration:
 
-1. Issuer Request URI: A token request URL for generating access tokens.
+1. Issuer Request URL: A token request URL for generating access tokens.
    For example, an Issuer URL might be
    https://issuer.example.net/request.
-   This parameter uses resource media type "text/plain".
 2. Issuer Public Key values: A list of Issuer Public Keys for the issuance
    protocol.
 
@@ -159,7 +158,7 @@ object are defined in {{directory-values}}.
 
 | Field Name           | Value                                                  |
 |:---------------------|:-------------------------------------------------------|
-| issuer-request-uri   | Issuer Request URI resource percent-encoded URL string, represented as a JSON string ({{RFC8259, Section 7}}) |
+| issuer-request-uri   | Issuer Request URL value as a percent-encoded URL string, represented as a JSON string ({{RFC8259, Section 7}}) |
 | token-keys           | List of Issuer Public Key values, each represented as JSON objects ({{RFC8259, Section 4}}) |
 {: #directory-values title="Issuer directory object description"}
 
