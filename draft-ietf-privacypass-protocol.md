@@ -116,20 +116,23 @@ Issuers MUST provide two parameters for configuration:
 
 The Issuer parameters can be obtained from an Issuer via a directory object,
 which is a JSON object ({{!RFC8259, Section 4}}) whose values are other JSON
-values ({{RFC8259, Section 3}}) for the parameters.
+values ({{RFC8259, Section 3}}) for the parameters. The contents of this JSON
+object are defined in {{directory-values}}.
 
 | Field Name           | Value                                                  |
 |:---------------------|:-------------------------------------------------------|
 | issuer-request-uri   | Issuer Request URI resource percent-encoded URL string, represented as a JSON string ({{RFC8259, Section 7}}) |
 | token-keys           | List of Issuer Public Key values, each represented as JSON objects ({{RFC8259, Section 4}}) |
+{: #directory-values title="Issuer directory object description"}
 
-Each "token-keys" JSON object contains the following fields and corresponding
-raw values.
+Each "token-keys" JSON object contains the fields and corresponding raw values
+defined in {{tokenkeys-values}}.
 
 | Field Name   | Value                                                  |
 |:-------------|:-------------------------------------------------------|
 | token-type   | Integer value of the Token Type, as defined in {{token-type}}, represented as a JSON number ({{RFC8259, Section 6}}) |
 | token-key    | The base64url encoding of the Public Key for use with the issuance protocol, including padding, represented as a JSON string ({{RFC8259, Section 7}}) |
+{: #tokenkeys-values title="Issuer 'token-keys' object description'"}
 
 Issuers MAY advertise multiple token-keys for the same token-type to
 support key rotation. In this case, Issuers indicate preference for which
@@ -154,9 +157,10 @@ Altogether, the Issuer's directory could look like:
  }
 ~~~
 
-Issuer directory resources have the media type "application/json"
-and are located at the well-known location /.well-known/token-issuer-directory;
-see {{wkuri-reg}} for the registration information for this well-known URI.
+Issuer directory resources have the media type
+"application/token-issuer-directory" and are located at the well-known location
+/.well-known/token-issuer-directory; see {{wkuri-reg}} for the registration
+information for this well-known URI.
 
 # Token Challenge Requirements
 
@@ -613,6 +617,8 @@ ensure they are not being given unique keys; see
 
 # IANA considerations
 
+This section contains considerations for IANA.
+
 ## Well-Known 'token-issuer-directory' URI {#wkuri-reg}
 
 This document updates the "Well-Known URIs" Registry {{WellKnownURIs}} with the
@@ -623,7 +629,84 @@ following values.
 | token-issuer-directory | IETF | [this document] | permanent | None |
 {: #wellknownuri-values title="'token-issuer-directory' Well-Known URI"}
 
-## Token Type
+## Token Issuer Directory Media Type
+
+This specification defines a new media type
+"application/token-issuer-directory" for representing the Issuer's directory.
+IANA [shall update / has updated] the "Media Types" registry at
+https://www.iana.org/assignments/media-types with the registration information
+in this section for the media type listed below.
+
+Type name:
+
+: application
+
+Subtype name:
+
+: token-issuer-directory
+
+Required parameters:
+
+: N/A
+
+Optional parameters:
+
+: None
+
+Encoding considerations:
+
+: "binary"
+
+Security considerations:
+
+: see {{setup}}
+
+Interoperability considerations:
+
+: N/A
+
+Published specification:
+
+: this specification
+
+Applications that use this media type:
+
+: N/A
+
+Fragment identifier considerations:
+
+: N/A
+
+Additional information:
+
+: <dl>
+  <dt>Magic number(s):</dt><dd>N/A</dd>
+  <dt>Deprecated alias names for this type:</dt><dd>N/A</dd>
+  <dt>File extension(s):</dt><dd>N/A</dd>
+  <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
+  </dl>
+
+Person and email address to contact for further information:
+
+: see Authors' Addresses section
+
+Intended usage:
+
+: COMMON
+
+Restrictions on usage:
+
+: N/A
+
+Author:
+
+: see Authors' Addresses section
+
+Change controller:
+
+: IESG
+
+## Token Type Registry Updates {#token-type}
 
 This document updates the "Token Type" Registry from
 {{AUTHSCHEME, Section 5.2}} with the following entries.
