@@ -158,6 +158,25 @@ Issuer directory resources have the media type "application/json"
 and are located at the well-known location /.well-known/token-issuer-directory;
 see {{wkuri-reg}} for the registration information for this well-known URI.
 
+Issuers SHOULD use HTTP caching to permit caching of this resource
+{{!RFC5861}}. The cache lifetime depends on the Issuer's key rotation schedule.
+Regular rotation of token keys is recommended to minimize the risk of key
+compromise.
+
+Issuers can control cache lifetime with the Cache-Control header, as follows:
+
+~~~
+  Cache-Control: max-age=86400
+~~~
+
+Consumers of the Issuer directory resource SHOULD follow the usual HTTP caching
+{{!RFC9111}} semantics when processing this resource. Long cache lifetimes may
+result in use of stale Issuer configuration information, whereas short
+lifetimes may result in decreased performance. When use of an Issuer
+configuration results to token issuance failures, e.g., because the
+configuration information is too stale, the directory SHOULD be fetched and
+revalidated.
+
 # Token Challenge Requirements
 
 Clients receive challenges for tokens, as described in
