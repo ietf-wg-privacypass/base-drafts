@@ -274,6 +274,8 @@ content-length = <Length of TokenRequest>
 <Bytes containing the TokenRequest>
 ~~~
 
+## Issuer-to-Client Response {#private-response}
+
 Upon receipt of the request, the Issuer validates the following conditions:
 
 - The TokenRequest contains a supported token_type.
@@ -282,11 +284,7 @@ Upon receipt of the request, the Issuer validates the following conditions:
 - The TokenRequest.blinded_msg is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
-to the client.
-
-## Issuer-to-Client Response {#private-response}
-
-Upon receipt of a TokenRequest, the Issuer tries to deseralize
+to the client. The Issuer then tries to deseralize
 TokenRequest.blinded_msg using DeserializeElement from {{Section 2.1 of OPRF}},
 yielding `blinded_element`. If this fails, the Issuer MUST return an HTTP 400
 error to the client. Otherwise, if the Issuer is willing to produce a token to
@@ -490,6 +488,8 @@ content-length = <Length of TokenRequest>
 <Bytes containing the TokenRequest>
 ~~~
 
+## Issuer-to-Client Response {#public-response}
+
 Upon receipt of the request, the Issuer validates the following conditions:
 
 - The TokenRequest contains a supported token_type.
@@ -498,11 +498,8 @@ Upon receipt of the request, the Issuer validates the following conditions:
 - The TokenRequest.blinded_msg is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
-to the Client, which will forward the error to the client.
-
-## Issuer-to-Client Response {#public-response}
-
-If the Issuer is willing to produce a token token to the Client, the Issuer
+to the Client, which will forward the error to the client. Otherwise, if the
+Issuer is willing to produce a token token to the Client, the Issuer
 completes the issuance flow by computing a blinded response as follows:
 
 ~~~
