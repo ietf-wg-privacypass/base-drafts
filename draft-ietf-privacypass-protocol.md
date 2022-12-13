@@ -78,8 +78,8 @@ issuance public key based on the blind RSA signature scheme
 {{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
 
 This document does not cover the Privacy Pass architecture, including
-choices that are necessary for ensuring that client privacy leaks.
-This information is covered in {{ARCHITECTURE}}.
+choices that are necessary for deployment and application specific choices
+for protecting client privacy. This information is covered in {{ARCHITECTURE}}.
 
 # Terminology
 
