@@ -621,7 +621,7 @@ following values.
 | URI Suffix  | Change Controller  | Reference | Status | Related information |
 |:------------|:-------------------|:----------|:-------|:--------------------|
 | token-issuer-directory | IETF | [this document] | permanent | None |
-{: #wellknownuri-values title="'xxx' Well-Known URI"}
+{: #wellknownuri-values title="'token-issuer-directory' Well-Known URI"}
 
 ## Token Type
 
