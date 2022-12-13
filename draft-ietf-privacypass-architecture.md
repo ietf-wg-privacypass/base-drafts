@@ -232,15 +232,15 @@ a challenge from the redemption protocol and produces a token, as shown
 in the figure below.
 
 ~~~
-  Origin          Client        Attester          Issuer
+  Origin             Client        Attester          Issuer
 
-                  +--------------------------------------\
-    Challenge ----> Attest ------->                      |
-                  | TokenRequest ------------------>     |
-                  |                            (validate)|
-                  |                            (evaluate)|
-      Token  <----+  <-------------------  TokenResponse |
-                  |--------------------------------------/
+                    +--------------------------------------\
+  TokenChallenge ---> Attest ------->                      |
+                    | TokenRequest ------------------>     |
+                    |                            (validate)|
+                    |                            (evaluate)|
+      Token  <------+  <-------------------  TokenResponse |
+                    |--------------------------------------/
 ~~~
 {: #fig-issuance title="Issuance Overview"}
 
@@ -435,8 +435,12 @@ context. Linking or combining these contexts can reveal sensitive information
 about the Client, including their identity or browsing history. Depending on
 the deployment model, separating these contexts can take different forms. The
 Origin, Attester, and Issuer portrayed in {{fig-overview}} can be instantiated
-and deployed in a number of ways. This section covers some expected deployment
-models and their corresponding security and privacy considerations.
+and deployed in a number of ways.
+
+This section covers some expected deployment models and their corresponding
+security and privacy considerations. Each deployment model is described in
+terms of the trust relationships and communication patterns between Client,
+Attester, Issuer, and Origin.
 
 The discussion below assumes non-collusion between entities that have access to
 the attestation context and entities that have access to the redemption
@@ -483,7 +487,10 @@ proxy when connecting to the Origin.
 ## Joint Attester and Issuer {#deploy-joint-issuer}
 
 In this model, the Attester and Issuer are operated by the same entity
-that is separate from the Origin, as shown in the figure below.
+that is separate from the Origin. The Origin trusts the joint Attester
+and Issuer to perform attestation and issue Tokens. Clients interact
+with the joint Attester and Issuer for attestation and issuance. This
+arrangement is shown in the figure below.
 
 ~~~
                                                    +-----------+
@@ -524,9 +531,12 @@ they could link attestation and redemption contexts through the Origin name.
 
 In this model, the Origin and Issuer are operated by the same entity, separate
 from the Attester, as shown in the figure below. The Issuer accepts token
-requests that come from trusted Attesters. Depending on the issuance protocol,
-the Attester may relay these requests between Client and Issuer over an
-authenticated channel, or trust may be established in some other manner.
+requests that come from trusted Attesters. Since the Attester and Issuer are
+separate entities, the Attester must authenticate itself to the Issuer. In
+settings where the Attester is a Client-trusted service, one way Attesters
+can authenticate to Issuers is via mutually-authenticated TLS. However,
+alernative authentication mechanisms are possible. This arrangement is shown
+below.
 
 ~~~
                                     +--------------------------+
@@ -573,7 +583,8 @@ cross-Origin.
 In this model, the Origin, Attester, and Issuer are all operated by different
 entities, as shown in the figure below. As with the joint Origin and Issuer
 model, the Issuer accepts token requests that come from trusted Attesters, and
-the details of that trust establishment depend on the issuance protocol.
+the details of that trust establishment depend on the issuance protocol and
+relationship between Attester and Issuer.
 
 ~~~
                                                    +-----------+
