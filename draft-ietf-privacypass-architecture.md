@@ -101,11 +101,11 @@ At a high level, the Privacy Pass architecture consists of two protocols:
 issuance and redemption. The issuance protocol runs between an endpoint referred
 to as a Client and two functions in the Privacy Pass architecture:
 Attestation and Issuance. These two network functions can be implemented by the
-same protocol participant, but can also be implemented separately. The entity that
-implements Issuance, referred to as the Issuer, is responsible for issuing tokens in
-response to requests from Clients. The entity that implements Attestation, referred to
-as the Attester, is responsible for attesting to properties about
-the Client for which tokens are issued. The Issuer needs to be
+same protocol participant, but can also be implemented separately. The entity
+that implements Issuance, referred to as the Issuer, is responsible for issuing
+tokens in response to requests from Clients. The entity that implements
+Attestation, referred to as the Attester, is responsible for attesting to
+properties about the Client for which tokens are issued. The Issuer needs to be
 trusted by the server that later redeems the token. Attestation can be
 performed by the Issuer or by an Attester that is trusted by the Issuer.
 Clients might prefer to select different Attesters, separate from the Issuer,
@@ -127,17 +127,17 @@ The issuance and redemption protocols operate in concert as shown in
 the figure below.
 
 ~~~
-      Origin          Client        Attester          Issuer
-  /---------------------------------------------------------------------
-  |                  /-----------------------------------------\
-  | TokenChallenge --> Attest --->                             |
-  |                  | TokenRequest --------------->           |
-  |   Redemption     |                              (validate) | Issuance
-  |      Flow        |                              (evaluate) |   Flow
-  |                  |     <-------------------  TokenResponse |
-  |     <---- Token  |                                         |
-  |                  \-----------------------------------------/
-  \---------------------------------------------------------------------
+    Origin          Client        Attester       Issuer
+/------------------------------------------------------
+|                  /----------------------------------\
+| TokenChallenge --> Attest --->                      |
+|                  | TokenRequest ---------->         |
+|   Redemption     |                       (validate) | Issuance
+|      Flow        |                       (evaluate) |   Flow
+|                  |     <------------  TokenResponse |
+|     <---- Token  |                                  |
+|                  \----------------------------------/
+\------------------------------------------------------
 ~~~
 {: #fig-overview title="Privacy Pass Architectural Components"}
 
@@ -147,7 +147,7 @@ should be deployed to ensure the privacy of clients and the security of
 all participating entities.
 
 The privacypass working group is working on
-{{?HTTP-Authentication=I-D.ietf-privacypass-auth-scheme}} as an instantiation
+{{?AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}} as an instantiation
 of a redemption protocol and {{?ISSUANCE=I-D.ietf-privacypass-protocol}} as an
 instantiation of the issuance protocol.
 
@@ -174,20 +174,22 @@ and the requirements therein on the relevant participants.
 
 ## Redemption Protocol
 
-The redemption protocol is an authorization protocol wherein Clients present tokens
-to Origins for authorization. Normally, redemption follows a challenge-response flow,
-wherein the Origin challenges Clients for a token and, if possible, Clients present
-a valid token for the challenge in response. Alternatively, when configured to do so,
-Clients may opportunistically present tokens to Origins without a corresponding challenge.
+The redemption protocol is an authorization protocol wherein Clients present
+tokens to Origins for authorization. Normally, redemption follows a
+challenge-response flow, wherein the Origin challenges Clients for a token and,
+if possible, Clients present a valid token for the challenge in response.
+Alternatively, when configured to do so, Clients may opportunistically present
+tokens to Origins without a corresponding challenge.
 
 The context in which an Origin challenges a Client for a token is referred to
-as the redemption context. This context includes all information associated with
-the redemption event, such as the timestamp of the event, Client visible information
-(including the IP address), and the Origin name.
+as the redemption context. This context includes all information associated
+with the redemption event, such as the timestamp of the event, Client visible
+information (including the IP address), and the Origin name.
 
 The challenge controls the type of token that the Origin will accept for the
-given resource. As described in {{?HTTP-Authentication=I-D.ietf-privacypass-auth-scheme}},
-there are a number of ways in which the token may vary, including:
+given resource. As described in
+{{?AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}, there are a number of ways in
+which the token may vary, including:
 
 - Issuance protocol. The token identifies the type of issuance protocol
   required for producing the token. Different issuance protocols have different
@@ -206,8 +208,8 @@ there are a number of ways in which the token may vary, including:
   influences a client's ability to pre-fetch and cache tokens. For example,
   an empty redemption context always allows tokens to be issued and redeemed
   non-interactively, whereas a fresh and random redemption context means
-  that the redeemed token must be issued only after the client receives the challenge.
-  See Section 2.1.1 of {{HTTP-Authentication}} for more details.
+  that the redeemed token must be issued only after the client receives the
+  challenge. See Section 2.1.1 of {{AUTHSCHEME}} for more details.
 - Per-Origin or cross-Origin. Tokens can be constrained to the Origin for
   which the challenge originated (referred to as per-Origin tokens), or
   can be used across multiple Origins (referred to as cross-Origin tokens).
@@ -221,7 +223,7 @@ state to track redeemed tokens. For example, Origins that accept cross-Origin
 tokens across shared redemption contexts SHOULD track which tokens have been
 redeemed already in those redemption contexts, since these tokens can
 be issued and then spent multiple times in response to any such challenge.
-See Section 2.1.1 of {{HTTP-Authentication}} for discussion.
+See Section 2.1.1 of {{AUTHSCHEME}} for discussion.
 
 ## Issuance Protocol
 
@@ -243,11 +245,11 @@ in the figure below.
 {: #fig-issuance title="Issuance Overview"}
 
 Clients interact with the Attester and Issuer to produce a token in response to
-a challenge. The context in which an Attester vouches for a Client during issuance
-is referred to as the attestation context. This context includes all information
-associated with the issuance event, such as the timestamp of the event and
-Client visible information, including the IP address or other information specific
-to the type of attestation done.
+a challenge. The context in which an Attester vouches for a Client during
+issuance is referred to as the attestation context. This context includes all
+information associated with the issuance event, such as the timestamp of the
+event and Client visible information, including the IP address or other
+information specific to the type of attestation done.
 
 Each issuance protocol may be different, e.g., in the number and types of
 participants, underlying cryptographic constructions used when issuing tokens,
@@ -256,7 +258,7 @@ and even privacy properties.
 Clients initiate the issuance protocol using the challenge, a randomly
 generated nonce, and public key for the Issuer, all of which are the Client's
 private input to the protocol and ultimately bound to an output Token;
-see Section 2.2. of {{HTTP-Authentication}} for details. Future specifications
+see Section 2.2. of {{AUTHSCHEME}} for details. Future specifications
 may change or extend the Client's input to the issuance protocol to produce
 Tokens with a different structure.
 
@@ -276,11 +278,11 @@ without interacting with the Issuer directly.
 1. Concurrent security. The issuance protocol MUST be safe to run concurrently
 with arbitrarily many Clients, Attesters and Issuers.
 
-See {{extensions}} for requirements on new issuance protocol variants and related
-extensions.
+See {{extensions}} for requirements on new issuance protocol variants and
+related extensions.
 
 Clients obtain the Issuer public key directly from the Origin using the process
-described in {{HTTP-Authentication}}. Clients MAY apply some form of key
+described in {{AUTHSCHEME}}. Clients MAY apply some form of key
 consistency check to determine if this public key is consistent and correct for
 the specified Issuer. See {{?CONSISTENCY=I-D.wood-key-consistency}} for example
 mechanisms. Depending on the deployment, the Attester might assist the Client
@@ -418,11 +420,11 @@ cryptographic protocol.
 
 ### Issuance Protocol Extensibility {#extensions}
 
-The Privacy Pass architecture and ecosystem are both intended to be receptive to
-extensions that expand the current set of functionalities through new issuance
-protocols. Each issuance protocol MUST include a detailed analysis of the
-privacy impacts of the extension, why these impacts are justified, and
-guidelines on how to deploy the protocol to minimize any privacy impacts.
+The Privacy Pass architecture and ecosystem are both intended to be receptive
+to extensions that expand the current set of functionalities through new
+issuance protocols. Each issuance protocol MUST include a detailed analysis
+of the privacy impacts of the extension, why these impacts are justified,
+and guidelines on how to deploy the protocol to minimize any privacy impacts.
 Any extension to the Privacy Pass protocol MUST adhere to the guidelines
 specified in {{issuer-role}} for managing Issuer public key data.
 
@@ -437,15 +439,16 @@ and deployed in a number of ways. This section covers some expected deployment
 models and their corresponding security and privacy considerations.
 
 The discussion below assumes non-collusion between entities that have access to
-the attestation context and entities that have access to the redemption context, as collusion between such entities
-would enable linking of these contexts. Generally, this means that entities operated
-by separate parties do not collude. Mechanisms for enforcing non-collusion are out of
-scope for this architecture.
+the attestation context and entities that have access to the redemption
+context, as collusion between such entities would enable linking of these
+contexts. Generally, this means that entities operated by separate parties do
+not collude. Mechanisms for enforcing non-collusion are out of scope for this
+architecture.
 
 ## Shared Origin, Attester, Issuer {#deploy-shared}
 
-In this model, the Origin, Attester, and Issuer are all operated by the same entity,
-as shown in the figure below.
+In this model, the Origin, Attester, and Issuer are all operated by the same
+entity, as shown in the figure below.
 
 ~~~
                    +------------------------------------------+
@@ -465,11 +468,12 @@ as shown in the figure below.
 ~~~
 {: #fig-deploy-shared title="Shared Deployment Model"}
 
-This model represents the initial deployment of Privacy Pass, as described in {{PPSRV}}.
-In this model, the Attester, Issuer, and Origin share the attestation and redemption contexts.
-As a result, attestation mechanisms that can uniquely identify a Client, e.g., requiring
-that Clients authenticate with some type of application-layer account, are not appropriate,
-as they could be used to learn or reconstruct a Client's browsing history.
+This model represents the initial deployment of Privacy Pass, as described in
+{{PPSRV}}. In this model, the Attester, Issuer, and Origin share the
+attestation and redemption contexts. As a result, attestation mechanisms that
+can uniquely identify a Client, e.g., requiring that Clients authenticate with
+some type of application-layer account, are not appropriate, as they could be
+used to learn or reconstruct a Client's browsing history.
 
 Attestation and redemption context unlinkability requires that these events be
 separated over time, such as through the use of tokens with an empty redemption
@@ -505,23 +509,24 @@ that is separate from the Origin, as shown in the figure below.
 ~~~
 {: #fig-deploy-joint-issuer title="Joint Attester and Issuer Deployment Model"}
 
-This model is useful if an Origin wants to offload attestation and issuance to a
-trusted entity. In this model, the Attester and Issuer share an attestation
+This model is useful if an Origin wants to offload attestation and issuance to
+a trusted entity. In this model, the Attester and Issuer share an attestation
 context for the Client, which can be separate from the Origin's redemption
 context.
 
-For certain types of issuance protocols, this model separates attestation and redemption
-contexts. However, issuance protocols that require the Issuer to learn information about
-the Origin, such as that which is described in {{?RATE-LIMITED=I-D.privacypass-rate-limit-tokens}},
-are not appropriate since they could link attestation and redemption contexts through the Origin name.
+For certain types of issuance protocols, this model separates attestation and
+redemption contexts. However, issuance protocols that require the Issuer to
+learn information about the Origin, such as that which is described in
+{{?RATE-LIMITED=I-D.privacypass-rate-limit-tokens}}, are not appropriate since
+they could link attestation and redemption contexts through the Origin name.
 
 ## Joint Origin and Issuer {#deploy-joint-origin}
 
-In this model, the Origin and Issuer are operated by the same entity, separate from
-the Attester, as shown in the figure below. The Issuer accepts token requests that come
-from trusted Attesters. Depending on the issuance protocol, the Attester may relay these
-requests between Client and Issuer over an authenticated channel, or trust may be established
-in some other manner.
+In this model, the Origin and Issuer are operated by the same entity, separate
+from the Attester, as shown in the figure below. The Issuer accepts token
+requests that come from trusted Attesters. Depending on the issuance protocol,
+the Attester may relay these requests between Client and Issuer over an
+authenticated channel, or trust may be established in some other manner.
 
 ~~~
                                     +--------------------------+
@@ -565,10 +570,10 @@ cross-Origin.
 
 ## Split Origin, Attester, Issuer {#deploy-split}
 
-In this model, the Origin, Attester, and Issuer are all operated by different entities,
-as shown in the figure below. As with the joint Origin and Issuer model, the Issuer
-accepts token requests that come from trusted Attesters, and the details of that
-trust establishment depend on the issuance protocol.
+In this model, the Origin, Attester, and Issuer are all operated by different
+entities, as shown in the figure below. As with the joint Origin and Issuer
+model, the Issuer accepts token requests that come from trusted Attesters, and
+the details of that trust establishment depend on the issuance protocol.
 
 ~~~
                                                    +-----------+
@@ -622,26 +627,25 @@ of Clients controlling tokens for the same keys.
 
 In the following, we consider the possible ways that Issuers can leverage their
 position to try and reduce the size of the anonymity sets to which Clients
-belong, often by segregating Clients. For each case, we provide mitigations that
-the Privacy Pass ecosystem must implement to prevent these actions.
+belong, often by segregating Clients. For each case, we provide mitigations
+that the Privacy Pass ecosystem must implement to prevent these actions.
 
 ## Metadata Privacy Implications
 
-Any metadata bits of information can be used to further segment the
-size of the Client's anonymity set. Any Issuer that wanted to
-track a single Client could add a single metadata bit to Client tokens. For
-the tracked Client it would set the bit to `1`, and `0` otherwise. Adding
-additional bits provides an exponential increase in tracking granularity
-similarly to introducing more Issuers (though with more potential
-targeting).
+Any metadata bits of information can be used to further segment the size
+of the Client's anonymity set. Any Issuer that wanted to track a single
+Client could add a single metadata bit to Client tokens. For the tracked
+Client it would set the bit to `1`, and `0` otherwise. Adding additional
+bits provides an exponential increase in tracking granularity similarly to
+introducing more Issuers (though with more potential targeting).
 
 For this reason, the amount of metadata used by an Issuer in creating
 redemption tokens must be taken into account -- together with the bits
 of information that Issuers may learn about Clients otherwise. Since this
 metadata may be useful for practical deployments of Privacy Pass, Issuers
 must balance this against the reduction in Client privacy. In general,
-bounding the metadata permitted ensures that it cannot uniquely identify individual
-Clients.
+bounding the metadata permitted ensures that it cannot uniquely identify
+individual Clients.
 
 ## Issuer Key Rotation {#key-rotation-privacy}
 
@@ -655,16 +659,16 @@ Key rotation can also be used to segment Client anonymity sets. In
 particular, when an Issuer rotates their key, any Client that invokes the
 issuance protocol in this key cycle will be part of a group of possible Clients
 owning valid tokens for this key. To mechanize this attack strategy, an Issuer
-could introduce a key rotation policy that forces Clients into small key cycles,
-reducing the size of the anonymity set for these Clients.
+could introduce a key rotation policy that forces Clients into small key
+cycles, reducing the size of the anonymity set for these Clients.
 
 In general, key rotations represent a trade-off between Client privacy and
 Issuer security. Therefore, it is still important that key rotations occur on
 a regular cycle to reduce the harmfulness of an Issuer key compromise. If there
-are multiple Issuer keys in rotation, Clients can apply some form of consistency
-mechanism {{CONSISTENCY}} to ensure that they receive the same key as other Clients.
-Likewise, Origins can use one or more public keys for redemption to support Issuer
-key rotation.
+are multiple Issuer keys in rotation, Clients can apply some form of
+consistency mechanism {{CONSISTENCY}} to ensure that they receive the same key
+as other Clients. Likewise, Origins can use one or more public keys for
+redemption to support Issuer key rotation.
 
 ## Issuer Selection {#servers}
 
@@ -678,14 +682,14 @@ exponential loss in anonymity relative to the number of Issuers.
 
 For example, if there are 32 Issuers, then Origins learn 32 bits of
 information about the Client if a valid token is presented for each Issuer.
-As a contrasting example, if Clients ensure that they only hold tokens issued from
-4 Issuers, then this increases the potential size of the anonymity sets
+As a contrasting example, if Clients ensure that they only hold tokens issued
+from 4 Issuers, then this increases the potential size of the anonymity sets
 that the Client belongs to. However, this doesn't protect Clients
 completely as it would if only 4 Issuers were permitted across the whole
 system. For example, these 4 Issuers could be different for each Client.
-Therefore, the selection of Issuers for which a Client possesses tokens is still
-revealing. This trade-off is important in deciding the effective anonymity
-of each Client in the system.
+Therefore, the selection of Issuers for which a Client possesses tokens is
+still revealing. This trade-off is important in deciding the effective
+anonymity of each Client in the system.
 
 Clients SHOULD bound the number of Issuers they are willing to request tokens
 from at any given time. The exact bound depends on the deployment model and
@@ -697,8 +701,8 @@ Issuers.
 
 Alternatively, when applicable, trusted registries can indicate which Issuers
 are deemed to be active. If a Client is asked to invoke the issuance protocol
-for an Issuer that is not declared active, then the client can refuse to run the
-protocol and obtain a token.
+for an Issuer that is not declared active, then the client can refuse to run
+the protocol and obtain a token.
 
 Another option to allow a large number of Issuers in the ecosystem,
 while preventing the joining of a number of different tokens, is for the
@@ -756,8 +760,8 @@ of those Clients that started issuance between the time of the Origin's
 challenge and the corresponding token redemption. Depending on the number
 of Clients using a particular Issuer during that time window, the set can
 be small. Appliations should take such side channels into consideration before
-choosing a particular deployment model and type of token challenge and redemption
-context.
+choosing a particular deployment model and type of token challenge and
+redemption context.
 
 # Centralization
 
@@ -797,5 +801,6 @@ occurred in a given time window.
 
 # Acknowledgements
 
-The authors would like to thank Eric Kinnear, Scott Hendrickson, Tommy Pauly, Christopher Patton, Benjamin Schwartz,
-Steven Valdez and other members of the Privacy Pass Working Group for many helpful contributions to this document.
+The authors would like to thank Eric Kinnear, Scott Hendrickson, Tommy Pauly,
+Christopher Patton, Benjamin Schwartz, Steven Valdez and other members of the
+Privacy Pass Working Group for many helpful contributions to this document.
