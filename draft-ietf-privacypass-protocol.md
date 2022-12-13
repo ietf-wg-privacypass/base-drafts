@@ -629,13 +629,48 @@ following values.
 | token-issuer-directory | IETF | [this document] | permanent | None |
 {: #wellknownuri-values title="'token-issuer-directory' Well-Known URI"}
 
-## Token Issuer Directory Media Type
+## Token Type Registry Updates {#token-type}
 
-This specification defines a new media type
-"application/token-issuer-directory" for representing the Issuer's directory.
-IANA [shall update / has updated] the "Media Types" registry at
-https://www.iana.org/assignments/media-types with the registration information
-in this section for the media type listed below.
+This document updates the "Token Type" Registry from
+{{AUTHSCHEME, Section 5.2}} with the following entries.
+
+### Token Type VOPRF (P-384, SHA-384)
+
+* Value: 0x0001
+* Name: VOPRF (P-384, SHA-384)
+* Publicly Verifiable: N
+* Public Metadata: N
+* Private Metadata: N
+* Nk: 48
+* Nid: 32
+* Reference: {{private-flow}}
+* Notes: None
+
+### Token Type Blind RSA (2048-bit)
+
+* Value: 0x0002
+* Name: Blind RSA (2048-bit)
+* Publicly Verifiable: Y
+* Public Metadata: N
+* Private Metadata: N
+* Nk: 256
+* Nid: 32
+* Reference: {{public-flow}}
+* Notes: The RSABSSA-SHA384-PSS-Deterministic and
+  RSABSSA-SHA384-PSSZERO-Deterministic variants are supported
+
+## Media Types
+
+This specification defines the following protocol messages, along with their
+corresponding media types:
+
+- Token issuer directory: "application/token-issuer-directory"
+- TokenRequest: "application/private-token-request"
+- TokenResponse: "application/private-token-response"
+
+The definition for each media type is in the following subsections.
+
+### "application/token-issuer-directory" media type
 
 Type name:
 
@@ -705,46 +740,6 @@ Author:
 Change controller:
 
 : IESG
-
-## Token Type Registry Updates {#token-type}
-
-This document updates the "Token Type" Registry from
-{{AUTHSCHEME, Section 5.2}} with the following entries.
-
-### Token Type VOPRF (P-384, SHA-384)
-
-* Value: 0x0001
-* Name: VOPRF (P-384, SHA-384)
-* Publicly Verifiable: N
-* Public Metadata: N
-* Private Metadata: N
-* Nk: 48
-* Nid: 32
-* Reference: {{private-flow}}
-* Notes: None
-
-### Token Type Blind RSA (2048-bit)
-
-* Value: 0x0002
-* Name: Blind RSA (2048-bit)
-* Publicly Verifiable: Y
-* Public Metadata: N
-* Private Metadata: N
-* Nk: 256
-* Nid: 32
-* Reference: {{public-flow}}
-* Notes: The RSABSSA-SHA384-PSS-Deterministic and
-  RSABSSA-SHA384-PSSZERO-Deterministic variants are supported
-
-## Media Types
-
-This specification defines the following protocol messages, along with their
-corresponding media types:
-
-- TokenRequest: "application/private-token-request"
-- TokenResponse: "application/private-token-response"
-
-The definition for each media type is in the following subsections.
 
 ### "application/private-token-request" media type
 
