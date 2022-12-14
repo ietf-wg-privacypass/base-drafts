@@ -105,7 +105,7 @@ network byte order.
 
 # Protocol Overview
 
-The issuance protocols defined in this document emody the core of Privacy Pass.
+The issuance protocols defined in this document embody the core of Privacy Pass.
 Clients receive TokenChallenge inputs from the redemption protocol
 ({{AUTHSCHEME, Section 2.1}}) and use the issuance protocols to produce
 corresponding Token values ({{AUTHSCHEME, Section 2.2}}). The issuance protocol
