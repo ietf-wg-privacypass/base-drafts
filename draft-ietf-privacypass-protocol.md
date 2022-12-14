@@ -226,7 +226,7 @@ with the input challenge and Issuer key identifier as described below:
 ~~~
 nonce = random(32)
 challenge_digest = SHA256(challenge)
-token_input = concat(0x0001, // 2-byte length
+token_input = concat(0x0001, // Token type field is 2 bytes long
                      nonce,
                      challenge_digest,
                      token_key_id)
