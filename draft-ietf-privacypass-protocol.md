@@ -448,7 +448,7 @@ The Client first creates an issuance request message for a random value
 ~~~
 nonce = random(32)
 challenge_digest = SHA256(challenge)
-token_input = concat(0x0002, // 2-byte length
+token_input = concat(0x0002, // Token type field is 2 bytes long
                      nonce,
                      challenge_digest,
                      token_key_id)
