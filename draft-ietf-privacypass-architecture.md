@@ -46,6 +46,14 @@ informative:
     author:
       ins: N. Sullivan
       org: Cloudflare
+  Dingledine2004:
+    title: "Tor: The Second-Generation Onion Router"
+    date: 2004-08
+    target: "https://svn.torproject.org/svn/projects/design-paper/tor-design.html"
+    author:
+      - ins: R. Dingledine
+      - ins: N. Mathewson
+      - ins: P. Syverson
   HIJK21:
     title: "PrivateStats: De-Identified Authenticated Logging at Scale"
     target: https://research.fb.com/privatestats
@@ -296,20 +304,22 @@ See {{extensions}} for requirements on new issuance protocol variants and
 related extensions.
 
 Clients obtain the Issuer public key directly from the Origin using the process
-described in {{AUTHSCHEME}}. Clients MAY apply some form of
+described in {{AUTHSCHEME}}. Clients can apply some form of
 consistency check to determine if this public key is consistent and correct for
 the specified Issuer. See {{?CONSISTENCY=I-D.privacypass-key-consistency}} for
 example mechanisms. Depending on the deployment, the Attester might assist the
 Client in applying these consistency checks across clients. See
-{{rotation-and-consistency}} for more information.
+{{rotation-and-consistency}} for more information. Failure to apply a
+consistency check can allow Client-specific keys to impact the Client anonymity
+set. See {{rotation-and-consistency}} for more details.
 
 Depending on the use case, issuance may require some form of Client
 anonymization service, similar to an IP-hiding proxy, so that Issuers cannot
 learn information about Clients. This can be provided by an explicit
 participant in the issuance protocol, or it can be provided via external means,
-such as through the use of an IP-hiding proxy service like Tor. In general,
-Clients SHOULD minimize or remove identifying information where possible when
-invoking the issuance protocol.
+such as through the use of an IP-hiding proxy service like Tor
+{{Dingledine2004}}. In general, Clients SHOULD minimize or remove identifying
+information where possible when invoking the issuance protocol.
 
 Issuers MUST NOT issue tokens for Clients through untrusted Attesters. This is
 important because the Attester's role is to vouch for trust in
