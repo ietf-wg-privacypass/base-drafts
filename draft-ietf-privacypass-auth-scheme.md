@@ -67,21 +67,15 @@ challenge by running the token issuance protocol
 Authorization request header is referred to as token redemption. This
 interaction between client and origin is shown below.
 
+~~~ aasvg
+    Origin                                     Client
+                                        +------------------.
+TokenChallenge --- WWW-Authenticate ---->                   |
+                                        | Issuance Protocol |
+    Token      <--- Authorization ------+                   |
+                                         `-----------------'
 ~~~
- Client                             Relying Party (Origin)
-
-    <---------------------- WWW-Authenticate  \  Challenge
-                            (TokenChallenge)  |
-+----------------------------------\          |
-|                                  |          |
-|  Issuance Protocol               |          |
-|                                  |          |
-+----------------------------------/          |
-                                              |
-  Authorization --------------------------->  /  Response
-     (Token)                                    (redemption)
-~~~
-{: #fig-overview title="Token Architectural Components"}
+{: #fig-overview title="Challenge-response redemption protocol flow"}
 
 In addition to working with different token issuance protocols, this scheme
 optionally supports use of tokens that are associated with origin-chosen
@@ -463,6 +457,16 @@ contexts can be replayed from one party by another, as shown below.
                        Redemption ----------> /
 ~~~
 {: #fig-replay title="Token Architectural Components"}
+
+Moreover, when a Client holds cross-origin tokens with empty contexts, it
+is possible for any Origin in the cross-origin set to deplete that Client
+set of tokens. To prevent this from happening, tokens can be scoped to single
+Origins (with non-empty origin_info) such that they can only be redeemed for
+a single Origin. Alternatively, if tokens are cross-Origin, Clients can use
+alternate methods to prevent many tokens from being redeemed at once. For
+example, if the Origin requests an excess of tokens, the Client could choose to
+not present any tokens for verification if a redemption had already
+occurred in a given time window.
 
 Token challenges that include non-empty origin_info bind tokens to one or more
 specific origins. As described in {{challenge}}, clients only accept such
