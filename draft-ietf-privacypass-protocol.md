@@ -89,7 +89,7 @@ The following terms are used throughout this document.
 
 - Client: An entity that runs the Issuance protocol with an Issuer to produce
   Tokens that can be later used for redemption (see
-  {{Section 2.2 of AUTHSCHEME}}).
+  {{Section 2.2 of !AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}).
 - Issuer: A service that provides Tokens to Clients.
 - Issuer Public Key: The public key (from a private-public key pair) used by
   the Issuer for issuing and verifying Tokens.
@@ -102,6 +102,44 @@ This document additionally uses the terms "Origin" and "Token" as defined in
 Unless otherwise specified, this document encodes protocol messages in TLS
 notation from {{Section 3 of !TLS13=RFC8446}}. Moreover, all constants are in
 network byte order.
+
+# Protocol Overview
+
+The issuance protocols defined in this document embody the core of Privacy Pass.
+Clients receive TokenChallenge inputs from the redemption protocol
+({{AUTHSCHEME, Section 2.1}}) and use the issuance protocols to produce
+corresponding Token values ({{AUTHSCHEME, Section 2.2}}). The issuance protocol
+describes how Clients and Issuers interact to compute a token using a one-round
+protocol consisting of a TokenRequest from the Client and TokenResponse from
+the Issuer. This interaction is shown below.
+
+~~~ aasvg
+  Origin             Client        Attester          Issuer
+
+                    +-------------------------------------.
+  TokenChallenge ---> Attest ------->                      |
+                    | TokenRequest ------------------>     |
+                    |                            (evaluate)|
+      Token  <------+  <-------------------  TokenResponse |
+                     `------------------------------------'
+~~~
+{: #fig-issuance title="Issuance Overview"}
+
+The TokenChallenge inputs to the issuance protocols described in this
+document can be interactive or non-interactive, and per-origin or cross-origin.
+
+The issuance protocols defined in this document are compatible with any
+deployment model defined in {{Section 4 of ARCHITECTURE}}. The details of
+attestation are outside the scope of the issuance protocol; see
+{{Section 4 of ARCHITECTURE}} for information about how attestation can
+be implemented in each of the relevant deployment models.
+
+This document describes two variants of the issuance protocol: one that is
+privately verifiable ({{private-flow}}) using the issuance private key based on
+the oblivious pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}, and one
+that is publicly verifiable ({{public-flow}}) using the issuance public key
+based on the blind RSA signature scheme
+{{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
 
 # Configuration {#setup}
 
@@ -162,41 +200,25 @@ Issuer directory resources have the media type
 /.well-known/token-issuer-directory; see {{wkuri-reg}} for the registration
 information for this well-known URI.
 
-# Token Challenge Requirements
-
-Clients receive challenges for tokens, as described in
-{{!AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}. The basic token issuance
-protocols described in this document can be interactive or non-interactive,
-and per-origin or cross-origin.
-
 # Issuance Protocol for Privately Verifiable Tokens {#private-flow}
 
-The Privacy Pass issuance protocol is a two-message protocol that takes
-as input a TokenChallenge from the redemption protocol
-({{AUTHSCHEME, Section 2.1}}) and produces a Token
-({{AUTHSCHEME, Section 2.2}}), as shown in the figure below.
+The privately verifiable issuance protocol allows Clients to produce Token
+values that verify using the Issuer Private Key. This protocol is based
+on the oblivious pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}.
 
-~~~ aasvg
-   Origin            Client                   Issuer
-                      (pkI)                 (skI, pkI)
-                   +-----------------------------------.
-TokenChallenge --->| TokenRequest ------------->        |
-                   |                       (evaluate)   |
-     Token    <----+     <--------------- TokenResponse |
-                    `----------------------------------'
-~~~
-
-This section describes a variant of this issuance protocol for producing
-privately verifiable tokens using the protocol in {{OPRF}}. In particular,
-this variant of the issuance protocol uses the OPRF(P-384, SHA-384)
-ciphersuite.
-
-In this variant, Issuers provide a Private and Public Key, denoted `skI` and
-`pkI` respectively, used to produce tokens as input to the protocol. See
-{{issuer-configuration}} for how this key-pair is generated.
+Issuers provide a Private and Public Key, denoted `skI` and `pkI` respectively,
+used to produce tokens as input to the protocol. See {{issuer-configuration}}
+for how this key pair is generated.
 
 Clients provide the following as input to the issuance protocol:
 
+- Issuer Request URI: A URI to which token request messages are sent. This can
+  be a URL derived from the "issuer-request-uri" value in the Issuer's
+  directory resource, or it can be another Client-configured URL. The value
+  of this parameter depends on the Client configuration and deployment model.
+  For example, in the 'Joint Origin and Issuer' deployment model, the Issuer
+  Request URI might be correspond to the Client's configured Attester, and the
+  Attester is configured to relay requests to the Issuer.
 - Issuer name: An identifier for the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
 - Issuer Public Key: `pkI`, with a key identifier `token_key_id` computed as
@@ -266,9 +288,9 @@ The structure fields are defined as follows:
 
 The values `token_input` and `blinded_element` are stored locally and used
 later as described in {{private-finalize}}. The Client then generates an HTTP
-POST request to send to the Issuer, with the TokenRequest as the content. The
-media type for this request is "application/private-token-request". An example
-request is shown below.
+POST request to send to the Issuer Request URI, with the TokenRequest as the
+content. The media type for this request is
+"application/private-token-request". An example request is shown below.
 
 ~~~
 :method = POST
@@ -433,6 +455,13 @@ respectively, used to produce tokens as input to the protocol. See
 
 Clients provide the following as input to the issuance protocol:
 
+- Issuer Request URI: A URI to which token request messages are sent. This can
+  be a URL derived from the "issuer-request-uri" value in the Issuer's
+  directory resource, or it can be another Client-configured URL. The value
+  of this parameter depends on the Client configuration and deployment model.
+  For example, in the 'Split Origin, Attester, Issuer' deployment model, the
+  Issuer Request URI might be correspond to the Client's configured Attester,
+  and the Attester is configured to relay requests to the Issuer.
 - Issuer name: An identifier for the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
 - Issuer Public Key: `pkI`, with a key identifier `token_key_id` computed as
@@ -486,8 +515,8 @@ The structure fields are defined as follows:
 
 - "blinded_msg" is the Nk-octet request defined above.
 
-The Client then generates an HTTP POST request to send to the Issuer,
-with the TokenRequest as the content. The media type for this request
+The Client then generates an HTTP POST request to send to the Issuer Request
+URI, with the TokenRequest as the content. The media type for this request
 is "application/private-token-request". An example request is shown below:
 
 ~~~
@@ -615,6 +644,10 @@ based on the VOPRF defined in {{OPRF}} and blind RSA protocol defined in
 documents also apply in the Privacy Pass use-case. Considerations related to
 broader privacy and security concerns in a multi-Client and multi-Issuer
 setting are deferred to the Architecture document {{ARCHITECTURE}}.
+Moreover, deployment-specific considerations regarding Client privacy
+when running the issuance protocol, especially with respect to Client-specific
+identifiers such as IP addresses that are revealed to the Attester and Issuer
+during issuance, are also discussed in {{Section 4 of ARCHITECTURE}}.
 
 Beyond these considerations, it is worth highlighting the fact that Client
 TokenRequest messages contain truncated token key IDs. This is done to minimize
