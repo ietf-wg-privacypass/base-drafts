@@ -173,7 +173,7 @@ Consumers of the Issuer directory resource SHOULD follow the usual HTTP caching
 {{!RFC9111}} semantics when processing this resource. Long cache lifetimes may
 result in use of stale Issuer configuration information, whereas short
 lifetimes may result in decreased performance. When use of an Issuer
-configuration results to token issuance failures, e.g., because the
+configuration results in token issuance failures, e.g., because the
 configuration information is too stale, the directory SHOULD be fetched and
 revalidated.
 
