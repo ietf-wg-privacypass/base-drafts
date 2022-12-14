@@ -125,7 +125,7 @@ the Issuer. This interaction is shown below.
 ~~~
 {: #fig-issuance title="Issuance Overview"}
 
-The TokenChallenge inputs The basic token issuance protocols described in this
+The TokenChallenge inputs to the issuance protocols described in this
 document can be interactive or non-interactive, and per-origin or cross-origin.
 
 The issuance protocols defined in this document are compatible with any
