@@ -100,7 +100,7 @@ This document additionally uses the terms "Origin" and "Token" as defined in
 {{ARCHITECTURE}}.
 
 Unless otherwise specified, this document encodes protocol messages in TLS
-notation from {{!TLS13=RFC8446}}, Section 3. Moreover, all constants are in
+notation from {{Section 3 of !TLS13=RFC8446}}. Moreover, all constants are in
 network byte order.
 
 # Configuration {#setup}
@@ -186,9 +186,14 @@ TokenChallenge --->| TokenRequest ------------->        |
                     `----------------------------------'
 ~~~
 
-Issuers provide a Private and Public Key, denoted `skI` and `pkI` respectively,
-used to produce tokens as input to the protocol. See {{issuer-configuration}}
-for how this key-pair is generated.
+This section describes a variant of this issuance protocol for producing
+privately verifiable tokens using the protocol in {{OPRF}}. In particular,
+this variant of the issuance protocol uses the OPRF(P-384, SHA-384)
+ciphersuite.
+
+In this variant, Issuers provide a Private and Public Key, denoted `skI` and
+`pkI` respectively, used to produce tokens as input to the protocol. See
+{{issuer-configuration}} for how this key-pair is generated.
 
 Clients provide the following as input to the issuance protocol:
 
@@ -225,7 +230,7 @@ with the input challenge and Issuer key identifier as described below:
 ~~~
 nonce = random(32)
 challenge_digest = SHA256(challenge)
-token_input = concat(0x0001,
+token_input = concat(0x0001, // Token type field is 2 bytes long
                      nonce,
                      challenge_digest,
                      token_key_id)
@@ -408,14 +413,17 @@ truncated key IDs in rotation.
 # Issuance Protocol for Publicly Verifiable Tokens {#public-flow}
 
 This section describes a variant of the issuance protocol in {{private-flow}}
-for producing publicly verifiable tokens. It differs from the previous variant
-in that the output tokens are publicly verifiable by anyone with the Issuer
-Public Key.
+for producing publicly verifiable tokens using the protocol in {{BLINDRSA}}.
+In particular, this variant of the issuance protocol works for the
+RSABSSA-SHA384-PSS-Deterministic and RSABSSA-SHA384-PSSZERO-Deterministic
+blind RSA protocol variants described in {{Section 5 of BLINDRSA}}.
 
-This means any Origin can select a given Issuer to produce tokens, as long as
-the Origin has the Issuer public key, without explicit coordination or
-permission from the Issuer. This is because the Issuer does not learn the
-Origin that requested the token during the issuance protocol.
+The publicly verifiable issuance protocol differs from the protocol in
+{{private-flow}} in that the output tokens are publicly verifiable by anyone
+with the Issuer Public Key. This means any Origin can select a given Issuer to
+produce tokens, as long as the Origin has the Issuer public key, without
+explicit coordination or permission from the Issuer. This is because the Issuer
+does not learn the Origin that requested the token during the issuance protocol.
 
 Beyond this difference, the publicly verifiable issuance protocol variant is
 nearly identical to the privately verifiable issuance protocol variant. In
@@ -444,14 +452,16 @@ The Client first creates an issuance request message for a random value
 ~~~
 nonce = random(32)
 challenge_digest = SHA256(challenge)
-token_input = concat(0x0002,
+token_input = concat(0x0002, // Token type field is 2 bytes long
                      nonce,
                      challenge_digest,
                      token_key_id)
-blinded_msg, blind_inv = rsabssa_blind(pkI, token_input)
+blinded_msg, blind_inv =
+  Blind(pkI, PrepareIdentity(token_input))
 ~~~
 
-The rsabssa_blind function is defined in {{BLINDRSA, Section 5.1.1.}}.
+The PrepareIdentity and Blind functions are defined in
+{{Section 4.1 of BLINDRSA}} and {{Section 4.2 of BLINDRSA}}, respectively.
 The Client stores the nonce and challenge_digest values locally for use
 when finalizing the issuance protocol to produce a token (as described
 in {{public-finalize}}).
@@ -508,11 +518,12 @@ Issuer is willing to produce a token token to the Client, the Issuer
 completes the issuance flow by computing a blinded response as follows:
 
 ~~~
-blind_sig = rsabssa_blind_sign(skI, TokenRequest.blinded_msg)
+blind_sig = BlindSign(skI, TokenRequest.blinded_msg)
 ~~~
 
-This is encoded and transmitted to the client in the following TokenResponse
-structure:
+The BlindSign function is defined in {{Section 4.3 of BLINDRSA}}.
+The result is encoded and transmitted to the client in the following
+TokenResponse structure:
 
 ~~~
 struct {
@@ -520,7 +531,6 @@ struct {
 } TokenResponse;
 ~~~
 
-The rsabssa_blind_sign function is defined in {{BLINDRSA, Section 5.1.2.}}.
 The Issuer generates an HTTP response with status code 200 whose content
 consists of TokenResponse, with the content type set as
 "application/private-token-response".
@@ -540,12 +550,12 @@ content as follows:
 
 ~~~
 authenticator =
-  rsabssa_finalize(pkI, nonce, blind_sig, blind_inv)
+  Finalize(pkI, nonce, blind_sig, blind_inv)
 ~~~
 
-The rsabssa_finalize function is defined in {{BLINDRSA, Section 5.1.3.}}.
-If this succeeds, the Client then constructs a Token as described in
-{{AUTHSCHEME}} as follows:
+The Finalize function is defined in {{Section 4.4 of BLINDRSA}}. If this
+succeeds, the Client then constructs a Token as described in {{AUTHSCHEME}} as
+follows:
 
 ~~~
 struct {
@@ -558,7 +568,7 @@ struct {
 ~~~
 
 The Token.nonce value is that which was sampled in {{private-request}}.
-If the rsabssa_finalize function fails, the Client aborts the protocol.
+If the Finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
 
