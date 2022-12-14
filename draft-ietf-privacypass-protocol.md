@@ -381,8 +381,9 @@ valid = (token_authenticator == Token.authenticator)
 ## Issuer Configuration
 
 Issuers are configured with Private and Public Key pairs, each denoted `skI`
-and `pkI`, respectively, used to produce tokens. A RECOMMENDED method for
-generating key pairs is as follows:
+and `pkI`, respectively, used to produce tokens. These keys MUST NOT be reused
+in other protocols. A RECOMMENDED method for generating key pairs is as
+follows:
 
 ~~~
 seed = random(Ns)
@@ -393,7 +394,7 @@ The key identifier for a public key `pkI`, denoted `token_key_id`, is computed
 as follows:
 
 ~~~
-token_key_id = SHA256(concat(0x0001, SerializeElement(pkI)))
+token_key_id = SHA256(SerializeElement(pkI))
 ~~~
 
 Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers should
@@ -578,7 +579,8 @@ valid = RSASSA-PSS-VERIFY(pkI,
 
 Issuers are configured with Private and Public Key pairs, each denoted skI and
 pkI, respectively, used to produce tokens. Each key pair SHALL be generated as
-as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}.
+as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}. These key
+pairs MUST NOT be reused in other protocols.
 
 The key identifier for a keypair (skI, pkI), denoted `token_key_id`, is
 computed as SHA256(encoded_key), where encoded_key is a DER-encoded
@@ -843,26 +845,26 @@ The test vector below lists the following values:
   string.
 
 ~~~
-skS: 3d473b7609c0c6f0acf5da90c3a4a791befd7f576004b74c72958c60f56e
-a2dd56261e9cc35f0dfc8a990790a57dda3e
-pkS: 03f49c2d549721f2b37fd20d1a82ed28a3a5eed578e1b3ad6815eb31c775
-21fd01c61c247a76a3f6da33087f86db06d983
+skS: cc1a7bb002c72bf0c96f787945fa081817a992a32b8b14f74548563c41f0
+d9c501d2f51d348578ca7461f00dd9f8bfce
+pkS: 034edb87360f298e8dfd4f15e1e252ea32a6d3211e6aed285b0e9b6ce94c
+9b117d236059046736e5a92e4bad3d5f32e39a
 nonce:
-0b1eea0aa2759e155d0c7f73dd5a0b5d7397ad34c9abc888da28b164680a4e3d
-blind: b0fc4b7dcf8477ef604c92fa6bfdd8abd216c6a1ed1555bca61c418650
-df0d7fe9d2cf5fe4b464d1a5d2402904bb56c4
-token_request: 0001a902228975d18032bc22516815ffd86578df3765fd426c
-4b4814cbb780e953c81776cdb658b543208f9c062875d3c303e095
-token_response: 0209604047559929a79fe2477c82fe9215bb80178ea8e7257
-3a216cfa34685cecac26b82ca3fedf02817c609c0a35af03cb75654651d328021
-6af7d6a48df86aacb15f83be4f50fe876ff9f516abf93ca61b269c5b8161bd726
-ed412ac3422f58e0fbfd970569968b63cd7f0431ede6a17205ab40e270189c4ca
-e98c5cb820cc85e8d370582cf298276423bc387dc39597
-token: 00010b1eea0aa2759e155d0c7f73dd5a0b5d7397ad34c9abc888da28b1
-64680a4e3dc994f7d5cdc2fb970b13d4e8eb6e6d8f9dcdaa65851fb091025dfe1
-34bd5a62aa94345c58c0d405d1da4f01accb465425ca4eeea4e4be392faed8d10
-e452eb1fb3509ed018b7107cffb03fd4da346a2409b51d3b3a15b716e4fbef7e3
-bd80cc09a9dc632654c85b4fd88210254d16573
+edfb4a0cdd8cdc77001b7a932fa6ac7dcccd43ab01a87a797f58d7f8524d32dc
+blind: 85e06ccd0f26ca88aefc0dc7c0ba654e91e0bd5ba9402ef9b9fb2da328
+a04161d4803daf94f48b7051d412117795e920
+token_request: 00012202bda66608b61b4a41fd650d77f587da87c163012b5c
+b4b1bf9fa348b5d53db47e98e6191961728a116aca1fbfb1ed3c79
+token_response: 03c4d208de2240fbcf5faa8787d051eaac359e361b4dc90c1
+de450d8f147501e4051f172c58a8f1e6f950866f84d7c95d27af2fc357e31bfbc
+03bc6eb848b2c1bb70d6c6685e949b4dc90547e7a36979f625efb39587b5abc6f
+4bbd1d19adba1741c410bc33400fdbc7233d5f0aa09f0154bfde2a29c96cccf1b
+c1b05836dc269a3b1bb043fe673c1b1841d1ddb0e2c1fa
+token: 0001edfb4a0cdd8cdc77001b7a932fa6ac7dcccd43ab01a87a797f58d7
+f8524d32dcc994f7d5cdc2fb970b13d4e8eb6e6d8f9dcdaa65851fb091025dfe1
+34bd5a62a22a108762bd190d1e3d59fc9e3716a4e448a2f7f4ba8d7268a52ced4
+9aa4cb8a38062f14a507f17b6128c06ce13ed31ec27e151c66d55e3f92561700a
+5db20806e618547476daa2b566d858eeb513e4c
 ~~~
 
 ## Issuance Protocol 2 - Blind RSA, 2048 {#test-vectors-rsa}
