@@ -116,12 +116,12 @@ the Issuer. This interaction is shown below.
 ~~~ aasvg
   Origin             Client        Attester          Issuer
 
-                    +--------------------------------------\
+                    +-------------------------------------.
   TokenChallenge ---> Attest ------->                      |
                     | TokenRequest ------------------>     |
                     |                            (evaluate)|
       Token  <------+  <-------------------  TokenResponse |
-                    |--------------------------------------/
+                     `------------------------------------'
 ~~~
 {: #fig-issuance title="Issuance Overview"}
 
