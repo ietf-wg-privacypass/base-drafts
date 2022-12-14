@@ -158,7 +158,7 @@ object are defined in {{directory-values}}.
 
 | Field Name           | Value                                                  |
 |:---------------------|:-------------------------------------------------------|
-| issuer-request-uri   | Issuer Request URL value as a percent-encoded URL string, represented as a JSON string ({{RFC8259, Section 7}}) |
+| issuer-request-uri   | Issuer Request URL value (as an absolute or relative URL) as a percent-encoded URL string, represented as a JSON string ({{RFC8259, Section 7}}) |
 | token-keys           | List of Issuer Public Key values, each represented as JSON objects ({{RFC8259, Section 4}}) |
 {: #directory-values title="Issuer directory object description"}
 
