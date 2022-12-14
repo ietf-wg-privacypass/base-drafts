@@ -78,8 +78,8 @@ issuance public key based on the blind RSA signature scheme
 {{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
 
 This document does not cover the Privacy Pass architecture, including
-choices that are necessary for ensuring that client privacy leaks.
-This information is covered in {{ARCHITECTURE}}.
+choices that are necessary for deployment and application specific choices
+for protecting client privacy. This information is covered in {{ARCHITECTURE}}.
 
 # Terminology
 
@@ -89,7 +89,7 @@ The following terms are used throughout this document.
 
 - Client: An entity that runs the Issuance protocol with an Issuer to produce
   Tokens that can be later used for redemption (see
-  {{Section 2.2 of AUTHSCHEME}}).
+  {{Section 2.2 of !AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}).
 - Issuer: A service that provides Tokens to Clients.
 - Issuer Public Key: The public key (from a private-public key pair) used by
   the Issuer for issuing and verifying Tokens.
@@ -100,8 +100,46 @@ This document additionally uses the terms "Origin" and "Token" as defined in
 {{ARCHITECTURE}}.
 
 Unless otherwise specified, this document encodes protocol messages in TLS
-notation from {{!TLS13=RFC8446}}, Section 3. Moreover, all constants are in
+notation from {{Section 3 of !TLS13=RFC8446}}. Moreover, all constants are in
 network byte order.
+
+# Protocol Overview
+
+The issuance protocols defined in this document embody the core of Privacy Pass.
+Clients receive TokenChallenge inputs from the redemption protocol
+({{AUTHSCHEME, Section 2.1}}) and use the issuance protocols to produce
+corresponding Token values ({{AUTHSCHEME, Section 2.2}}). The issuance protocol
+describes how Clients and Issuers interact to compute a token using a one-round
+protocol consisting of a TokenRequest from the Client and TokenResponse from
+the Issuer. This interaction is shown below.
+
+~~~ aasvg
+  Origin             Client        Attester          Issuer
+
+                    +-------------------------------------.
+  TokenChallenge ---> Attest ------->                      |
+                    | TokenRequest ------------------>     |
+                    |                            (evaluate)|
+      Token  <------+  <-------------------  TokenResponse |
+                     `------------------------------------'
+~~~
+{: #fig-issuance title="Issuance Overview"}
+
+The TokenChallenge inputs to the issuance protocols described in this
+document can be interactive or non-interactive, and per-origin or cross-origin.
+
+The issuance protocols defined in this document are compatible with any
+deployment model defined in {{Section 4 of ARCHITECTURE}}. The details of
+attestation are outside the scope of the issuance protocol; see
+{{Section 4 of ARCHITECTURE}} for information about how attestation can
+be implemented in each of the relevant deployment models.
+
+This document describes two variants of the issuance protocol: one that is
+privately verifiable ({{private-flow}}) using the issuance private key based on
+the oblivious pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}, and one
+that is publicly verifiable ({{public-flow}}) using the issuance public key
+based on the blind RSA signature scheme
+{{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
 
 # Configuration {#setup}
 
@@ -116,20 +154,23 @@ Issuers MUST provide two parameters for configuration:
 
 The Issuer parameters can be obtained from an Issuer via a directory object,
 which is a JSON object ({{!RFC8259, Section 4}}) whose values are other JSON
-values ({{RFC8259, Section 3}}) for the parameters.
+values ({{RFC8259, Section 3}}) for the parameters. The contents of this JSON
+object are defined in {{directory-values}}.
 
 | Field Name           | Value                                                  |
 |:---------------------|:-------------------------------------------------------|
 | issuer-request-uri   | Issuer Request URI resource percent-encoded URL string, represented as a JSON string ({{RFC8259, Section 7}}) |
 | token-keys           | List of Issuer Public Key values, each represented as JSON objects ({{RFC8259, Section 4}}) |
+{: #directory-values title="Issuer directory object description"}
 
-Each "token-keys" JSON object contains the following fields and corresponding
-raw values.
+Each "token-keys" JSON object contains the fields and corresponding raw values
+defined in {{tokenkeys-values}}.
 
 | Field Name   | Value                                                  |
 |:-------------|:-------------------------------------------------------|
 | token-type   | Integer value of the Token Type, as defined in {{token-type}}, represented as a JSON number ({{RFC8259, Section 6}}) |
 | token-key    | The base64url encoding of the Public Key for use with the issuance protocol, including padding, represented as a JSON string ({{RFC8259, Section 7}}) |
+{: #tokenkeys-values title="Issuer 'token-keys' object description'"}
 
 Issuers MAY advertise multiple token-keys for the same token-type to
 support key rotation. In this case, Issuers indicate preference for which
@@ -154,9 +195,10 @@ Altogether, the Issuer's directory could look like:
  }
 ~~~
 
-Issuer directory resources have the media type "application/json"
-and are located at the well-known location /.well-known/token-issuer-directory;
-see {{wkuri-reg}} for the registration information for this well-known URI.
+Issuer directory resources have the media type
+"application/token-issuer-directory" and are located at the well-known location
+/.well-known/token-issuer-directory; see {{wkuri-reg}} for the registration
+information for this well-known URI.
 
 Issuers SHOULD use HTTP caching to permit caching of this resource
 {{!RFC5861}}. The cache lifetime depends on the Issuer's key rotation schedule.
@@ -186,27 +228,23 @@ and per-origin or cross-origin.
 
 # Issuance Protocol for Privately Verifiable Tokens {#private-flow}
 
-The Privacy Pass issuance protocol is a two-message protocol that takes
-as input a TokenChallenge from the redemption protocol
-({{AUTHSCHEME, Section 2.1}}) and produces a Token
-({{AUTHSCHEME, Section 2.2}}), as shown in the figure below.
-
-~~~
-   Origin            Client                   Issuer
-                      (pkI)                 (skI, pkI)
-                   +------------------------------------\
-TokenChallenge ----> TokenRequest ------------->        |
-                   |                       (evaluate)   |
-     Token    <----+     <--------------- TokenResponse |
-                   \------------------------------------/
-~~~
+The privately verifiable issuance protocol allows Clients to produce Token
+values that verify using the Issuer Private Key. This protocol is based
+on the oblivious pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}.
 
 Issuers provide a Private and Public Key, denoted `skI` and `pkI` respectively,
 used to produce tokens as input to the protocol. See {{issuer-configuration}}
-for how this key-pair is generated.
+for how this key pair is generated.
 
 Clients provide the following as input to the issuance protocol:
 
+- Issuer Request URI: A URI to which token request messages are sent. This can
+  be a URL derived from the "issuer-request-uri" value in the Issuer's
+  directory resource, or it can be another Client-configured URL. The value
+  of this parameter depends on the Client configuration and deployment model.
+  For example, in the 'Joint Origin and Issuer' deployment model, the Issuer
+  Request URI might be correspond to the Client's configured Attester, and the
+  Attester is configured to relay requests to the Issuer.
 - Issuer name: An identifier for the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
 - Issuer Public Key: `pkI`, with a key identifier `token_key_id` computed as
@@ -220,7 +258,7 @@ this protocol are described below. This section uses notation described in
 SerializeScalar and DeserializeScalar, and DeriveKeyPair.
 
 The constants `Ne` and `Ns` are as defined in {{OPRF, Section 4}} for
-OPRF(P-384, SHA-384).
+OPRF(P-384, SHA-384). The constant `Nk` is defined by {{private-token-type}}.
 
 ## Client-to-Issuer Request {#private-request}
 
@@ -240,7 +278,7 @@ with the input challenge and Issuer key identifier as described below:
 ~~~
 nonce = random(32)
 challenge_digest = SHA256(challenge)
-token_input = concat(0x0001,
+token_input = concat(0x0001, // Token type field is 2 bytes long
                      nonce,
                      challenge_digest,
                      token_key_id)
@@ -276,9 +314,9 @@ The structure fields are defined as follows:
 
 The values `token_input` and `blinded_element` are stored locally and used
 later as described in {{private-finalize}}. The Client then generates an HTTP
-POST request to send to the Issuer, with the TokenRequest as the content. The
-media type for this request is "application/private-token-request". An example
-request is shown below.
+POST request to send to the Issuer Request URI, with the TokenRequest as the
+content. The media type for this request is
+"application/private-token-request". An example request is shown below.
 
 ~~~
 :method = POST
@@ -293,6 +331,8 @@ content-length = <Length of TokenRequest>
 <Bytes containing the TokenRequest>
 ~~~
 
+## Issuer-to-Client Response {#private-response}
+
 Upon receipt of the request, the Issuer validates the following conditions:
 
 - The TokenRequest contains a supported token_type.
@@ -301,11 +341,7 @@ Upon receipt of the request, the Issuer validates the following conditions:
 - The TokenRequest.blinded_msg is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
-to the client.
-
-## Issuer-to-Client Response {#private-response}
-
-Upon receipt of a TokenRequest, the Issuer tries to deseralize
+to the client. The Issuer then tries to deseralize
 TokenRequest.blinded_msg using DeserializeElement from {{Section 2.1 of OPRF}},
 yielding `blinded_element`. If this fails, the Issuer MUST return an HTTP 400
 error to the client. Otherwise, if the Issuer is willing to produce a token to
@@ -402,8 +438,9 @@ valid = (token_authenticator == Token.authenticator)
 ## Issuer Configuration
 
 Issuers are configured with Private and Public Key pairs, each denoted `skI`
-and `pkI`, respectively, used to produce tokens. A RECOMMENDED method for
-generating key pairs is as follows:
+and `pkI`, respectively, used to produce tokens. These keys MUST NOT be reused
+in other protocols. A RECOMMENDED method for generating key pairs is as
+follows:
 
 ~~~
 seed = random(Ns)
@@ -414,7 +451,7 @@ The key identifier for a public key `pkI`, denoted `token_key_id`, is computed
 as follows:
 
 ~~~
-token_key_id = SHA256(concat(0x0001, SerializeElement(pkI)))
+token_key_id = SHA256(SerializeElement(pkI))
 ~~~
 
 Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers should
@@ -424,14 +461,17 @@ truncated key IDs in rotation.
 # Issuance Protocol for Publicly Verifiable Tokens {#public-flow}
 
 This section describes a variant of the issuance protocol in {{private-flow}}
-for producing publicly verifiable tokens. It differs from the previous variant
-in that the output tokens are publicly verifiable by anyone with the Issuer
-Public Key.
+for producing publicly verifiable tokens using the protocol in {{BLINDRSA}}.
+In particular, this variant of the issuance protocol works for the
+RSABSSA-SHA384-PSS-Deterministic and RSABSSA-SHA384-PSSZERO-Deterministic
+blind RSA protocol variants described in {{Section 5 of BLINDRSA}}.
 
-This means any Origin can select a given Issuer to produce tokens, as long as
-the Origin has the Issuer public key, without explicit coordination or
-permission from the Issuer. This is because the Issuer does not learn the
-Origin that requested the token during the issuance protocol.
+The publicly verifiable issuance protocol differs from the protocol in
+{{private-flow}} in that the output tokens are publicly verifiable by anyone
+with the Issuer Public Key. This means any Origin can select a given Issuer to
+produce tokens, as long as the Origin has the Issuer public key, without
+explicit coordination or permission from the Issuer. This is because the Issuer
+does not learn the Origin that requested the token during the issuance protocol.
 
 Beyond this difference, the publicly verifiable issuance protocol variant is
 nearly identical to the privately verifiable issuance protocol variant. In
@@ -441,6 +481,13 @@ respectively, used to produce tokens as input to the protocol. See
 
 Clients provide the following as input to the issuance protocol:
 
+- Issuer Request URI: A URI to which token request messages are sent. This can
+  be a URL derived from the "issuer-request-uri" value in the Issuer's
+  directory resource, or it can be another Client-configured URL. The value
+  of this parameter depends on the Client configuration and deployment model.
+  For example, in the 'Split Origin, Attester, Issuer' deployment model, the
+  Issuer Request URI might be correspond to the Client's configured Attester,
+  and the Attester is configured to relay requests to the Issuer.
 - Issuer name: An identifier for the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
 - Issuer Public Key: `pkI`, with a key identifier `token_key_id` computed as
@@ -449,7 +496,8 @@ Clients provide the following as input to the issuance protocol:
   be provided by the redemption protocol in {{AUTHSCHEME}}.
 
 Given this configuration and these inputs, the two messages exchanged in
-this protocol are described below.
+this protocol are described below. The constant `Nk` is defined by
+{{public-token-type}}.
 
 ## Client-to-Issuer Request {#public-request}
 
@@ -459,14 +507,16 @@ The Client first creates an issuance request message for a random value
 ~~~
 nonce = random(32)
 challenge_digest = SHA256(challenge)
-token_input = concat(0x0002,
+token_input = concat(0x0002, // Token type field is 2 bytes long
                      nonce,
                      challenge_digest,
                      token_key_id)
-blinded_msg, blind_inv = rsabssa_blind(pkI, token_input)
+blinded_msg, blind_inv =
+  Blind(pkI, PrepareIdentity(token_input))
 ~~~
 
-The rsabssa_blind function is defined in {{BLINDRSA, Section 5.1.1.}}.
+The PrepareIdentity and Blind functions are defined in
+{{Section 4.1 of BLINDRSA}} and {{Section 4.2 of BLINDRSA}}, respectively.
 The Client stores the nonce and challenge_digest values locally for use
 when finalizing the issuance protocol to produce a token (as described
 in {{public-finalize}}).
@@ -491,8 +541,8 @@ The structure fields are defined as follows:
 
 - "blinded_msg" is the Nk-octet request defined above.
 
-The Client then generates an HTTP POST request to send to the Issuer,
-with the TokenRequest as the content. The media type for this request
+The Client then generates an HTTP POST request to send to the Issuer Request
+URI, with the TokenRequest as the content. The media type for this request
 is "application/private-token-request". An example request is shown below:
 
 ~~~
@@ -508,6 +558,8 @@ content-length = <Length of TokenRequest>
 <Bytes containing the TokenRequest>
 ~~~
 
+## Issuer-to-Client Response {#public-response}
+
 Upon receipt of the request, the Issuer validates the following conditions:
 
 - The TokenRequest contains a supported token_type.
@@ -516,19 +568,17 @@ Upon receipt of the request, the Issuer validates the following conditions:
 - The TokenRequest.blinded_msg is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
-to the Client, which will forward the error to the client.
-
-## Issuer-to-Client Response {#public-response}
-
-If the Issuer is willing to produce a token token to the Client, the Issuer
+to the Client, which will forward the error to the client. Otherwise, if the
+Issuer is willing to produce a token token to the Client, the Issuer
 completes the issuance flow by computing a blinded response as follows:
 
 ~~~
-blind_sig = rsabssa_blind_sign(skI, TokenRequest.blinded_msg)
+blind_sig = BlindSign(skI, TokenRequest.blinded_msg)
 ~~~
 
-This is encoded and transmitted to the client in the following TokenResponse
-structure:
+The BlindSign function is defined in {{Section 4.3 of BLINDRSA}}.
+The result is encoded and transmitted to the client in the following
+TokenResponse structure:
 
 ~~~
 struct {
@@ -536,7 +586,6 @@ struct {
 } TokenResponse;
 ~~~
 
-The rsabssa_blind_sign function is defined in {{BLINDRSA, Section 5.1.2.}}.
 The Issuer generates an HTTP response with status code 200 whose content
 consists of TokenResponse, with the content type set as
 "application/private-token-response".
@@ -556,12 +605,12 @@ content as follows:
 
 ~~~
 authenticator =
-  rsabssa_finalize(pkI, nonce, blind_sig, blind_inv)
+  Finalize(pkI, nonce, blind_sig, blind_inv)
 ~~~
 
-The rsabssa_finalize function is defined in {{BLINDRSA, Section 5.1.3.}}.
-If this succeeds, the Client then constructs a Token as described in
-{{AUTHSCHEME}} as follows:
+The Finalize function is defined in {{Section 4.4 of BLINDRSA}}. If this
+succeeds, the Client then constructs a Token as described in {{AUTHSCHEME}} as
+follows:
 
 ~~~
 struct {
@@ -574,7 +623,7 @@ struct {
 ~~~
 
 The Token.nonce value is that which was sampled in {{private-request}}.
-If the rsabssa_finalize function fails, the Client aborts the protocol.
+If the Finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
 
@@ -599,7 +648,8 @@ valid = RSASSA-PSS-VERIFY(pkI,
 
 Issuers are configured with Private and Public Key pairs, each denoted skI and
 pkI, respectively, used to produce tokens. Each key pair SHALL be generated as
-as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}.
+as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}. These key
+pairs MUST NOT be reused in other protocols.
 
 The key identifier for a keypair (skI, pkI), denoted `token_key_id`, is
 computed as SHA256(encoded_key), where encoded_key is a DER-encoded
@@ -620,6 +670,10 @@ based on the VOPRF defined in {{OPRF}} and blind RSA protocol defined in
 documents also apply in the Privacy Pass use-case. Considerations related to
 broader privacy and security concerns in a multi-Client and multi-Issuer
 setting are deferred to the Architecture document {{ARCHITECTURE}}.
+Moreover, deployment-specific considerations regarding Client privacy
+when running the issuance protocol, especially with respect to Client-specific
+identifiers such as IP addresses that are revealed to the Attester and Issuer
+during issuance, are also discussed in {{Section 4 of ARCHITECTURE}}.
 
 Beyond these considerations, it is worth highlighting the fact that Client
 TokenRequest messages contain truncated token key IDs. This is done to minimize
@@ -632,6 +686,8 @@ ensure they are not being given unique keys; see
 
 # IANA considerations
 
+This section contains considerations for IANA.
+
 ## Well-Known 'token-issuer-directory' URI {#wkuri-reg}
 
 This document updates the "Well-Known URIs" Registry {{WellKnownURIs}} with the
@@ -640,14 +696,14 @@ following values.
 | URI Suffix  | Change Controller  | Reference | Status | Related information |
 |:------------|:-------------------|:----------|:-------|:--------------------|
 | token-issuer-directory | IETF | [this document] | permanent | None |
-{: #wellknownuri-values title="'xxx' Well-Known URI"}
+{: #wellknownuri-values title="'token-issuer-directory' Well-Known URI"}
 
-## Token Type
+## Token Type Registry Updates {#token-type}
 
 This document updates the "Token Type" Registry from
 {{AUTHSCHEME, Section 5.2}} with the following entries.
 
-### Token Type VOPRF (P-384, SHA-384)
+### Token Type VOPRF (P-384, SHA-384) {#private-token-type}
 
 * Value: 0x0001
 * Name: VOPRF (P-384, SHA-384)
@@ -659,7 +715,7 @@ This document updates the "Token Type" Registry from
 * Reference: {{private-flow}}
 * Notes: None
 
-### Token Type Blind RSA (2048-bit)
+### Token Type Blind RSA (2048-bit) {#public-token-type}
 
 * Value: 0x0002
 * Name: Blind RSA (2048-bit)
@@ -677,10 +733,83 @@ This document updates the "Token Type" Registry from
 This specification defines the following protocol messages, along with their
 corresponding media types:
 
+- Token issuer directory: "application/token-issuer-directory"
 - TokenRequest: "application/private-token-request"
 - TokenResponse: "application/private-token-response"
 
 The definition for each media type is in the following subsections.
+
+### "application/token-issuer-directory" media type
+
+Type name:
+
+: application
+
+Subtype name:
+
+: token-issuer-directory
+
+Required parameters:
+
+: N/A
+
+Optional parameters:
+
+: None
+
+Encoding considerations:
+
+: "binary"
+
+Security considerations:
+
+: see {{setup}}
+
+Interoperability considerations:
+
+: N/A
+
+Published specification:
+
+: this specification
+
+Applications that use this media type:
+
+: N/A
+
+Fragment identifier considerations:
+
+: N/A
+
+Additional information:
+
+: <dl spacing="compact">
+  <dt>Magic number(s):</dt><dd>N/A</dd>
+  <dt>Deprecated alias names for this type:</dt><dd>N/A</dd>
+  <dt>File extension(s):</dt><dd>N/A</dd>
+  <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
+  </dl>
+
+Person and email address to contact for further information:
+
+: see Authors' Addresses section
+
+Intended usage:
+
+: COMMON
+
+Restrictions on usage:
+
+: N/A
+
+Author:
+
+: see Authors' Addresses section
+
+Change controller:
+
+: IESG
+{: spacing="compact"}
 
 ### "application/private-token-request" media type
 
@@ -726,7 +855,7 @@ Fragment identifier considerations:
 
 Additional information:
 
-: <dl>
+: <dl spacing="compact">
   <dt>Magic number(s):</dt><dd>N/A</dd>
   <dt>Deprecated alias names for this type:</dt><dd>N/A</dd>
   <dt>File extension(s):</dt><dd>N/A</dd>
@@ -752,6 +881,7 @@ Author:
 Change controller:
 
 : IESG
+{: spacing="compact"}
 
 ### "application/private-token-response" media type
 
@@ -797,7 +927,7 @@ Fragment identifier considerations:
 
 Additional information:
 
-: <dl>
+: <dl spacing="compact">
   <dt>Magic number(s):</dt><dd>N/A</dd>
   <dt>Deprecated alias names for this type:</dt><dd>N/A</dd>
   <dt>File extension(s):</dt><dd>N/A</dd>
@@ -823,6 +953,7 @@ Author:
 Change controller:
 
 : IESG
+{: spacing="compact"}
 
 --- back
 
@@ -862,26 +993,26 @@ The test vector below lists the following values:
   string.
 
 ~~~
-skS: 3d473b7609c0c6f0acf5da90c3a4a791befd7f576004b74c72958c60f56e
-a2dd56261e9cc35f0dfc8a990790a57dda3e
-pkS: 03f49c2d549721f2b37fd20d1a82ed28a3a5eed578e1b3ad6815eb31c775
-21fd01c61c247a76a3f6da33087f86db06d983
+skS: cc1a7bb002c72bf0c96f787945fa081817a992a32b8b14f74548563c41f0
+d9c501d2f51d348578ca7461f00dd9f8bfce
+pkS: 034edb87360f298e8dfd4f15e1e252ea32a6d3211e6aed285b0e9b6ce94c
+9b117d236059046736e5a92e4bad3d5f32e39a
 nonce:
-0b1eea0aa2759e155d0c7f73dd5a0b5d7397ad34c9abc888da28b164680a4e3d
-blind: b0fc4b7dcf8477ef604c92fa6bfdd8abd216c6a1ed1555bca61c418650
-df0d7fe9d2cf5fe4b464d1a5d2402904bb56c4
-token_request: 0001a902228975d18032bc22516815ffd86578df3765fd426c
-4b4814cbb780e953c81776cdb658b543208f9c062875d3c303e095
-token_response: 0209604047559929a79fe2477c82fe9215bb80178ea8e7257
-3a216cfa34685cecac26b82ca3fedf02817c609c0a35af03cb75654651d328021
-6af7d6a48df86aacb15f83be4f50fe876ff9f516abf93ca61b269c5b8161bd726
-ed412ac3422f58e0fbfd970569968b63cd7f0431ede6a17205ab40e270189c4ca
-e98c5cb820cc85e8d370582cf298276423bc387dc39597
-token: 00010b1eea0aa2759e155d0c7f73dd5a0b5d7397ad34c9abc888da28b1
-64680a4e3dc994f7d5cdc2fb970b13d4e8eb6e6d8f9dcdaa65851fb091025dfe1
-34bd5a62aa94345c58c0d405d1da4f01accb465425ca4eeea4e4be392faed8d10
-e452eb1fb3509ed018b7107cffb03fd4da346a2409b51d3b3a15b716e4fbef7e3
-bd80cc09a9dc632654c85b4fd88210254d16573
+edfb4a0cdd8cdc77001b7a932fa6ac7dcccd43ab01a87a797f58d7f8524d32dc
+blind: 85e06ccd0f26ca88aefc0dc7c0ba654e91e0bd5ba9402ef9b9fb2da328
+a04161d4803daf94f48b7051d412117795e920
+token_request: 00012202bda66608b61b4a41fd650d77f587da87c163012b5c
+b4b1bf9fa348b5d53db47e98e6191961728a116aca1fbfb1ed3c79
+token_response: 03c4d208de2240fbcf5faa8787d051eaac359e361b4dc90c1
+de450d8f147501e4051f172c58a8f1e6f950866f84d7c95d27af2fc357e31bfbc
+03bc6eb848b2c1bb70d6c6685e949b4dc90547e7a36979f625efb39587b5abc6f
+4bbd1d19adba1741c410bc33400fdbc7233d5f0aa09f0154bfde2a29c96cccf1b
+c1b05836dc269a3b1bb043fe673c1b1841d1ddb0e2c1fa
+token: 0001edfb4a0cdd8cdc77001b7a932fa6ac7dcccd43ab01a87a797f58d7
+f8524d32dcc994f7d5cdc2fb970b13d4e8eb6e6d8f9dcdaa65851fb091025dfe1
+34bd5a62a22a108762bd190d1e3d59fc9e3716a4e448a2f7f4ba8d7268a52ced4
+9aa4cb8a38062f14a507f17b6128c06ce13ed31ec27e151c66d55e3f92561700a
+5db20806e618547476daa2b566d858eeb513e4c
 ~~~
 
 ## Issuance Protocol 2 - Blind RSA, 2048 {#test-vectors-rsa}
