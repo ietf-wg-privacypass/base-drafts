@@ -219,13 +219,6 @@ configuration results in token issuance failures, e.g., because the
 configuration information is too stale, the directory SHOULD be fetched and
 revalidated.
 
-# Token Challenge Requirements
-
-Clients receive challenges for tokens, as described in
-{{!AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}. The basic token issuance
-protocols described in this document can be interactive or non-interactive,
-and per-origin or cross-origin.
-
 # Issuance Protocol for Privately Verifiable Tokens {#private-flow}
 
 The privately verifiable issuance protocol allows Clients to produce Token
