@@ -642,20 +642,12 @@ based on the VOPRF defined in {{OPRF}} and blind RSA protocol defined in
 {{BLINDRSA}}. All security considerations described in the VOPRF and blind RSA
 documents also apply in the Privacy Pass use-case. Considerations related to
 broader privacy and security concerns in a multi-Client and multi-Issuer
-setting are deferred to the Architecture document {{ARCHITECTURE}}.
-Moreover, deployment-specific considerations regarding Client privacy
-when running the issuance protocol, especially with respect to Client-specific
-identifiers such as IP addresses that are revealed to the Attester and Issuer
-during issuance, are also discussed in {{Section 4 of ARCHITECTURE}}.
-
-Beyond these considerations, it is worth highlighting the fact that Client
-TokenRequest messages contain truncated token key IDs. This is done to minimize
-the chance that an Issuer can use distinct keys for targeting specific users.
-Since the key ID is truncated to a single byte, an Issuer can partition the set
-of Clients into at most 256 different anonymity sets. On top of this key ID
-space, Clients SHOULD apply some form of key consistency mechanism to help
-ensure they are not being given unique keys; see
-{{?CONSISTENCY=I-D.privacypass-key-consistency}} for more details.
+setting are deferred to the Architecture document {{ARCHITECTURE}}. In
+particular, the privacy considerations in
+{{Section 4 and Section 5 of ARCHITECTURE}}, particularly those pertaining to
+Issuer Public Key rotation and consistency (where consistency is as described
+in {{?CONSISTENCY=I-D.privacypass-key-consistency}}) and Issuer selection, are
+relevant for implementations of the protocols in this document.
 
 # IANA considerations
 
