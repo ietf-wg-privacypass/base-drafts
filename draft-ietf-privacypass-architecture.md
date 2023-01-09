@@ -111,8 +111,9 @@ issuance and redemption. The redemption protocol
 (server). It allows Origins to challenge Clients to present one or more tokens
 for authorization. Depending on the type of token, e.g., whether or not it
 can be cached, the Client either presents a previously obtained token or
-invokes an issuance protocol, such as {{?ISSUANCE=I-D.ietf-privacypass-protocol}},
-to acquire a token to present as authorization.
+invokes an issuance protocol, such as
+{{?ISSUANCE=I-D.ietf-privacypass-protocol}}, to acquire a token to present as
+authorization.
 
 This document describes requirements for both issuance and redemption
 protocols and how they interact. It also provides recommendations on how
@@ -338,7 +339,7 @@ important because the Attester's role is to vouch for trust in
 privacy-sensitive Client information, such as account identifiers or IP address
 information, to the Issuer. Tokens produced by an Issuer that admits issuance
 for any type of attestation cannot be relied on for any specific property.
-See {{attester-role}} for more details.
+See {{attester}} for more details.
 
 ### Attester Role {#attester}
 
