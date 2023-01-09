@@ -106,61 +106,18 @@ These proofs, or tokens, are anonymous in the sense that a given token cannot
 be linked to the protocol instance in which that token was initially issued.
 
 At a high level, the Privacy Pass architecture consists of two protocols:
-issuance and redemption. The issuance protocol runs between an endpoint referred
-to as a Client and two functions in the Privacy Pass architecture:
-Attestation and Issuance. These two network functions can be implemented by the
-same protocol participant, but can also be implemented separately. The entity
-that implements Issuance, referred to as the Issuer, is responsible for issuing
-tokens in response to requests from Clients. The entity that implements
-Attestation, referred to as the Attester, is responsible for attesting to
-properties about the Client for which tokens are issued. The Issuer needs to be
-trusted by the server that later redeems the token. Attestation can be
-performed by the Issuer or by an Attester that is trusted by the Issuer.
-Clients might prefer to select different Attesters, separate from the Issuer,
-to be able to use preferred authentication methods or to improve privacy by not
-directly communicating with an Issuer. Depending on the attestation,
-Attesters can store state about a Client, such as the number of overall tokens
-issued thus far. As an example of an issuance protocol, in the original Privacy
-Pass protocol {{PPSRV}}{{PPEXT}}, tokens were only issued to Clients that solved
-CAPTCHAs. In this context, the Attester attested that some client solved a
-CAPTCHA and the resulting token produced by the Issuer was proof of this fact.
-
-The redemption protocol runs between Client and Origin (server). It allows
-Origins to challenge Clients to present one or more tokens for authorization.
-Depending on the type of token, e.g., whether or not it can be cached, the
-Client either presents a previously obtained token or invokes the issuance
-protocol to acquire one for authorization.
-
-The issuance and redemption protocols operate in concert as shown in
-the figure below.
-
-~~~ aasvg
-    Origin          Client      Attester     Issuer
-                  +---------------------------------.
- TokenChallenge --> Attest --->                      |
-                  | TokenRequest ---------->         |
-                  |                       (validate) |
-                  |                       (evaluate) |
-                  |     <------------  TokenResponse |
-     Token  <-----+                                  |
-                   `--------------------------------'
-                --------------------+-------------------
- -----------+-------------          |
-            |                       |
-        Redemption               Issuance
-         Protocol                Protocol
-~~~
-{: #fig-overview title="Privacy pass redemption and issuance protocol interaction"}
+issuance and redemption. The redemption protocol
+{{?AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}} runs between Client and Origin
+(server). It allows Origins to challenge Clients to present one or more tokens
+for authorization. Depending on the type of token, e.g., whether or not it
+can be cached, the Client either presents a previously obtained token or
+invokes an issuance protocol, such as {{?ISSUANCE=I-D.ietf-privacypass-protocol}},
+to acquire a token to present as authorization.
 
 This document describes requirements for both issuance and redemption
-protocols. It also provides recommendations on how the architecture
-should be deployed to ensure the privacy of clients and the security of
-all participating entities.
-
-The privacypass working group is working on
-{{?AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}} as an instantiation
-of a redemption protocol and {{?ISSUANCE=I-D.ietf-privacypass-protocol}} as an
-instantiation of the issuance protocol.
+protocols and how they interact. It also provides recommendations on how
+the architecture should be deployed to ensure the privacy of clients and
+the security of all participating entities.
 
 # Terminology
 
@@ -174,14 +131,69 @@ The following terms are used throughout this document.
   attested to by the Attester.
 - Attester: An entity that attests to properties of Client for the
   purposes of token issuance.
+- Redemption context: The interactions and set of information shared
+between the Client and Origin.
+- Issuance context: The interactions and set of information shared
+between the Client, Attester, and Issuer.
 
 # Architecture
 
 The Privacy Pass architecture consists of four logical entities --
 Client, Origin, Issuer, and Attester -- that work in concert as
-shown in {{introduction}} for token issuance and redemption. This
-section describes the purpose of token issuance and redemption
-and the requirements therein on the relevant participants.
+for token issuance and redemption. This section describes the purpose
+of token issuance and redemption and the requirements on the relevant
+participants.
+
+The typical interaction flow for Privacy Pass tokens uses the
+following steps:
+
+1. A Client interacts with an Origin by sending an HTTP request.
+The Origin sends an HTTP response that contains a token challenge
+that indicates a specific Issuer to use.
+Note that the request might be made as part of accessing a
+resource normally, or with the specific intent of triggering a token
+challenge.
+
+2. If the Client already has a token available that satisfies the token
+challenge, it can skip to step 5 and redeem its token. Otherwise, it
+performs attestation with the Attester and creates a Token Request to send
+to the Issuer (generally via the Attester).
+
+3. The Attester performs attestation checks on the Client. These checks
+could be proof of solving a CAPTCHA, device trust, hardware attestation,
+etc (see {{attester}}). If these checks pass, it sends the Token Request
+to the Issuer. The Attester and Issuer might be functions on the same server,
+depending on the deployment model (see {{deployment}}). If the checks fail,
+the Client receives an error.
+
+4. The Issuer generates a Token Response based on the Token Request, which
+is returned to the Client. Upon receiving the Token Response, the Client
+generates a token by cryptographically transforming the content of the
+response so that the token can be validated using a per-Issuer key, but
+cannot be linked to the content of the Token Response.
+
+5. If the Client has a token, it includes it in a subsequent HTTP
+request to the Origin, as authorization. This token is sent only once.
+The Origin validates that the token was generated by the expected Issuer.
+
+~~~ aasvg
+    Origin           Client      Attester     Issuer
+                   +---------------------------------.
+     Request <-----+                                  |
+                   |                                  |
+ TokenChallenge --->                                  |
+                   | TokenRequest ---------->         |
+                   |             (attest)             |
+                   |     <------------  TokenResponse |
+ Request + Token <-+                                  |
+                    `--------------------------------'
+                   -----------------+-------------------
+ -----------+-------------          |
+            |                       |
+        Redemption               Issuance
+         Protocol                Protocol
+~~~
+{: #fig-overview title="Privacy pass redemption and issuance protocol interaction"}
 
 ## Redemption Protocol
 
@@ -328,7 +340,7 @@ information, to the Issuer. Tokens produced by an Issuer that admits issuance
 for any type of attestation cannot be relied on for any specific property.
 See {{attester-role}} for more details.
 
-### Attester Role
+### Attester Role {#attester}
 
 Attestation is an important part of the issuance protocol. Attestation is the
 process by which an Attester bears witness to, confirms, or authenticates a
