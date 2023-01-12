@@ -162,7 +162,7 @@ invokes the issuance protocol to request a token from the designated Issuer.
 3. The first step in the issuance protocol is attestation. Specifically, the Attester
 performs attestation checks on the Client. These checks
 could be proof of solving a CAPTCHA, device trust, hardware attestation,
-etc (see {{attester}}). 
+etc (see {{attester}}).
 
 4. If attestation succeeds, the client creates a Token Request to send
 to the designated Issuer (generally via the Attester). The Attester and Issuer
