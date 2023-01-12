@@ -190,8 +190,8 @@ does not reply to the Origin's challenge with a new request.
      Request <-----+                                  |
                    |                                  |
  TokenChallenge --->                                  |
+                   | <--- (attest) --->             |
                    | TokenRequest ---------->         |
-                   |             (attest)             |
                    |     <------------  TokenResponse |
  Request + Token <-+                                  |
                     `--------------------------------'
