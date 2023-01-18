@@ -186,11 +186,11 @@ does not reply to the Origin's challenge with a new request.
 
 ~~~ aasvg
     Origin           Client         Attester     Issuer
-    
-     Request <------                                  
-                                                       
- TokenChallenge --->   
-                      <- (Attestation) ->                               
+
+     Request <------
+
+ TokenChallenge --->
+                      <- (Attestation) ->
   
                       TokenRequest -------------->
                               <-------------- TokenResponse
