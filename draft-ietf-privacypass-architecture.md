@@ -193,7 +193,6 @@ does not reply to the Origin's challenge with a new request.
 
  TokenChallenge --->
                       <- (Attestation) ->
-  
                       TokenRequest -------------->
                               <-------------- TokenResponse
  Request + Token <--
