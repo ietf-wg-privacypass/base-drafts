@@ -185,21 +185,16 @@ If the Client does not have a token, perhaps because issuance failed, the client
 does not reply to the Origin's challenge with a new request.
 
 ~~~ aasvg
-    Origin           Client      Attester     Issuer
-                   +---------------------------------.
-     Request <-----+                                  |
-                   |                                  |
- TokenChallenge --->                                  |
-                   | <--- (attest) --->             |
-                   | TokenRequest ---------->         |
-                   |     <------------  TokenResponse |
- Request + Token <-+                                  |
-                    `--------------------------------'
-                   -----------------+-------------------
- -----------+-------------          |
-            |                       |
-        Redemption               Issuance
-         Protocol                Protocol
+    Origin           Client         Attester     Issuer
+    
+     Request <------                                  
+                                                       
+ TokenChallenge --->   
+                      <- (Attestation) ->                               
+  
+                      TokenRequest -------------->
+                              <-------------- TokenResponse
+ Request + Token <--
 ~~~
 {: #fig-overview title="Privacy pass redemption and issuance protocol interaction"}
 
