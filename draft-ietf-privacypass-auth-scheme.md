@@ -253,7 +253,10 @@ protocols in {{ISSUANCE}} have the same functional properties, albeit with
 different mechanisms for verifying the resulting tokens during redemption.
 Since clients are free to choose which challenge they want to consume when
 presented with options, mixing multiple challenges with different functional
-properties for one use case is nonsensical.
+properties for one use case is nonsensical. If the origin has a preference
+for one challenge over another (for example, if one uses a token type
+that is faster to verify), it can sort it to be first in the list
+of challenges as a hint to the client.
 
 ### Redemption Context Construction {#context-construction}
 
