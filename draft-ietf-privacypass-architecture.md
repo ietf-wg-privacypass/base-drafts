@@ -142,13 +142,12 @@ the Client and Attester only, for the purposes of attesting the vailidity of the
 # Architecture
 
 The Privacy Pass architecture consists of four logical entities --
-Client, Origin, Issuer, and Attester -- that work in concert as
+Client, Origin, Issuer, and Attester -- that work in concert
 for token issuance and redemption. This section describes the purpose
 of token issuance and redemption and the requirements on the relevant
 participants.
 
-The typical interaction flow for Privacy Pass tokens uses the
-following steps:
+The typical interaction flow for Privacy Pass uses the following steps:
 
 1. A Client interacts with an Origin by sending an HTTP request.
 The Origin sends an HTTP response that contains a token challenge
@@ -158,8 +157,9 @@ resource normally, or with the specific intent of triggering a token
 challenge.
 
 2. If the Client already has a token available that satisfies the token
-challenge, it can skip to step 6 and redeem its token. Otherwise, it
-invokes the issuance protocol to request a token from the designated Issuer.
+challenge, e.g., because the Client has a cache of previously issued tokens,
+it can skip to step 6 and redeem its token. Otherwise, it invokes the issuance
+protocol to request a token from the designated Issuer.
 
 3. The first step in the issuance protocol is attestation. Specifically, the Attester
 performs attestation checks on the Client. These checks
@@ -198,6 +198,42 @@ does not reply to the Origin's challenge with a new request.
  Request + Token <--
 ~~~
 {: #fig-overview title="Privacy pass redemption and issuance protocol interaction"}
+
+The end-to-end flow for Privacy Pass involves three different types of contexts:
+
+- Redemption context: The interactions and set of information shared
+between the Client and Origin.
+- Issuance context: The interactions and set of information shared
+between the Client, Attester, and Issuer.
+- Attestation context: The interactions and set of information shared between
+the Client and Attester only, for the purposes of attesting the vailidity of the Client.
+
+The privacy goals of Privacy Pass are oriented around unlinkability based on these
+contexts. In particular, Privacy Pass aims to achieve Client unlinkability. This
+means that given two redemption (or issuer) contexts, the Origin (or Issuer) cannot
+determine if both redemption (or issuance) contexts correspond to the same Client
+or two different Clients. Informally, this means that a Client in a redemption context
+is indistinguishable from any other Client that might use the same redemption context.
+The set of Clients that share the same redemption (or issuance) context is referred
+to as an anonymity set.
+Depending on the deployment model, Privacy Pass might also aim to achieve Origin
+unlinkability. Similar to Client unlinkability, this means that given two attestation
+contexts, the Attester cannot determine if both contexcts correspond to the same
+Origin or two different Origins. The set of Clients that share the same attestation
+context is referred to as an anonymity set.
+
+At a high level, these properties ensure that no single party amongst the Attester,
+Issuer, or Origin can link client identifying information to client activity, e.g.,
+the origin being accessed.
+
+The manner in which Client and Origin unlinkability are achieved depends on the deployment
+model, type of attestation, and issuance protocol details. For example, as discussed
+in {{deployment}}, failure to use a privacy-enhancing proxy system such as Tor when
+interacting with Attesters, Isuers, or Origins allows the set of possible Clients to be
+partitioned by the Client's IP address, and can therefore lead to Client unlinkability
+violations. Similarly, malicious Origins may attempt to link two redemption contexts
+together by using Client-specific Issuer public keys. See {{deployment}} and
+{{privacy}} for more information.
 
 ## Redemption Protocol
 
@@ -274,9 +310,8 @@ as input a TokenChallenge from the redemption protocol
 ~~~ aasvg
    Origin              Client      Attester     Issuer
                    +-----------------------------------.
-TokenChallenge --->| Attest -------->                   |
+TokenChallenge --->| <- (Attestation) ->                |
                    | TokenRequest ---------------->     |
-                   |                         (evaluate) |
      Token    <----+     <--------------- TokenResponse |
                     `----------------------------------'
 ~~~
@@ -324,10 +359,9 @@ described in {{AUTHSCHEME}}. Clients can apply some form of
 consistency check to determine if this public key is consistent and correct for
 the specified Issuer. See {{?CONSISTENCY=I-D.privacypass-key-consistency}} for
 example mechanisms. Depending on the deployment, the Attester might assist the
-Client in applying these consistency checks across clients. See
-{{rotation-and-consistency}} for more information. Failure to apply a
-consistency check can allow Client-specific keys to impact the Client anonymity
-set. See {{rotation-and-consistency}} for more details.
+Client in applying these consistency checks across clients. Failure to apply a
+consistency check can allow Client-specific keys to violated Client unlinkability.
+See {{rotation-and-consistency}} for more information.
 
 Depending on the use case, issuance may require some form of Client
 anonymization service, similar to an IP-hiding proxy, so that Issuers cannot
@@ -413,7 +447,9 @@ metadata to be cryptographically bound to a token. As an example, one
 trivial way to include public metadata is to assign a unique issuer
 public key for each value of metadata, such that N keys yields log2(N)
 bits of metadata. The total amount of metadata bits included in a token
-is the sum of public and private metadata bits.
+is the sum of public and private metadata bits. Every bit of metadata can
+be used to partition the Client anonymity set; see {{metadata-privacy}} for
+more inforation.
 
 Public metadata is that which clients can observe as part of the token
 issuance flow. Public metadata can either be transparent or opaque. For
@@ -447,12 +483,10 @@ specified in {{issuer-role}} for managing Issuer public key data.
 
 # Deployment Considerations {#deployment}
 
-A Client uses Privacy Pass to separate attestation context and redemption
-context. Linking or combining these contexts can reveal sensitive information
-about the Client, including their identity or browsing history. Depending on
-the deployment model, separating these contexts can take different forms. The
-Origin, Attester, and Issuer portrayed in {{fig-overview}} can be instantiated
-and deployed in a number of ways.
+The Origin, Attester, and Issuer portrayed in {{fig-overview}} can be instantiated
+and deployed in a number of ways. The deployment model directly influences the manner
+in which attestation, issuance, and redemption contexts are separated to achieve
+Client and Origin unlinkability.
 
 This section covers some expected deployment models and their corresponding
 security and privacy considerations. Each deployment model is described in
@@ -460,9 +494,9 @@ terms of the trust relationships and communication patterns between Client,
 Attester, Issuer, and Origin.
 
 The discussion below assumes non-collusion between entities that have access to
-the attestation context and entities that have access to the redemption
-context, as collusion between such entities would enable linking of these
-contexts. Generally, this means that entities operated by separate parties do
+the attestation, issuance, and redemption contexts, as collusion between such
+entities would enable linking of these contexts and may lead to unlinkability
+violations. Generally, this means that entities operated by separate parties do
 not collude. Mechanisms for enforcing non-collusion are out of scope for this
 architecture.
 
@@ -491,12 +525,12 @@ entity, as shown in the figure below.
 
 This model represents the initial deployment of Privacy Pass, as described in
 {{PPSRV}}. In this model, the Attester, Issuer, and Origin share the
-attestation and redemption contexts. As a result, attestation mechanisms that
+attestation, issuance, and redemption contexts. As a result, attestation mechanisms that
 can uniquely identify a Client, e.g., requiring that Clients authenticate with
-some type of application-layer account, are not appropriate, as they could be
-used to learn or reconstruct a Client's browsing history.
+some type of application-layer account, are not appropriate, as they could lead
+to Client or Origin unlinkability violations.
 
-Attestation and redemption context unlinkability requires that these events be
+Client and Origin unlinkability requires that issuance and redemption events be
 separated over time, such as through the use of tokens with an empty redemption
 context, or be separated over space, such as through the use of an anonymizing
 proxy when connecting to the Origin.
@@ -535,14 +569,13 @@ arrangement is shown in the figure below.
 
 This model is useful if an Origin wants to offload attestation and issuance to
 a trusted entity. In this model, the Attester and Issuer share an attestation
-context for the Client, which can be separate from the Origin's redemption
-context.
+and issuance context for the Client, which is separate from the Origin's redemption context.
 
-For certain types of issuance protocols, this model separates attestation and
-redemption contexts. However, issuance protocols that require the Issuer to
+For certain types of issuance protocols, this model achieves Client and Origin
+unlinkability. However, issuance protocols that require the Issuer to
 learn information about the Origin, such as that which is described in
 {{?RATE-LIMITED=I-D.privacypass-rate-limit-tokens}}, are not appropriate since
-they could link attestation and redemption contexts through the Origin name.
+they could lead to Origin unlinkability violations through the Origin name.
 
 ## Joint Origin and Issuer {#deploy-joint-origin}
 
@@ -586,8 +619,8 @@ e.g., through the use of application-layer account information, but do not
 otherwise want to learn information about individual Clients beyond what is
 observed during the token redemption, such as Client IP addresses.
 
-In this model, attestation and redemption contexts are separate. As a result,
-any type of attestation is suitable in this model. Moreover, any type of token
+In this model, attestation contexts are separate from issuer and redemption contexts.
+As a result, any type of attestation is suitable in this model. Moreover, any type of token
 challenge is suitable assuming there is more than one Origin involved, since no
 single party will have access to the identifying Client information and unique
 Origin information. If there is only a single Origin, then per-Origin tokens
@@ -638,7 +671,7 @@ of the Client: the Attester sees potentially sensitive Client identifying
 information, such as account identifiers or IP addresses, the Issuer
 sees only the information necessary for issuance, and the Origin sees
 token challenges, corresponding tokens, and Client source information,
-such as their IP address. As a result, attestation and redemption contexts
+such as their IP address. As a result, attestation, issuance, and redemption contexts
 are separate, and therefore any type of token challenge is suitable in
 this model as long as there is more than a single Origin. As in the
 Joint Origin and Issuer model in {{deploy-joint-origin}}, if there is
@@ -646,27 +679,30 @@ only a single Origin, then per-Origin tokens are not appropriate.
 
 # Privacy Considerations {#privacy}
 
-A Client uses Privacy Pass to separate attestation context and redemption
-context. This separation means that the attestation context (or redemption
-context) for a Client does not uniquely identify the redemption context (or
-attestation) context. In other words, for a given attestation context, there
-exists a sufficiently large anonymity set of Clients that share the same
-redemption context, and vice versa.
+The previous section discusses the impact of deployment details on Client
+and Origin unlinkability. The value these properties affords to end users
+depends on the size of anonymity sets in which Clients or Origins are
+unlinkable. For example, consider two different deployments, one wherein
+there exists a redemption context anonymity set of size two and another
+wherein there redemption context anonymity set of size 2<sup>32</sup>. Although
+Client unlinkabiity guarantees that Issuer and Origin cannot link any two requests
+to the same Client based on these contexts, the probability of determining the
+"true" Client is higher the smaller these sets become.
 
-Maintaining these anonymity sets is a fundamental requirement for Privacy Pass
-deployments. In practice, there are a number of ways in which these anonymity
-sets can be partitioned. For example, as discussed in {{deployment}}, failure
-to use a privacy-enhancing proxy system such as Tor when interacting with
-Attesters, Isuers, or Origins allows the anonymity set to be partitioned by
-the Client's IP address. Similarly, malicious Origins may attempt to partition
-the anonymity set for a given redemption context by using Client-specific
-Issuer public keys.
+In practice, there are a number of ways in which the size of anonymity sets
+may be reduced or partitioned, though they all center around the concept of consistency.
+In particular, by definition, all Clients in an anonymity set share a consistent
+view of information needed to run the issuance and redemption protocols.
+An example type of information needed to run these protocols is the Issuer
+public key. When two Clients have inconsistent information, these Clients
+effectively have different redemption contexts and therefore belong in different
+anonymity sets.
 
-The following sections discuss issues that can influence Client anonymity set.
+The following sections discuss issues that can influence anonymity set size.
 For each issue, we discuss mitigations or safeguards to protect against the
 underlying problem.
 
-## Metadata Privacy Implications
+## Partitioning by Issuance Metadata {#metadata-privacy}
 
 Any metadata bits of information can be used to further segment the size
 of the Client's anonymity set. Any Issuer that wanted to track a single
@@ -683,76 +719,47 @@ must balance this against the reduction in Client privacy. In general,
 bounding the metadata permitted ensures that it cannot uniquely identify
 individual Clients.
 
-## Issuer Configuration Rotation and Consistency {#rotation-and-consistency}
+## Partitioning by Issuance Consistency {#rotation-and-consistency}
 
-Issuer configuration updates, e.g., due to key rotation, are an important part
-of hedging against long-term private key compromise. If an Issuer realizes that
-a key compromise has occurred then the Issuer should generate a new key and
-make it available to Clients. If possible, it should invoke any revocation
-procedures that may apply for the old key.
+Anonymity sets can be partitioned by information used for the issuance protocol, including:
+metadata, Issuer configuration (keys), and Issuer selection.
 
-Configuration changes can also be used to segment Client anonymity sets. In
-particular, when an Issuer updates their configuration and the corresponding
+Any issuance metadata bits of information can be used to partition the Client anonymity set.
+For example, any Issuer that wanted to track a single Client could add a single metadata
+bit to Client tokens. For the tracked Client it would set the bit to `1`, and `0` otherwise.
+Adding additional bits provides an exponential increase in tracking granularity similarly to
+introducing more Issuers (though with more potential targeting).
+
+The number of active Issuer configurations also contributes to anonymity set partitioning.
+In particular, when an Issuer updates their configuration and the corresponding
 key pair, any Client that invokes the issuance protocol with this configuration
 becomes be part of a set of Clients which also ran the issuance protocol using
-the same configuration. To mechanize this attack strategy, an Issuer could
-introduce a configuration rotation policy that forces Clients into small
-anonymity sets.
+the same configuration. Issuer configuration updates, e.g., due to key rotation,
+are an important part of hedging against long-term private key compromise.
+In general, key rotations represent a trade-off between Client
+privacy and Issuer security. Therefore, it is important that key rotations occur
+on a regular cycle to reduce the harm of an Issuer key compromise.
 
-In general, key rotations represent a trade-off between Client privacy and
-Issuer security. Therefore, it is important that key rotations occur on a
-regular cycle to reduce the harm of an Issuer key compromise. As a result,
-Clients SHOULD employ some form of consistency mechanism to ensure that they
-receive the same configuration information and are not being actively
-partitioned into smaller anonymity sets. See {{CONSISTENCY}} for possible
-consistency mechanisms.
+Lastly, if there are a large number of selected or trusted Issuers,
+and Origins accept all of them, segregation can occur. If Clients obtain tokens
+from many Issuers, and Origins later challenge a Client for a token from each
+Issuer, Origins can learn information about the Client. Each per-Issuer token
+that a Client holds essentially corresponds to a bit of information about the
+Client that Origin learns. Therefore, there is an exponential loss in anonymity
+relative to the number of Issuers.
 
-## Issuer Selection {#servers}
+The fundamental problem here is that the number of possible issuance configurations,
+including the keys in use and the Issuer identities themselves, can partition the Client
+anonymity set. To mitigate this problem, Clients SHOULD bound the number of active
+issuance configurations. Moreover, Clients SHOULD employ some form of consistency
+mechanism to ensure that they receive the same configuration information and are
+not being actively partitioned into smaller anonymity sets. See {{CONSISTENCY}} for
+possible consistency mechanisms.
 
-Similarly to the Issuer rotation dynamic discussed above, if there are a large
-number of Issuers, and Origins accept all of them, segregation can occur. If
-Clients obtain tokens from many Issuers, and Origins later challenge a Client
-for a token from each Issuer, Origins can learn information about the Client.
-Each per-Issuer token that a Client holds essentially corresponds to a bit of
-information about the Client that Origin learns. Therefore, there is an
-exponential loss in anonymity relative to the number of Issuers.
-
-For example, if there are 32 Issuers, then Origins learn 32 bits of
-information about the Client if a valid token is presented for each Issuer.
-As a contrasting example, if Clients ensure that they only hold tokens issued
-from 4 Issuers, then this increases the potential size of the anonymity sets
-that the Client belongs to. However, this doesn't protect Clients
-completely as it would if only 4 Issuers were permitted across the whole
-system. For example, these 4 Issuers could be different for each Client.
-Therefore, the selection of Issuers for which a Client possesses tokens is
-still revealing. This trade-off is important in deciding the effective
-anonymity of each Client in the system.
-
-Clients SHOULD bound the number of Issuers they are willing to request tokens
-from at any given time. The exact bound depends on the deployment model and
-number of Clients, i.e., having a very large Client base could potentially
-allow for larger values. Issuer replacements should only occur with the same
-frequency as config rotations as they can lead to similar losses in
-anonymity if clients still hold redemption tokens for previously active
-Issuers.
-
-Alternatively, when applicable, trusted registries can indicate which Issuers
-are deemed to be active. If a Client is asked to invoke the issuance protocol
-for an Issuer that is not declared active, then the client can refuse to run
-the protocol and obtain a token.
-
-Another option to allow a large number of Issuers in the ecosystem,
-while preventing the joining of a number of different tokens, is for the
-Client to maintain sharded "redemption partitions". Within each partition,
-the Client would place an upper bound on the number of allowed Issuers.
-As long as each redemption partition maintains a strong privacy boundary
-with the others, the number of bits of information the Origin can learn is
-bounded by the number of redemption partitions.
-
-## Side-Channel Attacks
+## Partitioning by Side-Channels
 
 Side-channel attacks, such as those based on timing correlation, could be
-used to link attestation and redemption contexts together. In particular,
+used to reduce anonymity set size. In particular,
 for interactive tokens that are bound to a Client-specific redemption
 context, the anonymity set of Clients during the issuance protocol consists
 of those Clients that started issuance between the time of the Origin's
@@ -796,5 +803,6 @@ meaningful privacy improvements to end-users.
 # Acknowledgements
 
 The authors would like to thank Eric Kinnear, Scott Hendrickson, Tommy Pauly,
-Christopher Patton, Benjamin Schwartz, Steven Valdez and other members of the
-Privacy Pass Working Group for many helpful contributions to this document.
+Christopher Patton, Benjamin Schwartz, Martin Thomson, Steven Valdez and other
+contributors of the Privacy Pass Working Group for many helpful contributions
+to this document.
