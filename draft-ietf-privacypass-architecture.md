@@ -203,16 +203,18 @@ between the Client, Attester, and Issuer.
 the Client and Attester only, for the purposes of attesting the vailidity of the Client.
 
 The privacy goals of Privacy Pass are oriented around unlinkability based on these
-contexts. In particular, Privacy Pass aims to achieve Client unlinkability. This
-means that given two redemption (or issuer) contexts, the Origin (or Issuer) cannot
-determine if both redemption (or issuance) contexts correspond to the same Client
-or two different Clients. Informally, this means that a Client in a redemption context
-is indistinguishable from any other Client that might use the same redemption context.
-The set of Clients that share the same redemption (or issuance) context is referred
-to as an anonymity set.
-Depending on the deployment model, Privacy Pass might also aim to achieve Origin
-unlinkability. Similar to Client unlinkability, this means that given two attestation
-contexts, the Attester cannot determine if both contexcts correspond to the same
+contexts. In particular, Privacy Pass aims to achieve Origin-Client unlinkability. This
+means that given two redemption contexts, the Origin cannot determine if both
+redemption contexts correspond to the same Client or two different Clients.
+Informally, this means that a Client in a redemption context is indistinguishable
+from any other Client that might use the same redemption context. The set of Clients
+that share the same redemption (or issuance) context is referred to as an anonymity set.
+Privacy Pass also aims to achieve Issuer-Client unlinkability, which is similar to
+Origin-Client unlinkability in that a Client in an issuer context is indistingusihable
+from any other Client that might use the same issuer context.
+Depending on the deployment model, Privacy Pass might also aim to achieve Attester-Origin
+unlinkability. Similar to Origin-Client and Issuer-Client unlinkability, this means that given two attestation
+contexts, the Attester cannot determine if both contexts correspond to the same
 Origin or two different Origins. The set of Clients that share the same attestation
 context is referred to as an anonymity set.
 
@@ -220,11 +222,11 @@ At a high level, these properties ensure that no single party amongst the Attest
 Issuer, or Origin can link client identifying information to client activity, e.g.,
 the origin being accessed.
 
-The manner in which Client and Origin unlinkability are achieved depends on the deployment
+The manner in which Origin-Client, Issuer-Client, and Attester-Origin unlinkability are achieved depends on the deployment
 model, type of attestation, and issuance protocol details. For example, as discussed
 in {{deployment}}, failure to use a privacy-enhancing proxy system such as Tor when
 interacting with Attesters, Isuers, or Origins allows the set of possible Clients to be
-partitioned by the Client's IP address, and can therefore lead to Client unlinkability
+partitioned by the Client's IP address, and can therefore lead to unlinkability
 violations. Similarly, malicious Origins may attempt to link two redemption contexts
 together by using Client-specific Issuer public keys. See {{deployment}} and
 {{privacy}} for more information.
@@ -354,7 +356,7 @@ consistency check to determine if this public key is consistent and correct for
 the specified Issuer. See {{?CONSISTENCY=I-D.privacypass-key-consistency}} for
 example mechanisms. Depending on the deployment, the Attester might assist the
 Client in applying these consistency checks across clients. Failure to apply a
-consistency check can allow Client-specific keys to violated Client unlinkability.
+consistency check can allow Client-specific keys to violate unlinkability.
 See {{rotation-and-consistency}} for more information.
 
 Depending on the use case, issuance may require some form of Client
@@ -480,7 +482,7 @@ specified in {{issuer-role}} for managing Issuer public key data.
 The Origin, Attester, and Issuer portrayed in {{fig-overview}} can be instantiated
 and deployed in a number of ways. The deployment model directly influences the manner
 in which attestation, issuance, and redemption contexts are separated to achieve
-Client and Origin unlinkability.
+Origin-Client, Issuer-Client, and Attester-Origin unlinkability.
 
 This section covers some expected deployment models and their corresponding
 security and privacy considerations. Each deployment model is described in
@@ -522,9 +524,9 @@ This model represents the initial deployment of Privacy Pass, as described in
 attestation, issuance, and redemption contexts. As a result, attestation mechanisms that
 can uniquely identify a Client, e.g., requiring that Clients authenticate with
 some type of application-layer account, are not appropriate, as they could lead
-to Client or Origin unlinkability violations.
+to unlinkability violations.
 
-Client and Origin unlinkability requires that issuance and redemption events be
+Origin-Client, Issuer-Client, and Attester-Origin unlinkability requires that issuance and redemption events be
 separated over time, such as through the use of tokens with an empty redemption
 context, or be separated over space, such as through the use of an anonymizing
 proxy when connecting to the Origin.
@@ -565,11 +567,12 @@ This model is useful if an Origin wants to offload attestation and issuance to
 a trusted entity. In this model, the Attester and Issuer share an attestation
 and issuance context for the Client, which is separate from the Origin's redemption context.
 
-For certain types of issuance protocols, this model achieves Client and Origin
+For certain types of issuance protocols, this model achieves
+Origin-Client, Issuer-Client, and Attester-Origin
 unlinkability. However, issuance protocols that require the Issuer to
 learn information about the Origin, such as that which is described in
 {{?RATE-LIMITED=I-D.privacypass-rate-limit-tokens}}, are not appropriate since
-they could lead to Origin unlinkability violations through the Origin name.
+they could lead to Attester-Origin unlinkability violations through the Origin name.
 
 ## Joint Origin and Issuer {#deploy-joint-origin}
 
@@ -673,14 +676,15 @@ only a single Origin, then per-Origin tokens are not appropriate.
 
 # Privacy Considerations {#privacy}
 
-The previous section discusses the impact of deployment details on Client
-and Origin unlinkability. The value these properties affords to end users
-depends on the size of anonymity sets in which Clients or Origins are
+The previous section discusses the impact of deployment details on
+Origin-Client, Issuer-Client, and Attester-Origin unlinkability.
+The value these properties affords to end users depends on
+the size of anonymity sets in which Clients or Origins are
 unlinkable. For example, consider two different deployments, one wherein
 there exists a redemption context anonymity set of size two and another
 wherein there redemption context anonymity set of size 2<sup>32</sup>. Although
-Client unlinkabiity guarantees that Issuer and Origin cannot link any two requests
-to the same Client based on these contexts, the probability of determining the
+Origin-Client and Issuer-Client unlinkabiity guarantees that Origin and Issuer cannot link any two requests
+to the same Client based on these contexts, respectively, the probability of determining the
 "true" Client is higher the smaller these sets become.
 
 In practice, there are a number of ways in which the size of anonymity sets
