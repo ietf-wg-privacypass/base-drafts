@@ -225,8 +225,8 @@ as the redemption context. This context includes all information associated
 with the redemption event, such as the timestamp of the event, Client visible
 information (including the IP address), and the Origin name.
 
-The challenge controls the type of token that the Origin will accept for the
-given resource. As described in
+The challenge provides the client with the information necessary to obtain tokens
+that the server might subsequently accept (in this context). As described in
 {{?AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}, there are a number of ways in
 which the token may vary, including:
 
