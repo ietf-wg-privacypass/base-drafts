@@ -132,12 +132,6 @@ The following terms are used throughout this document.
   attested to by the Attester.
 - Attester: An entity that attests to properties of Client for the
   purposes of token issuance.
-- Redemption context: The interactions and set of information shared
-between the Client and Origin.
-- Issuance context: The interactions and set of information shared
-between the Client, Attester, and Issuer.
-- Attestation context: The interactions and set of information shared between
-the Client and Attester only, for the purposes of attesting the vailidity of the Client.
 
 # Architecture
 
