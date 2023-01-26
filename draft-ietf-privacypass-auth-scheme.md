@@ -346,7 +346,8 @@ issuance protocol.
 
 - "authenticator" is a Nk-octet authenticator that covers the preceding fields
 in the token. The value of this field is defined by the token_type and
-corresponding issuance protocol.
+corresponding issuance protocol. The value of constant Nk depends on
+token_type, as defined in {{token-types}}.
 
 The authenticator value in the Token structure is computed over the token_type,
 nonce, challenge_digest, and token_key_id fields.
