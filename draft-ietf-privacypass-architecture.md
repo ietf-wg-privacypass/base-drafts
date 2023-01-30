@@ -689,7 +689,7 @@ this model as long as there is more than a single Origin. As in the
 Joint Origin and Issuer model in {{deploy-joint-origin}}, if there is
 only a single Origin, then per-Origin tokens are not appropriate.
 
-# Centralization
+# Centralization Considerations
 
 A consequence of limiting the number of participants (Attesters or Issuers) in
 Privacy Pass deployments for meaningful privacy is that it forces concentrated
