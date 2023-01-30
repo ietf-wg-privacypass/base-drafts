@@ -351,7 +351,7 @@ attestation is the process by which an Attester bears witness to, confirms,
 or authenticates a Client so as to verify a property about the Client that
 is required for Issuance. {{?RFC9334}} describes an architecture for attestation
 procedures. Using that architecture as a conceptual basis, Clients are
-attesters that produce attestation evidence, and Attesters are verififiers that
+RATS attesters that produce attestation evidence, and Attesters are RATS verififiers that
 appraise the validity of attestation evidence.
 
 The type of attestation procedure is a deployment-specific option and outside
