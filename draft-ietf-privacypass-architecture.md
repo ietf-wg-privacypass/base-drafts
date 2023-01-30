@@ -224,7 +224,7 @@ the origin being accessed.
 
 The manner in which Origin-Client, Issuer-Client, and Attester-Origin unlinkability are achieved depends on the deployment
 model, type of attestation, and issuance protocol details. For example, as discussed
-in {{deployment}}, failure to use a privacy-enhancing proxy system such as Tor when
+in {{deployment}}, failure to use a privacy-enhancing proxy system such as Tor {{Dingledine2004}} when
 interacting with Attesters, Isuers, or Origins allows the set of possible Clients to be
 partitioned by the Client's IP address, and can therefore lead to unlinkability
 violations. Similarly, malicious Origins may attempt to link two redemption contexts
@@ -363,8 +363,8 @@ Depending on the use case, issuance may require some form of Client
 anonymization service, similar to an IP-hiding proxy, so that Issuers cannot
 learn information about Clients. This can be provided by an explicit
 participant in the issuance protocol, or it can be provided via external means,
-such as through the use of an IP-hiding proxy service like Tor
-{{Dingledine2004}}. In general, Clients SHOULD minimize or remove identifying
+such as through the use of an IP-hiding proxy service like Tor.
+In general, Clients SHOULD minimize or remove identifying
 information where possible when invoking the issuance protocol.
 
 Issuers MUST NOT issue tokens for Clients through untrusted Attesters. This is
@@ -713,9 +713,14 @@ For this reason, the amount of metadata used by an Issuer in creating
 redemption tokens must be taken into account -- together with the bits
 of information that Issuers may learn about Clients otherwise. Since this
 metadata may be useful for practical deployments of Privacy Pass, Issuers
-must balance this against the reduction in Client privacy. In general,
-bounding the metadata permitted ensures that it cannot uniquely identify
-individual Clients.
+must balance this against the reduction in Client privacy.
+
+In general, limiting the amount of metadata permitted helps limit the extent
+to which metadata can uniquely identify individual Clients. Clients SHOULD
+bound the number of possible metadata values in practice. Most token types do
+not admit any metadata, so this bound is implicitly enforced. Moreover,
+Privacy Pass deployments SHOULD NOT use metadata unless its value has been
+assessed and weighed against the corresponding reduction in Client privacy.
 
 ## Partitioning by Issuance Consistency {#rotation-and-consistency}
 
@@ -738,10 +743,11 @@ In general, key rotations represent a trade-off between Client
 privacy and Issuer security. Therefore, it is important that key rotations occur
 on a regular cycle to reduce the harm of an Issuer key compromise.
 
-Lastly, if there are a large number of selected or trusted Issuers,
-and Origins accept all of them, segregation can occur. If Clients obtain tokens
-from many Issuers, and Origins later challenge a Client for a token from each
-Issuer, Origins can learn information about the Client. Each per-Issuer token
+Lastly, if Clients are willing to issue and redeem tokens from a large number
+of Issuers for a specific Origin, and that Origin accepts tokens from all
+Issuers, segregation can occur. In particular, if a Client obtains tokens from
+many Issuers and an Origin later challenges that Client for a token from each
+Issuer, the Origin can learn information about the Client. Each per-Issuer token
 that a Client holds essentially corresponds to a bit of information about the
 Client that Origin learns. Therefore, there is an exponential loss in anonymity
 relative to the number of Issuers.
@@ -749,10 +755,10 @@ relative to the number of Issuers.
 The fundamental problem here is that the number of possible issuance configurations,
 including the keys in use and the Issuer identities themselves, can partition the Client
 anonymity set. To mitigate this problem, Clients SHOULD bound the number of active
-issuance configurations. Moreover, Clients SHOULD employ some form of consistency
-mechanism to ensure that they receive the same configuration information and are
-not being actively partitioned into smaller anonymity sets. See {{CONSISTENCY}} for
-possible consistency mechanisms.
+issuance configurations per Origin as well as across Origins. Moreover, Clients
+SHOULD employ some form of consistency mechanism to ensure that they receive the
+same configuration information and are not being actively partitioned into smaller
+anonymity sets. See {{CONSISTENCY}} for possible consistency mechanisms.
 
 ## Partitioning by Side-Channels
 
