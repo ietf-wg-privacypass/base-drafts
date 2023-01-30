@@ -378,7 +378,7 @@ attestation correctly and in a way that does not violate their privacy.
 
 {{?RFC9334}} describes an architecture for attestation procedures. Using
 that architecture as a conceptual basis, Clients are RATS attesters that
-produce attestation evidence, and Attesters are RATS verififiers that
+produce attestation evidence, and Attesters are RATS verifiers that
 appraise the validity of attestation evidence.
 
 The type of attestation procedure is a deployment-specific option and outside
