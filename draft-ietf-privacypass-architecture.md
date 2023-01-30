@@ -204,7 +204,7 @@ visible information (including the IP address), and the Origin name.
 - Issuance context: The interactions and set of information shared
 between the Client, Attester, and Issuer. This context includes all
 information associated with issuance, such as the timestamp of the event,
-any Client visibile information (including the IP address), and the
+any Client visible information (including the IP address), and the
 Origin name (if revealed during issuance).
 - Attestation context: The interactions and set of information shared between
 the Client and Attester only, for the purposes of attesting the vailidity of
