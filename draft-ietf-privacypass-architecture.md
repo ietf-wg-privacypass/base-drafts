@@ -514,8 +514,8 @@ architecture.
 In this model, the Origin, Attester, and Issuer are all operated by the same
 entity, as shown in the figure below.
 
-~~~
-                   +------------------------------------------+
+~~~ aasvg
+                   +-----------------------------------------.
       Client       |  Attester         Issuer         Origin  |
         |          |                                          |
         |          |       TokenChallenge                     |
@@ -528,7 +528,7 @@ entity, as shown in the figure below.
         <--------------------------------+                    |
         |          |           Token                          |
         +---------------------------------------------->      |
-                   +------------------------------------------+
+                    `----------------------------------------'
 ~~~
 {: #fig-deploy-shared title="Shared Deployment Model"}
 
@@ -552,13 +552,13 @@ and Issuer to perform attestation and issue Tokens. Clients interact
 with the joint Attester and Issuer for attestation and issuance. This
 arrangement is shown in the figure below.
 
-~~~
-                                                   +-----------+
+~~~ aasvg
+                                                   +----------.
       Client                                       |   Origin  |
         |                 TokenChallenge           |           |
         <-----------------------------------------------+      |
         |                                          |           |
-        |          +---------------------------+   |           |
+        |          +--------------------------.    |           |
         |          |  Attester         Issuer  |   |           |
         |          |                           |   |           |
         |          | Attest                    |   |           |
@@ -567,12 +567,12 @@ arrangement is shown in the figure below.
         +-------------------------------->     |   |           |
         |          |     TokenResponse         |   |           |
         <--------------------------------+     |   |           |
-        |          +---------------------------+   |           |
+        |           `-------------------------'    |           |
         |                                          |           |
         |                     Token                |           |
         +----------------------------------------------->      |
                                                    |           |
-                                                   +-----------+
+                                                    `---------'
 ~~~
 {: #fig-deploy-joint-issuer title="Joint Attester and Issuer Deployment Model"}
 
@@ -600,13 +600,13 @@ can authenticate to Issuers is via mutually-authenticated TLS. However,
 alernative authentication mechanisms are possible. This arrangement is shown
 below.
 
-~~~
-                                    +--------------------------+
+~~~ aasvg
+                                    +-------------------------.
       Client                        |   Issuer         Origin  |
         |         TokenChallenge    |                          |
         <-----------------------------------------------+      |
         |                           |                          |
-        |          +-----------+    |                          |
+        |          +----------.     |                          |
         |          |  Attester |    |                          |
         |          |           |    |                          |
         |          | Attest    |    |                          |
@@ -618,11 +618,11 @@ below.
         |          |     TokenResponse                         |
         <--------------------------------+                     |
         |          |           |    |                          |
-        |          +-----------+    |                          |
+        |           `---------'     |                          |
         |                           |                          |
         |              Token        |                          |
         +----------------------------------------------->      |
-                                    +--------------------------+
+                                     `------------------------'
 ~~~
 {: #fig-deploy-joint-origin title="Joint Origin and Issuer Deployment Model"}
 
@@ -648,16 +648,16 @@ model, the Issuer accepts token requests that come from trusted Attesters, and
 the details of that trust establishment depend on the issuance protocol and
 relationship between Attester and Issuer.
 
-~~~
-                                                   +-----------+
+~~~ aasvg
+                                                   +----------.
       Client                                       |   Origin  |
         |                 TokenChallenge           |           |
         <-----------------------------------------------+      |
         |                                          |           |
-        |          +-----------+                   |           |
+        |          +----------.                    |           |
         |          |  Attester |                   |           |
         |          |           |                   |           |
-        |          | Attest    |    +----------+   |           |
+        |          | Attest    |    +---------.    |           |
         +----------------->    |    |  Issuer  |   |           |
         |          |           |    |          |   |           |
         |          |     TokenRequest          |   |           |
@@ -666,12 +666,12 @@ relationship between Attester and Issuer.
         |          |     TokenResponse         |   |           |
         <--------------------------------+     |   |           |
         |          |           |    |          |   |           |
-        |          +-----------+    +----------+   |           |
+        |           `---------'      `--------'    |           |
         |                                          |           |
         |                     Token                |           |
         +----------------------------------------------->      |
                                                    |           |
-                                                   +-----------+
+                                                    `---------'
 ~~~
 {: #fig-deploy-split title="Split Deployment Model"}
 
@@ -688,6 +688,24 @@ contexts are separate, and therefore any type of token challenge is suitable in
 this model as long as there is more than a single Origin. As in the
 Joint Origin and Issuer model in {{deploy-joint-origin}}, if there is
 only a single Origin, then per-Origin tokens are not appropriate.
+
+# Centralization
+
+A consequence of limiting the number of participants (Attesters or Issuers) in
+Privacy Pass deployments for meaningful privacy is that it forces concentrated
+centralization amongst those participants.
+{{?CENTRALIZATION=I-D.nottingham-avoiding-internet-centralization}} discusses
+several ways in which this might be mitigated. For example, a multi-stakeholder
+governance model could be established to determine what candidate participants
+are fit to operate as participants in a Privacy Pass deployment. This is
+precisely the system used to control the Web's trust model.
+
+Alternatively, Privacy Pass deployments might mitigate this problem through
+implementation. For example, rather than centralize the role of attestation
+in one or few entities, attestation could be a distributed function performed
+by a quorum of many parties, provided that neither Issuers nor Origins learn
+which Attester implementations were chosen. As a result, Clients could have
+more opportunities to switch between attestation participants.
 
 # Privacy Considerations {#privacy}
 
@@ -796,24 +814,6 @@ of Clients using a particular Issuer during that time window, the set can
 be small. Appliations should take such side channels into consideration before
 choosing a particular deployment model and type of token challenge and
 redemption context.
-
-# Centralization
-
-A consequence of limiting the number of participants (Attesters or Issuers) in
-Privacy Pass deployments for meaningful privacy is that it forces concentrated
-centralization amongst those participants.
-{{?CENTRALIZATION=I-D.nottingham-avoiding-internet-centralization}} discusses
-several ways in which this might be mitigated. For example, a multi-stakeholder
-governance model could be established to determine what candidate participants
-are fit to operate as participants in a Privacy Pass deployment. This is
-precisely the system used to control the Web's trust model.
-
-Alternatively, Privacy Pass deployments might mitigate this problem through
-implementation. For example, rather than centralize the role of attestation
-in one or few entities, attestation could be a distributed function performed
-by a quorum of many parties, provided that neither Issuers nor Origins learn
-which Attester implementations were chosen. As a result, Clients could have
-more opportunities to switch between attestation participants.
 
 # Security Considerations {#security}
 
