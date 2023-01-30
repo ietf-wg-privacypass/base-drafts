@@ -224,7 +224,7 @@ redemption context is indistinguishable from any other Client that might use
 the same redemption context. The set of Clients that share the same redemption
 context is referred to as a redemption anonymity set.
 2. Issuer-Client unlinkability. This is similar to Origin-Client unlinkability
-in that a Client in an issuer context is indistingusihable from any other
+in that a Client in an issuer context is indistinguishable from any other
 Client that might use the same issuer context. The set of Clients that share
 the same redemption context is referred to as a redemption anonymity set.
 3. Attester-Origin unlinkability. This is similar to Origin-Client and
