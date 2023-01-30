@@ -382,23 +382,30 @@ See {{attester}} for more details.
 
 ### Attester Role {#attester}
 
-Attestation is an important part of the issuance protocol. Attestation is the
-process by which an Attester bears witness to, confirms, or authenticates a
-Client so as to verify a property about the Client that is required for
-Issuance. Examples of attestation properties include, though are not limited
-to:
+Attestation is an important part of the issuance protocol. In Privacy Pass,
+attestation is the process by which an Attester bears witness to, confirms,
+or authenticates a Client so as to verify a property about the Client that
+is required for Issuance. {{?RFC9334}} describes an architecture for attestation
+procedures. Using that architecture as a conceptual basis, Clients are
+RATS attesters that produce attestation evidence, and Attesters are RATS verififiers that
+appraise the validity of attestation evidence.
 
-- Capable of solving a CAPTCHA. Clients that solve CAPTCHA challenges can be
-  attested to have this capability for the purpose of being ruled out as a bot
-  or otherwise automated Client.
-- Client state. Clients can be associated with state and the attester can
-  attest to this state. Examples of state include the number of issuance
-  protocol invocations, the Client's geographic region, and whether the
-  client has a valid application-layer account.
-- Trusted device. Some Clients run on trusted hardware that are capable of
-  producing device-level attestation statements.
+The type of attestation procedure is a deployment-specific option and outside
+the scope of the issuance protocol. Example attestation procedures are below.
 
-Each of these attestation types has different security properties. For example,
+- Solving a CAPTCHA. Clients that solve CAPTCHA challenges can be attested to
+  have this capability for the purpose of being ruled out as a bot or otherwise
+  automated Client.
+- Presenting evidence of Client device validity. Some Clients run on trusted
+  hardware that are capable of producing device-level attestation evidence.
+- Proving properties about Client state. Clients can be associated with state
+  and the Attester can verify this state. Examples of state include the Client's
+  geographic region and whether the Client has a valid application-layer account.
+
+Attesters may support different types of attestation procedures. A type of attestation
+procedure is also referred as an attestation format.
+
+In general, each attestation format has different security properties. For example,
 attesting to having a valid account is different from attesting to running on
 trusted hardware. In general, minimizing the set of attestation formats helps
 minimize the amount of information leaked through a token.
