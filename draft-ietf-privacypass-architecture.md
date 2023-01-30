@@ -210,8 +210,7 @@ Origin name (if revealed during issuance).
 the Client and Attester only, for the purposes of attesting the vailidity of
 the Client. This context includes all information associated with attestation,
 such as the timestamp of the event and any Client visibile information,
-including the IP address or other information specific to the type of
-attestation done.
+including information needed for the attestation procedure to complete.
 
 The privacy goals of Privacy Pass are oriented around unlinkability based on
 these contexts. In particular, Privacy Pass aims to achieve three different
