@@ -699,7 +699,7 @@ the size of anonymity sets in which Clients or Origins are
 unlinkable. For example, consider two different deployments, one wherein
 there exists a redemption anonymity set of size two and another
 wherein there redemption anonymity set of size 2<sup>32</sup>. Although
-Origin-Client unlinkabiity guarantees that tje Origin cannot link any two
+Origin-Client unlinkabiity guarantees that the Origin cannot link any two
 requests to the same Client based on these contexts, respectively, the
 probability of determining the "true" Client is higher the smaller these
 sets become.
