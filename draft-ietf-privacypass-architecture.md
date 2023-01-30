@@ -187,7 +187,7 @@ client does not reply to the Origin's challenge with a new request.
      Request <------
 
  TokenChallenge --->
-                      <- (Attestation) ->
+                      <--(Attestation)-->
                       TokenRequest -------------->
                               <-------------- TokenResponse
  Request + Token <--
@@ -321,12 +321,12 @@ protocol that takes as input a TokenChallenge from the redemption protocol
 ~~~ aasvg
    Origin              Client      Attester     Issuer
                    +-----------------------------------.
-TokenChallenge --->| <- (Attestation) ->                |
+TokenChallenge --->| <--(Attestation)-->                |
                    | TokenRequest ---------------->     |
      Token    <----+     <--------------- TokenResponse |
                     `----------------------------------'
 ~~~
-{: #fig-issuance title="Isuance protocol interaction"}
+{: #fig-issuance title="Issuance protocol interaction"}
 
 Clients interact with the Attester and Issuer to produce a token in response to
 a challenge. The context in which an Attester vouches for a Client during
