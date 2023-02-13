@@ -691,6 +691,8 @@ This document updates the "Token Type" Registry from
 
 * Value: 0x0001
 * Name: VOPRF (P-384, SHA-384)
+* Token Structure: As defined in {{Section 2.2 of AUTHSCHEME}}
+* TokenChallenge Structure: As defined in {{Section 2.1 of AUTHSCHEME}}
 * Publicly Verifiable: N
 * Public Metadata: N
 * Private Metadata: N
@@ -703,6 +705,8 @@ This document updates the "Token Type" Registry from
 
 * Value: 0x0002
 * Name: Blind RSA (2048-bit)
+* Token Structure: As defined in {{Section 2.2 of AUTHSCHEME}}
+* TokenChallenge Structure: As defined in {{Section 2.1 of AUTHSCHEME}}
 * Publicly Verifiable: Y
 * Public Metadata: N
 * Private Metadata: N

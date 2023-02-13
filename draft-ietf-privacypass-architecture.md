@@ -138,8 +138,8 @@ The following terms are used throughout this document.
 The Privacy Pass architecture consists of four logical entities --
 Client, Origin, Issuer, and Attester -- that work in concert
 for token redemption and issuance. This section describes the purpose
-of token redemption and issuance and the requirements on the relevant
-participants.
+of token the redemption and issuance protocols and the requirements
+on the relevant participants.
 
 The typical interaction flow for Privacy Pass uses the following steps:
 
@@ -272,6 +272,10 @@ TokenChallenge --->|                   |
 Alternatively, when configured to do so, Clients may opportunistically present
 Token values to Origins without a corresponding TokenChallenge.
 
+The structure and semantics of the TokenChallenge and Token messages depend
+on the issuance protocol and token type being used; see {{AUTHSCHEME}} for
+more information.
+
 The challenge provides the client with the information necessary to obtain
 tokens that the server might subsequently accept in the redemption context.
 There are a number of ways in which the token may vary based on this challenge,
@@ -327,6 +331,10 @@ TokenChallenge --->| <--(Attestation)-->                |
                     `----------------------------------'
 ~~~
 {: #fig-issuance title="Issuance protocol interaction"}
+
+The structure and semantics of the TokenRequest and TokenResponse messages
+depend on the issuance protocol and token type being used; see {{ISSUANCE}}
+for more information.
 
 Clients interact with the Attester and Issuer to produce a token in response to
 a challenge. The context in which an Attester vouches for a Client during

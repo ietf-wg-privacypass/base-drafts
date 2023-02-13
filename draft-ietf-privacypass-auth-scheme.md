@@ -160,7 +160,8 @@ The structure fields are defined as follows:
 - "token_type" is a 2-octet integer, in network byte order. This type indicates
 the issuance protocol used to generate the token. Values are registered
 in an IANA registry, {{token-types}}. Challenges with unsupported token_type
-values MUST be ignored.
+values MUST be ignored. This value determines the structure and semantics of
+the rest of the structure.
 
 - "issuer_name" is a string containing the name of the issuer. This is a
 hostname that is used to identify the issuer that is allowed to issue
@@ -332,7 +333,8 @@ struct {
 The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, in network byte order. This value must
-match the value in the challenge ({{challenge}}).
+match the value in the challenge ({{challenge}}). This value determines the
+structure and semantics of the rest of the structure.
 
 - "nonce" is a 32-octet message containing a client-generated random
 nonce.
@@ -538,6 +540,8 @@ Template:
 
 * Value: The two-byte identifier for the algorithm
 * Name: Name of the issuance protocol
+* Token Structure: The contents of the Token structure
+* TokenChallenge Structure: The contents of the TokenChallenge structure
 * Publicly Verifiable: A Y/N value indicating if the output tokens are
   publicly verifiable
 * Public Metadata: A Y/N value indicating if the output tokens can contain
@@ -603,6 +607,8 @@ for Private Use.
 
 * Value: 0xFF00-0xFFFF
 * Name: Private Use
+* Token Structure: As defined in {{redemption}}
+* TokenChallenge Structure: As defined in {{challenge}}
 * Publicly Verifiable: N/A
 * Public Metadata: N/A
 * Private Metadata: N/A
