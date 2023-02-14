@@ -4,6 +4,7 @@
 *.swp
 *.txt
 *.upload
+*.xml
 *~
 .DS_Store
 .refcache
@@ -11,6 +12,7 @@
 /*-[0-9][0-9].xml
 /node_modules/
 /package-lock.json
+/versioned/
 issues.json
 lib
 pulls.json
