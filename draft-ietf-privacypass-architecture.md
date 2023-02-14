@@ -478,7 +478,7 @@ issuance and redemption protocols.
 Certain instantiations of the issuance protocol may permit public or private
 metadata to be cryptographically bound to a token. As an example, one
 trivial way to include public metadata is to assign a unique Issuer
-public key for each value of metadata, such that N keys yields log2(N)
+public key for each value of metadata, such that N keys yields log<sub>2</sub>(N)
 bits of metadata. Metadata may be public or private.
 
 Public metadata is that which clients can observe as part of the token
