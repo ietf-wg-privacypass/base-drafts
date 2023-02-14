@@ -34,7 +34,6 @@ author:
     email: caw@heapingbits.net
 
 normative:
-  RFC2119:
 
 informative:
   PrivacyPassExtension:
