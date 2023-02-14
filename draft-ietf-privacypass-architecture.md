@@ -208,16 +208,21 @@ client does not reply to the Origin's challenge with a new request.
 The end-to-end flow for Privacy Pass involves three different types of
 contexts:
 
-- Redemption context: The interactions and set of information shared
+Redemption context:
+: The interactions and set of information shared
 between the Client and Origin. This context includes all information
 associated with redemption, such as the timestamp of the event, Client
 visible information (including the IP address), and the Origin name.
-- Issuance context: The interactions and set of information shared
+
+Issuance context:
+: The interactions and set of information shared
 between the Client, Attester, and Issuer. This context includes all
 information associated with issuance, such as the timestamp of the event,
 any Client visible information (including the IP address), and the
 Origin name (if revealed during issuance).
-- Attestation context: The interactions and set of information shared between
+
+Attestation context:
+: The interactions and set of information shared between
 the Client and Attester only, for the purposes of attesting the vailidity of
 the Client. This context includes all information associated with attestation,
 such as the timestamp of the event and any Client visibile information,
