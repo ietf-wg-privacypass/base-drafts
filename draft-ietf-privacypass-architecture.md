@@ -316,7 +316,7 @@ including:
   example, an empty redemption context always allows tokens to be issued and
   redeemed non-interactively, whereas a fresh and random redemption context
   means that the redeemed token must be issued only after the client receives
-  the challenge. See Section 2.1.1 of {{AUTHSCHEME}} for more details.
+  the challenge. See {{Section 2.1.1 of AUTHSCHEME}} for more details.
 - Per-Origin or cross-Origin. Challenges can be constrained to the Origin for
   which the challenge originated (referred to as per-Origin tokens), or
   can be used across multiple Origins (referred to as cross-Origin tokens).
@@ -330,7 +330,7 @@ state to track redeemed tokens. For example, Origins that accept cross-Origin
 tokens across shared redemption contexts SHOULD track which tokens have been
 redeemed already in those redemption contexts, since these tokens can
 be issued and then spent multiple times in response to any such challenge.
-See Section 2.1.1 of {{AUTHSCHEME}} for discussion.
+See {{Section 2.1.1 of AUTHSCHEME}} for discussion.
 
 ## Issuance Protocol
 
