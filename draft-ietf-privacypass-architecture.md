@@ -99,7 +99,7 @@ authentication mechanisms. Typical approaches for authorizing clients,
 such as through the use of long-term cookies, are not privacy-friendly
 since they allow servers to track clients across sessions and interactions.
 Privacy Pass takes a different approach: instead of presenting linkable
-state carrying information to servers, e.g., a cookie indicating whether
+state-carrying information to servers, e.g., a cookie indicating whether
 or not the client is an authorized user or has completed some prior
 challenge, clients present unlinkable proofs that attest to this information.
 These proofs, or tokens, are private in the sense that a given token cannot
