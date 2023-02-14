@@ -45,7 +45,7 @@ informative:
     author:
       ins: N. Sullivan
       org: Cloudflare
-  Dingledine2004:
+  DMS2004:
     title: "Tor: The Second-Generation Onion Router"
     date: 2004-08
     target: "https://svn.torproject.org/svn/projects/design-paper/tor-design.html"
@@ -239,8 +239,8 @@ redemption context is indistinguishable from any other Client that might use
 the same redemption context. The set of Clients that share the same redemption
 context is referred to as a redemption anonymity set.
 2. Issuer-Client unlinkability. This is similar to Origin-Client unlinkability
-in that a Client in an issuer context is indistinguishable from any other
-Client that might use the same issuer context. The set of Clients that share
+in that a Client in an issuance context is indistinguishable from any other
+Client that might use the same issuance context. The set of Clients that share
 the same redemption context is referred to as a redemption anonymity set.
 3. Attester-Origin unlinkability. This is similar to Origin-Client and
 Issuer-Client unlinkability. It means that given two attestation contexts,
@@ -256,7 +256,7 @@ The manner in which Origin-Client, Issuer-Client, and Attester-Origin
 unlinkability are achieved depends on the deployment model, type of
 attestation, and issuance protocol details. For example, as discussed in
 {{deployment}}, failure to use a privacy-enhancing proxy system such as Tor
-{{Dingledine2004}} when interacting with Attesters, Issuers, or Origins allows
+{{DMS2004}} when interacting with Attesters, Issuers, or Origins allows
 the set of possible Clients to be partitioned by the Client's IP address, and
 can therefore lead to unlinkability violations. Similarly, malicious Origins
 may attempt to link two redemption contexts together by using Client-specific
