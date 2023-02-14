@@ -190,22 +190,18 @@ client does not reply to the Origin's challenge with a new request.
 {: anchor="step-redemption"}
 
 ~~~ aasvg
-  +--------+        +--------+     +----------+ +--------+
-  | Origin |        | Client |     | Attester | | Issuer |
-  +---+----+        +---+----+     +----+-----+ +---+----+
-      |    Request      |               |           |
-      |<----------------+               |           |
-      | TokenChallenge  |               |           |
-      +---------------->|               |           |
-      |                 |  Attestation  |           |
-      |                 |<=============>|           |
-      |                 |               |           |
-      |                 +------- TokenRequest ----->|
-      |                 |               |           |
-      |                 |<------ TokenResponse -----+
-      | Request + Token |               |           |
-      |<----------------+               |           |
-      |                 |               |           |
++--------+            +--------+         +----------+ +--------+
+| Origin |            | Client |         | Attester | | Issuer |
++---+----+            +---+----+         +----+-----+ +---+----+
+    |                     |                   |           |
+    |<----- Request ------+                   |           |
+    +-- TokenChallenge -->|                   |           |
+    |                     |<== Attestation ==>|           |
+    |                     |                   |           |
+    |                     +--------- TokenRequest ------->|
+    |                     |<-------- TokenResponse -------+
+    |<-- Request+Token ---+                   |           |
+    |                     |                   |           |
 ~~~
 {: #fig-overview title="Privacy pass redemption and issuance protocol interaction"}
 
