@@ -103,7 +103,7 @@ state-carrying information to servers, e.g., a cookie indicating whether
 or not the client is an authorized user or has completed some prior
 challenge, clients present unlinkable proofs that attest to this information.
 These proofs, or tokens, are private in the sense that a given token cannot
-be linked to the protocol instance in which that token was initially issued.
+be linked to the protocol interaction where that token was initially issued.
 
 At a high level, the Privacy Pass architecture consists of two protocols:
 redemption and issuance. The redemption protocol, described in
