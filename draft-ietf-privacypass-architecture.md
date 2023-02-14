@@ -248,9 +248,10 @@ the Attester cannot determine if both contexts correspond to the same Origin
 or two different Origins. The set of Clients that share the same attestation
 context is referred to as an anonymity set.
 
-At a high level, these properties ensure that no single party amongst the
-Attester, Issuer, or Origin can link client identifying information to client
-activity, e.g., the origin being accessed.
+By ensuring that different contexts cannot be linked in this way, only the
+Client is able to correlate information that might be used to identify them with
+activity on the Origin.  The Attester, Issuer, and Origin only receive the
+information necessary to perform their respective functions.
 
 The manner in which Origin-Client, Issuer-Client, and Attester-Origin
 unlinkability are achieved depends on the deployment model, type of
