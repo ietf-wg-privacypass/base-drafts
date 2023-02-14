@@ -124,13 +124,20 @@ the security of all participating entities.
 
 {::boilerplate bcp14}
 
-The following terms are used throughout this document.
+The following terms are used throughout this document:
 
-- Client: An entity that seeks authorization to an Origin.
-- Origin: An entity that redeems tokens presented by Clients.
-- Issuer: An entity that issues tokens to Clients for properties
+Client:
+: An entity that seeks authorization to an Origin.
+
+Origin:
+: An entity that redeems tokens presented by Clients.
+
+Issuer:
+: An entity that issues tokens to Clients for properties
   attested to by the Attester.
-- Attester: An entity that attests to properties of Client for the
+
+Attester:
+: An entity that attests to properties of Client for the
   purposes of token issuance.
 
 # Architecture
