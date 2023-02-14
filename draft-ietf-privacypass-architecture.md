@@ -514,7 +514,7 @@ and guidelines on how to deploy the protocol to minimize any privacy impacts.
 Any extension to the Privacy Pass protocol MUST adhere to the guidelines
 specified in {{issuer-role}} for managing Issuer public key data.
 
-# Deployment Considerations {#deployment}
+# Deployment Configurations {#deployment}
 
 The Origin, Attester, and Issuer portrayed in {{fig-overview}} can be
 instantiated and deployed in a number of ways. The deployment model directly
