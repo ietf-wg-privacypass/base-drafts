@@ -470,7 +470,7 @@ Issuers maintain one or more configurations, including issuance key pairs, for
 use in the issuance protocol. Issuers can rotate these configurations as needed
 to mitigate risk of compromise; see {{rotation-and-consistency}} for more
 considerations around configuration rotation. The Issuer public key for each
-active configuraton is made available to Origins and Clients for use in the
+active configuration is made available to Origins and Clients for use in the
 issuance and redemption protocols.
 
 ### Issuance Metadata {#metadata}
