@@ -143,9 +143,13 @@ Attester:
 
 The Privacy Pass architecture consists of four logical entities --
 Client, Origin, Issuer, and Attester -- that work in concert
-for token redemption and issuance. This section describes the purpose
-of token the redemption and issuance protocols and the requirements
-on the relevant participants.
+for token redemption and issuance. This section presents an overview
+of Privacy Pass, a high-level description of the threat model and
+privacy goals of the architecture, and the purpose of the the redemption
+and issuance protocols, including requirements on the relevant participants
+in these protocols, necessary to achieve the intended privacy goals.
+
+## Overview
 
 The typical interaction flow for Privacy Pass uses the following steps:
 
@@ -205,8 +209,10 @@ cannot be linked to the content of the Token Request or Token Response.
 ~~~
 {: #fig-overview title="Privacy pass redemption and issuance protocol interaction"}
 
-The end-to-end flow for Privacy Pass involves three different types of
-contexts:
+## Privacy Goals and Threat Model {#privacy-and-trust}
+
+The end-to-end flow for Privacy Pass described in {{overview}} involves three
+different types of contexts:
 
 Redemption context:
 : The interactions and set of information shared
@@ -225,12 +231,24 @@ Attestation context:
 : The interactions and set of information shared between
 the Client and Attester only, for the purposes of attesting the vailidity of
 the Client. This context includes all information associated with attestation,
-such as the timestamp of the event and any Client visibile information,
+such as the timestamp of the event and any Client visible information,
 including information needed for the attestation procedure to complete.
 
-The privacy goals of Privacy Pass are oriented around unlinkability based on
-these contexts. In particular, Privacy Pass aims to achieve three different
-types of unlinkability:
+The privacy goals of Privacy Pass assume a threat model in which Origins trust
+specific Issuers to produce tokens, and Issuers in turn trust one or more
+Attesters to correctly run the attestation procedure with Clients. This
+arrangement ensures that tokens which validate for a given Issuer were only
+issued to a Client that successfully complete attestation with an Attester that
+the Issuer trusts. The mechanisms for establishing trust between these entities
+are deployment specific. For example, in settings where Attesters and Issuers
+communicate over TLS, Attesters and Issuers may use mutually authenticated TLS
+to authenticate one another. Clients explicitly trust Attesters to perform
+attestation correctly and in a way that does not violate their privacy.
+However, Clients assume Issuers and Origins are malicious.
+
+Given this threat model, the privacy goals of Privacy Pass are oriented around
+unlinkability based on redemption, issuance, and attestation contexts, as
+described below.
 
 1. Origin-Client unlinkability. This means that given two redemption contexts,
 the Origin cannot determine if both redemption contexts correspond to the same
@@ -619,11 +637,12 @@ name.
 In this model, the Origin and Issuer are operated by the same entity, separate
 from the Attester, as shown in the figure below. The Issuer accepts token
 requests that come from trusted Attesters. Since the Attester and Issuer are
-separate entities, the Attester must authenticate itself to the Issuer. In
-settings where the Attester is a Client-trusted service, one way Attesters
-can authenticate to Issuers is via mutually-authenticated TLS. However,
-alernative authentication mechanisms are possible. This arrangement is shown
-below.
+separate entities, this model requires some mechanism by which Issuers
+establish trust in the Attester (as described in {{privacy-and-trust}}).
+For example, in settings where the Attester is a Client-trusted service that
+directly communicates with the Issuer, one way to establish this trust is via
+mutually-authenticated TLS. However, alernative authentication mechanisms are
+possible. This arrangement is shown below.
 
 ~~~ aasvg
                                     +-------------------------.
@@ -671,7 +690,7 @@ In this model, the Origin, Attester, and Issuer are all operated by different
 entities, as shown in the figure below. As with the joint Origin and Issuer
 model, the Issuer accepts token requests that come from trusted Attesters, and
 the details of that trust establishment depend on the issuance protocol and
-relationship between Attester and Issuer.
+relationship between Attester and Issuer; see {{privacy-and-trust}}.
 
 ~~~ aasvg
                                                    +----------.
