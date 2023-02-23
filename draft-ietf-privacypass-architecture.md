@@ -159,7 +159,7 @@ challenge.
 2. If the Client already has a token available that satisfies the token
 challenge, e.g., because the Client has a cache of previously issued tokens,
 it can skip to [step 6](#step-redemption){: format="none"} and redeem its
-token.
+token; see {{hoarding}} for security considerations of cached tokens.
 
 3. If the Client does not have a token available and decides it wants to
 obtain one (or more) bound to the token challenge, it then invokes the
@@ -853,6 +853,29 @@ active work on behalf of the Client, especially in the presence of malicious
 Issuers and Origins. Implementing mitigations discused in {{deployment}}
 and {{privacy}} is therefore necessary to ensure that Privacy Pass offers
 meaningful privacy improvements to end-users.
+
+## Token Caching {#hoarding}
+
+Depending on the Origin's token challenge, Clients can request and cache more
+than one using the issuance protocol. Cached tokens help improve privacy by
+separating the time of token issuance from the time of token redemption, and
+also allows Clients to avoid any overhead of receiving new tokens via the
+issuance protocol.
+
+As a consequence, Origins that send token challenges which are compatible with
+cached tokens need to take precautions to ensure that tokens are not replayed.
+This is typically done via keeping track of tokens that are redeemed for the
+period of time in which cached tokens would be accepted for particular
+challenges.
+
+Moreover, since tokens are not intrinsically bound to Clients, it is possible
+for malicious Clients to collude and share tokens in a so-called "hoarding
+attack." As an example of this attack, many distributed Clients obtain
+cacheable tokens and them share them with a single Client to redeem in a way
+that would violate an Origin's attempt to limit tokens to any one particular
+Client. Depending on the deployment model, it may be possible to detect these
+types of attacks by comparing issuance and redemption contexts, as is possible
+in the Joint Origin and Issuer model.
 
 --- back
 
