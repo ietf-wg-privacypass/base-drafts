@@ -136,8 +136,12 @@ Issuer:
   attested to by the Attester.
 
 Attester:
-: An entity that attests to properties of Client for the
+: An entity that attests to properties of Clients for the
   purposes of token issuance.
+
+Attestation procedure:
+: The procedure by which an Attester determines whether or not a Client
+  is trusted with a specific set of properties for token issuance.
 
 # Architecture
 
