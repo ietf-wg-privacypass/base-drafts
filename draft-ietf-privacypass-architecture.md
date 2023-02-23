@@ -352,6 +352,12 @@ redeemed already in those redemption contexts, since these tokens can
 be issued and then spent multiple times in response to any such challenge.
 See {{Section 2.1.1 of AUTHSCHEME}} for discussion.
 
+How Clients respond to token challenges can have privacy implications.
+For example, if a token challenge admits a choice of Issuer, then the choice
+of Issuer can reveal information about the Client used to partition anonymity
+sets; see {{rotation-and-consistency}} for more information about these privacy
+considerations.
+
 ## Issuance Protocol
 
 The Privacy Pass issuance protocol, described in {{ISSUANCE}}, is a two-message
