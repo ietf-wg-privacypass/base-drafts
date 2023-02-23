@@ -210,23 +210,28 @@ contexts:
 
 Redemption context:
 : The interactions and set of information shared
-between the Client and Origin. This context includes all information
-associated with redemption, such as the timestamp of the event, Client
-visible information (including the IP address), and the Origin name.
+between the Client and Origin, i.e., the information that is provided or
+otherwise available to the Origin during redemption that might be used
+to identify a Client. This context includes all information associated
+with redemption, such as the timestamp of the event, Client visible
+information (including the IP address), and the Origin name.
 
 Issuance context:
-: The interactions and set of information shared
-between the Client, Attester, and Issuer. This context includes all
-information associated with issuance, such as the timestamp of the event,
-any Client visible information (including the IP address), and the
-Origin name (if revealed during issuance).
+: The interactions and set of information shared between the Client, Attester,
+and Issuer, i.e., the information that is provided or otherwise available
+to Attester and Issuer during issuance that might be used to identify a Client.
+This context includes all information associated with issuance, such as the
+timestamp of the event, any Client visible information (including the IP
+address), and the Origin name (if revealed during issuance).
 
 Attestation context:
 : The interactions and set of information shared between
 the Client and Attester only, for the purposes of attesting the vailidity of
-the Client. This context includes all information associated with attestation,
-such as the timestamp of the event and any Client visibile information,
-including information needed for the attestation procedure to complete.
+the Client, that is provided or otherwise available during attestation that
+might be used to identify the Client. This context includes all information
+associated with attestation, such as the timestamp of the event and any Client
+visibile information, including information needed for the attestation
+procedure to complete.
 
 The privacy goals of Privacy Pass are oriented around unlinkability based on
 these contexts. In particular, Privacy Pass aims to achieve three different
@@ -266,7 +271,7 @@ Issuer public keys. See {{deployment}} and {{privacy}} for more information.
 The remainder of this section describes the functional properties and security
 requirements of the redemption and issuance protocols in more detail.
 
-## Redemption Protocol
+## Redemption Protocol {#redemption}
 
 The Privacy Pass redemption protocol, described in
 {{?AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}, is an authorization protocol
@@ -566,8 +571,9 @@ not appropriate, as they could lead to unlinkability violations.
 
 Origin-Client, Issuer-Client, and Attester-Origin unlinkability requires that
 issuance and redemption events be separated over time, such as through the use
-of tokens with an empty redemption context, or be separated over space, such
-as through the use of an anonymizing proxy when connecting to the Origin.
+of tokens that correspond to token challenges with an empty redemption context
+(see {{redemption}}), or be separated over space, such as through the use of an
+anonymizing proxy when connecting to the Origin.
 
 ## Joint Attester and Issuer {#deploy-joint-issuer}
 
