@@ -239,12 +239,18 @@ specific Issuers to produce tokens, and Issuers in turn trust one or more
 Attesters to correctly run the attestation procedure with Clients. This
 arrangement ensures that tokens which validate for a given Issuer were only
 issued to a Client that successfully complete attestation with an Attester that
-the Issuer trusts. The mechanisms for establishing trust between these entities
+the Issuer trusts. Moreover, this arrangement means that if an Origin accepts
+tokens issued by an Issuer that trusts multiple Attesters then a Client can
+use any of these Attesters to issue and redeem tokens for the Origin.
+
+The mechanisms for establishing trust between each entity in this arrangement
 are deployment specific. For example, in settings where Attesters and Issuers
 communicate over TLS, Attesters and Issuers may use mutually authenticated TLS
-to authenticate one another. Clients explicitly trust Attesters to perform
-attestation correctly and in a way that does not violate their privacy.
-However, Clients assume Issuers and Origins are malicious.
+to authenticate one another.
+
+Clients explicitly trust Attesters to perform attestation correctly and in a
+way that does not violate their privacy. However, Clients assume Issuers and
+Origins are malicious.
 
 Given this threat model, the privacy goals of Privacy Pass are oriented around
 unlinkability based on redemption, issuance, and attestation contexts, as
@@ -321,14 +327,10 @@ including:
   security properties, e.g., some issuance protocols may produce tokens that
   are publicly verifiable, whereas others may not have this property.
 - Issuer identity. Token challenges identify which Issuers are trusted for a
-  given issuance protocol. Each Issuer, in turn, determines which Attesters it
-  is willing to accept in the issuance protocol. This means that if an Origin
-  origin.example accepts tokens issued by Issuer issuer.example, and that
-  Issuer in turn accepts different types of attestation from more than one
-  trusted Attester, then a Client may use either of these trusted Attesters
-  to issue and redeem tokens for origin.example. However, origin.example
-  neither explicitly specifies nor learns the Attesters or their attestation
-  formats used for token issuance.
+  given issuance protocol. As described in {{privacy-and-trust}}, the choice
+  of Issuer determines the type of Attesters and attestation procedures possible
+  for a token from the specified Issuer, but the Client does not learn exactly
+  which Attester was used for a given token issuance event.
 - Redemption context. Challenges can be bound to a given redemption context,
   which influences a client's ability to pre-fetch and cache tokens. For
   example, an empty redemption context always allows tokens to be issued and
