@@ -276,13 +276,17 @@ Clients for a token with a TokenChallenge ({{AUTHSCHEME, Section 2.1}}) and,
 if possible, Clients present a valid Token ({{AUTHSCHEME, Section 2.2}})
 in response. This interaction is shown below.
 
+
 ~~~ aasvg
-     Origin               Client
-                   +------------------.
-TokenChallenge --->|                   |
-                   | Issuance protocol |
-     Token    <----+                   |
-                    `-----------------'
++--------+            +--------+
+| Origin |            | Client |
++---+----+            +---+----+
+    |                     |
+    |<----- Request ------+
+    +-- TokenChallenge -->|
+    |                     | <== Issuance protocol ==>
+    |<-- Request+Token ---+
+    |                     |
 ~~~
 {: #fig-redemption title="Challenge-response redemption protocol interaction"}
 
@@ -337,17 +341,7 @@ See {{Section 2.1.1 of AUTHSCHEME}} for discussion.
 The Privacy Pass issuance protocol, described in {{ISSUANCE}}, is a two-message
 protocol that takes as input a TokenChallenge from the redemption protocol
 ({{AUTHSCHEME, Section 2.1}}) and produces a Token
-({{AUTHSCHEME, Section 2.2}}), as shown in the figure below.
-
-~~~ aasvg
-   Origin              Client      Attester     Issuer
-                   +-----------------------------------.
-TokenChallenge --->| <--(Attestation)-->                |
-                   | TokenRequest ---------------->     |
-     Token    <----+     <--------------- TokenResponse |
-                    `----------------------------------'
-~~~
-{: #fig-issuance title="Issuance protocol interaction"}
+({{AUTHSCHEME, Section 2.2}}), as shown in {{fig-overview}}.
 
 The structure and semantics of the TokenRequest and TokenResponse messages
 depend on the issuance protocol and token type being used; see {{ISSUANCE}}
@@ -478,8 +472,8 @@ issuance and redemption protocols.
 Certain instantiations of the issuance protocol may permit public or private
 metadata to be cryptographically bound to a token. As an example, one
 trivial way to include public metadata is to assign a unique Issuer
-public key for each value of metadata, such that N keys yields log<sub>2</sub>(N)
-bits of metadata. Metadata may be public or private.
+public key for each value of metadata, such that N keys yields
+log<sub>2</sub>(N) bits of metadata. Metadata may be public or private.
 
 Public metadata is that which clients can observe as part of the token
 issuance flow. Public metadata can either be transparent or opaque. For
@@ -537,23 +531,23 @@ architecture.
 ## Shared Origin, Attester, Issuer {#deploy-shared}
 
 In this model, the Origin, Attester, and Issuer are all operated by the same
-entity, as shown in the figure below.
+entity, as shown in {{fig-deploy-shared}}.
 
 ~~~ aasvg
-                   +-----------------------------------------.
-      Client       |  Attester         Issuer         Origin  |
-        |          |                                          |
-        |          |       TokenChallenge                     |
-        <----------------------------------------------+      |
-        |          | Attest                                   |
-        +----------------->                                   |
-        |          |     TokenRequest                         |
-        +-------------------------------->                    |
-        |          |     TokenResponse                        |
-        <--------------------------------+                    |
-        |          |           Token                          |
-        +---------------------------------------------->      |
-                    `----------------------------------------'
+                 +---------------------------------------------.
++--------+       |  +----------+     +--------+     +--------+  |
+| Client |       |  | Attester |     | Issuer |     | Origin |  |
++---+----+       |  +-----+----+     +----+---+     +---+----+  |
+    |             `-------|---------------|-------------|------'
+    |<-------------------------------- TokenChallenge --+
+    |                     |               |             |
+    |<=== Attestation ===>|               |             |
+    |                     |               |             |
+    +----------- TokenRequest ----------->|             |
+    |<---------- TokenResponse -----------+             |
+    |                                                   |
+    +--------------------- Token ----------------------->
+    |                                                   |
 ~~~
 {: #fig-deploy-shared title="Shared Deployment Model"}
 
@@ -575,29 +569,23 @@ In this model, the Attester and Issuer are operated by the same entity
 that is separate from the Origin. The Origin trusts the joint Attester
 and Issuer to perform attestation and issue Tokens. Clients interact
 with the joint Attester and Issuer for attestation and issuance. This
-arrangement is shown in the figure below.
+arrangement is shown in {{fig-deploy-joint-issuer}}.
 
 ~~~ aasvg
-                                                   +----------.
-      Client                                       |   Origin  |
-        |                 TokenChallenge           |           |
-        <-----------------------------------------------+      |
-        |                                          |           |
-        |          +--------------------------.    |           |
-        |          |  Attester         Issuer  |   |           |
-        |          |                           |   |           |
-        |          | Attest                    |   |           |
-        +----------------->                    |   |           |
-        |          |     TokenRequest          |   |           |
-        +-------------------------------->     |   |           |
-        |          |     TokenResponse         |   |           |
-        <--------------------------------+     |   |           |
-        |           `-------------------------'    |           |
-        |                                          |           |
-        |                     Token                |           |
-        +----------------------------------------------->      |
-                                                   |           |
-                                                    `---------'
+                   +------------------------------.
++--------+         |  +----------+     +--------+  |  +--------+
+| Client |         |  | Attester |     | Issuer |  |  | Origin |
++---+----+         |  +-----+----+     +----+---+  |  +---+----+
+    |               `-------|---------------|-----'       |
+    |<---------------------------------- TokenChallenge --+
+    |                       |               |             |
+    |<==== Attestation ====>|               |             |
+    |                       |               |             |
+    +------------- TokenRequest ----------->|             |
+    |<----------- TokenResponse ------------+             |
+    |                                                     |
+    +----------------------- Token ----------------------->
+    |                                                     |
 ~~~
 {: #fig-deploy-joint-issuer title="Joint Attester and Issuer Deployment Model"}
 
@@ -623,31 +611,23 @@ separate entities, the Attester must authenticate itself to the Issuer. In
 settings where the Attester is a Client-trusted service, one way Attesters
 can authenticate to Issuers is via mutually-authenticated TLS. However,
 alernative authentication mechanisms are possible. This arrangement is shown
-below.
+in {{fig-deploy-joint-origin}}.
 
 ~~~ aasvg
-                                    +-------------------------.
-      Client                        |   Issuer         Origin  |
-        |         TokenChallenge    |                          |
-        <-----------------------------------------------+      |
-        |                           |                          |
-        |          +----------.     |                          |
-        |          |  Attester |    |                          |
-        |          |           |    |                          |
-        |          | Attest    |    |                          |
-        +----------------->    |    |                          |
-        |          |           |    |                          |
-        |          |     TokenRequest                          |
-        +-------------------------------->                     |
-        |          |           |    |                          |
-        |          |     TokenResponse                         |
-        <--------------------------------+                     |
-        |          |           |    |                          |
-        |           `---------'     |                          |
-        |                           |                          |
-        |              Token        |                          |
-        +----------------------------------------------->      |
-                                     `------------------------'
+                                 +-----------------------------.
++--------+          +----------+  |  +--------+     +--------+  |
+| Client |          | Attester |  |  | Issuer |     | Origin |  |
++---+----+          +-----+----+  |  +----+---+     +---+----+  |
+    |                     |        `------|-------------|------'
+    |<-------------------------------- TokenChallenge --+
+    |                     |               |             |
+    |<=== Attestation ===>|               |             |
+    |                     |               |             |
+    +------------ TokenRequest ---------->|             |
+    |<---------- TokenResponse -----------+             |
+    |                                                   |
+    +--------------------- Token ----------------------->
+    |                                                   |
 ~~~
 {: #fig-deploy-joint-origin title="Joint Origin and Issuer Deployment Model"}
 
@@ -671,34 +651,8 @@ In this model, the Origin, Attester, and Issuer are all operated by different
 entities, as shown in the figure below. As with the joint Origin and Issuer
 model, the Issuer accepts token requests that come from trusted Attesters, and
 the details of that trust establishment depend on the issuance protocol and
-relationship between Attester and Issuer.
-
-~~~ aasvg
-                                                   +----------.
-      Client                                       |   Origin  |
-        |                 TokenChallenge           |           |
-        <-----------------------------------------------+      |
-        |                                          |           |
-        |          +----------.                    |           |
-        |          |  Attester |                   |           |
-        |          |           |                   |           |
-        |          | Attest    |    +---------.    |           |
-        +----------------->    |    |  Issuer  |   |           |
-        |          |           |    |          |   |           |
-        |          |     TokenRequest          |   |           |
-        +-------------------------------->     |   |           |
-        |          |           |    |          |   |           |
-        |          |     TokenResponse         |   |           |
-        <--------------------------------+     |   |           |
-        |          |           |    |          |   |           |
-        |           `---------'      `--------'    |           |
-        |                                          |           |
-        |                     Token                |           |
-        +----------------------------------------------->      |
-                                                   |           |
-                                                    `---------'
-~~~
-{: #fig-deploy-split title="Split Deployment Model"}
+relationship between Attester and Issuer. This arrangement is shown in
+{{fig-overview}}.
 
 This is the most general deployment model, and is necessary for some
 types of issuance protocols where the Attester plays a role in token
