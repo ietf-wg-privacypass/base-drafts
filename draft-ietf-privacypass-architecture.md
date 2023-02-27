@@ -136,8 +136,12 @@ Issuer:
   attested to by the Attester.
 
 Attester:
-: An entity that attests to properties of Client for the
+: An entity that attests to properties of Clients for the
   purposes of token issuance.
+
+Attestation procedure:
+: The procedure by which an Attester determines whether or not a Client
+  is trusted with a specific set of properties for token issuance.
 
 # Architecture
 
@@ -306,8 +310,8 @@ including:
   Issuer in turn accepts different types of attestation from more than one
   trusted Attester, then a Client may use either of these trusted Attesters
   to issue and redeem tokens for origin.example. However, origin.example
-  neither explicitly specifies nor learns the Attesters or their attestation
-  formats used for token issuance.
+  neither explicitly specifies nor learns the Attesters or their specific
+  attestation procedures used for token issuance.
 - Redemption context. Challenges can be bound to a given redemption context,
   which influences a client's ability to pre-fetch and cache tokens. For
   example, an empty redemption context always allows tokens to be issued and
@@ -416,15 +420,15 @@ the scope of the issuance protocol. Example attestation procedures are below.
   Client's geographic region and whether the Client has a valid
   application-layer account.
 
-Attesters may support different types of attestation procedures. A type of
-attestation procedure is also referred as an attestation format.
+Attesters may support different types of attestation procedures.
 
-In general, each attestation format has different security properties. For
+In general, each attestation procedure has different security properties. For
 example, attesting to having a valid account is different from attesting to
-running on trusted hardware. In general, minimizing the set of attestation
-formats helps minimize the amount of information leaked through a token.
+running on trusted hardware. In general, minimizing the set of supported
+attestation procedures helps minimize the amount of information leaked through
+a token.
 
-Each attestation format also has an impact on the overall system privacy.
+Each attestation procedure also has an impact on the overall system privacy.
 Requiring a conjunction of attestation types could decrease the overall
 anonymity set size. For example, the number of Clients that have solved a
 CAPTCHA in the past day, that have a valid account, and that are running on a
@@ -439,7 +443,7 @@ types of attestation can vary in value over time, e.g., if the attestation
 process is compromised or maliciously automated. These are considered
 exceptional events and require configuration changes to address the underlying
 cause. For example, if attestation is compromised because of a zero-day exploit
-on compliant devices, then the corresponding attestation format should be
+on compliant devices, then the corresponding attestation procedure should be
 untrusted until the exploit is patched. Addressing changes in attestation
 quality is therefore a deployment-specific task. In Split Attester and Issuer
 deployments (see {{deploy-split}}), Issuers can choose to remove compromised
