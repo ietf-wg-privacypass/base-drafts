@@ -575,7 +575,11 @@ For example, a token request may contribute information to the attestation
 or issuance contexts as described below.
 
 - Issuance protocol. The type of issuance protocol can contribute information
-about the Issuer's capabilities to the attestation or issuance contexts.
+about the Issuer's capabilities to the attestation or issuance contexts, as
+well as the capabilities of a given Client. For example, if a Client is
+presented with multuiple issuance protocol options, then the choice of which
+issuance protocol to use can contrbute information about the Client's
+capabilities.
 - Issuer configuration. Information about the Issuer configuration, such as
 its identity or the public key used to validate tokens it creates, can be
 revealed during issuance and contribute to the attestation or issuance
