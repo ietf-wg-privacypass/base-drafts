@@ -160,21 +160,24 @@ a token challenge. The token challenge indicates a specific Issuer to use.
 2. If the Client already has a token available that satisfies the token
 challenge, e.g., because the Client has a cache of previously issued tokens,
 it can skip to [step 6](#step-redemption){: format="none"} and redeem its
-token. Otherwise, it invokes the issuance
-protocol to request a token from the designated Issuer.
+token.
 
-3. The first step in the issuance protocol is attestation. Specifically, the
-Attester performs attestation checks on the Client. These checks
-could be proof of solving a CAPTCHA, device trust, hardware attestation,
-etc (see {{attester}}).
+3. If the Client does not have a token available and decides it wants to
+obtain one (or more) bound to the token challenge, it then invokes the
+issuance protocol. As a prerequisite to the issuance protocol, the Client
+runs the deployment specific attestation process that is required for the
+designated Issuer. Client attestation can be done via proof of solving a
+CAPTCHA, checking device or hardware attestation validity, etc; see
+{{attester}} for more details.
 
-4. If attestation succeeds, the client creates a Token Request to send
-to the designated Issuer (generally via the Attester). The Attester and Issuer
-might be functions on the same server, depending on the deployment model
-(see {{deployment}}). Depending on the details of Attestation, the Client can
-send the Token Request to the Attester alongside any attestation information.
-If attestation fails, the Client receives an error and issuance aborts without
-a token.
+4. If the attestation process completes successfully, the client creates a
+Token Request to send to the designated Issuer (generally via the Attester).
+The Attester and Issuer might be functions on the same server, depending on the
+deployment model (see {{deployment}}). Depending on the attestation process, it
+is possible for attestation to run alongside the issuance protocol, e.g., where
+Clients send necessary attestation information to the Attester along with their
+Token Request. If the attestation process fails, the Client receives an error
+and issuance aborts without a token.
 
 5. The Issuer generates a Token Response based on the Token Request, which
 is returned to the Client (generally via the Attester). Upon receiving the
