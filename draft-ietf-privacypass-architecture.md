@@ -175,7 +175,8 @@ CAPTCHA, checking device or hardware attestation validity, etc; see
 {{attester}} for more details.
 
 4. If the attestation process completes successfully, the client creates a
-Token Request to send to the designated Issuer (generally via the Attester).
+Token Request to send to the designated Issuer (generally via the Attester,
+though it is not required to be sent through the Attester).
 The Attester and Issuer might be functions on the same server, depending on the
 deployment model (see {{deployment}}). Depending on the attestation process, it
 is possible for attestation to run alongside the issuance protocol, e.g., where
@@ -248,9 +249,11 @@ tokens issued by an Issuer that trusts multiple Attesters then a Client can
 use any of these Attesters to issue and redeem tokens for the Origin.
 
 The mechanisms for establishing trust between each entity in this arrangement
-are deployment specific. For example, in settings where Attesters and Issuers
-communicate over TLS, Attesters and Issuers may use mutually authenticated TLS
-to authenticate one another.
+are deployment specific. For example, in settings where Clients interact with
+Issuers transitively through an Attester, Attesters and Issuers might use
+mutually authenticated TLS to authenticate one another. In settings where
+Clients do not communicate with Issuers through an Attester, the Attesters
+might convey this trust via a digital signature over that Issuers can verify.
 
 Clients explicitly trust Attesters to perform attestation correctly and in a
 way that does not violate their privacy. However, Clients assume Issuers and
@@ -603,7 +606,8 @@ or issuance contexts as described below.
 - Origin information. The issuance protocol can contribute information about
 the Origin in how it responds to a token request. For example, if an Issuer
 learns the Origin during issuance and is also configured to respond in some way
-on the basis of that information, that response can reveal information to the
+on the basis of that information, and the Client interacts with the Issuer
+transitively through the Attester, that response can reveal information to the
 Attester.
 - Token. The token produced by the issuance protocol can contain information
 from the issuance context. In particular, depending on the issuance protocol,
