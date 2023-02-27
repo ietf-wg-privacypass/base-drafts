@@ -591,8 +591,11 @@ a given Attester means that the Client which generated the token request must
 be capable of the completing the designated attestation procedure.
 - Origin information. The issuance protocol can contribute information about
 the Origin that challenged the Client in {{challenge-flow}}. In particular,
-a token request designated for a specific Issuer means that the resulting token
-is for an Origin that trusts the specified Issuer.
+a token request designated for a specific Issuer might imply that the resulting
+token is for an Origin that trusts the specified Issuer. However, this is not
+always true, as some token requests can correspond to cross-Origin tokens,
+i.e., they are tokens that would be accepted at any Origin that accepts the
+cross-Origin token.
 
 Moreover, a token response may contribute information to the attestation
 or issuance contexts as described below.
