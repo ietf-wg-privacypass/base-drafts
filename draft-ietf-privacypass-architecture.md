@@ -245,12 +245,12 @@ context is referred to as a redemption anonymity set.
 2. Issuer-Client unlinkability. This is similar to Origin-Client unlinkability
 in that a Client in an issuance context is indistinguishable from any other
 Client that might use the same issuance context. The set of Clients that share
-the same redemption context is referred to as a redemption anonymity set.
+the same issuance context is referred to as an issuance anonymity set.
 3. Attester-Origin unlinkability. This is similar to Origin-Client and
 Issuer-Client unlinkability. It means that given two attestation contexts,
 the Attester cannot determine if both contexts correspond to the same Origin
 or two different Origins. The set of Clients that share the same attestation
-context is referred to as an anonymity set.
+context is referred to as an attestation anonymity set.
 
 By ensuring that different contexts cannot be linked in this way, only the
 Client is able to correlate information that might be used to identify them with
