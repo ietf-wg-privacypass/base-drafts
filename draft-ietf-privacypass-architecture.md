@@ -561,7 +561,10 @@ accept tokens. Origins then construct a token challenge using this specified
 Issuer and the redemption context it shares with the Client. This token
 challenge is then delivered to a Client. The token challenge conveys
 information about the Issuer and the redemption context, such as whether the
-Origin desires a per-Origin or cross-Origin token.
+Origin desires a per-Origin or cross-Origin token. Any entity that sees
+the token challenge might learn things about the Client as known to the Origin.
+This is why input secrecy is a requirement for issuance protocols, as it
+ensures that the challenge is not directly available to the Issuer.
 
 ### Attestation and Issuance Flow {#issue-flow}
 
