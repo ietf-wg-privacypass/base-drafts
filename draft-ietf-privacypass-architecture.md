@@ -576,9 +576,10 @@ or issuance contexts as described below.
 
 - Issuance protocol. The type of issuance protocol can contribute information
 about the Issuer's capabilities to the attestation or issuance contexts.
-- Issuer identity or configuration. Information about the Issuer, such as its
-identity or the public key used to validate tokens it creates, can be revealed
-during issuance and contribute to the attestation or issuance contexts.
+- Issuer configuration. Information about the Issuer configuration, such as
+its identity or the public key used to validate tokens it creates, can be
+revealed during issuance and contribute to the attestation or issuance
+contexts.
 - Attestation information. The issuance protocol can contribute information to
 the issuance context based on what attestation procedure the Issuer uses to
 trust a token request. In particular, a token request that is validated by
