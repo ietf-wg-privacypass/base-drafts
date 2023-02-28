@@ -870,7 +870,7 @@ challenges.
 
 Moreover, since tokens are not intrinsically bound to Clients, it is possible
 for malicious Clients to collude and share tokens in a so-called "hoarding
-attack." As an example of this attack, many distributed Clients obtain
+attack." As an example of this attack, many distributed Clients could obtain
 cacheable tokens and them share them with a single Client to redeem in a way
 that would violate an Origin's attempt to limit tokens to any one particular
 Client. Depending on the deployment model, it may be possible to detect these
