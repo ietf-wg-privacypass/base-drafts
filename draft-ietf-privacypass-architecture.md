@@ -235,10 +235,10 @@ Origin name (if revealed during issuance).
 Attestation context:
 : The interactions and set of information shared between
 the Client and Attester only, for the purposes of attesting the vailidity of
-the Client for the purposes of completing the issuance protocol. This context
-includes all information associated with attestation, such as the timestamp of
-the event and any Client visible information, including information needed for
-the attestation procedure to complete.
+the Client in the issuance protocol. This context includes all information
+associated with attestation, such as the timestamp of the event and any Client
+visible information, including information needed for the attestation procedure
+to complete.
 
 The privacy goals of Privacy Pass assume a threat model in which Origins trust
 specific Issuers to produce tokens, and Issuers in turn trust one or more
