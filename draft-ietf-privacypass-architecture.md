@@ -439,7 +439,7 @@ are running on a trusted device is less than the number of Clients that have
 solved a CAPTCHA in the past day. Attesters SHOULD NOT be based on attestation
 procedures that result in small anonymity sets.
 
-Depending on the issuance protocol, the Issuer may necessarily learn
+Depending on the issuance protocol, the Issuer might learn
 information about the Origin. To ensure Issuer-Client unlinkability, the Issuer
 should be unable to link that information to a specific Client. For such
 issuance protocols where the Attester has access to Client-specific
