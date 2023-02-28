@@ -425,11 +425,10 @@ detail.
 
 ### Attester Role {#attester}
 
-Attestation is an important part of the issuance protocol. In Privacy Pass,
-attestation is the process by which an Attester bears witness to, confirms,
-or authenticates a Client so as to verify a property about the Client that
-is required for Issuance. Clients explicitly trust Attesters to perform
-attestation correctly and in a way that does not violate their privacy.
+In Privacy Pass, attestation is the process by which an Attester bears
+witness to, confirms, or authenticates a Client so as to verify properties
+about the Client that are required for Issuance. Issuers trust Attesters
+to perform attestation correctly.
 
 {{?RFC9334}} describes an architecture for attestation procedures. Using
 that architecture as a conceptual basis, Clients are RATS attesters that
@@ -457,13 +456,26 @@ running on trusted hardware. In general, minimizing the set of supported
 attestation procedures helps minimize the amount of information leaked through
 a token.
 
-Each attestation procedure also has an impact on the overall system privacy.
-Requiring a conjunction of attestation types could decrease the overall
-anonymity set size. For example, the number of Clients that have solved a
-CAPTCHA in the past day, that have a valid account, and that are running on a
-trusted device is less than the number of Clients that have solved a CAPTCHA in
-the past day. Attesters SHOULD not admit attestation types that result in small
-anonymity sets.
+The role of the Attester in the issuance protocol and its impact on privacy
+depends on the type of attestation procedure, issuance protocol, deployment
+model. For instance, requiring a conjunction of attestation procedures could
+decrease the overall anonymity set size. As an example, the number of Clients
+that have solved a CAPTCHA in the past day, that have a valid account, and that
+are running on a trusted device is less than the number of Clients that have
+solved a CAPTCHA in the past day. Attesters SHOULD NOT be based on attestation
+procedures that result in small anonymity sets.
+
+Depending on the issuance protocol, the Issuer might learn
+information about the Origin. To ensure Issuer-Client unlinkability, the Issuer
+should be unable to link that information to a specific Client. For such
+issuance protocols where the Attester has access to Client-specific
+information, such as is the case for attestation procedures that involve
+Client-specific information (such as application-layer account information)
+or for deployment models where the Attester learns Client-specific information
+(such as Client IP addresses), Clients trust the Attester to not share any
+Client-specific information with the Issuer. In deployments where the Attester
+does not learn Client-specific information, the Client does not need to
+explicitly trust the Attester in this regard.
 
 Issuers trust Attesters to correctly and reliably perform attestation. However,
 certain types of attestation can vary in value over time, e.g., if the
