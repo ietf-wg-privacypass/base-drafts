@@ -243,7 +243,7 @@ Attesters to correctly run the attestation procedure with Clients. This
 arrangement ensures that tokens which validate for a given Issuer were only
 issued to a Client that successfully completed attestation with an Attester that
 the Issuer trusts. Moreover, this arrangement means that if an Origin accepts
-tokens issued by an Issuer that trusts multiple Attesters then a Client can
+tokens issued by an Issuer that trusts multiple Attesters, then a Client can
 use any of these Attesters to issue and redeem tokens for the Origin.
 
 The mechanisms for establishing trust between each entity in this arrangement
