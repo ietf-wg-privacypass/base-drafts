@@ -212,7 +212,7 @@ Redemption context:
 : The interactions and set of information shared
 between the Client and Origin, i.e., the information that is provided or
 otherwise available to the Origin during redemption that might be used
-to identify a Client. This context includes all information associated
+to identify a Client and construct a token challenge. This context includes all information associated
 with redemption, such as the timestamp of the event, Client visible
 information (including the IP address), and the Origin name.
 
