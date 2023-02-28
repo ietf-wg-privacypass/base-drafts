@@ -149,9 +149,8 @@ The Privacy Pass architecture consists of four logical entities --
 Client, Origin, Issuer, and Attester -- that work in concert
 for token redemption and issuance. This section presents an overview
 of Privacy Pass, a high-level description of the threat model and
-privacy goals of the architecture, and the purpose of the the redemption
-and issuance protocols, including requirements on the relevant participants
-in these protocols, necessary to achieve the intended privacy goals.
+privacy goals of the architecture, and the goals and requirements of the
+redemption and issuance protocols.
 
 ## Overview
 
