@@ -441,7 +441,7 @@ anonymity sets.
 
 Issuers trust Attesters to correctly and reliably perform attestation. However,
 certain types of attestation can vary in value over time, e.g., if the
-attestation procedure is compromised or maliciously automated. Broken
+attestation procedure is compromised. Broken
 attestation procedures are considered exceptional events and require
 configuration changes to address the underlying cause. For example, if
 attestation is compromised because of a zero-day exploit on compliant devices,
