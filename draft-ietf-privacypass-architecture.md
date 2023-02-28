@@ -857,7 +857,7 @@ meaningful privacy improvements to end-users.
 ## Token Caching {#hoarding}
 
 Depending on the Origin's token challenge, Clients can request and cache more
-than one using the issuance protocol. Cached tokens help improve privacy by
+than one token using an issuance protocol. Cached tokens help improve privacy by
 separating the time of token issuance from the time of token redemption, and
 also allows Clients to avoid any overhead of receiving new tokens via the
 issuance protocol.
