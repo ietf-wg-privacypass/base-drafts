@@ -436,7 +436,7 @@ model. For instance, requiring a conjunction of attestation procedures could
 decrease the overall anonymity set size. As an example, the number of Clients
 that have solved a CAPTCHA in the past day, that have a valid account, and that
 are running on a trusted device is less than the number of Clients that have
-solved a CAPTCHA in the past day. Attesters SHOULD not admit attestation
+solved a CAPTCHA in the past day. Attesters SHOULD NOT be based on attestation
 procedures that result in small anonymity sets.
 
 Depending on the issuance protocol, the Issuer may necessarily learn
