@@ -551,7 +551,7 @@ specified in {{issuer-role}} for managing Issuer public key data.
 
 ## Information Flow {#flow}
 
-The end-to-end run of redemption and issuance protocol involves information
+The end-to-end process of redemption and issuance protocols involves information
 flowing between Issuer, Origin, Client, and Attester. That information can
 have implications on the privacy goals that Privacy Pass aims to provide
 as outlined in {{privacy-and-trust}}. In this section, we describe the flow
