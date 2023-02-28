@@ -873,7 +873,7 @@ for malicious Clients to collude and share tokens in a so-called "hoarding
 attack." As an example of this attack, many distributed Clients could obtain
 cacheable tokens and them share them with a single Client to redeem in a way
 that would violate an Origin's attempt to limit tokens to any one particular
-Client. Depending on the deployment model, it may be possible to detect these
+Client. Depending on the deployment model, it can be possible to detect these
 types of attacks by comparing issuance and redemption contexts, as is possible
 in the Joint Origin and Issuer model.
 
