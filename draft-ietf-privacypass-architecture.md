@@ -859,7 +859,7 @@ meaningful privacy improvements to end-users.
 Depending on the Origin's token challenge, Clients can request and cache more
 than one token using an issuance protocol. Cached tokens help improve privacy by
 separating the time of token issuance from the time of token redemption, and
-also allows Clients to avoid any overhead of receiving new tokens via the
+also allow Clients to reduce the overhead of receiving new tokens via the
 issuance protocol.
 
 As a consequence, Origins that send token challenges which are compatible with
