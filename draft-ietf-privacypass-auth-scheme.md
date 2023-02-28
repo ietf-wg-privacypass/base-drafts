@@ -68,12 +68,14 @@ Authorization request header is referred to as token redemption. This
 interaction between client and origin is shown below.
 
 ~~~ aasvg
-    Origin                                     Client
-                                        +------------------.
-TokenChallenge --- WWW-Authenticate ---->                   |
-                                        | Issuance Protocol |
-    Token      <--- Authorization ------+                   |
-                                         `-----------------'
++--------+                              +--------+
+| Origin |                              | Client |
++---+----+                              +---+----+
+    |                                       |
+    +-- WWW-Authenticate: TokenChallenge -->|
+    |                                       | // Run issuance protocol
+    <------- Authorization: Token ----------+
+    |                                       |
 ~~~
 {: #fig-overview title="Challenge-response redemption protocol flow"}
 
@@ -453,14 +455,10 @@ contexts can be replayed from one party by another, as shown below.
 
 ~~~
  Client          Attacker                  Origin
-
-                       <----------- Challenge \
-                                              |
-   <--------- Challenge                       |
-                                              |
-   Redemption ---->                           |
-                                              |
-                       Redemption ----------> /
+                       <------ TokenChallenge \
+   <--- TokenChallenge                        |
+    Token ---------->                         |
+                       Token ---------------> /
 ~~~
 {: #fig-replay title="Token Architectural Components"}
 
