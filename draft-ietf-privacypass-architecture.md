@@ -247,7 +247,7 @@ tokens issued by an Issuer that trusts multiple Attesters, then a Client can
 use any one of these Attesters to issue and redeem tokens for the Origin.
 
 The mechanisms for establishing trust between each entity in this arrangement
-are deployment specific. For example, in settings where Attesters and Issuers
+are deployment-specific. For example, in settings where Attesters and Issuers
 communicate over TLS, Attesters and Issuers may use mutually authenticated TLS
 to authenticate one another.
 
