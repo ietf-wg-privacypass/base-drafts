@@ -440,18 +440,28 @@ trusted device is less than the number of Clients that have solved a CAPTCHA in
 the past day. Attesters SHOULD not admit attestation types that result in small
 anonymity sets.
 
-The trustworthiness of Attesters depends on their ability to correctly and
-reliably perform attestation during the issuance protocol. Indeed, Issuers
-trust Attesters to correctly and reliably perform attestation. However, certain
-types of attestation can vary in value over time, e.g., if the attestation
-process is compromised or maliciously automated. These are considered
-exceptional events and require configuration changes to address the underlying
-cause. For example, if attestation is compromised because of a zero-day exploit
-on compliant devices, then the corresponding attestation procedure should be
-untrusted until the exploit is patched. Addressing changes in attestation
-quality is therefore a deployment-specific task. In Split Attester and Issuer
-deployments (see {{deploy-split}}), Issuers can choose to remove compromised
-Attesters from their trusted set until the compromise is patched.
+Issuers trust Attesters to correctly and reliably perform attestation. However,
+certain types of attestation can vary in value over time, e.g., if the
+attestation procedure is compromised. Broken
+attestation procedures are considered exceptional events and require
+configuration changes to address the underlying cause. For example, if
+attestation is compromised because of a zero-day exploit on compliant devices,
+then the corresponding attestation procedure should be untrusted until the
+exploit is patched. Addressing changes in attestation quality is therefore a
+deployment-specific task. In Split Attester and Issuer deployments (see
+{{deploy-split}}), Issuers can choose to remove compromised Attesters from
+their trusted set until the compromise is patched.
+
+From the perspective of an Origin, tokens produced by an Issuer with at least
+one compromised Attester cannot be trusted assuming the Origin does not know
+which attestation procedure was used for issuance. This is because the Origin
+cannot distinguish between tokens that were issued via compromised Attesters
+and tokens that were issued via uncompromised Attesters absent some
+distinguishing information in the tokens themselves or from the Issuer. As a
+result, until the attestation procedure is fixed, the Issuer cannot be trusted
+by Origins. Moreover, as a consequence, any tokens issued by an Issuer with a
+compromised attester may no longer be trusted by Origins, even if those tokens
+were issued to Clients interacting with an uncompromised Attester.
 
 ### Issuer Role
 
