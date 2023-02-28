@@ -222,7 +222,9 @@ and Issuer, i.e., the information that is provided or otherwise available
 to Attester and Issuer during issuance that might be used to identify a Client.
 This context includes all information associated with issuance, such as the
 timestamp of the event, any Client visible information (including the IP
-address), and the Origin name (if revealed during issuance).
+address), and the Origin name (if revealed during issuance). This does not include
+the token challenge in its entirety, as that is kept secret from the Issuer during the
+issuance protocol.
 
 Attestation context:
 : The interactions and set of information shared between
