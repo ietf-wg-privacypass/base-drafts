@@ -652,7 +652,7 @@ separate entities, this model requires some mechanism by which Issuers
 establish trust in the Attester (as described in {{privacy-and-trust}}).
 For example, in settings where the Attester is a Client-trusted service that
 directly communicates with the Issuer, one way to establish this trust is via
-mutually-authenticated TLS. However, alernative authentication mechanisms are
+mutually-authenticated TLS. However, alternative authentication mechanisms are
 possible. This arrangement is shown below.
 
 ~~~ aasvg
