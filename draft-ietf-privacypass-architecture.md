@@ -235,9 +235,10 @@ Origin name (if revealed during issuance).
 Attestation context:
 : The interactions and set of information shared between
 the Client and Attester only, for the purposes of attesting the vailidity of
-the Client. This context includes all information associated with attestation,
-such as the timestamp of the event and any Client visible information,
-including information needed for the attestation procedure to complete.
+the Client for the purposes of completing the issuance protocol. This context
+includes all information associated with attestation, such as the timestamp of
+the event and any Client visible information, including information needed for
+the attestation procedure to complete.
 
 The privacy goals of Privacy Pass assume a threat model in which Origins trust
 specific Issuers to produce tokens, and Issuers in turn trust one or more
@@ -569,13 +570,22 @@ the token challenge might learn things about the Client as known to the Origin.
 This is why input secrecy is a requirement for issuance protocols, as it
 ensures that the challenge is not directly available to the Issuer.
 
-### Attestation and Issuance Flow {#issue-flow}
+### Attestation Flow {#attestation-flow}
+
+Clients interact with the Attester to prove that they meet some required
+set of properties. In doing so, Clients contribute information to the
+attestation context, which might include sensitive information such as
+application-layer identities, IP addresses, and so on. Clients can choose
+whether or not to contribute this information based on local policy or
+preference.
+
+### Issuance Flow {#issue-flow}
 
 Clients use the issuance protocol to produce a token bound to a token
 challenge. In doing so, there are several ways in which the issuance protocol
-contributes information to the attestation context and issuance context.
-For example, a token request may contribute information to the attestation
-or issuance contexts as described below.
+contributes information to the attestation or issuance contexts. For example, a
+token request may contribute information to the attestation or issuance
+contexts as described below.
 
 - Issuance protocol. The type of issuance protocol can contribute information
 about the Issuer's capabilities to the attestation or issuance contexts, as
@@ -588,10 +598,10 @@ its identity or the public key used to validate tokens it creates, can be
 revealed during issuance and contribute to the attestation or issuance
 contexts.
 - Attestation information. The issuance protocol can contribute information to
-the issuance context based on what attestation procedure the Issuer uses to
-trust a token request. In particular, a token request that is validated by
-a given Attester means that the Client which generated the token request must
-be capable of the completing the designated attestation procedure.
+the attestation or issuance contexts based on what attestation procedure the
+Issuer uses to trust a token request. In particular, a token request that is
+validated by a given Attester means that the Client which generated the token
+request must be capable of the completing the designated attestation procedure.
 - Origin information. The issuance protocol can contribute information about
 the Origin that challenged the Client in {{challenge-flow}}. In particular,
 a token request designated for a specific Issuer might imply that the resulting
@@ -600,8 +610,8 @@ always true, as some token requests can correspond to cross-Origin tokens,
 i.e., they are tokens that would be accepted at any Origin that accepts the
 cross-Origin token.
 
-Moreover, a token response may contribute information to the attestation
-or issuance contexts as described below.
+Moreover, a token response may contribute information to the issuance
+attestation or contexts as described below.
 
 - Origin information. The issuance protocol can contribute information about
 the Origin in how it responds to a token request. For example, if an Issuer
@@ -616,9 +626,11 @@ metadata on the basis of information in the issuance context.
 
 In general, exceptional cases in the issuance protocol, such as when either the
 Attester or Issuer aborts the protocol, can contribute information to the
-attestation or issuance contexts. The extent to which information in these
-contexts harms the privacy goals in {{privacy-and-trust}} depends on deployment
-model; see {{deployment}}.
+attestation or issuance contexts. The extent to which information in this
+context harms the Issuer-Client or Attester-Origin unlinkability goals in
+{{privacy-and-trust}} depends on deployment model; see {{deployment}}.
+Clients can choose whether or not to contribute information to these contexts
+based on local policy or preference.
 
 ### Token Redemption Flow {#redemption-flow}
 
@@ -628,7 +640,9 @@ Information can either be explicitly passed in a token, or it can be implicit
 in the way the Client responds to a token challenge. For example, if a Client
 fails to complete issuance, and consequently fails to redeem a token in
 response to a token challenge, this can reveal information to the Origin that
-it might not otherwise have access to.
+it might not otherwise have access to. However, an Origin cannot necessarily
+distinguish between a Client that fails to complete issuance and one that
+ignores the token challenge altogether.
 
 # Deployment Configurations {#deployment}
 
