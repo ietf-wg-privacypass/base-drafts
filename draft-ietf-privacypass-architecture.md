@@ -561,7 +561,7 @@ goals in particular deployment models is further discussed in {{deployment}}.
 
 To use Privacy Pass, Origins choose an Issuer from which they are willing to
 accept tokens. Origins then construct a token challenge using this specified
-Issuer and the redemption context it shares with the Client. This token
+Issuer and information from the redemption context it shares with the Client. This token
 challenge is then delivered to a Client. The token challenge conveys
 information about the Issuer and the redemption context, such as whether the
 Origin desires a per-Origin or cross-Origin token. Any entity that sees
