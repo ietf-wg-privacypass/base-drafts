@@ -356,7 +356,7 @@ be issued and then spent multiple times in response to any such challenge.
 See {{Section 2.1.1 of AUTHSCHEME}} for discussion.
 
 How Clients respond to token challenges can have privacy implications.
-For example, if a token challenge admits a choice of Issuer, then the choice
+For example, if an Origin allows the Client to choose an Issuer, then the choice
 of Issuer can reveal information about the Client used to partition anonymity
 sets; see {{rotation-and-consistency}} for more information about these privacy
 considerations.
