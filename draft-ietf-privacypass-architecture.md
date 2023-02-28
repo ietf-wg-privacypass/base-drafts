@@ -251,7 +251,7 @@ use any of these Attesters to issue and redeem tokens for the Origin.
 
 The mechanisms for establishing trust between each entity in this arrangement
 are deployment specific. For example, in settings where Clients interact with
-Issuers transitively through an Attester, Attesters and Issuers might use
+Issuers through an Attester, Attesters and Issuers might use
 mutually authenticated TLS to authenticate one another. In settings where
 Clients do not communicate with Issuers through an Attester, the Attesters
 might convey this trust via a digital signature over that Issuers can verify.
