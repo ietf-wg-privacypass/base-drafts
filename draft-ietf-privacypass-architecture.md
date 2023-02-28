@@ -400,8 +400,8 @@ detail.
 ### Attester Role {#attester}
 
 In Privacy Pass, attestation is the process by which an Attester bears
-witness to, confirms, or authenticates a Client so as to verify a property
-about the Client that is required for Issuance. Issuers trust Attesters
+witness to, confirms, or authenticates a Client so as to verify properties
+about the Client that are required for Issuance. Issuers trust Attesters
 to perform attestation correctly.
 
 {{?RFC9334}} describes an architecture for attestation procedures. Using
