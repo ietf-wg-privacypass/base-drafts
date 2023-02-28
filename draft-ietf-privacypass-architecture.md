@@ -449,7 +449,7 @@ or for deployment models where the Attester learns Client-specific information
 (such as Client IP addresses), Clients trust the Attester to not share any
 Client-specific information with the Issuer. In deployments where the Attester
 does not learn Client-specific information, the Client does not need to
-explicitly trust the Attester.
+explicitly trust the Attester in this regard.
 
 The trustworthiness of Attesters depends on their ability to correctly and
 reliably perform attestation during the issuance protocol. Indeed, Issuers
