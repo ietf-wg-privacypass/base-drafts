@@ -149,9 +149,8 @@ The Privacy Pass architecture consists of four logical entities --
 Client, Origin, Issuer, and Attester -- that work in concert
 for token redemption and issuance. This section presents an overview
 of Privacy Pass, a high-level description of the threat model and
-privacy goals of the architecture, and the purpose of the the redemption
-and issuance protocols, including requirements on the relevant participants
-in these protocols, necessary to achieve the intended privacy goals.
+privacy goals of the architecture, and the goals and requirements of the
+redemption and issuance protocols.
 
 ## Overview
 
@@ -164,7 +163,7 @@ a token challenge. The token challenge indicates a specific Issuer to use.
 2. If the Client already has a token available that satisfies the token
 challenge, e.g., because the Client has a cache of previously issued tokens,
 it can skip to [step 6](#step-redemption){: format="none"} and redeem its
-token.
+token; see {{hoarding}} for security considerations of cached tokens.
 
 3. If the Client does not have a token available and decides it wants to
 obtain one (or more) bound to the token challenge, it then invokes the
@@ -221,33 +220,39 @@ different types of contexts:
 
 Redemption context:
 : The interactions and set of information shared
-between the Client and Origin. This context includes all information
-associated with redemption, such as the timestamp of the event, Client
-visible information (including the IP address), and the Origin name.
+between the Client and Origin, i.e., the information that is provided or
+otherwise available to the Origin during redemption that might be used
+to identify a Client and construct a token challenge. This context includes all information associated
+with redemption, such as the timestamp of the event, Client visible
+information (including the IP address), and the Origin name.
 
 Issuance context:
-: The interactions and set of information shared
-between the Client, Attester, and Issuer. This context includes all
-information associated with issuance, such as the timestamp of the event,
-any Client visible information (including the IP address), and the
-Origin name (if revealed during issuance).
+: The interactions and set of information shared between the Client, Attester,
+and Issuer, i.e., the information that is provided or otherwise available
+to Attester and Issuer during issuance that might be used to identify a Client.
+This context includes all information associated with issuance, such as the
+timestamp of the event, any Client visible information (including the IP
+address), and the Origin name (if revealed during issuance). This does not include
+the token challenge in its entirety, as that is kept secret from the Issuer during the
+issuance protocol.
 
 Attestation context:
 : The interactions and set of information shared between
 the Client and Attester only, for the purposes of attesting the vailidity of
-the Client in the issuance protocol. This context includes all information
+the Client, that is provided or otherwise available during attestation that
+might be used to identify the Client. This context includes all information
 associated with attestation, such as the timestamp of the event and any Client
-visible information, including information needed for the attestation procedure
-to complete.
+visible information, including information needed for the attestation
+procedure to complete.
 
 The privacy goals of Privacy Pass assume a threat model in which Origins trust
 specific Issuers to produce tokens, and Issuers in turn trust one or more
 Attesters to correctly run the attestation procedure with Clients. This
 arrangement ensures that tokens which validate for a given Issuer were only
-issued to a Client that successfully complete attestation with an Attester that
+issued to a Client that successfully completed attestation with an Attester that
 the Issuer trusts. Moreover, this arrangement means that if an Origin accepts
-tokens issued by an Issuer that trusts multiple Attesters then a Client can
-use any of these Attesters to issue and redeem tokens for the Origin.
+tokens issued by an Issuer that trusts multiple Attesters, then a Client can
+use any one of these Attesters to issue and redeem tokens for the Origin.
 
 The mechanisms for establishing trust between each entity in this arrangement
 are deployment specific. For example, in settings where Clients interact with
@@ -273,12 +278,12 @@ context is referred to as a redemption anonymity set.
 2. Issuer-Client unlinkability. This is similar to Origin-Client unlinkability
 in that a Client in an issuance context is indistinguishable from any other
 Client that might use the same issuance context. The set of Clients that share
-the same redemption context is referred to as a redemption anonymity set.
+the same issuance context is referred to as an issuance anonymity set.
 3. Attester-Origin unlinkability. This is similar to Origin-Client and
 Issuer-Client unlinkability. It means that given two attestation contexts,
 the Attester cannot determine if both contexts correspond to the same Origin
 or two different Origins. The set of Clients that share the same attestation
-context is referred to as an anonymity set.
+context is referred to as an attestation anonymity set.
 
 By ensuring that different contexts cannot be linked in this way, only the
 Client is able to correlate information that might be used to identify them with
@@ -300,7 +305,7 @@ requirements of the redemption and issuance protocols in more detail. {{flow}}
 describes how information flows between Issuer, Origin, Client, and Attester
 through these protocols.
 
-## Redemption Protocol
+## Redemption Protocol {#redemption}
 
 The Privacy Pass redemption protocol, described in
 {{?AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}, is an authorization protocol
@@ -310,13 +315,17 @@ Clients for a token with a TokenChallenge ({{AUTHSCHEME, Section 2.1}}) and,
 if possible, Clients present a valid Token ({{AUTHSCHEME, Section 2.2}})
 in response. This interaction is shown below.
 
+
 ~~~ aasvg
-     Origin               Client
-                   +------------------.
-TokenChallenge --->|                   |
-                   | Issuance protocol |
-     Token    <----+                   |
-                    `-----------------'
++--------+            +--------+
+| Origin |            | Client |
++---+----+            +---+----+
+    |                     |
+    |<----- Request ------+
+    +-- TokenChallenge -->|
+    |                     | <== Issuance protocol ==>
+    |<-- Request+Token ---+
+    |                     |
 ~~~
 {: #fig-redemption title="Challenge-response redemption protocol interaction"}
 
@@ -363,7 +372,7 @@ be issued and then spent multiple times in response to any such challenge.
 See {{Section 2.1.1 of AUTHSCHEME}} for discussion.
 
 How Clients respond to token challenges can have privacy implications.
-For example, if a token challenge admits a choice of Issuer, then the choice
+For example, if an Origin allows the Client to choose an Issuer, then the choice
 of Issuer can reveal information about the Client used to partition anonymity
 sets; see {{rotation-and-consistency}} for more information about these privacy
 considerations.
@@ -373,17 +382,7 @@ considerations.
 The Privacy Pass issuance protocol, described in {{ISSUANCE}}, is a two-message
 protocol that takes as input a TokenChallenge from the redemption protocol
 ({{AUTHSCHEME, Section 2.1}}) and produces a Token
-({{AUTHSCHEME, Section 2.2}}), as shown in the figure below.
-
-~~~ aasvg
-   Origin              Client      Attester     Issuer
-                   +-----------------------------------.
-TokenChallenge --->| <--(Attestation)-->                |
-                   | TokenRequest ---------------->     |
-     Token    <----+     <--------------- TokenResponse |
-                    `----------------------------------'
-~~~
-{: #fig-issuance title="Issuance protocol interaction"}
+({{AUTHSCHEME, Section 2.2}}), as shown in {{fig-overview}}.
 
 The structure and semantics of the TokenRequest and TokenResponse messages
 depend on the issuance protocol and token type being used; see {{ISSUANCE}}
@@ -430,11 +429,10 @@ detail.
 
 ### Attester Role {#attester}
 
-Attestation is an important part of the issuance protocol. In Privacy Pass,
-attestation is the process by which an Attester bears witness to, confirms,
-or authenticates a Client so as to verify a property about the Client that
-is required for Issuance. Clients explicitly trust Attesters to perform
-attestation correctly and in a way that does not violate their privacy.
+In Privacy Pass, attestation is the process by which an Attester bears
+witness to, confirms, or authenticates a Client so as to verify properties
+about the Client that are required for Issuance. Issuers trust Attesters
+to perform attestation correctly.
 
 {{?RFC9334}} describes an architecture for attestation procedures. Using
 that architecture as a conceptual basis, Clients are RATS attesters that
@@ -462,26 +460,49 @@ running on trusted hardware. In general, minimizing the set of supported
 attestation procedures helps minimize the amount of information leaked through
 a token.
 
-Each attestation procedure also has an impact on the overall system privacy.
-Requiring a conjunction of attestation types could decrease the overall
-anonymity set size. For example, the number of Clients that have solved a
-CAPTCHA in the past day, that have a valid account, and that are running on a
-trusted device is less than the number of Clients that have solved a CAPTCHA in
-the past day. Attesters SHOULD not admit attestation types that result in small
-anonymity sets.
+The role of the Attester in the issuance protocol and its impact on privacy
+depends on the type of attestation procedure, issuance protocol, deployment
+model. For instance, requiring a conjunction of attestation procedures could
+decrease the overall anonymity set size. As an example, the number of Clients
+that have solved a CAPTCHA in the past day, that have a valid account, and that
+are running on a trusted device is less than the number of Clients that have
+solved a CAPTCHA in the past day. Attesters SHOULD NOT be based on attestation
+procedures that result in small anonymity sets.
 
-The trustworthiness of Attesters depends on their ability to correctly and
-reliably perform attestation during the issuance protocol. Indeed, Issuers
-trust Attesters to correctly and reliably perform attestation. However, certain
-types of attestation can vary in value over time, e.g., if the attestation
-process is compromised or maliciously automated. These are considered
-exceptional events and require configuration changes to address the underlying
-cause. For example, if attestation is compromised because of a zero-day exploit
-on compliant devices, then the corresponding attestation procedure should be
-untrusted until the exploit is patched. Addressing changes in attestation
-quality is therefore a deployment-specific task. In Split Attester and Issuer
-deployments (see {{deploy-split}}), Issuers can choose to remove compromised
-Attesters from their trusted set until the compromise is patched.
+Depending on the issuance protocol, the Issuer might learn
+information about the Origin. To ensure Issuer-Client unlinkability, the Issuer
+should be unable to link that information to a specific Client. For such
+issuance protocols where the Attester has access to Client-specific
+information, such as is the case for attestation procedures that involve
+Client-specific information (such as application-layer account information)
+or for deployment models where the Attester learns Client-specific information
+(such as Client IP addresses), Clients trust the Attester to not share any
+Client-specific information with the Issuer. In deployments where the Attester
+does not learn Client-specific information, the Client does not need to
+explicitly trust the Attester in this regard.
+
+Issuers trust Attesters to correctly and reliably perform attestation. However,
+certain types of attestation can vary in value over time, e.g., if the
+attestation procedure is compromised. Broken
+attestation procedures are considered exceptional events and require
+configuration changes to address the underlying cause. For example, if
+attestation is compromised because of a zero-day exploit on compliant devices,
+then the corresponding attestation procedure should be untrusted until the
+exploit is patched. Addressing changes in attestation quality is therefore a
+deployment-specific task. In Split Attester and Issuer deployments (see
+{{deploy-split}}), Issuers can choose to remove compromised Attesters from
+their trusted set until the compromise is patched.
+
+From the perspective of an Origin, tokens produced by an Issuer with at least
+one compromised Attester cannot be trusted assuming the Origin does not know
+which attestation procedure was used for issuance. This is because the Origin
+cannot distinguish between tokens that were issued via compromised Attesters
+and tokens that were issued via uncompromised Attesters absent some
+distinguishing information in the tokens themselves or from the Issuer. As a
+result, until the attestation procedure is fixed, the Issuer cannot be trusted
+by Origins. Moreover, as a consequence, any tokens issued by an Issuer with a
+compromised attester may no longer be trusted by Origins, even if those tokens
+were issued to Clients interacting with an uncompromised Attester.
 
 ### Issuer Role
 
@@ -513,8 +534,8 @@ issuance and redemption protocols.
 Certain instantiations of the issuance protocol may permit public or private
 metadata to be cryptographically bound to a token. As an example, one
 trivial way to include public metadata is to assign a unique Issuer
-public key for each value of metadata, such that N keys yields log<sub>2</sub>(N)
-bits of metadata. Metadata may be public or private.
+public key for each value of metadata, such that N keys yields
+log<sub>2</sub>(N) bits of metadata. Metadata may be public or private.
 
 Public metadata is that which clients can observe as part of the token
 issuance flow. Public metadata can either be transparent or opaque. For
@@ -667,23 +688,23 @@ architecture.
 ## Shared Origin, Attester, Issuer {#deploy-shared}
 
 In this model, the Origin, Attester, and Issuer are all operated by the same
-entity, as shown in the figure below.
+entity, as shown in {{fig-deploy-shared}}.
 
 ~~~ aasvg
-                   +-----------------------------------------.
-      Client       |  Attester         Issuer         Origin  |
-        |          |                                          |
-        |          |       TokenChallenge                     |
-        <----------------------------------------------+      |
-        |          | Attest                                   |
-        +----------------->                                   |
-        |          |     TokenRequest                         |
-        +-------------------------------->                    |
-        |          |     TokenResponse                        |
-        <--------------------------------+                    |
-        |          |           Token                          |
-        +---------------------------------------------->      |
-                    `----------------------------------------'
+                 +---------------------------------------------.
++--------+       |  +----------+     +--------+     +--------+  |
+| Client |       |  | Attester |     | Issuer |     | Origin |  |
++---+----+       |  +-----+----+     +----+---+     +---+----+  |
+    |             `-------|---------------|-------------|------'
+    |<-------------------------------- TokenChallenge --+
+    |                     |               |             |
+    |<=== Attestation ===>|               |             |
+    |                     |               |             |
+    +----------- TokenRequest ----------->|             |
+    |<---------- TokenResponse -----------+             |
+    |                                                   |
+    +--------------------- Token ----------------------->
+    |                                                   |
 ~~~
 {: #fig-deploy-shared title="Shared Deployment Model"}
 
@@ -696,8 +717,9 @@ not appropriate, as they could lead to unlinkability violations.
 
 Origin-Client, Issuer-Client, and Attester-Origin unlinkability requires that
 issuance and redemption events be separated over time, such as through the use
-of tokens with an empty redemption context, or be separated over space, such
-as through the use of an anonymizing proxy when connecting to the Origin.
+of tokens that correspond to token challenges with an empty redemption context
+(see {{redemption}}), or be separated over space, such as through the use of an
+anonymizing proxy when connecting to the Origin.
 
 ## Joint Attester and Issuer {#deploy-joint-issuer}
 
@@ -705,29 +727,23 @@ In this model, the Attester and Issuer are operated by the same entity
 that is separate from the Origin. The Origin trusts the joint Attester
 and Issuer to perform attestation and issue Tokens. Clients interact
 with the joint Attester and Issuer for attestation and issuance. This
-arrangement is shown in the figure below.
+arrangement is shown in {{fig-deploy-joint-issuer}}.
 
 ~~~ aasvg
-                                                   +----------.
-      Client                                       |   Origin  |
-        |                 TokenChallenge           |           |
-        <-----------------------------------------------+      |
-        |                                          |           |
-        |          +--------------------------.    |           |
-        |          |  Attester         Issuer  |   |           |
-        |          |                           |   |           |
-        |          | Attest                    |   |           |
-        +----------------->                    |   |           |
-        |          |     TokenRequest          |   |           |
-        +-------------------------------->     |   |           |
-        |          |     TokenResponse         |   |           |
-        <--------------------------------+     |   |           |
-        |           `-------------------------'    |           |
-        |                                          |           |
-        |                     Token                |           |
-        +----------------------------------------------->      |
-                                                   |           |
-                                                    `---------'
+                   +------------------------------.
++--------+         |  +----------+     +--------+  |  +--------+
+| Client |         |  | Attester |     | Issuer |  |  | Origin |
++---+----+         |  +-----+----+     +----+---+  |  +---+----+
+    |               `-------|---------------|-----'       |
+    |<---------------------------------- TokenChallenge --+
+    |                       |               |             |
+    |<==== Attestation ====>|               |             |
+    |                       |               |             |
+    +------------- TokenRequest ----------->|             |
+    |<----------- TokenResponse ------------+             |
+    |                                                     |
+    +----------------------- Token ----------------------->
+    |                                                     |
 ~~~
 {: #fig-deploy-joint-issuer title="Joint Attester and Issuer Deployment Model"}
 
@@ -753,32 +769,24 @@ separate entities, this model requires some mechanism by which Issuers
 establish trust in the Attester (as described in {{privacy-and-trust}}).
 For example, in settings where the Attester is a Client-trusted service that
 directly communicates with the Issuer, one way to establish this trust is via
-mutually-authenticated TLS. However, alernative authentication mechanisms are
-possible. This arrangement is shown below.
+mutually-authenticated TLS. However, alternative authentication mechanisms are
+possible. This arrangement is shown in {{fig-deploy-joint-origin}}.
 
 ~~~ aasvg
-                                    +-------------------------.
-      Client                        |   Issuer         Origin  |
-        |         TokenChallenge    |                          |
-        <-----------------------------------------------+      |
-        |                           |                          |
-        |          +----------.     |                          |
-        |          |  Attester |    |                          |
-        |          |           |    |                          |
-        |          | Attest    |    |                          |
-        +----------------->    |    |                          |
-        |          |           |    |                          |
-        |          |     TokenRequest                          |
-        +-------------------------------->                     |
-        |          |           |    |                          |
-        |          |     TokenResponse                         |
-        <--------------------------------+                     |
-        |          |           |    |                          |
-        |           `---------'     |                          |
-        |                           |                          |
-        |              Token        |                          |
-        +----------------------------------------------->      |
-                                     `------------------------'
+                                 +-----------------------------.
++--------+          +----------+  |  +--------+     +--------+  |
+| Client |          | Attester |  |  | Issuer |     | Origin |  |
++---+----+          +-----+----+  |  +----+---+     +---+----+  |
+    |                     |        `------|-------------|------'
+    |<-------------------------------- TokenChallenge --+
+    |                     |               |             |
+    |<=== Attestation ===>|               |             |
+    |                     |               |             |
+    +------------ TokenRequest ---------->|             |
+    |<---------- TokenResponse -----------+             |
+    |                                                   |
+    +--------------------- Token ----------------------->
+    |                                                   |
 ~~~
 {: #fig-deploy-joint-origin title="Joint Origin and Issuer Deployment Model"}
 
@@ -805,34 +813,8 @@ In this model, the Origin, Attester, and Issuer are all operated by different
 entities, as shown in the figure below. As with the joint Origin and Issuer
 model, the Issuer accepts token requests that come from trusted Attesters, and
 the details of that trust establishment depend on the issuance protocol and
-relationship between Attester and Issuer; see {{privacy-and-trust}}.
-
-~~~ aasvg
-                                                   +----------.
-      Client                                       |   Origin  |
-        |                 TokenChallenge           |           |
-        <-----------------------------------------------+      |
-        |                                          |           |
-        |          +----------.                    |           |
-        |          |  Attester |                   |           |
-        |          |           |                   |           |
-        |          | Attest    |    +---------.    |           |
-        +----------------->    |    |  Issuer  |   |           |
-        |          |           |    |          |   |           |
-        |          |     TokenRequest          |   |           |
-        +-------------------------------->     |   |           |
-        |          |           |    |          |   |           |
-        |          |     TokenResponse         |   |           |
-        <--------------------------------+     |   |           |
-        |          |           |    |          |   |           |
-        |           `---------'      `--------'    |           |
-        |                                          |           |
-        |                     Token                |           |
-        +----------------------------------------------->      |
-                                                   |           |
-                                                    `---------'
-~~~
-{: #fig-deploy-split title="Split Deployment Model"}
+relationship between Attester and Issuer; see {{privacy-and-trust}}. This
+arrangement is shown in {{fig-overview}}.
 
 This is the most general deployment model, and is necessary for some
 types of issuance protocols where the Attester plays a role in token
@@ -988,6 +970,29 @@ active work on behalf of the Client, especially in the presence of malicious
 Issuers and Origins. Implementing mitigations discused in {{deployment}}
 and {{privacy}} is therefore necessary to ensure that Privacy Pass offers
 meaningful privacy improvements to end-users.
+
+## Token Caching {#hoarding}
+
+Depending on the Origin's token challenge, Clients can request and cache more
+than one token using an issuance protocol. Cached tokens help improve privacy by
+separating the time of token issuance from the time of token redemption, and
+also allow Clients to reduce the overhead of receiving new tokens via the
+issuance protocol.
+
+As a consequence, Origins that send token challenges which are compatible with
+cached tokens need to take precautions to ensure that tokens are not replayed.
+This is typically done via keeping track of tokens that are redeemed for the
+period of time in which cached tokens would be accepted for particular
+challenges.
+
+Moreover, since tokens are not intrinsically bound to Clients, it is possible
+for malicious Clients to collude and share tokens in a so-called "hoarding
+attack." As an example of this attack, many distributed Clients could obtain
+cacheable tokens and them share them with a single Client to redeem in a way
+that would violate an Origin's attempt to limit tokens to any one particular
+Client. Depending on the deployment model, it can be possible to detect these
+types of attacks by comparing issuance and redemption contexts; for example,
+this is possible in the Joint Origin and Issuer model.
 
 --- back
 

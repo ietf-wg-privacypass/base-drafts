@@ -114,14 +114,18 @@ protocol consisting of a TokenRequest from the Client and TokenResponse from
 the Issuer. This interaction is shown below.
 
 ~~~ aasvg
-  Origin             Client        Attester          Issuer
-
-                    +-------------------------------------.
-  TokenChallenge ---> Attest ------->                      |
-                    | TokenRequest ------------------>     |
-                    |                            (evaluate)|
-      Token  <------+  <-------------------  TokenResponse |
-                     `------------------------------------'
++--------+            +--------+         +----------+ +--------+
+| Origin |            | Client |         | Attester | | Issuer |
++---+----+            +---+----+         +----+-----+ +---+----+
+    |                     |                   |           |
+    |<----- Request ------+                   |           |
+    +-- TokenChallenge -->|                   |           |
+    |                     |<== Attestation ==>|           |
+    |                     |                   |           |
+    |                     +--------- TokenRequest ------->|
+    |                     |<-------- TokenResponse -------+
+    |<-- Request+Token ---+                   |           |
+    |                     |                   |           |
 ~~~
 {: #fig-issuance title="Issuance Overview"}
 
