@@ -676,8 +676,6 @@ $ cat spki.bin | xxd -r -p | openssl asn1parse -dump -inform DER
    67:d=1  hl=4 l= 271 prim: BIT STRING
 ```
 
-And the expected key identifier based 
-
 Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers should
 ensure that the truncated form of new key IDs do not collide with other
 truncated key IDs in rotation.
