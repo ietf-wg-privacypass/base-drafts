@@ -174,7 +174,8 @@ CAPTCHA, checking device or hardware attestation validity, etc; see
 {{attester}} for more details.
 
 4. If the attestation process completes successfully, the client creates a
-Token Request to send to the designated Issuer (generally via the Attester).
+Token Request to send to the designated Issuer (generally via the Attester,
+though it is not required to be sent through the Attester).
 The Attester and Issuer might be functions on the same server, depending on the
 deployment model (see {{deployment}}). Depending on the attestation process, it
 is possible for attestation to run alongside the issuance protocol, e.g., where
@@ -254,9 +255,11 @@ tokens issued by an Issuer that trusts multiple Attesters, then a Client can
 use any one of these Attesters to issue and redeem tokens for the Origin.
 
 The mechanisms for establishing trust between each entity in this arrangement
-are deployment-specific. For example, in settings where Attesters and Issuers
-communicate over TLS, Attesters and Issuers may use mutually authenticated TLS
-to authenticate one another.
+are deployment specific. For example, in settings where Clients interact with
+Issuers through an Attester, Attesters and Issuers might use
+mutually authenticated TLS to authenticate one another. In settings where
+Clients do not communicate with Issuers through an Attester, the Attesters
+might convey this trust via a digital signature over that Issuers can verify.
 
 Clients explicitly trust Attesters to perform attestation correctly and in a
 way that does not violate their privacy. However, Clients assume Issuers and
@@ -298,7 +301,9 @@ may attempt to link two redemption contexts together by using Client-specific
 Issuer public keys. See {{deployment}} and {{privacy}} for more information.
 
 The remainder of this section describes the functional properties and security
-requirements of the redemption and issuance protocols in more detail.
+requirements of the redemption and issuance protocols in more detail. {{flow}}
+describes how information flows between Issuer, Origin, Client, and Attester
+through these protocols.
 
 ## Redemption Protocol {#redemption}
 
@@ -408,9 +413,8 @@ private input, subject to the following security requirements.
 1. Unconditional input secrecy. The issuance protocol MUST NOT reveal anything
 about the Client's private input, including the challenge and nonce, to the
 Attester or Issuer, regardless of the hardness assumptions of the underlying
-cryptographic protocol(s). The issuance protocol can reveal the Issuer public
-key for the purposes of determining which private key to use in producing the
-token. This property is sometimes also referred to as blindness.
+cryptographic protocol(s). This property is sometimes also referred to as
+blindness.
 1. One-more forgery security. The issuance protocol MUST NOT allow malicious
 Clients or Attesters (acting as Clients) to forge tokens offline or otherwise
 without interacting with the Issuer directly.
@@ -566,6 +570,101 @@ and guidelines on how to deploy the protocol to minimize any privacy impacts.
 Any extension to the Privacy Pass protocol MUST adhere to the guidelines
 specified in {{issuer-role}} for managing Issuer public key data.
 
+## Information Flow {#flow}
+
+The end-to-end process of redemption and issuance protocols involves information
+flowing between Issuer, Origin, Client, and Attester. That information can
+have implications on the privacy goals that Privacy Pass aims to provide
+as outlined in {{privacy-and-trust}}. In this section, we describe the flow
+of information between each party. How this information affects the privacy
+goals in particular deployment models is further discussed in {{deployment}}.
+
+### Token Challenge Flow {#challenge-flow}
+
+To use Privacy Pass, Origins choose an Issuer from which they are willing to
+accept tokens. Origins then construct a token challenge using this specified
+Issuer and information from the redemption context it shares with the Client. This token
+challenge is then delivered to a Client. The token challenge conveys
+information about the Issuer and the redemption context, such as whether the
+Origin desires a per-Origin or cross-Origin token. Any entity that sees
+the token challenge might learn things about the Client as known to the Origin.
+This is why input secrecy is a requirement for issuance protocols, as it
+ensures that the challenge is not directly available to the Issuer.
+
+### Attestation Flow {#attestation-flow}
+
+Clients interact with the Attester to prove that they meet some required
+set of properties. In doing so, Clients contribute information to the
+attestation context, which might include sensitive information such as
+application-layer identities, IP addresses, and so on. Clients can choose
+whether or not to contribute this information based on local policy or
+preference.
+
+### Issuance Flow {#issue-flow}
+
+Clients use the issuance protocol to produce a token bound to a token
+challenge. In doing so, there are several ways in which the issuance protocol
+contributes information to the attestation or issuance contexts. For example, a
+token request may contribute information to the attestation or issuance
+contexts as described below.
+
+- Issuance protocol. The type of issuance protocol can contribute information
+about the Issuer's capabilities to the attestation or issuance contexts, as
+well as the capabilities of a given Client. For example, if a Client is
+presented with multuiple issuance protocol options, then the choice of which
+issuance protocol to use can contrbute information about the Client's
+capabilities.
+- Issuer configuration. Information about the Issuer configuration, such as
+its identity or the public key used to validate tokens it creates, can be
+revealed during issuance and contribute to the attestation or issuance
+contexts.
+- Attestation information. The issuance protocol can contribute information to
+the attestation or issuance contexts based on what attestation procedure the
+Issuer uses to trust a token request. In particular, a token request that is
+validated by a given Attester means that the Client which generated the token
+request must be capable of the completing the designated attestation procedure.
+- Origin information. The issuance protocol can contribute information about
+the Origin that challenged the Client in {{challenge-flow}}. In particular,
+a token request designated for a specific Issuer might imply that the resulting
+token is for an Origin that trusts the specified Issuer. However, this is not
+always true, as some token requests can correspond to cross-Origin tokens,
+i.e., they are tokens that would be accepted at any Origin that accepts the
+cross-Origin token.
+
+Moreover, a token response may contribute information to the issuance
+attestation or contexts as described below.
+
+- Origin information. The issuance protocol can contribute information about
+the Origin in how it responds to a token request. For example, if an Issuer
+learns the Origin during issuance and is also configured to respond in some way
+on the basis of that information, and the Client interacts with the Issuer
+transitively through the Attester, that response can reveal information to the
+Attester.
+- Token. The token produced by the issuance protocol can contain information
+from the issuance context. In particular, depending on the issuance protocol,
+tokens can contain public or private metadata, and Issuers can choose that
+metadata on the basis of information in the issuance context.
+
+In general, exceptional cases in the issuance protocol, such as when either the
+Attester or Issuer aborts the protocol, can contribute information to the
+attestation or issuance contexts. The extent to which information in this
+context harms the Issuer-Client or Attester-Origin unlinkability goals in
+{{privacy-and-trust}} depends on deployment model; see {{deployment}}.
+Clients can choose whether or not to contribute information to these contexts
+based on local policy or preference.
+
+### Token Redemption Flow {#redemption-flow}
+
+Clients send tokens to Origins during the redemption protocol. Any information
+that is added to the token during issuance can therefore be sent to the Origin.
+Information can either be explicitly passed in a token, or it can be implicit
+in the way the Client responds to a token challenge. For example, if a Client
+fails to complete issuance, and consequently fails to redeem a token in
+response to a token challenge, this can reveal information to the Origin that
+it might not otherwise have access to. However, an Origin cannot necessarily
+distinguish between a Client that fails to complete issuance and one that
+ignores the token challenge altogether.
+
 # Deployment Configurations {#deployment}
 
 The Origin, Attester, and Issuer portrayed in {{fig-overview}} can be
@@ -698,12 +797,15 @@ observed during the token redemption, such as Client IP addresses.
 
 In this model, attestation contexts are separate from issuer and redemption
 contexts. As a result, any type of attestation is suitable in this model.
+
 Moreover, any type of token challenge is suitable assuming there is more than
 one Origin involved, since no single party will have access to the identifying
-Client information and unique Origin information. If there is only a single
-Origin, then per-Origin tokens are not appropriate in this model, since the
-Attester can learn the redemption context. However, the Attester does not
-learn whether a token is per-Origin or cross-Origin.
+Client information and unique Origin information. Issuers that produce tokens
+for a single Origin are not suitable in this model since an Attester can
+infer the Origin from a token request, as described in {{issue-flow}}. However,
+since the issuance protocol provides input secrecy, the Attester does not learn
+details about the corresponding token challenge, such as whether the token
+challenge is per-Origin or cross-Origin.
 
 ## Split Origin, Attester, Issuer {#deploy-split}
 
@@ -717,6 +819,7 @@ arrangement is shown in {{fig-overview}}.
 This is the most general deployment model, and is necessary for some
 types of issuance protocols where the Attester plays a role in token
 issuance; see {{RATE-LIMITED}} for one such type of issuance protocol.
+
 In this model, the Attester, Issuer, and Origin have a separate view
 of the Client: the Attester sees potentially sensitive Client identifying
 information, such as account identifiers or IP addresses, the Issuer
@@ -724,9 +827,12 @@ sees only the information necessary for issuance, and the Origin sees
 token challenges, corresponding tokens, and Client source information,
 such as their IP address. As a result, attestation, issuance, and redemption
 contexts are separate, and therefore any type of token challenge is suitable in
-this model as long as there is more than a single Origin. As in the
-Joint Origin and Issuer model in {{deploy-joint-origin}}, if there is
-only a single Origin, then per-Origin tokens are not appropriate.
+this model as long as there is more than a single Origin.
+
+As in the Joint Origin and Issuer model in {{deploy-joint-origin}}, and as
+described in {{issue-flow}}, if the Issuer produces tokens for a single Origin,
+then per-Origin tokens are not appropriate since the Attester can infer the
+Origin from a token request.
 
 # Centralization Considerations
 
