@@ -657,7 +657,7 @@ mask generation function and the digest being signed MUST be omitted.
 
 An example sequence of the SPKI object (in ASN.1 format) for a 2048-bit key is below:
 
-```
+~~~
 $ cat spki.bin | xxd -r -p | openssl asn1parse -dump -inform DER
     0:d=0  hl=4 l= 338 cons: SEQUENCE
     4:d=1  hl=2 l=  61 cons: SEQUENCE
@@ -674,7 +674,7 @@ $ cat spki.bin | xxd -r -p | openssl asn1parse -dump -inform DER
    62:d=3  hl=2 l=   3 cons: cont [ 2 ]
    64:d=4  hl=2 l=   1 prim: INTEGER           :30
    67:d=1  hl=4 l= 271 prim: BIT STRING
-```
+~~~
 
 Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers should
 ensure that the truncated form of new key IDs do not collide with other
