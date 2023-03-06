@@ -652,7 +652,29 @@ computed as SHA256(encoded_key), where encoded_key is a DER-encoded
 SubjectPublicKeyInfo (SPKI) object carrying pkI. The SPKI object MUST use the
 RSASSA-PSS OID {{!RFC5756}}, which specifies the hash algorithm and salt size.
 The salt size MUST match the output size of the hash function associated with
-the public key and token type.
+the public key and token type. The parameters field for the digest used in the
+mask generation function and the digest being signed MUST be omitted.
+
+An example sequence of the SPKI object (in ASN.1 format) for a 2048-bit key is below:
+
+```
+$ cat spki.bin | xxd -r -p | openssl asn1parse -dump -inform DER
+    0:d=0  hl=4 l= 338 cons: SEQUENCE
+    4:d=1  hl=2 l=  61 cons: SEQUENCE
+    6:d=2  hl=2 l=   9 prim: OBJECT            :rsassaPss
+   17:d=2  hl=2 l=  48 cons: SEQUENCE
+   19:d=3  hl=2 l=  13 cons: cont [ 0 ]
+   21:d=4  hl=2 l=  11 cons: SEQUENCE
+   23:d=5  hl=2 l=   9 prim: OBJECT            :sha384
+   34:d=3  hl=2 l=  26 cons: cont [ 1 ]
+   36:d=4  hl=2 l=  24 cons: SEQUENCE
+   38:d=5  hl=2 l=   9 prim: OBJECT            :mgf1
+   49:d=5  hl=2 l=  11 cons: SEQUENCE
+   51:d=6  hl=2 l=   9 prim: OBJECT            :sha384
+   62:d=3  hl=2 l=   3 cons: cont [ 2 ]
+   64:d=4  hl=2 l=   1 prim: INTEGER           :30
+   67:d=1  hl=4 l= 271 prim: BIT STRING
+```
 
 Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers should
 ensure that the truncated form of new key IDs do not collide with other
