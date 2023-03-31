@@ -510,7 +510,7 @@ chosen Issuer, and Clients are not capable of doing the same. A consequence of t
 is that Privacy Pass could enable discriminatory treatment of Clients based on Attestation support. This could
 lead to harmful ecosystem effects if left unresolved. In general, Issuers should
 strive to work with a set of Attesters that are suitable for all possible Clients, thereby
-mitigating such discriminatory behavior. In practice, this may be require tradeoffs
+mitigating such discriminatory behavior. In practice, this may require tradeoffs
 in what type of attestation Issuers are willing to trust so as to enable more widespread
 support. For example, to disallow discriminatory behavior between Clients with
 and without device attestation support, an Issuer may wish to support Attesters
