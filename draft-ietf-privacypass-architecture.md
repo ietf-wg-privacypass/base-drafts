@@ -509,7 +509,7 @@ that are capable of completing attestation with one Attester trusted by the Orig
 chosen Issuer, and Clients are not capable of doing the same. A consequence of this
 is that Privacy Pass could enable discriminatory treatment of Clients based on Attestation support. This could
 lead to harmful ecosystem effects if left unresolved. In general, Issuers should
-strive to work with Attesters that are suitable for all possible Clients, thereby
+strive to work with a set of Attesters that are suitable for all possible Clients, thereby
 mitigating such discriminatory behavior. In practice, this may be require tradeoffs
 in what type of attestation Issuers are willing to trust so as to enable more widespread
 support. For example, to disallow discriminatory behavior between Clients with
