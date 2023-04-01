@@ -504,20 +504,6 @@ by Origins. Moreover, as a consequence, any tokens issued by an Issuer with a
 compromised attester may no longer be trusted by Origins, even if those tokens
 were issued to Clients interacting with an uncompromised Attester.
 
-Finally, Origins can use tokens as a signal for distinguishing between Clients
-that are capable of completing attestation with one Attester trusted by the Origin's
-chosen Issuer, and Clients that are not capable of doing the same. A consequence of this
-is that Privacy Pass could enable discriminatory treatment of Clients based on Attestation support. This could
-lead to harmful ecosystem effects if left unresolved. In general, Issuers should
-strive to work with a set of Attesters that are suitable for all possible Clients, thereby
-mitigating such discriminatory behavior. In practice, this may require tradeoffs
-in what type of attestation Issuers are willing to trust so as to enable more widespread
-support. For example, to disallow discriminatory behavior between Clients with
-and without device attestation support, an Issuer may wish to support Attesters
-that support CAPTCHA-based attestation. This means that the overall attestation
-value of a Privacy Pass token is bound by the difficulty in spoofing or bypassing
-either one of these attestation procedures.
-
 ### Issuer Role
 
 In Privacy Pass, the Issuer is responsible for completing the issuance protocol
@@ -679,7 +665,7 @@ it might not otherwise have access to. However, an Origin cannot necessarily
 distinguish between a Client that fails to complete issuance and one that
 ignores the token challenge altogether.
 
-# Deployment Configurations {#deployment}
+# Deployment Models {#deployment}
 
 The Origin, Attester, and Issuer portrayed in {{fig-overview}} can be
 instantiated and deployed in a number of ways. The deployment model directly
@@ -848,7 +834,36 @@ described in {{issue-flow}}, if the Issuer produces tokens for a single Origin,
 then per-Origin tokens are not appropriate since the Attester can infer the
 Origin from a token request.
 
-# Centralization Considerations {#centralization}
+# Deployment Considerations
+
+{{deployment}} discusses deployment models that are possible in practice.
+Beyond possible implications on security and privacy properties of the
+resulting system, Privacy Pass deployments can impact the overall ecosystem
+in two important ways: (1) discriminatory treatment of Clients and the viability
+of an open Web, and (2) centralization. This section describes considerations
+relevant to these topics.
+
+## Discriminatory Treatment
+
+Origins can use tokens as a signal for distinguishing between Clients
+that are capable of completing attestation with one Attester trusted by the
+Origin's chosen Issuer, and Clients that are not capable of doing the same. A
+consequence of this is that Privacy Pass could enable discriminatory treatment
+of Clients based on Attestation support. This could lead to harmful ecosystem
+effects if left unresolved.
+
+In principle, Issuers should strive to work with a set of Attesters that are
+suitable for all possible Clients, thereby mitigating such discriminatory behavior.
+In practice, this may require tradeoffs in what type of attestation Issuers are
+willing to trust so as to enable more widespread support.
+
+For example, to disallow discriminatory behavior between Clients with and without
+device attestation support, an Issuer may wish to support Attesters that support
+CAPTCHA-based attestation. This means that the overall attestation value of a
+Privacy Pass token is bound by the difficulty in spoofing or bypassing either
+one of these attestation procedures.
+
+## Centralization {#centralization}
 
 A consequence of limiting the number of participants (Attesters or Issuers) in
 Privacy Pass deployments for meaningful privacy is that it forces concentrated
