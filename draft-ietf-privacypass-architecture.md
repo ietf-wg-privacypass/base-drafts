@@ -515,7 +515,7 @@ in what type of attestation Issuers are willing to trust so as to enable more wi
 support. For example, to disallow discriminatory behavior between Clients with
 and without device attestation support, an Issuer may wish to support Attesters
 that support CAPTCHA-based attestation. This means that the overall attestation
-value of a Privacy Pass token is bound by the difficult in spoofing or bypassing
+value of a Privacy Pass token is bound by the difficulty in spoofing or bypassing
 either one of these attestation procedures.
 
 ### Issuer Role
