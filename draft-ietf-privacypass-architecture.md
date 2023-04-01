@@ -506,7 +506,7 @@ were issued to Clients interacting with an uncompromised Attester.
 
 Finally, Origins can use tokens as a signal for distinguishing between Clients
 that are capable of completing attestation with one Attester trusted by the Origin's
-chosen Issuer, and Clients are not capable of doing the same. A consequence of this
+chosen Issuer, and Clients that are not capable of doing the same. A consequence of this
 is that Privacy Pass could enable discriminatory treatment of Clients based on Attestation support. This could
 lead to harmful ecosystem effects if left unresolved. In general, Issuers should
 strive to work with a set of Attesters that are suitable for all possible Clients, thereby
