@@ -853,7 +853,7 @@ of Clients based on Attestation support. This could lead to harmful ecosystem
 effects if left unresolved.
 
 In principle, Issuers should strive to work with a set of Attesters that are
-suitable for all possible Clients, thereby mitigating such discriminatory behavior.
+suitable for all Clients, thereby mitigating such discriminatory behavior.
 In practice, this may require tradeoffs in what type of attestation Issuers are
 willing to trust so as to enable more widespread support.
 
