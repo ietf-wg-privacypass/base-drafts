@@ -261,10 +261,10 @@ OPRF(P-384, SHA-384). The constant `Nk` is defined by {{private-token-type}}.
 The Client first creates a context as follows:
 
 ~~~
-client_context = SetupVOPRFClient(0x0004, pkI)
+client_context = SetupVOPRFClient("P384-SHA384", pkI)
 ~~~
 
-Here, 0x0004 is the two-octet identifier corresponding to the
+Here, "P384-SHA384" is the identifier corresponding to the
 OPRF(P-384, SHA-384) ciphersuite in {{OPRF}}. SetupVOPRFClient
 is defined in {{OPRF, Section 3.2}}.
 
@@ -345,12 +345,12 @@ the Client, the Issuer completes the issuance flow by computing a blinded
 response as follows:
 
 ~~~
-server_context = SetupVOPRFServer(0x0004, skI, pkI)
+server_context = SetupVOPRFServer("P384-SHA384", skI, pkI)
 evaluate_element, proof =
   server_context.Evaluate(skI, blinded_element)
 ~~~
 
-SetupVOPRFServer is in {{OPRF, Section 3.2}} and Evaluate is defined in
+SetupVOPRFServer is defined in {{OPRF, Section 3.2}} and Evaluate is defined in
 {{OPRF, Section 3.3.2}}. The Issuer then creates a TokenResponse structured
 as follows:
 
@@ -420,7 +420,7 @@ Key and Public Key, evaluating the token contents, and comparing the result
 against the token authenticator value:
 
 ~~~
-server_context = SetupVOPRFServer(0x0004, skI, pkI)
+server_context = SetupVOPRFServer("P384-SHA384", skI, pkI)
 token_authenticator_input =
   concat(Token.token_type,
          Token.nonce,
