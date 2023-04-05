@@ -222,9 +222,9 @@ Redemption context:
 : The interactions and set of information shared
 between the Client and Origin, i.e., the information that is provided or
 otherwise available to the Origin during redemption that might be used
-to identify a Client and construct a token challenge. This context includes all information associated
-with redemption, such as the timestamp of the event, Client visible
-information (including the IP address), and the Origin name.
+to identify a Client and construct a token challenge. This context includes all
+information associated with redemption, such as the timestamp of the event,
+Client visible information (including the IP address), and the Origin name.
 
 Issuance context:
 : The interactions and set of information shared between the Client, Attester,
@@ -232,9 +232,9 @@ and Issuer, i.e., the information that is provided or otherwise available
 to Attester and Issuer during issuance that might be used to identify a Client.
 This context includes all information associated with issuance, such as the
 timestamp of the event, any Client visible information (including the IP
-address), and the Origin name (if revealed during issuance). This does not include
-the token challenge in its entirety, as that is kept secret from the Issuer during the
-issuance protocol.
+address), and the Origin name (if revealed during issuance). This does not
+include the token challenge in its entirety, as that is kept secret from the
+Issuer during the issuance protocol.
 
 Attestation context:
 : The interactions and set of information shared between
@@ -249,10 +249,11 @@ The privacy goals of Privacy Pass assume a threat model in which Origins trust
 specific Issuers to produce tokens, and Issuers in turn trust one or more
 Attesters to correctly run the attestation procedure with Clients. This
 arrangement ensures that tokens which validate for a given Issuer were only
-issued to a Client that successfully completed attestation with an Attester that
-the Issuer trusts. Moreover, this arrangement means that if an Origin accepts
-tokens issued by an Issuer that trusts multiple Attesters, then a Client can
-use any one of these Attesters to issue and redeem tokens for the Origin.
+issued to a Client that successfully completed attestation with an Attester
+that the Issuer trusts. Moreover, this arrangement means that if an Origin
+accepts tokens issued by an Issuer that trusts multiple Attesters, then a
+Client can use any one of these Attesters to issue and redeem tokens for the
+Origin.
 
 The mechanisms for establishing trust between each entity in this arrangement
 are deployment specific. For example, in settings where Clients interact with
@@ -583,8 +584,8 @@ goals in particular deployment models is further discussed in {{deployment}}.
 
 To use Privacy Pass, Origins choose an Issuer from which they are willing to
 accept tokens. Origins then construct a token challenge using this specified
-Issuer and information from the redemption context it shares with the Client. This token
-challenge is then delivered to a Client. The token challenge conveys
+Issuer and information from the redemption context it shares with the Client.
+This token challenge is then delivered to a Client. The token challenge conveys
 information about the Issuer and the redemption context, such as whether the
 Origin desires a per-Origin or cross-Origin token. Any entity that sees
 the token challenge might learn things about the Client as known to the Origin.
@@ -857,11 +858,11 @@ suitable for all Clients, thereby mitigating such discriminatory behavior.
 In practice, this may require tradeoffs in what type of attestation Issuers are
 willing to trust so as to enable more widespread support.
 
-For example, to disallow discriminatory behavior between Clients with and without
-device attestation support, an Issuer may wish to support Attesters that support
-CAPTCHA-based attestation. This means that the overall attestation value of a
-Privacy Pass token is bound by the difficulty in spoofing or bypassing either
-one of these attestation procedures.
+For example, to disallow discriminatory behavior between Clients with and
+without device attestation support, an Issuer may wish to support Attesters
+that support CAPTCHA-based attestation. This means that the overall attestation
+value of a Privacy Pass token is bound by the difficulty in spoofing or
+bypassing either one of these attestation procedures.
 
 ## Centralization {#centralization}
 

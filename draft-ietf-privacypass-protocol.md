@@ -655,7 +655,8 @@ The salt size MUST match the output size of the hash function associated with
 the public key and token type. The parameters field for the digest used in the
 mask generation function and the digest being signed MUST be omitted.
 
-An example sequence of the SPKI object (in ASN.1 format) for a 2048-bit key is below:
+An example sequence of the SPKI object (in ASN.1 format) for a 2048-bit key is
+below:
 
 ~~~
 $ cat spki.bin | xxd -r -p | openssl asn1parse -dump -inform DER
