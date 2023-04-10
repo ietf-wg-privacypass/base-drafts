@@ -229,7 +229,7 @@ Upon receipt of this challenge, a client validates the TokenChallenge before
 responding to it. Validation requirements are as follows:
 
 - The TokenChallenge structure is well-formed;
-- The token_type is recognized and supported by by the client; and
+- The token_type is recognized and supported by the client; and
 - If the origin_info field is non-empty, the name of the origin that issued the
   authentication challenge is included in the list of origin names.
 
