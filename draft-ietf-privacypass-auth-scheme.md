@@ -225,13 +225,15 @@ WWW-Authenticate:
   PrivateToken challenge="abc...", token-key="123..."
 ~~~
 
-Upon receipt of this challenge, a client uses the message and keys in the
-issuance protocol indicated by the token_type. If the TokenChallenge has a
-token_type the client does not recognize or support, it MUST NOT parse or
-respond to the challenge. If the TokenChallenge contains a non-empty
-origin_info field, the client MUST validate that the name of the origin
-that issued the authentication challenge is included in the list of origin
-names; if validation fails, the client MUST NOT process or respond to the
+Upon receipt of this challenge, a client validates the TokenChallenge before
+responding to it. Validation requirements are as follows:
+
+- The TokenChallenge structure is well-formed;
+- The token_type is recognized and supported by the client; and
+- If the origin_info field is non-empty, the name of the origin that issued the
+  authentication challenge is included in the list of origin names.
+
+If validation fails, the client MUST NOT process or respond to the
 challenge. Clients MAY have further restrictions and requirements around
 validating when a challenge is considered acceptable or valid. For example,
 clients can choose to ignore challenges that list origin names for which
