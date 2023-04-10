@@ -125,6 +125,14 @@ same client. In deployment scenarios where origins send token challenges to
 request tokens, origins ought to expect at most one request containing a token
 from the client in reaction to a particular challenge.
 
+Origins SHOULD minimize the number of challenges sent on a particular client
+session, such as a unique TLS session between a client and origin
+(referred to as the "redemption context" in {{ARCHITECTURE}}). Clients can
+have implementation-specific policy to minimize the number of tokens that
+can be retrieved by origins, so origins are advised to only request tokens
+when necessary within a single session. See {{interaction}} for more discussion
+on how to optimize token challenges to improve the user experience.
+
 ## Token Challenge {#challenge}
 
 Origins send a token challenge to clients in an "WWW-Authenticate" header field
@@ -390,7 +398,7 @@ the context can be used to verify token uniqueness.
 If a client is unable to fetch a token, it MUST react to the challenge as
 if it could not produce a valid Authorization response.
 
-# User Interaction
+# User Interaction {#interaction}
 
 When used in contexts like websites, origins that challenge clients for
 tokens need to consider how to optimize their interaction model to ensure a
