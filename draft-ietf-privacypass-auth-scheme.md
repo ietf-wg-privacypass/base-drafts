@@ -231,7 +231,7 @@ responding to it. Validation requirements are as follows:
 - The TokenChallenge structure is well-formed;
 - The token_type is recognized and supported by by the client; and
 - If the origin_info field is non-empty, the name of the origin that issued the
-  authentication challenge is included in the list of origin names. 
+  authentication challenge is included in the list of origin names.
 
 If validation fails, the client MUST NOT process or respond to the
 challenge. Clients MAY have further restrictions and requirements around
