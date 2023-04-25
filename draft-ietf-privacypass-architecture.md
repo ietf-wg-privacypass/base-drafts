@@ -1024,6 +1024,10 @@ Client. Depending on the deployment model, it can be possible to detect these
 types of attacks by comparing issuance and redemption contexts; for example,
 this is possible in the Joint Origin and Issuer model.
 
+# IANA Considerations {#iana}
+
+This document has no IANA actions.
+
 --- back
 
 # Acknowledgements
