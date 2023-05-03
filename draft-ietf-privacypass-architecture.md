@@ -283,8 +283,14 @@ the same issuance context is referred to as an issuance anonymity set.
 3. Attester-Origin unlinkability. This is similar to Origin-Client and
 Issuer-Client unlinkability. It means that given two attestation contexts,
 the Attester cannot determine if both contexts correspond to the same Origin
-or two different Origins. The set of Clients that share the same attestation
+or two different Origins. The set of Origins that share the same attestation
 context is referred to as an attestation anonymity set.
+4. Redemption context unlinkability. Given two redemption contexts, the Origin
+cannot determine which issuance and attestation contexts each redemption
+corresponds to, even with the collaboration of the Issuer and Attester (should
+these be different parties). This means that any information that may be learned
+about the Client during the issuance and attestation flows cannot be used by the
+Origin to compromise Client privacy.
 
 By ensuring that different contexts cannot be linked in this way, only the
 Client is able to correlate information that might be used to identify them with
