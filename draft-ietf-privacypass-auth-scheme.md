@@ -629,6 +629,20 @@ for Private Use.
 
 # Test Vectors
 
+This section includes test vectors for the HTTP authentication scheme specified
+in this document. It consists of the following types of test vectors:
+
+1. Test vectors for the challenge and redemption protocols. Implementations can
+use these test vectors for verifying code that builds and encodes
+TokenChallenge structures, as well as code that produces a well-formed Token
+bound to a TokenChallenge.
+2. Test vectors for the HTTP headers used for authentication. Implementations
+can use these test vectors for validating whether they parse HTTP
+authentication headers correctly to produce TokenChallenge structures and the
+other associated parameters, such as the token-key and max-age values.
+
+## Challenge and Redemption Structure Test Vectors
+
 This section includes test vectors for the challenge and redemption
 functionalities described in {{challenge}} and {{redemption}}. Each test vector
 lists the following values:
@@ -647,8 +661,6 @@ lists the following values:
   type, represented as a hexadecimal string.
 - token_authenticator_input: The values in the Token structure used to compute
   the Token authenticator value, represented as a hexadecimal string.
-- token_authenticator: The output Token authenticator which verifies under
-  token_key, represented as a hexadecimal string.
 
 Test vectors are provided for each of the following TokenChallenge
 configurations:
@@ -730,4 +742,90 @@ token_authenticator_input: 000286ed4bb9f76ab1107a05a9af4aa4eec84d
 d02f390f9bf5ef14730e0ee15aa92df7eeba1bd7c550a8184bee32ce66e6fb527
 17aa67da7e0ca32f4cdca9dec7130f861220ad4241ee0e33eb4a486a32f05af05
 ee33fcfdd1104c665eb827c20621
+~~~
+
+## HTTP Header Test Vectors
+
+This section includes test vectors the contents of the HTTP authentication
+headers. Each test vector consists of one or more challenges that comprise
+a WWW-Authenticate header. For each challenge, the token-type, token-key,
+max-age, and token-challenge parameters are listed. Each challenge also
+includes an unknown (not specified) parameter that implementations are meant
+to ignore.
+
+The parameters for each challenge are indexed by their position
+in the WWW-Authentication challenge list. For example, token-key-0 denotes
+the token-key parameter for the first challenge in the list, whereas
+token-key-1 denotes the token-key for the second challenge in the list.
+
+The resulting wire-encoded WWW-Authentication header based on this
+list of challenges is then listed at the end.
+
+~~~
+token-type-0: 0x0002
+token-key-0: 30820152303d06092a864886f70d01010a3030a00d300b060960864
+8016503040202a11a301806092a864886f70d010108300b060960864801650304020
+2a2030201300382010f003082010a0282010100cb1aed6b6a95f5b1ce013a4cfcab2
+5b94b2e64a23034e4250a7eab43c0df3a8c12993af12b111908d4b471bec31d4b6c9
+ad9cdda90612a2ee903523e6de5a224d6b02f09e5c374d0cfe01d8f529c500a78a2f
+67908fa682b5a2b430c81eaf1af72d7b5e794fc98a3139276879757ce453b526ef9b
+f6ceb99979b8423b90f4461a22af37aab0cf5733f7597abe44d31c732db68a181c6c
+bbe607d8c0e52e0655fd9996dc584eca0be87afbcd78a337d17b1dba9e828bbd81e2
+91317144e7ff89f55619709b096cbb9ea474cead264c2073fe49740c01f00e109106
+066983d21e5f83f086e2e823c879cd43cef700d2a352a9babd612d03cad02db134b7
+e225a5f0203010001
+max-age-0: 10
+token-challenge-0: 0002000e6973737565722e6578616d706c65208a3e83a33d9
+8005d2f30bef419fa6bf4cd5c6005e36b1285bbb4ccd40fa4b383000e6f726967696
+e2e6578616d706c65
+
+WWW-Authenticate: PrivateToken challenge="AAIADmlzc3Vlci5leGFtcGxlII
+o-g6M9mABdLzC-9Bn6a_TNXGAF42sShbu0zNQPpLODAA5vcmlnaW4uZXhhbXBsZQ==",
+ token-key="MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqG
+SIb3DQEBCDALBglghkgBZQMEAgKiAwIBMAOCAQ8AMIIBCgKCAQEAyxrta2qV9bHOATpM
+_KsluUsuZKIwNOQlCn6rQ8DfOowSmTrxKxEZCNS0cb7DHUtsmtnN2pBhKi7pA1I-beWi
+JNawLwnlw3TQz-Adj1KcUAp4ovZ5CPpoK1orQwyB6vGvcte155T8mKMTknaHl1fORTtS
+bvm_bOuZl5uEI7kPRGGiKvN6qwz1cz91l6vkTTHHMttooYHGy75gfYwOUuBlX9mZbcWE
+7KC-h6-814ozfRex26noKLvYHikTFxROf_ifVWGXCbCWy7nqR0zq0mTCBz_kl0DAHwDh
+CRBgZpg9IeX4PwhuLoI8h5zUPO9wDSo1Kpur1hLQPK0C2xNLfiJaXwIDAQAB",unknow
+nChallengeAttribute="ignore-me", max-age="10"
+
+token-type-0: 0x0002
+token-key-0: 30820152303d06092a864886f70d01010a3030a00d300b060960864
+8016503040202a11a301806092a864886f70d010108300b060960864801650304020
+2a2030201300382010f003082010a0282010100cb1aed6b6a95f5b1ce013a4cfcab2
+5b94b2e64a23034e4250a7eab43c0df3a8c12993af12b111908d4b471bec31d4b6c9
+ad9cdda90612a2ee903523e6de5a224d6b02f09e5c374d0cfe01d8f529c500a78a2f
+67908fa682b5a2b430c81eaf1af72d7b5e794fc98a3139276879757ce453b526ef9b
+f6ceb99979b8423b90f4461a22af37aab0cf5733f7597abe44d31c732db68a181c6c
+bbe607d8c0e52e0655fd9996dc584eca0be87afbcd78a337d17b1dba9e828bbd81e2
+91317144e7ff89f55619709b096cbb9ea474cead264c2073fe49740c01f00e109106
+066983d21e5f83f086e2e823c879cd43cef700d2a352a9babd612d03cad02db134b7
+e225a5f0203010001
+max-age-0: 10
+token-challenge-0: 0002000e6973737565722e6578616d706c65208a3e83a33d9
+8005d2f30bef419fa6bf4cd5c6005e36b1285bbb4ccd40fa4b383000e6f726967696
+e2e6578616d706c65
+token-type-1: 0x0001
+token-key-1: ebb1fed338310361c08d0c7576969671296e05e99a17d7926dfc28a
+53fabd489fac0f82bca86249a668f3a5bfab374c9
+max-age-1: 10
+token-challenge-1: 0001000e6973737565722e6578616d706c65208a3e83a33d9
+8005d2f30bef419fa6bf4cd5c6005e36b1285bbb4ccd40fa4b383000e6f726967696
+e2e6578616d706c65
+
+WWW-Authenticate: PrivateToken challenge="AAIADmlzc3Vlci5leGFtcGxlII
+o-g6M9mABdLzC-9Bn6a_TNXGAF42sShbu0zNQPpLODAA5vcmlnaW4uZXhhbXBsZQ==",
+ token-key="MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqG
+SIb3DQEBCDALBglghkgBZQMEAgKiAwIBMAOCAQ8AMIIBCgKCAQEAyxrta2qV9bHOATpM
+_KsluUsuZKIwNOQlCn6rQ8DfOowSmTrxKxEZCNS0cb7DHUtsmtnN2pBhKi7pA1I-beWi
+JNawLwnlw3TQz-Adj1KcUAp4ovZ5CPpoK1orQwyB6vGvcte155T8mKMTknaHl1fORTtS
+bvm_bOuZl5uEI7kPRGGiKvN6qwz1cz91l6vkTTHHMttooYHGy75gfYwOUuBlX9mZbcWE
+7KC-h6-814ozfRex26noKLvYHikTFxROf_ifVWGXCbCWy7nqR0zq0mTCBz_kl0DAHwDh
+CRBgZpg9IeX4PwhuLoI8h5zUPO9wDSo1Kpur1hLQPK0C2xNLfiJaXwIDAQAB",unknow
+nChallengeAttribute="ignore-me", max-age="10", PrivateToken challeng
+e="AAEADmlzc3Vlci5leGFtcGxlIIo-g6M9mABdLzC-9Bn6a_TNXGAF42sShbu0zNQPp
+LODAA5vcmlnaW4uZXhhbXBsZQ==", token-key="67H-0zgxA2HAjQx1dpaWcSluBem
+aF9eSbfwopT-r1In6wPgryoYkmmaPOlv6s3TJ",unknownChallengeAttribute="ig
+nore-me", max-age="10"
 ~~~
