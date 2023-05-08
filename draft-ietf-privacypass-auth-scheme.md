@@ -749,7 +749,7 @@ ee33fcfdd1104c665eb827c20621
 This section includes test vectors the contents of the HTTP authentication
 headers. Each test vector consists of one or more challenges that comprise
 a WWW-Authenticate header. For each challenge, the token-type, token-key,
-max-age, and token-challenge parametrs are listed. Each challenge also
+max-age, and token-challenge parameters are listed. Each challenge also
 includes an unknown (not specified) parameter that implementations are meant
 to ignore.
 
