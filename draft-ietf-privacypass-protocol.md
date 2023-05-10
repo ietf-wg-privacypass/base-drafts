@@ -745,14 +745,16 @@ This document updates the "Token Type" Registry from
 
 ## Media Types
 
-This specification defines the following protocol messages, along with their
-corresponding media types:
+The following entries should be added to the IANA "media types"
+registry:
 
-- Token issuer directory: "application/token-issuer-directory"
-- TokenRequest: "application/private-token-request"
-- TokenResponse: "application/private-token-response"
+- "application/token-issuer-directory"
+- "application/private-token-request"
+- "application/private-token-response"
 
-The definition for each media type is in the following subsections.
+The templates for these entries are listed below and the
+reference should be this RFC.
+
 
 ### "application/token-issuer-directory" media type
 
