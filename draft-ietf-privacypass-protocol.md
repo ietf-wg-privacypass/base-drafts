@@ -197,8 +197,8 @@ information for this well-known URI.
 
 The issuer directory and issuer request url SHOULD exist on the same domain. If
 an Issuer wants to service multiple different issuer directories they MUST create
-unique subdomains for each so the TokenChallenge defined in 
-{{Section 2.1 of !AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}} can be 
+unique subdomains for each so the TokenChallenge defined in
+{{Section 2.1 of !AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}} can be
 differentiated correctly.
 
 Issuers SHOULD use HTTP caching to permit caching of this resource
