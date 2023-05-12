@@ -3,7 +3,7 @@ title: "Privacy Pass Issuance Protocol"
 abbrev: Privacy Pass Issuance
 docname: draft-ietf-privacypass-protocol-latest
 date:
-category: info
+category: std
 
 ipr: trust200902
 keyword: Internet-Draft
