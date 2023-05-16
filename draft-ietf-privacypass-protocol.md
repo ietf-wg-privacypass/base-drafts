@@ -195,6 +195,12 @@ Issuer directory resources have the media type
 /.well-known/token-issuer-directory; see {{wkuri-reg}} for the registration
 information for this well-known URI.
 
+The issuer directory and issuer resources SHOULD be available on the same domain. If
+an Issuer wants to service multiple different issuer directories they MUST create
+unique subdomains for each so the TokenChallenge defined in
+{{Section 2.1 of !AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}} can be
+differentiated correctly.
+
 Issuers SHOULD use HTTP caching to permit caching of this resource
 {{!RFC5861}}. The cache lifetime depends on the Issuer's key rotation schedule.
 Regular rotation of token keys is recommended to minimize the risk of key
