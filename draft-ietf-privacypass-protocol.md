@@ -690,7 +690,7 @@ setting are deferred to the Architecture document {{ARCHITECTURE}}. In
 particular, the privacy considerations in
 {{Section 4 and Section 5 of ARCHITECTURE}}, particularly those pertaining to
 Issuer Public Key rotation and consistency (where consistency is as described
-in {{?CONSISTENCY=I-D.privacypass-key-consistency}}) and Issuer selection, are
+in {{?CONSISTENCY=I-D.ietf-privacypass-key-consistency}}) and Issuer selection, are
 relevant for implementations of the protocols in this document.
 
 # IANA considerations
