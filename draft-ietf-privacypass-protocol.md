@@ -441,6 +441,7 @@ seed = random(Ns)
 (skI, pkI) = DeriveKeyPair(seed, "PrivacyPass")
 ~~~
 
+The DeriveKeyPair function is defined in {{OPRF, Section 3.3.1}}.
 The key identifier for a public key `pkI`, denoted `token_key_id`, is computed
 as follows:
 
