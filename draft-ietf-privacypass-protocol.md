@@ -252,7 +252,8 @@ this protocol are described below. This section uses notation described in
 SerializeScalar and DeserializeScalar, and DeriveKeyPair.
 
 The constants `Ne` and `Ns` are as defined in {{OPRF, Section 4}} for
-OPRF(P-384, SHA-384). The constant `Nk` is defined by {{private-token-type}}.
+OPRF(P-384, SHA-384). The constant `Nk`, which is also equal to `Nh` as defined
+in {{OPRF, Section 4}}, is defined by {{private-token-type}}.
 
 ## Client-to-Issuer Request {#private-request}
 
@@ -345,7 +346,7 @@ response as follows:
 ~~~
 server_context = SetupVOPRFServer("P384-SHA384", skI, pkI)
 evaluate_element, proof =
-  server_context.Evaluate(skI, blinded_element)
+  server_context.BlindEvaluate(skI, pkI, blinded_element)
 ~~~
 
 SetupVOPRFServer is defined in {{OPRF, Section 3.2}} and Evaluate is defined in
