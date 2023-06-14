@@ -219,7 +219,7 @@ Consumers of the Issuer directory resource SHOULD follow the usual HTTP caching
 result in use of stale Issuer configuration information, whereas short
 lifetimes may result in decreased performance. When use of an Issuer
 configuration results in token issuance failures, e.g., because the
-Issuer directory resource is no longer valid and issuance requests using this
+Issuer has invalidated its directory resource before its expiration time and issuance requests using this
 configuration are unsuccessful, the directory SHOULD be fetched and revalidated.
 
 # Issuance Protocol for Privately Verifiable Tokens {#private-flow}
