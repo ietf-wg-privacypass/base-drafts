@@ -305,7 +305,7 @@ attestation, and issuance protocol details. For example, as discussed in
 the set of possible Clients to be partitioned by the Client's IP address, and
 can therefore lead to unlinkability violations. Similarly, malicious Origins
 may attempt to link two redemption contexts together by using Client-specific
-Issuer public keys. See {{deployment}} and {{privacy}} for more information.
+Issuer public keys. See {{deployment-considerations}} and {{privacy}} for more information.
 
 The remainder of this section describes the functional properties and security
 requirements of the redemption and issuance protocols in more detail. {{flow}}
@@ -577,7 +577,7 @@ to the following requirements:
 1. Include a detailed analysis of the privacy impacts of the extension, why
    these impacts are justified, and guidelines on how to use the protocol
    to mitigate or minimize negative deployment or privacy consequences
-   discussed in {{deployment}} and {{privacy}}, respectively.
+   discussed in {{deployment-considerations}} and {{privacy}}, respectively.
 1. Adhere to the guidelines specified in {{issuer-role}} for managing Issuer
    public key data.
 1. Clearly specify how to interpret and validate TokenChallenge and Token
@@ -847,7 +847,7 @@ described in {{issue-flow}}, if the Issuer produces tokens for a single Origin,
 then per-Origin tokens are not appropriate since the Attester can infer the
 Origin from a token request.
 
-# Deployment Considerations {#deployment}
+# Deployment Considerations {#deployment-considerations}
 
 {{deployment}} discusses deployment models that are possible in practice.
 Beyond possible implications on security and privacy properties of the
