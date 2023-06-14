@@ -154,7 +154,7 @@ object are defined in {{directory-values}}.
 
 | Field Name           | Value                                                  |
 |:---------------------|:-------------------------------------------------------|
-| issuer-request-uri   | Issuer Request URL value (as an absolute or relative URL) as a percent-encoded URL string, represented as a JSON string ({{RFC8259, Section 7}}) |
+| issuer-request-uri   | Issuer Request URL value (as an absolute URL, or a URL relative to the directory object) as a percent-encoded URL string, represented as a JSON string ({{RFC8259, Section 7}}) |
 | token-keys           | List of Issuer Public Key values, each represented as JSON objects ({{RFC8259, Section 4}}) |
 {: #directory-values title="Issuer directory object description"}
 
@@ -193,10 +193,12 @@ Altogether, the Issuer's directory could look like:
 Issuer directory resources have the media type
 "application/token-issuer-directory" and are located at the well-known location
 /.well-known/token-issuer-directory; see {{wkuri-reg}} for the registration
-information for this well-known URI.
+information for this well-known URI. The reason that this resource is located
+at a well-known URI is that Issuers are defined by their origin in TokenChallenge
+structures; see {{Section 2.1 of AUTHSCHEME}}.
 
-The issuer directory and issuer resources SHOULD be available on the same domain. If
-an Issuer wants to service multiple different issuer directories they MUST create
+The Issuer directory and Issuer resources SHOULD be available on the same domain. If
+an Issuer wants to service multiple different Issuer directories they MUST create
 unique subdomains for each so the TokenChallenge defined in
 {{Section 2.1 of !AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}} can be
 differentiated correctly.
@@ -217,8 +219,8 @@ Consumers of the Issuer directory resource SHOULD follow the usual HTTP caching
 result in use of stale Issuer configuration information, whereas short
 lifetimes may result in decreased performance. When use of an Issuer
 configuration results in token issuance failures, e.g., because the
-configuration information is too stale, the directory SHOULD be fetched and
-revalidated.
+Issuer directory resource is no longer valid and issuance requests using this
+configuration are unsuccessful, the directory SHOULD be fetched and revalidated.
 
 # Issuance Protocol for Privately Verifiable Tokens {#private-flow}
 
@@ -232,12 +234,12 @@ for how this key pair is generated.
 
 Clients provide the following as input to the issuance protocol:
 
-- Issuer Request URI: A URI to which token request messages are sent. This can
-  be a URL derived from the "issuer-request-uri" value in the Issuer's
-  directory resource, or it can be another Client-configured URL. The value
+- Issuer Request URL: A URL identifying the location to which issuance requests
+  are sent. This can be a URL derived from the "issuer-request-uri" value in the
+  Issuer's directory resource, or it can be another Client-configured URL. The value
   of this parameter depends on the Client configuration and deployment model.
   For example, in the 'Joint Origin and Issuer' deployment model, the Issuer
-  Request URI might be correspond to the Client's configured Attester, and the
+  Request URL might be correspond to the Client's configured Attester, and the
   Attester is configured to relay requests to the Issuer.
 - Issuer name: An identifier for the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
@@ -309,7 +311,7 @@ The structure fields are defined as follows:
 
 The values `token_input` and `blinded_element` are stored locally and used
 later as described in {{private-finalize}}. The Client then generates an HTTP
-POST request to send to the Issuer Request URI, with the TokenRequest as the
+POST request to send to the Issuer Request URL, with the TokenRequest as the
 content. The media type for this request is
 "application/private-token-request". An example request is shown below.
 
@@ -332,7 +334,7 @@ Upon receipt of the request, the Issuer validates the following conditions:
 
 - The TokenRequest contains a supported token_type.
 - The TokenRequest.truncated_token_key_id corresponds to the truncated key ID
-  of a Public Key owned by the issuer.
+  of a Public Key owned by the Issuer.
 - The TokenRequest.blinded_msg is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
@@ -477,12 +479,12 @@ respectively, used to produce tokens as input to the protocol. See
 
 Clients provide the following as input to the issuance protocol:
 
-- Issuer Request URI: A URI to which token request messages are sent. This can
-  be a URL derived from the "issuer-request-uri" value in the Issuer's
-  directory resource, or it can be another Client-configured URL. The value
+- Issuer Request URL: A URL identifying the location to which issuance requests
+  are sent. This can be a URL derived from the "issuer-request-uri" value in the
+  Issuer's directory resource, or it can be another Client-configured URL. The value
   of this parameter depends on the Client configuration and deployment model.
   For example, in the 'Split Origin, Attester, Issuer' deployment model, the
-  Issuer Request URI might be correspond to the Client's configured Attester,
+  Issuer Request URL might be correspond to the Client's configured Attester,
   and the Attester is configured to relay requests to the Issuer.
 - Issuer name: An identifier for the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
@@ -538,7 +540,7 @@ The structure fields are defined as follows:
 - "blinded_msg" is the Nk-octet request defined above.
 
 The Client then generates an HTTP POST request to send to the Issuer Request
-URI, with the TokenRequest as the content. The media type for this request
+URL, with the TokenRequest as the content. The media type for this request
 is "application/private-token-request". An example request is shown below:
 
 ~~~
