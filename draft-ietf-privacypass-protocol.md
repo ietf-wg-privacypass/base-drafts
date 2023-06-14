@@ -194,7 +194,7 @@ Issuer directory resources have the media type
 "application/token-issuer-directory" and are located at the well-known location
 /.well-known/token-issuer-directory; see {{wkuri-reg}} for the registration
 information for this well-known URI. The reason that this resource is located
-at a well-known URI is that Issuers are defined by their origin in TokenChallenge
+at a well-known URI is that Issuers are defined by an origin name in TokenChallenge
 structures; see {{Section 2.1 of AUTHSCHEME}}.
 
 The Issuer directory and Issuer resources SHOULD be available on the same domain. If
