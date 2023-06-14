@@ -349,7 +349,7 @@ evaluate_element, proof =
   server_context.BlindEvaluate(skI, pkI, blinded_element)
 ~~~
 
-SetupVOPRFServer is defined in {{OPRF, Section 3.2}} and Evaluate is defined in
+SetupVOPRFServer is defined in {{OPRF, Section 3.2}} and BlindEvaluate is defined in
 {{OPRF, Section 3.3.2}}. The Issuer then creates a TokenResponse structured
 as follows:
 
