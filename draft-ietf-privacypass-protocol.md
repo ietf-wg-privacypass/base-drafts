@@ -344,7 +344,7 @@ the Client, the Issuer completes the issuance flow by computing a blinded
 response as follows:
 
 ~~~
-server_context = SetupVOPRFServer("P384-SHA384", skI, pkI)
+server_context = SetupVOPRFServer("P384-SHA384", skI)
 evaluate_element, proof =
   server_context.BlindEvaluate(skI, pkI, blinded_element)
 ~~~
@@ -419,7 +419,7 @@ Key and Public Key, evaluating the token contents, and comparing the result
 against the token authenticator value:
 
 ~~~
-server_context = SetupVOPRFServer("P384-SHA384", skI, pkI)
+server_context = SetupVOPRFServer("P384-SHA384", skI)
 token_authenticator_input =
   concat(Token.token_type,
          Token.nonce,
