@@ -167,6 +167,13 @@ defined in {{tokenkeys-values}}.
 | token-key    | The base64url encoding of the Public Key for use with the issuance protocol, including padding, represented as a JSON string ({{RFC8259, Section 7}}) |
 {: #tokenkeys-values title="Issuer 'token-keys' object description'"}
 
+Each "token-keys" JSON object may also contain the optional field "not-before".
+The value of this field is the UNIX timestamp (number of milliseconds since
+January 1, 1970, UTC) at which the key can be used. If this field is present,
+Clients SHOULD NOT use a token key before this timestamp, as doing so may
+lead to issuance failures. The purpose of this field is to assist in scheduled
+key rotations.
+
 Issuers MAY advertise multiple token-keys for the same token-type to
 support key rotation. In this case, Issuers indicate preference for which
 token key to use based on the order of keys in the list, with preference
