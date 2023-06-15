@@ -174,10 +174,10 @@ Clients SHOULD NOT use a token key before this timestamp, as doing so may
 lead to issuance failures. The purpose of this field is to assist in scheduled
 key rotations.
 
-Issuers MAY advertise multiple token-keys for the same token-type to
-support key rotation. In this case, Issuers indicate preference for which
-token key to use based on the order of keys in the list, with preference
-given to keys earlier in the list.
+Beyond staging keys with the "not-before" value, Issuers MAY advertise multiple
+token-keys for the same token-type to facilitate key rotation. In this case,
+Issuers indicate preference for which token key to use based on the order of
+keys in the list, with preference given to keys earlier in the list.
 
 Altogether, the Issuer's directory could look like:
 
@@ -188,6 +188,7 @@ Altogether, the Issuer's directory could look like:
       {
         "token-type": 2,
         "token-key": "MI...AB",
+        "not-before": 1686850920881,
       },
       {
         "token-type": 2,
@@ -196,6 +197,10 @@ Altogether, the Issuer's directory could look like:
     ]
  }
 ~~~
+
+Clients that use this directory resource before 1686850920881 in UNIX time would use the
+second key in the "token-keys" list, whereas Clients that use this directory after
+1686850920881 in UNIX time would use the first key in the "token-keys" list.
 
 Issuer directory resources have the media type
 "application/private-token-issuer-directory" and are located at the well-known location
