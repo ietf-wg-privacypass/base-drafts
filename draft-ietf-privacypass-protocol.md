@@ -179,7 +179,10 @@ Beyond staging keys with the "not-before" value, Issuers MAY advertise multiple
 Issuers indicate preference for which token key to use based on the order of
 keys in the list, with preference given to keys earlier in the list. Clients
 SHOULD use the first key in the "token-keys" list that either does not have a
-"not-before" value or has a "not-before" value in the past.
+"not-before" value or has a "not-before" value in the past. Origins can attempt
+to use any key in the "token-keys" list to verify tokens, starting with the most
+preferred key in the list. Trial verification like this can help deal with Client
+clock skew.
 
 Altogether, the Issuer's directory could look like:
 
