@@ -191,8 +191,8 @@ Altogether, the Issuer's directory could look like:
 ~~~
 
 Issuer directory resources have the media type
-"application/token-issuer-directory" and are located at the well-known location
-/.well-known/token-issuer-directory; see {{wkuri-reg}} for the registration
+"application/private-token-issuer-directory" and are located at the well-known location
+/.well-known/private-token-issuer-directory; see {{wkuri-reg}} for the registration
 information for this well-known URI. The reason that this resource is located
 at a well-known URI is that Issuers are defined by an origin name in TokenChallenge
 structures; see {{Section 2.1 of AUTHSCHEME}}.
@@ -701,15 +701,15 @@ relevant for implementations of the protocols in this document.
 
 This section contains considerations for IANA.
 
-## Well-Known 'token-issuer-directory' URI {#wkuri-reg}
+## Well-Known 'private-token-issuer-directory' URI {#wkuri-reg}
 
 This document updates the "Well-Known URIs" Registry {{WellKnownURIs}} with the
 following values.
 
 | URI Suffix  | Change Controller  | Reference | Status | Related information |
 |:------------|:-------------------|:----------|:-------|:--------------------|
-| token-issuer-directory | IETF | [this document] | permanent | None |
-{: #wellknownuri-values title="'token-issuer-directory' Well-Known URI"}
+| private-token-issuer-directory | IETF | [this document] | permanent | None |
+{: #wellknownuri-values title="'private-token-issuer-directory' Well-Known URI"}
 
 ## Token Type Registry Updates {#token-type}
 
@@ -750,7 +750,7 @@ This document updates the "Token Type" Registry from
 The following entries should be added to the IANA "media types"
 registry:
 
-- "application/token-issuer-directory"
+- "application/private-token-issuer-directory"
 - "application/private-token-request"
 - "application/private-token-response"
 
@@ -758,7 +758,7 @@ The templates for these entries are listed below and the
 reference should be this RFC.
 
 
-### "application/token-issuer-directory" media type
+### "application/private-token-issuer-directory" media type
 
 Type name:
 
@@ -766,7 +766,7 @@ Type name:
 
 Subtype name:
 
-: token-issuer-directory
+: private-token-issuer-directory
 
 Required parameters:
 
