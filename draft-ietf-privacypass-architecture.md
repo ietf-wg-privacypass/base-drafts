@@ -305,7 +305,7 @@ attestation, and issuance protocol details. For example, as discussed in
 the set of possible Clients to be partitioned by the Client's IP address, and
 can therefore lead to unlinkability violations. Similarly, malicious Origins
 may attempt to link two redemption contexts together by using Client-specific
-Issuer public keys. See {{deployment}} and {{privacy}} for more information.
+Issuer public keys. See {{deployment-considerations}} and {{privacy}} for more information.
 
 The remainder of this section describes the functional properties and security
 requirements of the redemption and issuance protocols in more detail. {{flow}}
@@ -530,11 +530,12 @@ information where possible when invoking the issuance protocol.
 Issuers are uniquely identifiable by all Clients with a consistent
 identifier. In a web context, this identifier might be the Issuer host name.
 Issuers maintain one or more configurations, including issuance key pairs, for
-use in the issuance protocol. Issuers can rotate these configurations as needed
-to mitigate risk of compromise; see {{rotation-and-consistency}} for more
-considerations around configuration rotation. The Issuer public key for each
-active configuration is made available to Origins and Clients for use in the
-issuance and redemption protocols.
+use in the issuance protocol. Each configuration is assumed to have a unique
+and canonical identifier, sometimes referred to as a key identifier or key ID.
+Issuers can rotate these configurations as needed to mitigate risk of compromise;
+see {{rotation-and-consistency}} for more considerations around configuration
+rotation. The Issuer public key for each active configuration is made available
+to Origins and Clients for use in the issuance and redemption protocols.
 
 ### Issuance Metadata {#metadata}
 
@@ -567,15 +568,21 @@ public and private metadata bits. Every bit of metadata can be used to
 partition the Client issuance or redemption anonymity sets; see
 {{metadata-privacy}} for more information.
 
-### Issuance Protocol Extensibility {#extensions}
+### Future Issuance Protocol Requirements {#extensions}
 
 The Privacy Pass architecture and ecosystem are both intended to be receptive
 to extensions that expand the current set of functionalities through new
-issuance protocols. Each issuance protocol MUST include a detailed analysis
-of the privacy impacts of the extension, why these impacts are justified,
-and guidelines on how to deploy the protocol to minimize any privacy impacts.
-Any extension to the Privacy Pass protocol MUST adhere to the guidelines
-specified in {{issuer-role}} for managing Issuer public key data.
+issuance protocols. Each new issuance protocol and extension MUST adhere
+to the following requirements:
+
+1. Include a detailed analysis of the privacy impacts of the extension, why
+   these impacts are justified, and guidelines on how to use the protocol
+   to mitigate or minimize negative deployment or privacy consequences
+   discussed in {{deployment-considerations}} and {{privacy}}, respectively.
+1. Adhere to the guidelines specified in {{issuer-role}} for managing Issuer
+   public key data.
+1. Clearly specify how to interpret and validate TokenChallenge and Token
+   messages that are exchanged during the redemption protocol.
 
 ## Information Flow {#flow}
 
@@ -841,7 +848,7 @@ described in {{issue-flow}}, if the Issuer produces tokens for a single Origin,
 then per-Origin tokens are not appropriate since the Attester can infer the
 Origin from a token request.
 
-# Deployment Considerations
+# Deployment Considerations {#deployment-considerations}
 
 {{deployment}} discusses deployment models that are possible in practice.
 Beyond possible implications on security and privacy properties of the
