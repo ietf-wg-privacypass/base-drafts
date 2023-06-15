@@ -175,9 +175,11 @@ lead to issuance failures. The purpose of this field is to assist in scheduled
 key rotations.
 
 Beyond staging keys with the "not-before" value, Issuers MAY advertise multiple
-token-keys for the same token-type to facilitate key rotation. In this case,
+"token-keys" for the same token-type to facilitate key rotation. In this case,
 Issuers indicate preference for which token key to use based on the order of
-keys in the list, with preference given to keys earlier in the list.
+keys in the list, with preference given to keys earlier in the list. Clients
+SHOULD use the first key in the "token-keys" list that either does not have a
+"not-before" value or has a "not-before" value in the past.
 
 Altogether, the Issuer's directory could look like:
 
