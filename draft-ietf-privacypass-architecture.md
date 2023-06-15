@@ -530,11 +530,12 @@ information where possible when invoking the issuance protocol.
 Issuers are uniquely identifiable by all Clients with a consistent
 identifier. In a web context, this identifier might be the Issuer host name.
 Issuers maintain one or more configurations, including issuance key pairs, for
-use in the issuance protocol. Issuers can rotate these configurations as needed
-to mitigate risk of compromise; see {{rotation-and-consistency}} for more
-considerations around configuration rotation. The Issuer public key for each
-active configuration is made available to Origins and Clients for use in the
-issuance and redemption protocols.
+use in the issuance protocol. Each configuration is assumed to have a unique
+and canonical identifier, sometimes referred to as a key identifier or key ID.
+Issuers can rotate these configurations as needed to mitigate risk of compromise;
+see {{rotation-and-consistency}} for more considerations around configuration
+rotation. The Issuer public key for each active configuration is made available
+to Origins and Clients for use in the issuance and redemption protocols.
 
 ### Issuance Metadata {#metadata}
 
