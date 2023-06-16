@@ -203,9 +203,9 @@ Altogether, the Issuer's directory could look like:
  }
 ~~~
 
-Clients that use this directory resource before 1686850920881 in UNIX time would use the
+Clients that use this directory resource before 1686913811 in UNIX time would use the
 second key in the "token-keys" list, whereas Clients that use this directory after
-1686850920881 in UNIX time would use the first key in the "token-keys" list.
+1686913811 in UNIX time would use the first key in the "token-keys" list.
 
 Issuer directory resources have the media type
 "application/private-token-issuer-directory" and are located at the well-known location
