@@ -193,7 +193,7 @@ Altogether, the Issuer's directory could look like:
       {
         "token-type": 2,
         "token-key": "MI...AB",
-        "not-before": 1686850920881,
+        "not-before": 1686913811,
       },
       {
         "token-type": 2,
