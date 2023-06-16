@@ -168,7 +168,7 @@ defined in {{tokenkeys-values}}.
 {: #tokenkeys-values title="Issuer 'token-keys' object description'"}
 
 Each "token-keys" JSON object may also contain the optional field "not-before".
-The value of this field is the UNIX timestamp (number of milliseconds since
+The value of this field is the UNIX timestamp (number of seconds since
 January 1, 1970, UTC) at which the key can be used. If this field is present,
 Clients SHOULD NOT use a token key before this timestamp, as doing so may
 lead to issuance failures. The purpose of this field is to assist in scheduled
