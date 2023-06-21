@@ -463,14 +463,17 @@ challenge contains a redemption context or not, as well as whether the
 challenge is per-origin or not. For example, cross-origin tokens with empty
 contexts can be replayed from one party by another, as shown below.
 
+~~~ aasvg
++--------+                            +----------+                 +--------+
+| Origin |                            | Attacker |                 | Client |
++---+----+                            +-----+----+                 +---+----+
+    |                                       |                          |
+    +-- WWW-Authenticate: TokenChallenge -->|                          |
+    |                                       +--- (replay challenge) --->
+    |                                       <-- Authorization: Token --+
+    <----------- (replay token) ------------+
 ~~~
- Client          Attacker                  Origin
-                       <------ TokenChallenge \
-   <--- TokenChallenge                        |
-    Token ---------->                         |
-                       Token ---------------> /
-~~~
-{: #fig-replay title="Token Architectural Components"}
+{: #fig-replay title="Replay attack example"}
 
 Moreover, when a Client holds cross-origin tokens with empty contexts, it
 is possible for any Origin in the cross-origin set to deplete that Client
