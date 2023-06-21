@@ -173,7 +173,7 @@ in an IANA registry, {{token-types}}. Challenges with unsupported token_type
 values MUST be ignored. This value determines the structure and semantics of
 the rest of the structure.
 
-- "issuer_name" is a value containing the hostname of the issuer. This is
+- "issuer_name" is a value containing the hostname of the issuer as a UTF-8 string. This is
 hostname identifies the issuer that is allowed to issue tokens that can be
 redeemed by this origin. The field that stores this value in the challenge
 is prefixed with a 2-octet integer indicating the length, in network byte order.
