@@ -171,7 +171,9 @@ The structure fields are defined as follows:
 the issuance protocol used to generate the token. Values are registered
 in an IANA registry, {{token-types}}. Challenges with unsupported token_type
 values MUST be ignored. This value determines the structure and semantics of
-the rest of the structure.
+the rest of the structure; see {{token-types}} for the registry information
+which establishes and defines the relationship between "token_type" and the
+contents of the TokenChallenge message.
 
 - "issuer_name" is a string containing the name of the issuer. This is a
 hostname that is used to identify the issuer that is allowed to issue
@@ -346,12 +348,13 @@ The structure fields are defined as follows:
 
 - "token_type" is a 2-octet integer, in network byte order. This value must
 match the value in the challenge ({{challenge}}). This value determines the
-structure and semantics of the rest of the structure.
+structure and semantics of the rest of the structure; see {{token-types}} for
+the registry information which establishes and defines the relationship between
+"token_type" and the contents of the Token structure.
 
-- "nonce" is a 32-octet message containing a client-generated random
-nonce.
+- "nonce" is a 32-octet value containing a client-generated random nonce.
 
-- "challenge_digest" is a 32-octet message containing the hash of the
+- "challenge_digest" is a 32-octet value containing the hash of the
 original TokenChallenge, SHA256(TokenChallenge).
 
 - "token_key_id" is an Nid-octet identifier for the the token authentication
@@ -548,8 +551,8 @@ Template:
 
 * Value: The two-byte identifier for the algorithm
 * Name: Name of the issuance protocol
-* Token Structure: The contents of the Token structure
-* TokenChallenge Structure: The contents of the TokenChallenge structure
+* Token Structure: The contents of the Token structure in {{redemption}}
+* TokenChallenge Structure: The contents of the TokenChallenge structure in {{challenge}}
 * Publicly Verifiable: A Y/N value indicating if the output tokens are
   publicly verifiable
 * Public Metadata: A Y/N value indicating if the output tokens can contain
@@ -615,8 +618,8 @@ for Private Use.
 
 * Value: 0xFF00-0xFFFF
 * Name: Private Use
-* Token Structure: As defined in {{redemption}}
-* TokenChallenge Structure: As defined in {{challenge}}
+* Token Structure: The contents of the Token structure in {{redemption}}
+* TokenChallenge Structure: The contents of the TokenChallenge structure in {{challenge}}
 * Publicly Verifiable: N/A
 * Public Metadata: N/A
 * Private Metadata: N/A
@@ -624,6 +627,8 @@ for Private Use.
 * Nid: N/A
 * Reference: This document
 * Notes: None
+
+{{ISSUANCE}} defines other non-grease entries for this registry.
 
 --- back
 
