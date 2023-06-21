@@ -221,8 +221,8 @@ using an out-of-band mechanism.
 - "max-age", an optional parameter that consists of the number of seconds for
 which the challenge will be accepted by the origin.
 
-Clients can ignore the challenge if the token-key is invalid or otherwise
-untrusted.
+Clients MAY ignore the challenge, e.g., because the token-key is
+invalid or otherwise untrusted.
 
 The header field MAY also include the standard "realm" parameter, if desired.
 Issuance protocols MAY require other parameters. Clients SHOULD ignore unknown
