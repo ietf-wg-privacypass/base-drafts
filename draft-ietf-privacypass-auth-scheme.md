@@ -173,9 +173,9 @@ in an IANA registry, {{token-types}}. Challenges with unsupported token_type
 values MUST be ignored. This value determines the structure and semantics of
 the rest of the structure.
 
-- "issuer_name" is a value containing the hostname of the issuer as a UTF-8 string. This is
-hostname identifies the issuer that is allowed to issue tokens that can be
-redeemed by this origin. The field that stores this value in the challenge
+- "issuer_name" is a UTF-8 string containing the hostname of the issuer.
+This is hostname identifies the issuer that is allowed to issue tokens that can be
+redeemed by this origin. The field that stores this string in the challenge
 is prefixed with a 2-octet integer indicating the length, in network byte order.
 
 - "redemption_context" is an optional field. If present, it allows the origin
@@ -187,13 +187,14 @@ lengths for this field are either 0 or 32 bytes. The field is prefixed with a
 single octet indicating the length. Challenges with redemption_context values
 of invalid lengths MUST be ignored.
 
-- "origin_info" is an optional value containing one or more origin hostnames,
+- "origin_info" is an optional UTF-8 string containing one or more origin hostnames,
 which allows a token to be scoped to a specific set of origins. The field
-that stores this value in the challenge is prefixed with a 2-octet integer
+that stores this string in the challenge is prefixed with a 2-octet integer
 indicating the length, in network byte order. If empty, any non-origin-specific
-token can be redeemed. If the value contains multiple origin hostnames, they are
-delimited with commas "," without any whitespace. If this field is not empty,
-the Origin MUST include its own name as one of the hostnames in the list.
+token can be redeemed. If the string contains multiple origin hostnames, they are
+delimited with commas "," without any whitespace. Each origin hostname MUST NOT
+include a comma "," element. If the "origin_info" field is not empty, the Origin
+MUST include its own name as one of the hostnames in the list.
 
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following parameters:
@@ -484,15 +485,15 @@ occurred in a given time window.
 
 Token challenges that include non-empty origin_info bind tokens to one or more
 specific origins. As described in {{challenge}}, clients only accept such
-challenges from origin names listed in the origin_info value. Even if multiple
+challenges from origin names listed in the origin_info string. Even if multiple
 origins are listed, a token can only be redeemed for an origin if the challenge
 has an exact match for the origin_info. For example, if "a.example.com" issues
-a challenge with an origin_info value of "a.example.com,b.example.com", a
+a challenge with an origin_info string of "a.example.com,b.example.com", a
 client could redeem a token fetched for this challenge if and only if
-"b.example.com" also included an origin_info value of
+"b.example.com" also included an origin_info string of
 "a.example.com,b.example.com". On the other hand, if "b.example.com" had an
-origin_info value of "b.example.com" or "b.example.com,a.example.com" or
-"a.example.com,b.example.com,c.example.com", the value would not match and the
+origin_info string of "b.example.com" or "b.example.com,a.example.com" or
+"a.example.com,b.example.com,c.example.com", the string would not match and the
 client would need to use a different token.
 
 Context-bound token challenges require clients to obtain matching tokens when
