@@ -173,7 +173,9 @@ in an IANA registry, {{token-types}}. Challenges with unsupported token_type
 values MUST be ignored. This value determines the structure and semantics of
 the rest of the structure.
 
-- "issuer_name" is a UTF-8 string containing the hostname of the issuer.
+- "issuer_name" is a UTF-8 string containing the hostname of the issuer, i.e., the
+fully qualified DNS hostname of the issuer using ASCII encoding without a trailing dot.
+This allows the support of internationalized hostnames through the use of A-labels defined in {{?RFC5890}}.
 This is hostname identifies the issuer that is allowed to issue tokens that can be
 redeemed by this origin. The field that stores this string in the challenge
 is prefixed with a 2-octet integer indicating the length, in network byte order.
@@ -188,13 +190,16 @@ single octet indicating the length. Challenges with redemption_context values
 of invalid lengths MUST be ignored.
 
 - "origin_info" is an optional UTF-8 string containing one or more origin hostnames,
-which allows a token to be scoped to a specific set of origins. The field
-that stores this string in the challenge is prefixed with a 2-octet integer
+each of which is a fully qualified DNS hostname using ASCII encoding without a trailing dot.
+This allows the support of internationalized hostnames through the use of A-labels defined in {{?RFC5890}}.
+The purpose of this field is to allow a token to be scoped to a specific set of origins.
+The field that stores this string in the challenge is prefixed with a 2-octet integer
 indicating the length, in network byte order. If empty, any non-origin-specific
 token can be redeemed. If the string contains multiple origin hostnames, they are
-delimited with commas "," without any whitespace. Each origin hostname MUST NOT
-include a comma "," element. If the "origin_info" field is not empty, the Origin
-MUST include its own name as one of the hostnames in the list.
+delimited with commas "," without any whitespace. Moreover, any whitespace in the
+string MUST be ignored. Each origin hostname MUST NOT include a comma "," element.
+If the "origin_info" field is not empty, the Origin MUST include its own name as
+one of the hostnames in the list.
 
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following parameters:
