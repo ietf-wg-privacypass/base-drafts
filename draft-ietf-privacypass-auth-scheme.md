@@ -154,7 +154,24 @@ be empty to allow fully cross-origin tokens, a single origin name that
 matches the origin itself, or a list of origin names containing the origin
 itself.
 
-The TokenChallenge message has the following structure:
+All token challenges MUST begin with a 2-octet integer that defines the
+token type, in network byte order. This type indicates the issuance protocol
+used to generate the token and determines the structure and semantics of the rest of
+the structure. Values are registered in an IANA registry, {{token-types}}. Client MUST
+ignore challenges with token_types they do not support.
+
+This document defines the default challenge structure that can be used across
+token types, although future token types MAY extend or modify the structure
+of the challenge; see {{token-types}} for the registry information
+which establishes and defines the relationship between "token_type" and the
+contents of the TokenChallenge message.
+
+Even when a given token type uses the default challenge, structure,
+the requirements on the presence or interpretation of the fields can differ
+across token types. For example, some token types might require that "origin_info"
+is non-empty, while others allow it to be empty.
+
+The default TokenChallenge message has the following structure:
 
 ~~~
 struct {
@@ -167,13 +184,8 @@ struct {
 
 The structure fields are defined as follows:
 
-- "token_type" is a 2-octet integer, in network byte order. This type indicates
-the issuance protocol used to generate the token. Values are registered
-in an IANA registry, {{token-types}}. Challenges with unsupported token_type
-values MUST be ignored. This value determines the structure and semantics of
-the rest of the structure; see {{token-types}} for the registry information
-which establishes and defines the relationship between "token_type" and the
-contents of the TokenChallenge message.
+- "token_type" is a 2-octet integer, in network byte order, as described
+above.
 
 - "issuer_name" is a string containing the name of the issuer. This is a
 hostname that is used to identify the issuer that is allowed to issue
@@ -238,8 +250,8 @@ WWW-Authenticate:
 Upon receipt of this challenge, a client validates the TokenChallenge before
 responding to it. Validation requirements are as follows:
 
-- The TokenChallenge structure is well-formed;
-- The token_type is recognized and supported by the client; and
+- The token_type is recognized and supported by the client;
+- The TokenChallenge structure is well-formed; and
 - If the origin_info field is non-empty, the name of the origin that issued the
   authentication challenge is included in the list of origin names.
 
@@ -332,7 +344,16 @@ original context could allow the origin to recognize a client.
 The output of the issuance protocol is a token that corresponds to the origin's
 challenge (see {{challenge}}). A token is a structure that begins with a
 two-octet field that indicates a token type, which MUST match the token_type in
-the TokenChallenge structure.
+the TokenChallenge structure. This value determines the structure and semantics
+of the rest of token structure.
+
+This document defines the default token structure that can be used across
+token types, although future token types MAY extend or modify the structure
+of the token; see {{token-types}} for the registry information which
+establishes and defines the relationship between "token_type" and the contents
+of the Token structure.
+
+The default Token message has the following structure:
 
 ~~~
 struct {
@@ -346,11 +367,8 @@ struct {
 
 The structure fields are defined as follows:
 
-- "token_type" is a 2-octet integer, in network byte order. This value must
-match the value in the challenge ({{challenge}}). This value determines the
-structure and semantics of the rest of the structure; see {{token-types}} for
-the registry information which establishes and defines the relationship between
-"token_type" and the contents of the Token structure.
+- "token_type" is a 2-octet integer, in network byte order, as described
+above.
 
 - "nonce" is a 32-octet value containing a client-generated random nonce.
 
