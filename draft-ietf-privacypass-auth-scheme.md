@@ -188,7 +188,7 @@ single octet indicating the length. Challenges with redemption_context values
 of invalid lengths MUST be ignored.
 
 - "origin_info" is an optional ASCII string containing one or more origin names, each of which
-uses the format of the authority portion of a URI as defined in {{Section 3.2 of URI}}. 
+uses the format of the authority portion of a URI as defined in {{Section 3.2 of URI}}.
 The purpose of this field is to allow a token to be scoped to a specific set of origins.
 The field that stores this string in the challenge is prefixed with a 2-octet integer
 indicating the length, in network byte order. If empty, any non-origin-specific
