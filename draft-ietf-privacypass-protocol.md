@@ -167,10 +167,22 @@ defined in {{tokenkeys-values}}.
 | token-key    | The base64url encoding of the Public Key for use with the issuance protocol, including padding, represented as a JSON string ({{RFC8259, Section 7}}) |
 {: #tokenkeys-values title="Issuer 'token-keys' object description'"}
 
-Issuers MAY advertise multiple token-keys for the same token-type to
-support key rotation. In this case, Issuers indicate preference for which
-token key to use based on the order of keys in the list, with preference
-given to keys earlier in the list.
+Each "token-keys" JSON object may also contain the optional field "not-before".
+The value of this field is the UNIX timestamp (number of seconds since
+January 1, 1970, UTC) at which the key can be used. If this field is present,
+Clients SHOULD NOT use a token key before this timestamp, as doing so may
+lead to issuance failures. The purpose of this field is to assist in scheduled
+key rotations.
+
+Beyond staging keys with the "not-before" value, Issuers MAY advertise multiple
+"token-keys" for the same token-type to facilitate key rotation. In this case,
+Issuers indicate preference for which token key to use based on the order of
+keys in the list, with preference given to keys earlier in the list. Clients
+SHOULD use the first key in the "token-keys" list that either does not have a
+"not-before" value or has a "not-before" value in the past. Origins can attempt
+to use any key in the "token-keys" list to verify tokens, starting with the most
+preferred key in the list. Trial verification like this can help deal with Client
+clock skew.
 
 Altogether, the Issuer's directory could look like:
 
@@ -181,6 +193,7 @@ Altogether, the Issuer's directory could look like:
       {
         "token-type": 2,
         "token-key": "MI...AB",
+        "not-before": 1686913811,
       },
       {
         "token-type": 2,
@@ -189,6 +202,10 @@ Altogether, the Issuer's directory could look like:
     ]
  }
 ~~~
+
+Clients that use this directory resource before 1686913811 in UNIX time would use the
+second key in the "token-keys" list, whereas Clients that use this directory after
+1686913811 in UNIX time would use the first key in the "token-keys" list.
 
 Issuer directory resources have the media type
 "application/private-token-issuer-directory" and are located at the well-known location
