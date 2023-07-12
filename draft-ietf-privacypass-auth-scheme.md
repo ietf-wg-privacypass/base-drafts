@@ -690,83 +690,98 @@ lists the following values:
 Test vectors are provided for each of the following TokenChallenge
 configurations:
 
-- TokenChallenge with a single origin and non-empty redemption context
-- TokenChallenge with a single origin and empty redemption context
-- TokenChallenge with an empty origin and redemption context
-- TokenChallenge with an empty origin and non-empty redemption context
-- TokenChallenge with a multiple origins and non-empty redemption context
+1. TokenChallenge with a single origin and non-empty redemption context
+2. TokenChallenge with a single origin and empty redemption context
+3. TokenChallenge with an empty origin and redemption context
+4. TokenChallenge with an empty origin and non-empty redemption context
+5. TokenChallenge with a multiple origins and non-empty redemption context
 
 These test vectors are below.
 
 ~~~
-token_type: 2
+// Test vector 1:
+//   token_type(0002), issuer_name(issuer.example),
+//   origin_info(origin.example), redemption_context(non-empty)
+token_type: 0002
 issuer_name: 6973737565722e6578616d706c65
 redemption_context:
-9d262778b3dc2be365d667b03f9cca99efd049e76eb53a6de37120ca34da373b
+476ac2c935f458e9b2d7af32dacfbd22dd6023ef5887a789f1abe004e79bb5bb
 origin_info: 6f726967696e2e6578616d706c65
 nonce:
-86ed4bb9f76ab1107a05a9af4aa4eec84dd02f390f9bf5ef14730e0ee15aa92d
+e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab
 token_key_id:
-f861220ad4241ee0e33eb4a486a32f05af05ee33fcfdd1104c665eb827c20621
-token_authenticator_input: 000286ed4bb9f76ab1107a05a9af4aa4eec84d
-d02f390f9bf5ef14730e0ee15aa92df099ea46d6c892cdbc8513586fa8518a6d6
-3f28fe4da6f8ddd2a46a405c14488f861220ad4241ee0e33eb4a486a32f05af05
-ee33fcfdd1104c665eb827c20621
+ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708
+token_authenticator_input: 0002e01978182c469e5e026d66558ee1865686
+14f235e41ef7e2378e6f202688abab8e1d5518ec82964255526efd8f9db88205a
+8ddd3ffb1db298fcc3ad36c42388fca572f8982a9ca248a3056186322d93ca147
+266121ddeb5632c07f1f71cd2708
 
-token_type: 2
+// Test vector 2:
+//   token_type(0002), issuer_name(issuer.example),
+//   origin_info(origin.example), redemption_context(empty)
+token_type: 0002
 issuer_name: 6973737565722e6578616d706c65
 redemption_context:
 origin_info: 6f726967696e2e6578616d706c65
 nonce:
-86ed4bb9f76ab1107a05a9af4aa4eec84dd02f390f9bf5ef14730e0ee15aa92d
+e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab
 token_key_id:
-f861220ad4241ee0e33eb4a486a32f05af05ee33fcfdd1104c665eb827c20621
-token_authenticator_input: 000286ed4bb9f76ab1107a05a9af4aa4eec84d
-d02f390f9bf5ef14730e0ee15aa92d11e15c91a7c2ad02abd66645802373db1d8
-23bea80f08d452541fb2b62b5898bf861220ad4241ee0e33eb4a486a32f05af05
-ee33fcfdd1104c665eb827c20621
+ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708
+token_authenticator_input: 0002e01978182c469e5e026d66558ee1865686
+14f235e41ef7e2378e6f202688abab11e15c91a7c2ad02abd66645802373db1d8
+23bea80f08d452541fb2b62b5898bca572f8982a9ca248a3056186322d93ca147
+266121ddeb5632c07f1f71cd2708
 
-token_type: 2
+// Test vector 3:
+//   token_type(0002), issuer_name(issuer.example),
+//   origin_info(), redemption_context(empty)
+token_type: 0002
 issuer_name: 6973737565722e6578616d706c65
 redemption_context:
 origin_info:
 nonce:
-86ed4bb9f76ab1107a05a9af4aa4eec84dd02f390f9bf5ef14730e0ee15aa92d
+e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab
 token_key_id:
-f861220ad4241ee0e33eb4a486a32f05af05ee33fcfdd1104c665eb827c20621
-token_authenticator_input: 000286ed4bb9f76ab1107a05a9af4aa4eec84d
-d02f390f9bf5ef14730e0ee15aa92db741ec1b6fd05f1e95f8982906aec161289
-6d9ca97d53eef94ad3c9fe023f7a4f861220ad4241ee0e33eb4a486a32f05af05
-ee33fcfdd1104c665eb827c20621
+ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708
+token_authenticator_input: 0002e01978182c469e5e026d66558ee1865686
+14f235e41ef7e2378e6f202688ababb741ec1b6fd05f1e95f8982906aec161289
+6d9ca97d53eef94ad3c9fe023f7a4ca572f8982a9ca248a3056186322d93ca147
+266121ddeb5632c07f1f71cd2708
 
-token_type: 2
+// Test vector 4:
+//   token_type(0002), issuer_name(issuer.example),
+//   origin_info(), redemption_context(non-empty)
+token_type: 0002
 issuer_name: 6973737565722e6578616d706c65
 redemption_context:
-9d262778b3dc2be365d667b03f9cca99efd049e76eb53a6de37120ca34da373b
+476ac2c935f458e9b2d7af32dacfbd22dd6023ef5887a789f1abe004e79bb5bb
 origin_info:
 nonce:
-86ed4bb9f76ab1107a05a9af4aa4eec84dd02f390f9bf5ef14730e0ee15aa92d
+e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab
 token_key_id:
-f861220ad4241ee0e33eb4a486a32f05af05ee33fcfdd1104c665eb827c20621
-token_authenticator_input: 000286ed4bb9f76ab1107a05a9af4aa4eec84d
-d02f390f9bf5ef14730e0ee15aa92dda5366799e0facc5cf9ea3dfc4a6f57072c
-31fff84e7331919ebdb06445b2c50f861220ad4241ee0e33eb4a486a32f05af05
-ee33fcfdd1104c665eb827c20621
+ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708
+token_authenticator_input: 0002e01978182c469e5e026d66558ee1865686
+14f235e41ef7e2378e6f202688ababb85fb5bc06edeb0e8e8bdb5b3bea8c4fa40
+837c82e8bcaf5882c81e14817ea18ca572f8982a9ca248a3056186322d93ca147
+266121ddeb5632c07f1f71cd2708
 
-token_type: 2
+// Test vector 5:
+//   token_type(0002), issuer_name(issuer.example),
+//   origin_info(foo.example,bar.example),
+//   redemption_context(non-empty)
+token_type: 0002
 issuer_name: 6973737565722e6578616d706c65
 redemption_context:
-9d262778b3dc2be365d667b03f9cca99efd049e76eb53a6de37120ca34da373b
-origin_info:
-6f726967696e2e6578616d706c652c6f726967696e322e6578616d706c65
+476ac2c935f458e9b2d7af32dacfbd22dd6023ef5887a789f1abe004e79bb5bb
+origin_info: 666f6f2e6578616d706c652c6261722e6578616d706c65
 nonce:
-86ed4bb9f76ab1107a05a9af4aa4eec84dd02f390f9bf5ef14730e0ee15aa92d
+e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab
 token_key_id:
-f861220ad4241ee0e33eb4a486a32f05af05ee33fcfdd1104c665eb827c20621
-token_authenticator_input: 000286ed4bb9f76ab1107a05a9af4aa4eec84d
-d02f390f9bf5ef14730e0ee15aa92df7eeba1bd7c550a8184bee32ce66e6fb527
-17aa67da7e0ca32f4cdca9dec7130f861220ad4241ee0e33eb4a486a32f05af05
-ee33fcfdd1104c665eb827c20621
+ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708
+token_authenticator_input: 0002e01978182c469e5e026d66558ee1865686
+14f235e41ef7e2378e6f202688ababa2a775866b6ae0f98944910c8f48728d8a2
+735b9157762ddbf803f70e2e8ba3eca572f8982a9ca248a3056186322d93ca147
+266121ddeb5632c07f1f71cd2708
 ~~~
 
 ## HTTP Header Test Vectors
