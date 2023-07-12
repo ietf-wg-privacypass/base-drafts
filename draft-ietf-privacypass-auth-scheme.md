@@ -221,8 +221,9 @@ following parameters:
  all challenges.
 
 - "token-key", which contains a base64url encoding of the public key for
-use with the issuance protocol indicated by the challenge. Since the length of
-the key is not fixed, the base64url value MUST include padding. As an
+use with the issuance protocol indicated by the challenge. The encoding of
+the public key is determined by the token type; see {{token-types}}. Since the
+length of the key is not fixed, the base64url value MUST include padding. As an
 Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}), the
 value can be either a token or a quoted-string, and might be required to be a
 quoted-string if the base64url string includes "=" characters. This parameter
@@ -572,6 +573,7 @@ Template:
 * Value: The two-byte identifier for the algorithm
 * Name: Name of the issuance protocol
 * Token Structure: The contents of the Token structure in {{redemption}}
+* Token Key Encoding: The encoding of the "token-key" parameter in {{redemption}}
 * TokenChallenge Structure: The contents of the TokenChallenge structure in {{challenge}}
 * Publicly Verifiable: A Y/N value indicating if the output tokens are
   publicly verifiable
@@ -639,6 +641,7 @@ for Private Use.
 * Value: 0xFF00-0xFFFF
 * Name: Private Use
 * Token Structure: The contents of the Token structure in {{redemption}}
+* Token Key Encoding: N/A
 * TokenChallenge Structure: The contents of the TokenChallenge structure in {{challenge}}
 * Publicly Verifiable: N/A
 * Public Metadata: N/A
