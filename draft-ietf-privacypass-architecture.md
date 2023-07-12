@@ -149,8 +149,11 @@ The Privacy Pass architecture consists of four logical entities --
 Client, Origin, Issuer, and Attester -- that work in concert
 for token redemption and issuance. This section presents an overview
 of Privacy Pass, a high-level description of the threat model and
-privacy goals of the architecture, and the goals and requirements of the
-redemption and issuance protocols.
+privacy goals of the architecture, and the goals and requirements of
+the redemption and issuance protocols. Deployment variations for the
+Origin, Issuer, and Attester in this architecture, including
+considerations for implements these entities, are further discussed
+in {{deployment}}.
 
 ## Overview
 
@@ -170,7 +173,7 @@ obtain one (or more) bound to the token challenge, it then invokes the
 issuance protocol. As a prerequisite to the issuance protocol, the Client
 runs the deployment specific attestation process that is required for the
 designated Issuer. Client attestation can be done via proof of solving a
-CAPTCHA, checking device or hardware attestation validity, etc; see
+CAPTCHA, checking device or hardware attestation validity, etc.; see
 {{attester}} for more details.
 
 4. If the attestation process completes successfully, the client creates a
@@ -238,7 +241,7 @@ Issuer during the issuance protocol.
 
 Attestation context:
 : The interactions and set of information shared between
-the Client and Attester only, for the purposes of attesting the vailidity of
+the Client and Attester only, for the purposes of attesting the validity of
 the Client, that is provided or otherwise available during attestation that
 might be used to identify the Client. This context includes all information
 associated with attestation, such as the timestamp of the event and any Client
@@ -999,7 +1002,7 @@ context, the anonymity set of Clients during the issuance protocol consists
 of those Clients that started issuance between the time of the Origin's
 challenge and the corresponding token redemption. Depending on the number
 of Clients using a particular Issuer during that time window, the set can
-be small. Appliations should take such side channels into consideration before
+be small. Applications should take such side channels into consideration before
 choosing a particular deployment model and type of token challenge and
 redemption context.
 
@@ -1010,7 +1013,7 @@ redemption and issuance protocols. It also describes deployment models and
 privacy considerations for using Privacy Pass within those models. Ensuring
 Client privacy -- separation of attestation and redemption contexts -- requires
 active work on behalf of the Client, especially in the presence of malicious
-Issuers and Origins. Implementing mitigations discused in {{deployment}}
+Issuers and Origins. Implementing mitigations discussed in {{deployment}}
 and {{privacy}} is therefore necessary to ensure that Privacy Pass offers
 meaningful privacy improvements to end-users.
 
