@@ -753,7 +753,7 @@ This document updates the "Token Type" Registry from
 * Value: 0x0002
 * Name: Blind RSA (2048-bit)
 * Token Structure: As defined in {{Section 2.2 of AUTHSCHEME}}
-* Token Key Encoding: Serialized as a DER-encoded SubjectPublicKeyInfo (SPKI) object
+* Token Key Encoding: Serialized as a DER-encoded SubjectPublicKeyInfo (SPKI) object, using the RSASSA-PSS OID {{!RFC5756}}
 * TokenChallenge Structure: As defined in {{Section 2.1 of AUTHSCHEME}}
 * Publicly Verifiable: Y
 * Public Metadata: N
