@@ -738,6 +738,7 @@ This document updates the "Token Type" Registry from
 * Value: 0x0001
 * Name: VOPRF (P-384, SHA-384)
 * Token Structure: As defined in {{Section 2.2 of AUTHSCHEME}}
+* Token Key Encoding: Serialized using SerializeElement from {{Section 2.1 of OPRF}}
 * TokenChallenge Structure: As defined in {{Section 2.1 of AUTHSCHEME}}
 * Publicly Verifiable: N
 * Public Metadata: N
@@ -752,6 +753,7 @@ This document updates the "Token Type" Registry from
 * Value: 0x0002
 * Name: Blind RSA (2048-bit)
 * Token Structure: As defined in {{Section 2.2 of AUTHSCHEME}}
+* Token Key Encoding: Serialized as a DER-encoded SubjectPublicKeyInfo (SPKI) object using the RSASSA-PSS OID {{!RFC5756}}
 * TokenChallenge Structure: As defined in {{Section 2.1 of AUTHSCHEME}}
 * Publicly Verifiable: Y
 * Public Metadata: N
@@ -1012,8 +1014,7 @@ The test vector below lists the following values:
 
 - skS: The Issuer private Key, serialized using SerializeScalar from
   {{Section 2.1 of OPRF}} and represented as a hexadecimal string.
-- pkS: The Issuer Public Key, serialized using SerializeElement from
-  {{Section 2.1 of OPRF}} and represented as a hexadecimal string.
+- pkS: The Issuer Public Key, serialized according to the encoding in {{private-token-type}}.
 - token_challenge: A randomly generated TokenChallenge structure, represented
   as a hexadecimal string.
 - nonce: The 32-byte client nonce generated according to {{private-request}},
@@ -1156,9 +1157,7 @@ The test vector below lists the following values:
 
 - skS: The PEM-encoded PKCS#8 RSA Issuer Private Key used for signing tokens,
   represented as a hexadecimal string.
-- pkS: The DER-encoded SubjectPublicKeyInfo object carrying the Issuer Public
-  Key, as described in {{public-issuer-configuration}}, represented as a
-  hexadecimal string.
+- pkS: The Issuer Public Key, serialized according to the encoding in {{public-token-type}}.
 - token_challenge: A randomly generated TokenChallenge structure, represented
   as a hexadecimal string.
 - nonce: The 32-byte client nonce generated according to {{public-request}},
