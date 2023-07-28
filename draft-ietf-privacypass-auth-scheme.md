@@ -212,18 +212,18 @@ When used in an authentication challenge, the "PrivateToken" scheme uses the
 following parameters:
 
 - "challenge", which contains a base64url-encoded {{!RFC4648}} TokenChallenge
- value. Since the length of the challenge is not fixed, the base64url value
- MUST include padding. As an Authentication Parameter (`auth-param` from
- {{!RFC9110, Section 11.2}}), the value can be either a token or a
- quoted-string, and might be required to be a quoted-string if the base64url
- string includes "=" characters. This challenge value MUST be unique for every
- 401 HTTP response to prevent replay attacks. This parameter is required for
- all challenges.
+value. This document follows the default padding behavior described in
+{{Section 3.2 of !RFC4648}}, so the base64url value MUST include padding.
+As an Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}),
+the value can be either a token or a quoted-string, and might be required to
+be a quoted-string if the base64url string includes "=" characters. This
+challenge value MUST be unique for every 401 HTTP response to prevent replay
+attacks. This parameter is required for all challenges.
 
 - "token-key", which contains a base64url encoding of the public key for
 use with the issuance protocol indicated by the challenge. The encoding of
-the public key is determined by the token type; see {{token-types}}. Since the
-length of the key is not fixed, the base64url value MUST include padding. As an
+the public key is determined by the token type; see {{token-types}}.
+As with "challenge", the base64url value MUST include padding. As an
 Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}), the
 value can be either a token or a quoted-string, and might be required to be a
 quoted-string if the base64url string includes "=" characters. This parameter
@@ -389,7 +389,7 @@ nonce, challenge_digest, and token_key_id fields.
 
 When used for client authorization, the "PrivateToken" authentication
 scheme defines one parameter, "token", which contains the base64url-encoded
-Token struct. Since the length of the Token struct is not fixed, the base64url
+Token struct. As with the challenge parameters ({{challenge}}), the base64url
 value MUST include padding. As an Authentication Parameter (`auth-param` from
 {{!RFC9110, Section 11.2}}), the value can be either a token or a
 quoted-string, and might be required to be a quoted-string if the base64url
