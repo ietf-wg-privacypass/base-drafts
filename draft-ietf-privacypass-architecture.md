@@ -827,11 +827,11 @@ challenge is per-Origin or cross-Origin.
 ## Split Origin, Attester, Issuer {#deploy-split}
 
 In this model, the Origin, Attester, and Issuer are all operated by different
-entities, as shown in the figure below. As with the joint Origin and Issuer
-model, the Issuer accepts token requests that come from trusted Attesters, and
-the details of that trust establishment depend on the issuance protocol and
-relationship between Attester and Issuer; see {{privacy-and-trust}}. This
-arrangement is shown in {{fig-overview}}.
+entities. As with the joint Origin and Issuer model, the Issuer accepts token
+requests that come from trusted Attesters, and the details of that trust
+establishment depend on the issuance protocol and relationship between
+Attester and Issuer; see {{privacy-and-trust}}. This arrangement is shown
+in {{fig-overview}}.
 
 This is the most general deployment model, and is necessary for some
 types of issuance protocols where the Attester plays a role in token
