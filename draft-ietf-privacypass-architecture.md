@@ -790,7 +790,7 @@ mutually-authenticated TLS. However, alternative authentication mechanisms are
 possible. This arrangement is shown in {{fig-deploy-joint-origin}}.
 
 ~~~ aasvg
-                                 +-----------------------------.
+                                  +----------------------------.
 +--------+          +----------+  |  +--------+     +--------+  |
 | Client |          | Attester |  |  | Issuer |     | Origin |  |
 +---+----+          +-----+----+  |  +----+---+     +---+----+  |
