@@ -60,7 +60,7 @@ Clients and relying parties (origins) interact using this scheme to perform the
 token challenge and token redemption flow. In particular, origins challenge
 clients for a token with an HTTP Authentication challenge (using the
 WWW-Authenticate response header field). Clients then respond to that challenge
-with an HTTP authentiation response (using the Authorization request header
+with an HTTP authentication response (using the Authorization request header
 field). Clients produce an authentication response based on the origin's token
 challenge by running the token issuance protocol
 {{?ISSUANCE=I-D.ietf-privacypass-protocol}}. The act of presenting a token in an
