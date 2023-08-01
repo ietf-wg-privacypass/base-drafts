@@ -375,7 +375,7 @@ above.
 - "challenge_digest" is a 32-octet value containing the hash of the
 original TokenChallenge, SHA256(TokenChallenge).
 
-- "token_key_id" is an Nid-octet identifier for the the token authentication
+- "token_key_id" is an Nid-octet identifier for the token authentication
 key. The value of this field is defined by the token_type and corresponding
 issuance protocol.
 
