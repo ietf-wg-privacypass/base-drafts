@@ -295,11 +295,12 @@ properties and methods for constructing the corresponding context are below.
 This list is not exhaustive.
 
 - Context bound to a given time window: Construct redemption context as
-  SHA256(current time window).
+  F(current time window), where F is a pseudorandom function.
 - Context bound to a client location: Construct redemption context as
-  SHA256(client IP address prefix).
+  F(client IP address prefix), where F is a pseudorandom function
 - Context bound to a given time window and location: Construct redemption
-  context as SHA256(current time window, client IP address prefix).
+  context as F(current time window, client IP address prefix), where F is
+  a pseudorandom function.
 
 An empty redemption context is not bound to any property of the client session.
 Preventing double spending on tokens requires the origin to keep state
@@ -373,7 +374,10 @@ above.
 - "nonce" is a 32-octet value containing a client-generated random nonce.
 
 - "challenge_digest" is a 32-octet value containing the hash of the
-original TokenChallenge, SHA256(TokenChallenge).
+original TokenChallenge, SHA-256(TokenChallenge), where SHA-256 is as defined
+in {{!SHS=DOI.10.6028/NIST.FIPS.180-4}}. Changing the hash function to something
+other than SHA-256 would require defining a new token structure, which can be
+done in a future specification.
 
 - "token_key_id" is an Nid-octet identifier for the token authentication
 key. The value of this field is defined by the token_type and corresponding
