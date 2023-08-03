@@ -539,7 +539,7 @@ Depending on the deployment model case, issuance may require some form of
 Client anonymization service, similar to an IP-hiding proxy, so that Issuers
 cannot learn information about Clients. This can be provided by an explicit
 participant in the issuance protocol, or it can be provided via external means,
-such as through the use of an IP-hiding proxy service like Tor.
+such as through the use of an IP-hiding proxy service like Tor {{DMS2004}}.
 In general, Clients SHOULD minimize or remove identifying
 information where possible when invoking the issuance protocol.
 
@@ -869,9 +869,9 @@ Origin from a token request.
 {{deployment}} discusses deployment models that are possible in practice.
 Beyond possible implications on security and privacy properties of the
 resulting system, Privacy Pass deployments can impact the overall ecosystem
-in two important ways: (1) discriminatory treatment of Clients and the viability
-of an open Web, and (2) centralization. This section describes considerations
-relevant to these topics.
+in two important ways: (1) discriminatory treatment of Clients and the gated
+access to otherwise open services, and (2) centralization. This section
+describes considerations relevant to these topics.
 
 ## Discriminatory Treatment
 
@@ -879,13 +879,16 @@ Origins can use tokens as a signal for distinguishing between Clients
 that are capable of completing attestation with one Attester trusted by the
 Origin's chosen Issuer, and Clients that are not capable of doing the same. A
 consequence of this is that Privacy Pass could enable discriminatory treatment
-of Clients based on Attestation support. This could lead to harmful ecosystem
-effects if left unresolved.
+of Clients based on Attestation support. For example, an Origin could only
+authorize Clients that successfully authenticate with a token, prohibiting access
+to all other Clients. If the Attestation is not equitable, this can yield
+harmful ecosystem effects if left unresolved.
 
-In principle, Issuers should strive to work with a set of Attesters that are
-suitable for all Clients, thereby mitigating such discriminatory behavior.
-In practice, this may require tradeoffs in what type of attestation Issuers are
-willing to trust so as to enable more widespread support.
+In principle, Issuers should strive to mitigate discriminatory behavior by
+providing equitable access to all Clients. This can be done by working with a
+set of Attesters that are suitable for all Clients. In practice, this may require
+tradeoffs in what type of attestation Issuers are willing to trust so as to
+enable more widespread support.
 
 For example, to disallow discriminatory behavior between Clients with and
 without device attestation support, an Issuer may wish to support Attesters
