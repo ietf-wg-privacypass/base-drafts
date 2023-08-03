@@ -125,13 +125,8 @@ same client. In deployment scenarios where origins send token challenges to
 request tokens, origins ought to expect at most one request containing a token
 from the client in reaction to a particular challenge.
 
-Origins SHOULD minimize the number of challenges sent on a particular client
-session, such as a unique TLS session between a client and origin
-(referred to as the "redemption context" in {{ARCHITECTURE}}). Clients can
-have implementation-specific policy to minimize the number of tokens that
-can be retrieved by origins, so origins are advised to only request tokens
-when necessary within a single session. See {{interaction}} for more discussion
-on how to optimize token challenges to improve the user experience.
+The rest of this section describes the token challenge and redemption interactions
+in more detail.
 
 ## Token Challenge {#challenge}
 
@@ -221,7 +216,9 @@ challenge value MUST be unique for every 401 HTTP response to prevent replay
 attacks. This parameter is required for all challenges.
 
 - "token-key", which contains a base64url encoding of the public key for
-use with the issuance protocol indicated by the challenge. The encoding of
+use with the issuance protocol indicated by the challenge. See {{ISSUANCE}}
+for more information about how this public key is used by the issuance protocols
+in that specification. The encoding of
 the public key is determined by the token type; see {{token-types}}.
 As with "challenge", the base64url value MUST include padding. As an
 Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}), the
@@ -425,6 +422,14 @@ When used in contexts like websites, origins that challenge clients for
 tokens need to consider how to optimize their interaction model to ensure a
 good user experience.
 
+Origins SHOULD minimize the number of challenges sent on a particular client
+session, such as a unique TLS session between a client and origin
+(referred to as the "redemption context" in {{ARCHITECTURE}}). Similarly, clients
+SHOULD have some implementation-specific policy to minimize the number of tokens
+that can be retrieved by origins. One possible implementation of this policy is
+to bound the number of token challenges a given origin can provide for a given
+session.
+
 Tokens challenges can be performed without explicit user involvement, depending
 on the issuance protocol. If tokens are scoped to a specific origin,
 there is no need for per-challenge user interaction. Note that the issuance
@@ -470,7 +475,7 @@ either do not support tokens or are unable to fetch tokens at a particular
 time can present the user with the puzzle.
 
 To mitigate the risk of deployments becoming dependent on tokens, clients and
-servers SHOULD grease their behavior unless explicitly configured not to. In
+origins SHOULD grease their behavior unless explicitly configured not to. In
 particular, clients SHOULD ignore token challenges with some non-zero
 probability. Likewise, origins SHOULD randomly choose to not challenge clients
 for tokens with some non-zero probability. Moreover, origins SHOULD include
