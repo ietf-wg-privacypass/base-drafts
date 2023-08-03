@@ -385,7 +385,9 @@ corresponding issuance protocol. The value of constant Nk depends on
 token_type, as defined in {{token-types}}.
 
 The authenticator value in the Token structure is computed over the token_type,
-nonce, challenge_digest, and token_key_id fields.
+nonce, challenge_digest, and token_key_id fields. A token is considered a valid
+if token verification using succeeds; see {{verification}} for details about
+verifying the token and its authenticator value.
 
 When used for client authorization, the "PrivateToken" authentication
 scheme defines one parameter, "token", which contains the base64url-encoded
@@ -403,21 +405,38 @@ the Authorization header field as follows:
 Authorization: PrivateToken token="abc..."
 ~~~
 
-For token types that support public verifiability, origins verify the token
-authenticator using the public key of the issuer, and validate that the signed
-message matches the concatenation of the client nonce and the hash of a
-valid TokenChallenge. For context-bound tokens, origins store or reconstruct
-the contexts of previous TokenChallenge structures in order to validate the
-token. A TokenChallenge MAY be bound to a specific TLS session with a client,
-but origins can also accept tokens for valid challenges in new sessions.
-Origins SHOULD implement some form of double-spend prevention that prevents
-a token with the same nonce from being redeemed twice. This prevents clients
-from "replaying" tokens for previous challenges. For context-bound tokens,
-this double-spend prevention can require no state or minimal state, since
-the context can be used to verify token uniqueness.
+For context-bound tokens, origins store or reconstruct the contexts of previous
+TokenChallenge structures in order to validate the token. A TokenChallenge MAY
+be bound to a specific TLS session with a client, but origins can also accept
+tokens for valid challenges in new sessions. Origins SHOULD implement some form
+of double-spend prevention that prevents a token with the same nonce from being
+redeemed twice. Double-spend prevention ensures that clients cannot replay tokens
+for previous challenges. For context-bound tokens, this double-spend prevention
+can require no state or minimal state, since the context can be used to verify
+token uniqueness.
 
 If a client is unable to fetch a token, it MUST react to the challenge as
 if it could not produce a valid Authorization response.
+
+### Token Verification {#verification}
+
+Verifying a Token consists of checking that the authenticator value is correct.
+The authenticator value is as computed when running and finalizing the issuance
+protocol corresponding to the token type with the following value as the input:
+
+~~~
+struct {
+    uint16_t token_type;
+    uint8_t nonce[32];
+    uint8_t challenge_digest[32];
+    uint8_t token_key_id[Nid];
+} AuthenticatorInput;
+~~~
+
+The value of these fields are as described in {{redemption}}. The cryptographic
+verification check depends on the token type; see {{Section 5.4 of ISSUANCE}}
+and {{Section 6.4 of ISSUANCE}} for verification instructions for the issuance
+protocols described in {{ISSUANCE}}.
 
 # User Interaction {#interaction}
 
