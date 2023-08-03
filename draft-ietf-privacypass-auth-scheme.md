@@ -436,14 +436,15 @@ there is no need for per-challenge user interaction. Note that the issuance
 protocol may separately involve user interaction if the client needs to be
 newly validated.
 
-If a client cannot use cached tokens to respond to a challenge (either because
-it has run out of cached tokens or the associated context is unique), the token
+If a client cannot use cached tokens to respond to a challenge, either because
+it has run out of cached tokens or the associated context is unique, the token
 issuance process can add user-perceivable latency. Origins need not block
-useful work on token authentication. Instead, token authentication can be used
-in similar ways to CAPTCHA validation today, but without the need for user
-interaction. If issuance is taking a long time, a website could show an
-indicator that it is waiting, or fall back to another method of user
-validation.
+useful work such as loading the contents of a web page on token authentication.
+Instead, token authentication can be used in similar ways to CAPTCHA validation
+today, wherein validation sometimes proceeds alongside useful work, e.g., when
+loading contents of a web page, but without the need for user interaction.
+If issuance is taking a long time, an origin could fall back to another method
+of user validation.
 
 An origin MUST NOT use more than one redemption context value for a given token
 type and issuer per client request. If an origin issues a large number of
