@@ -84,35 +84,45 @@ informative:
 --- abstract
 
 This document specifies the Privacy Pass architecture and requirements for
-its constituent protocols used for constructing privacy-preserving
-authentication mechanisms. It provides recommendations on how the architecture
-should be deployed to ensure the privacy of clients and the security of all
-participating entities.
+its constituent protocols used for authorization based on privacy-preserving
+authentication mechanisms. It describes the conceptual model of Privacy Pass
+and its protocols, its security and privacy goals, practical deployment models,
+and recommendations for each deployment model that helps ensure the desired
+security and privacy goals are fulfilled.
 
 --- middle
 
 # Introduction
 
 Privacy Pass is an architecture for authorization based on privacy-preserving
-authentication mechanisms. Typical approaches for authorizing clients,
-such as through the use of long-term state (cookies), are not privacy-friendly
-since they allow servers to track clients across sessions and interactions.
-Privacy Pass takes a different approach: instead of presenting linkable
-state-carrying information to servers, e.g., a cookie indicating whether
-or not the client is an authorized user or has completed some prior
-challenge, clients present unlinkable proofs that attest to this information.
-These proofs, or tokens, are private in the sense that a given token cannot
-be linked to the protocol interaction where that token was initially issued.
+authentication mechanisms. In other words, relying parties authenticate clients
+in a privacy-preserving way, i.e., without learning any unique, per-client
+information through the authentication protocol, and then make authorization
+decisions on the basis of that authentication suceeding or failing. Possible
+authorization decisions might be to provide clients with read access to a
+particular resource or write access to a particular API.
+
+Typical approaches for authorizing clients, such as through the use of long-term
+state (cookies), are not privacy-friendly since they allow servers to track
+clients across sessions and interactions. Privacy Pass takes a different
+approach: instead of presenting linkable state-carrying information to servers,
+e.g., a cookie indicating whether or not the client is an authorized user or
+has completed some prior challenge, clients present unlinkable proofs that
+attest to this information. These proofs, or tokens, are private in the sense
+that a given token cannot be linked to the protocol interaction where that
+token was initially issued.
 
 At a high level, the Privacy Pass architecture consists of two protocols:
 redemption and issuance. The redemption protocol, described in
 {{?AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}, runs between Clients and
 Origins (servers). It allows Origins to challenge Clients to present tokens
-for authorization. Depending on the type of token, e.g., whether or not it
-can be cached, the Client either presents a previously obtained token or
-invokes an issuance protocol, such as
-{{?ISSUANCE=I-D.ietf-privacypass-protocol}}, to acquire a token to present as
-authorization.
+for consumption. Origins verify the token to authenticate the Client -- without
+learning any specific information about the Client -- and then make an authorization
+decision on the basis of the token verifying successfully or not. Depending
+on the type of token, e.g., whether or not it can be cached, the Client
+either presents a previously obtained token or invokes an issuance protocol,
+such as {{?ISSUANCE=I-D.ietf-privacypass-protocol}}, to acquire a token to
+present as authorization.
 
 This document describes requirements for both redemption and issuance
 protocols and how they interact. It also provides recommendations on how
@@ -128,6 +138,9 @@ The following terms are used throughout this document:
 Client:
 : An entity that seeks authorization to an Origin.
 
+Token:
+: A privacy-preserving authenticator that is used for authorization.
+
 Origin:
 : An entity that redeems tokens presented by Clients.
 
@@ -141,7 +154,7 @@ Attester:
 
 Attestation procedure:
 : The procedure by which an Attester determines whether or not a Client
-  is trusted with a specific set of properties for token issuance.
+  has the specific set of properties that are necessary for token issuance.
 
 # Architecture
 
