@@ -462,8 +462,10 @@ An origin MUST NOT assume that token challenges will always yield a valid
 token. Clients might experience issues running the issuance protocol, e.g.,
 because the attester or issuer is unavailable, or clients might simply not
 support the requested token type. Origins SHOULD account for such operational
-or interoperability failures by offering clients an alternative type of
-challenge such as CAPTCHA for accessing a resource.
+or interoperability failures by offering clients a fallback challenge such
+as CAPTCHA for accessing a resource. Failure to provide a fallback will likely
+mean that some clients fail authentication and cannot perform the desired
+action, such as loading a web page or accessing some other resource.
 
 For example, consider a scenario in which the client is a web browser, and the
 origin can accept either a token or a solution to a puzzle intended to
@@ -478,10 +480,13 @@ time can present the user with the puzzle.
 To mitigate the risk of deployments becoming dependent on tokens, clients and
 origins SHOULD grease their behavior unless explicitly configured not to. In
 particular, clients SHOULD ignore token challenges with some non-zero
-probability. Likewise, origins SHOULD randomly choose to not challenge clients
-for tokens with some non-zero probability. Moreover, origins SHOULD include
-random token types, from the Reserved list of "greased" types (defined in
-{{token-types}}), with some non-zero probability.
+probability. From the origin's perspective, ignoring a token challenge is
+indistinguishable from the issuance protocol failing for arbitrary reasons
+(excluding what can be inferred from latency between the client and origin interaction).
+Likewise, origins SHOULD randomly choose to not challenge clients for tokens
+with some non-zero probability. Moreover, origins SHOULD include random token
+types, from the Reserved list of "greased" types (defined in {{token-types}}),
+with some non-zero probability.
 
 # Security Considerations {#sec-considerations}
 
