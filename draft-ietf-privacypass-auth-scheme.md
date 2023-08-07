@@ -297,7 +297,7 @@ This list is not exhaustive.
 - Context bound to a given time window: Construct redemption context as
   F(current time window), where F is a pseudorandom function.
 - Context bound to a client location: Construct redemption context as
-  F(client IP address prefix), where F is a pseudorandom function
+  F(client IP address prefix), where F is a pseudorandom function.
 - Context bound to a given time window and location: Construct redemption
   context as F(current time window, client IP address prefix), where F is
   a pseudorandom function.
