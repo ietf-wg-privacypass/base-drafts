@@ -376,7 +376,7 @@ above.
 - "challenge_digest" is a 32-octet value containing the hash of the
 original TokenChallenge, SHA-256(TokenChallenge), where SHA-256 is as defined
 in {{!SHS=DOI.10.6028/NIST.FIPS.180-4}}. Changing the hash function to something
-other than SHA-256 would require defining a new token structure, which can be
+other than SHA-256 would require defining a new token type and token structure, which can be
 done in a future specification.
 
 - "token_key_id" is an Nid-octet identifier for the token authentication
