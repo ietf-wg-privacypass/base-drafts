@@ -242,9 +242,23 @@ cannot be linked to the content of the Token Request or Token Response.
 ~~~
 {: #fig-overview title="Privacy pass redemption and issuance protocol interaction"}
 
-<!-- ## Use Cases
+## Use Cases
 
-XXX(caw): add use cases here -->
+Use cases for Privacy Pass are broad and depend greatly on the deployment model
+as discussed in {{deployment}}. The initial motivating use case for Privacy Pass
+{{PrivacyPassCloudflare}} was to help rate limit malicious or otherwise abusive
+traffic from services such as Tor {{DMS2004}}. The generalized and evolved
+architecture described in this document also work for this use case. However,
+for added clarity, some more possible use cases are described below.
+
+- Low-quality, anti-fraud signal for open Internet services. Tokens can attest that
+  the client behind the user agent is likely not a bot attempting to perform some
+  form of automated attack such as credential stuffing. Example attestation procedures
+  for this use case might be solving some form of CAPTCHA or presenting evidence of a
+  valid, unlocked device in good standing.
+- Privacy-preserving authentication for proprietary services. Tokens can attest that
+  the client is a valid subscriber for a propietary service, such as a deployment of
+  Oblivious HTTP {{?OHTTP=I-D.ietf-ohai-ohttp}}.
 
 ## Privacy Goals and Threat Model {#privacy-and-trust}
 
