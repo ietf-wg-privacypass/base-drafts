@@ -407,7 +407,7 @@ Authorization: PrivateToken token="abc..."
 ~~~
 
 For context-bound tokens, origins store or reconstruct the contexts of previous
-TokenChallenge structures in order to validate the token. A TokenChallenge MAY
+TokenChallenge structures in order to validate the token. A TokenChallenge can
 be bound to a specific TLS session with a client, but origins can also accept
 tokens for valid challenges in new sessions. Origins SHOULD implement some form
 of double-spend prevention that prevents a token with the same nonce from being
