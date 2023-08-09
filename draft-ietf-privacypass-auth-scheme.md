@@ -252,7 +252,9 @@ responding to it. Validation requirements are as follows:
 - The token_type is recognized and supported by the client;
 - The TokenChallenge structure is well-formed; and
 - If the origin_info field is non-empty, the name of the origin that issued the
-  authentication challenge is included in the list of origin names.
+  authentication challenge is included in the list of origin names. Comparison
+  of the origin name that issued the authentication challenge against elements
+  in the origin_info list is done via case-insensitive equality checks.
 
 If validation fails, the client MUST NOT process or respond to the
 challenge. Clients MAY have further restrictions and requirements around
@@ -374,8 +376,9 @@ above.
 - "challenge_digest" is a 32-octet value containing the hash of the
 original TokenChallenge, SHA-256(TokenChallenge), where SHA-256 is as defined
 in {{!SHS=DOI.10.6028/NIST.FIPS.180-4}}. Changing the hash function to something
-other than SHA-256 would require defining a new token type and token structure (since the contents of challenge_digest would be computed differently), which can be
-done in a future specification.
+other than SHA-256 would require defining a new token type and token structure
+(since the contents of challenge_digest would be computed differently),
+which can be done in a future specification.
 
 - "token_key_id" is a Nid-octet identifier for the token authentication
 key. The value of this field is defined by the token_type and corresponding
@@ -552,7 +555,7 @@ Token challenges that include non-empty origin_info bind tokens to one or more
 specific origins. As described in {{challenge}}, clients only accept such
 challenges from origin names listed in the origin_info string. Even if multiple
 origins are listed, a token can only be redeemed for an origin if the challenge
-has an exact match for the origin_info. For example, if "a.example.com" issues
+has a match for the origin_info. For example, if "a.example.com" issues
 a challenge with an origin_info string of "a.example.com,b.example.com", a
 client could redeem a token fetched for this challenge if and only if
 "b.example.com" also included an origin_info string of
