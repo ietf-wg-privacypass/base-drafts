@@ -157,13 +157,6 @@ Attestation procedure:
 : The procedure by which an Attester determines whether or not a Client
   is trusted with a specific set of properties for token issuance.
 
-Anonymization service:
-: A service through which Clients mask their IP address when connecting to other
-protocol participants, e.g., an IP-hiding proxy. In general, use of an anonymization
-service ensures that all Clients which use the service are indistinguishable from
-one another, though in practice there may be small distinguishing features (TLS
-fingerprints, HTTP headers, etc).
-
 The trust relationships between each of the entities in this list is further
 elaborated upon in {{privacy-and-trust}}.
 
@@ -345,24 +338,25 @@ these be different parties). This means that any information that may be learned
 about the Client during the issuance and attestation flows cannot be used by the
 Origin to compromise Client privacy.
 
-By ensuring that different contexts cannot be linked in this way, only the
-Client is able to correlate information that might be used to identify them with
-activity on the Origin.  The Attester, Issuer, and Origin only receive the
-information necessary to perform their respective functions.
+These unlinkability properties ensure that only the Client is able to correlate
+information that might be used to identify them with activity on the Origin.
+The Attester, Issuer, and Origin only receive the information necessary to perform
+their respective functions.
 
-The manner in which Origin-Client, Issuer-Client, and Attester-Origin
-unlinkability are achieved depends on the deployment model, type of
-attestation, and issuance protocol details. For example, as discussed in
-{{deployment}}, failure to use a privacy-enhancing proxy system such as Tor
-{{DMS2004}} when interacting with Attesters, Issuers, or Origins allows
-the set of possible Clients to be partitioned by the Client's IP address, and
-can therefore lead to unlinkability violations. As such, depending on the
-deployment model, Clients may need to make use of an anonymization service when
-interacting with Origin or Attester in order to maintain unlinkability. When
-such services are used, Clients trust them to not disclosure private Client
-information (such as IP addresses) to untrusted parties. Similarly, malicious
-Origins may attempt to link two redemption contexts together by using Client-specific
-Issuer public keys. See {{deployment-considerations}} and {{privacy}} for more information.
+The manner in which these unlinkability properties are achieved depends on the
+deployment model, type of attestation, and issuance protocol details. For example,
+as discussed in {{deployment}}, in some cases it is necessary to use an anonymization
+service such as Tor {{DMS2004}} which hides Clients IP addresses. In general,
+anonymization services ensures that all Clients which use the service are indistinguishable
+from one another, though in practice there may be small distinguishing features
+(TLS fingerprints, HTTP headers, etc). Moreover, Clients generally trust these services
+to not disclose private Client information (such as IP addresses) to untrusted parties.
+Failure to use an anonymization service when interacting with Attesters, Issuers, or
+Origins can allow the set of possible Clients to be partitioned by the Client's IP address,
+and can therefore lead to unlinkability violations. Similarly, malicious Origins
+may attempt to link two redemption contexts together by using Client-specific
+Issuer public keys. See {{deployment-considerations}} and {{privacy}} for more
+information.
 
 The remainder of this section describes the functional properties and security
 requirements of the redemption and issuance protocols in more detail. {{flow}}
