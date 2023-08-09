@@ -100,7 +100,7 @@ in a privacy-preserving way, i.e., without learning any unique, per-client
 information through the authentication protocol, and then make authorization
 decisions on the basis of that authentication suceeding or failing. Possible
 authorization decisions might be to provide clients with read access to a
-particular resource or write access to a particular API.
+particular resource or write access to a particular resource.
 
 Typical approaches for authorizing clients, such as through the use of long-term
 state (cookies), are not privacy-friendly since they allow servers to track
