@@ -84,35 +84,45 @@ informative:
 --- abstract
 
 This document specifies the Privacy Pass architecture and requirements for
-its constituent protocols used for constructing privacy-preserving
-authentication mechanisms. It provides recommendations on how the architecture
-should be deployed to ensure the privacy of clients and the security of all
-participating entities.
+its constituent protocols used for authorization based on privacy-preserving
+authentication mechanisms. It describes the conceptual model of Privacy Pass
+and its protocols, its security and privacy goals, practical deployment models,
+and recommendations for each deployment model that helps ensure the desired
+security and privacy goals are fulfilled.
 
 --- middle
 
 # Introduction
 
 Privacy Pass is an architecture for authorization based on privacy-preserving
-authentication mechanisms. Typical approaches for authorizing clients,
-such as through the use of long-term state (cookies), are not privacy-friendly
-since they allow servers to track clients across sessions and interactions.
-Privacy Pass takes a different approach: instead of presenting linkable
-state-carrying information to servers, e.g., a cookie indicating whether
-or not the client is an authorized user or has completed some prior
-challenge, clients present unlinkable proofs that attest to this information.
-These proofs, or tokens, are private in the sense that a given token cannot
-be linked to the protocol interaction where that token was initially issued.
+authentication mechanisms. In other words, relying parties authenticate clients
+in a privacy-preserving way, i.e., without learning any unique, per-client
+information through the authentication protocol, and then make authorization
+decisions on the basis of that authentication suceeding or failing. Possible
+authorization decisions might be to provide clients with read access to a
+particular resource or write access to a particular resource.
+
+Typical approaches for authorizing clients, such as through the use of long-term
+state (cookies), are not privacy-friendly since they allow servers to track
+clients across sessions and interactions. Privacy Pass takes a different
+approach: instead of presenting linkable state-carrying information to servers,
+e.g., a cookie indicating whether or not the client is an authorized user or
+has completed some prior challenge, clients present unlinkable proofs that
+attest to this information. These proofs, or tokens, are private in the sense
+that a given token cannot be linked to the protocol interaction where that
+token was initially issued.
 
 At a high level, the Privacy Pass architecture consists of two protocols:
 redemption and issuance. The redemption protocol, described in
 {{?AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}, runs between Clients and
 Origins (servers). It allows Origins to challenge Clients to present tokens
-for authorization. Depending on the type of token, e.g., whether or not it
-can be cached, the Client either presents a previously obtained token or
-invokes an issuance protocol, such as
-{{!ISSUANCE=I-D.ietf-privacypass-protocol}}, to acquire a token to present as
-authorization.
+for consumption. Origins verify the token to authenticate the Client -- without
+learning any specific information about the Client -- and then make an authorization
+decision on the basis of the token verifying successfully or not. Depending
+on the type of token, e.g., whether or not it can be cached, the Client
+either presents a previously obtained token or invokes an issuance protocol,
+such as {{?ISSUANCE=I-D.ietf-privacypass-protocol}}, to acquire a token to
+present as authorization.
 
 This document describes requirements for both redemption and issuance
 protocols and how they interact. It also provides recommendations on how
@@ -131,6 +141,9 @@ Clients implement the RATS Attester role.
 
 Token:
 : A cryptographic authentication message used for authorization decisions.
+
+Token:
+: A privacy-preserving authenticator that is used for authorization.
 
 Origin:
 : An entity that consumes tokens presented by Clients and uses them to make authorization decisions.
@@ -155,7 +168,7 @@ Attester:
 
 Attestation procedure:
 : The procedure by which an Attester determines whether or not a Client
-  is trusted with a specific set of properties for token issuance.
+  has the specific set of properties that are necessary for token issuance.
 
 The trust relationships between each of the entities in this list is further
 elaborated upon in {{privacy-and-trust}}.
@@ -580,7 +593,7 @@ Depending on the deployment model case, issuance may require some form of
 Client anonymization service, similar to an IP-hiding proxy, so that Issuers
 cannot learn information about Clients. This can be provided by an explicit
 participant in the issuance protocol, or it can be provided via external means,
-such as through the use of an IP-hiding proxy service like Tor.
+such as through the use of an IP-hiding proxy service like Tor {{DMS2004}}.
 In general, Clients SHOULD minimize or remove identifying
 information where possible when invoking the issuance protocol.
 
@@ -910,27 +923,35 @@ Origin from a token request.
 {{deployment}} discusses deployment models that are possible in practice.
 Beyond possible implications on security and privacy properties of the
 resulting system, Privacy Pass deployments can impact the overall ecosystem
-in two important ways: (1) discriminatory treatment of Clients and the viability
-of an open Web, and (2) centralization. This section describes considerations
-relevant to these topics.
+in two important ways: (1) discriminatory treatment of Clients and the gated
+access to otherwise open services, and (2) centralization. This section
+describes considerations relevant to these topics.
 
 ## Discriminatory Treatment {#discrimination}
 
 Origins can use tokens as a signal for distinguishing between Clients
 that are capable of completing attestation with one Attester trusted by the
-Origin's chosen Issuer, and Clients that are not capable of doing the same,
-either because they cannot work with a supported Attester, have disabled
-Privacy Pass support, or maybe even have not implemented the protocol. A
-consequence of this is that Privacy Pass, when used for open services on the
-Internet, could enable discriminatory treatment of Clients based on Attestation
-support. This could lead to harmful ecosystem effects if left unresolved, such
-as Attester lock-in ("walled gardens") or similar obstacles to interacting with
-otherwise open services.
+Origin's chosen Issuer, and Clients that are not capable of doing the same. A
+consequence of this is that Privacy Pass could enable discriminatory treatment
+of Clients based on Attestation support. For example, an Origin could only
+authorize Clients that successfully authenticate with a token, prohibiting access
+to all other Clients.
 
-In principle, Issuers should strive to work with a set of Attesters that are
-suitable for all Clients, thereby mitigating such discriminatory behavior.
-In practice, this may require tradeoffs in what type of attestation Issuers are
-willing to trust so as to enable more widespread support.
+The type of attestation procedures supported for a particular deployment depends
+greatly on the use case. For example, consider a proprietary deployment of Privacy Pass
+that authorizes clients to access a resource such as an anonymization service. In this
+context, it is reasonable to support specific types of attestation procedures that
+demonstrate Clients can access the resource, such as with an account or specific
+type of device. However, in open deployments of Privacy Pass that are used to
+safeguard access to otherwise open or publicly accessible resources, diversity
+in attestation procedures is critically important so as to not discriminate against
+Clients that choose certain software, hardware, or identity providers.
+
+In principle, Issuers should strive to mitigate discriminatory behavior by
+providing equitable access to all Clients. This can be done by working with a
+set of Attesters that are suitable for all Clients. In practice, this may require
+tradeoffs in what type of attestation Issuers are willing to trust so as to
+enable more widespread support.
 
 For example, to disallow discriminatory behavior between Clients with and
 without device attestation support, an Issuer may wish to support Attesters
