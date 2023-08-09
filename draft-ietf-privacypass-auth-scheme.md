@@ -127,13 +127,8 @@ same client. In deployment scenarios where origins send token challenges to
 request tokens, origins ought to expect at most one request containing a token
 from the client in reaction to a particular challenge.
 
-Origins SHOULD minimize the number of challenges sent on a particular client
-session, such as a unique TLS session between a client and origin
-(referred to as the "redemption context" in {{ARCHITECTURE}}). Clients can
-have implementation-specific policy to minimize the number of tokens that
-can be retrieved by origins, so origins are advised to only request tokens
-when necessary within a single session. See {{interaction}} for more discussion
-on how to optimize token challenges to improve the user experience.
+The rest of this section describes the token challenge and redemption interactions
+in more detail.
 
 ## Token Challenge {#challenge}
 
@@ -223,7 +218,9 @@ challenge value MUST be unique for every 401 HTTP response to prevent replay
 attacks. This parameter is required for all challenges.
 
 - "token-key", which contains a base64url encoding of the public key for
-use with the issuance protocol indicated by the challenge. The encoding of
+use with the issuance protocol indicated by the challenge. See {{ISSUANCE}}
+for more information about how this public key is used by the issuance protocols
+in that specification. The encoding of
 the public key is determined by the token type; see {{token-types}}.
 As with "challenge", the base64url value MUST include padding. As an
 Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}), the
@@ -456,20 +453,29 @@ When used in contexts like websites, origins that challenge clients for
 tokens need to consider how to optimize their interaction model to ensure a
 good user experience.
 
+Origins SHOULD minimize the number of challenges sent on a particular client
+session, such as a unique TLS session between a client and origin
+(referred to as the "redemption context" in {{ARCHITECTURE}}). Similarly, clients
+SHOULD have some implementation-specific policy to minimize the number of tokens
+that can be retrieved by origins. One possible implementation of this policy is
+to bound the number of token challenges a given origin can provide for a given
+session.
+
 Token challenges can be performed without explicit user involvement, depending
 on the issuance protocol. If tokens are scoped to a specific origin,
 there is no need for per-challenge user interaction. Note that the issuance
 protocol may separately involve user interaction if the client needs to be
 newly validated.
 
-If a client cannot use cached tokens to respond to a challenge (either because
-it has run out of cached tokens or the associated context is unique), the token
+If a client cannot use cached tokens to respond to a challenge, either because
+it has run out of cached tokens or the associated context is unique, the token
 issuance process can add user-perceivable latency. Origins need not block
-useful work on token authentication. Instead, token authentication can be used
-in similar ways to CAPTCHA validation today, but without the need for user
-interaction. If issuance is taking a long time, a website could show an
-indicator that it is waiting, or fall back to another method of user
-validation.
+useful work such as loading the contents of a web page on token authentication.
+Instead, token authentication can be used in similar ways to existing CAPTCHA
+validation flows, wherein validation sometimes proceeds alongside useful work,
+e.g., when loading contents of a web page, but without the need for user interaction.
+If issuance is taking a long time, an origin can fall back to another method
+of user validation.
 
 An origin MUST NOT use more than one redemption context value for a given token
 type and issuer per client request. If an origin issues a large number of
@@ -487,8 +493,10 @@ An origin MUST NOT assume that token challenges will always yield a valid
 token. Clients might experience issues running the issuance protocol, e.g.,
 because the attester or issuer is unavailable, or clients might simply not
 support the requested token type. Origins SHOULD account for such operational
-or interoperability failures by offering clients an alternative type of
-challenge such as CAPTCHA for accessing a resource.
+or interoperability failures by offering clients a fallback challenge such
+as CAPTCHA for accessing a resource. Failure to provide a fallback will likely
+mean that some clients fail authentication and cannot perform the desired
+action, such as loading a web page or accessing some other resource.
 
 For example, consider a scenario in which the client is a web browser, and the
 origin can accept either a token or a solution to a puzzle intended to
@@ -501,12 +509,15 @@ either do not support tokens or are unable to fetch tokens at a particular
 time can present the user with the puzzle.
 
 To mitigate the risk of deployments becoming dependent on tokens, clients and
-servers SHOULD grease their behavior unless explicitly configured not to. In
+origins SHOULD grease their behavior unless explicitly configured not to. In
 particular, clients SHOULD ignore token challenges with some non-zero
-probability. Likewise, origins SHOULD randomly choose to not challenge clients
-for tokens with some non-zero probability. Moreover, origins SHOULD include
-random token types, from the Reserved list of "greased" types (defined in
-{{token-types}}), with some non-zero probability.
+probability. From the origin's perspective, ignoring a token challenge is
+indistinguishable from the issuance protocol failing for arbitrary reasons
+(excluding what can be inferred from latency between the client and origin interaction).
+Likewise, origins SHOULD randomly choose to not challenge clients for tokens
+with some non-zero probability. Moreover, origins SHOULD include random token
+types, from the Reserved list of "greased" types (defined in {{token-types}}),
+with some non-zero probability.
 
 # Security Considerations {#sec-considerations}
 
