@@ -881,8 +881,17 @@ Origin's chosen Issuer, and Clients that are not capable of doing the same. A
 consequence of this is that Privacy Pass could enable discriminatory treatment
 of Clients based on Attestation support. For example, an Origin could only
 authorize Clients that successfully authenticate with a token, prohibiting access
-to all other Clients. If the Attestation is not equitable, this can yield
-harmful ecosystem effects if left unresolved.
+to all other Clients.
+
+The type of attestation procedures supported for a particular deployment depends
+greatly on the use case. For example, proprietary deployments of Privacy Pass that
+use to authorize clients to access a resource such as an anonymization service,
+it is reasonable to only support specific types of attestation procedures that
+demonstrate Clients can access the resource, such as with an account or specific
+type of device. However, in open deployments of Privacy Pass that are used to
+safeguard access to otherwise open or publicly accessible resources, diversity
+in attestation procedures is critically important so as to not discriminate against
+Clients that choose certain software, hardware, or identity providers.
 
 In principle, Issuers should strive to mitigate discriminatory behavior by
 providing equitable access to all Clients. This can be done by working with a
