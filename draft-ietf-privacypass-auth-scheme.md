@@ -254,8 +254,7 @@ responding to it. Validation requirements are as follows:
 - If the origin_info field is non-empty, the name of the origin that issued the
   authentication challenge is included in the list of origin names. Comparison
   of the origin name that issued the authentication challenge against elements
-  in the origin_info list is done via exact match; case-insensitive matching
-  as is common for comparison of DNS names does not apply.
+  in the origin_info list is done via case-insensitive equality checks.
 
 If validation fails, the client MUST NOT process or respond to the
 challenge. Clients MAY have further restrictions and requirements around
@@ -556,7 +555,7 @@ Token challenges that include non-empty origin_info bind tokens to one or more
 specific origins. As described in {{challenge}}, clients only accept such
 challenges from origin names listed in the origin_info string. Even if multiple
 origins are listed, a token can only be redeemed for an origin if the challenge
-has an exact match for the origin_info. For example, if "a.example.com" issues
+has a match for the origin_info. For example, if "a.example.com" issues
 a challenge with an origin_info string of "a.example.com,b.example.com", a
 client could redeem a token fetched for this challenge if and only if
 "b.example.com" also included an origin_info string of
