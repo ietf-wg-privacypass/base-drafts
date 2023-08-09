@@ -32,9 +32,11 @@ author:
 
 --- abstract
 
-This document defines an HTTP authentication scheme that can be used by clients
-to redeem Privacy Pass tokens with an origin. It can also be used by origins to
-challenge clients to present an acceptable Privacy Pass token.
+This document defines an HTTP authentication scheme for Privacy Pass,
+a privacy-preserving authentication mechanism used for authorization.
+The authentication scheme in this document can be used by clients
+to redeem Privacy Pass tokens with an origin. It can also be used by
+origins to challenge clients to present Privacy Pass tokens.
 
 --- middle
 
@@ -125,13 +127,8 @@ same client. In deployment scenarios where origins send token challenges to
 request tokens, origins ought to expect at most one request containing a token
 from the client in reaction to a particular challenge.
 
-Origins SHOULD minimize the number of challenges sent on a particular client
-session, such as a unique TLS session between a client and origin
-(referred to as the "redemption context" in {{ARCHITECTURE}}). Clients can
-have implementation-specific policy to minimize the number of tokens that
-can be retrieved by origins, so origins are advised to only request tokens
-when necessary within a single session. See {{interaction}} for more discussion
-on how to optimize token challenges to improve the user experience.
+The rest of this section describes the token challenge and redemption interactions
+in more detail.
 
 ## Token Challenge {#challenge}
 
@@ -221,7 +218,9 @@ challenge value MUST be unique for every 401 HTTP response to prevent replay
 attacks. This parameter is required for all challenges.
 
 - "token-key", which contains a base64url encoding of the public key for
-use with the issuance protocol indicated by the challenge. The encoding of
+use with the issuance protocol indicated by the challenge. See {{ISSUANCE}}
+for more information about how this public key is used by the issuance protocols
+in that specification. The encoding of
 the public key is determined by the token type; see {{token-types}}.
 As with "challenge", the base64url value MUST include padding. As an
 Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}), the
@@ -295,17 +294,17 @@ properties and methods for constructing the corresponding context are below.
 This list is not exhaustive.
 
 - Context bound to a given time window: Construct redemption context as
-  SHA256(current time window).
-- Context bound to a client location: Construct redemption context as
-  SHA256(client IP address prefix).
-- Context bound to a given time window and location: Construct redemption
-  context as SHA256(current time window, client IP address prefix).
+  F(current time window), where F is a pseudorandom function.
+- Context bound to a client network: Construct redemption context as
+  F(client ASN), where F is a pseudorandom function.
+- Context bound to a given time window and client network: Construct redemption
+  context as F(current time window, client ASN), where F is a pseudorandom function.
 
 An empty redemption context is not bound to any property of the client session.
 Preventing double spending on tokens requires the origin to keep state
 associated with the redemption context. The size of this state varies based on
 the size of the redemption context. For example, double spend state for unique,
-per-request redemption contexts does only needs to exist within the scope of
+per-request redemption contexts only needs to exist within the scope of
 the request connection or session. In contrast, double spend state for empty
 redemption contexts must be stored and shared across all requests until
 token-key expiration or rotation.
@@ -373,19 +372,25 @@ above.
 - "nonce" is a 32-octet value containing a client-generated random nonce.
 
 - "challenge_digest" is a 32-octet value containing the hash of the
-original TokenChallenge, SHA256(TokenChallenge).
+original TokenChallenge, SHA-256(TokenChallenge), where SHA-256 is as defined
+in {{!SHS=DOI.10.6028/NIST.FIPS.180-4}}. Changing the hash function to something
+other than SHA-256 would require defining a new token type and token structure (since the contents of challenge_digest would be computed differently), which can be
+done in a future specification.
 
-- "token_key_id" is an Nid-octet identifier for the token authentication
+- "token_key_id" is a Nid-octet identifier for the token authentication
 key. The value of this field is defined by the token_type and corresponding
 issuance protocol.
 
-- "authenticator" is a Nk-octet authenticator that covers the preceding fields
-in the token. The value of this field is defined by the token_type and
-corresponding issuance protocol. The value of constant Nk depends on
-token_type, as defined in {{token-types}}.
+- "authenticator" is a Nk-octet authenticator that is cryptographically bound
+to the preceding fields in the token; see {{verification}} for more information
+about how this field is used in verifying a token. The token_type and corresponding
+issuance protocol determine the value of the authenticator field and how it is computed.
+The value of constant Nk depends on token_type, as defined in {{token-types}}.
 
 The authenticator value in the Token structure is computed over the token_type,
-nonce, challenge_digest, and token_key_id fields.
+nonce, challenge_digest, and token_key_id fields. A token is considered a valid
+if token verification using succeeds; see {{verification}} for details about
+verifying the token and its authenticator value.
 
 When used for client authorization, the "PrivateToken" authentication
 scheme defines one parameter, "token", which contains the base64url-encoded
@@ -403,21 +408,44 @@ the Authorization header field as follows:
 Authorization: PrivateToken token="abc..."
 ~~~
 
-For token types that support public verifiability, origins verify the token
-authenticator using the public key of the issuer, and validate that the signed
-message matches the concatenation of the client nonce and the hash of a
-valid TokenChallenge. For context-bound tokens, origins store or reconstruct
-the contexts of previous TokenChallenge structures in order to validate the
-token. A TokenChallenge MAY be bound to a specific TLS session with a client,
-but origins can also accept tokens for valid challenges in new sessions.
-Origins SHOULD implement some form of double-spend prevention that prevents
-a token with the same nonce from being redeemed twice. This prevents clients
-from "replaying" tokens for previous challenges. For context-bound tokens,
-this double-spend prevention can require no state or minimal state, since
-the context can be used to verify token uniqueness.
+For context-bound tokens, origins store or reconstruct the contexts of previous
+TokenChallenge structures in order to validate the token. A TokenChallenge can
+be bound to a specific TLS session with a client, but origins can also accept
+tokens for valid challenges in new sessions. Origins SHOULD implement some form
+of double-spend prevention that prevents a token with the same nonce from being
+redeemed twice. Double-spend prevention ensures that clients cannot replay tokens
+for previous challenges. For context-bound tokens, this double-spend prevention
+can require no state or minimal state, since the context can be used to verify
+token uniqueness.
 
 If a client is unable to fetch a token, it MUST react to the challenge as
 if it could not produce a valid Authorization response.
+
+### Token Verification {#verification}
+
+A token consists of some input cryptographically bound to an authenticator
+value, such as a digital signature. Verifying a token consists of checking that
+the authenticator value is correct.
+
+The authenticator value is as computed when running and finalizing the issuance
+protocol corresponding to the token type with the following value as the input:
+
+~~~
+struct {
+    uint16_t token_type;
+    uint8_t nonce[32];
+    uint8_t challenge_digest[32];
+    uint8_t token_key_id[Nid];
+} AuthenticatorInput;
+~~~
+
+The value of these fields are as described in {{redemption}}. The cryptographic
+verification check depends on the token type; see {{Section 5.4 of ISSUANCE}}
+and {{Section 6.4 of ISSUANCE}} for verification instructions for the issuance
+protocols described in {{ISSUANCE}}. As such, the security properties of the
+token, e.g., the probability that one can forge an authenticator value without
+invoking the issuance protocol, depend on the cryptographic algorithm used by
+the issuance protocol as determined by the token type.
 
 # User Interaction {#interaction}
 
@@ -425,20 +453,29 @@ When used in contexts like websites, origins that challenge clients for
 tokens need to consider how to optimize their interaction model to ensure a
 good user experience.
 
-Tokens challenges can be performed without explicit user involvement, depending
+Origins SHOULD minimize the number of challenges sent on a particular client
+session, such as a unique TLS session between a client and origin
+(referred to as the "redemption context" in {{ARCHITECTURE}}). Similarly, clients
+SHOULD have some implementation-specific policy to minimize the number of tokens
+that can be retrieved by origins. One possible implementation of this policy is
+to bound the number of token challenges a given origin can provide for a given
+session.
+
+Token challenges can be performed without explicit user involvement, depending
 on the issuance protocol. If tokens are scoped to a specific origin,
 there is no need for per-challenge user interaction. Note that the issuance
 protocol may separately involve user interaction if the client needs to be
 newly validated.
 
-If a client cannot use cached tokens to respond to a challenge (either because
-it has run out of cached tokens or the associated context is unique), the token
+If a client cannot use cached tokens to respond to a challenge, either because
+it has run out of cached tokens or the associated context is unique, the token
 issuance process can add user-perceivable latency. Origins need not block
-useful work on token authentication. Instead, token authentication can be used
-in similar ways to CAPTCHA validation today, but without the need for user
-interaction. If issuance is taking a long time, a website could show an
-indicator that it is waiting, or fall back to another method of user
-validation.
+useful work such as loading the contents of a web page on token authentication.
+Instead, token authentication can be used in similar ways to existing CAPTCHA
+validation flows, wherein validation sometimes proceeds alongside useful work,
+e.g., when loading contents of a web page, but without the need for user interaction.
+If issuance is taking a long time, an origin can fall back to another method
+of user validation.
 
 An origin MUST NOT use more than one redemption context value for a given token
 type and issuer per client request. If an origin issues a large number of
@@ -456,8 +493,10 @@ An origin MUST NOT assume that token challenges will always yield a valid
 token. Clients might experience issues running the issuance protocol, e.g.,
 because the attester or issuer is unavailable, or clients might simply not
 support the requested token type. Origins SHOULD account for such operational
-or interoperability failures by offering clients an alternative type of
-challenge such as CAPTCHA for accessing a resource.
+or interoperability failures by offering clients a fallback challenge such
+as CAPTCHA for accessing a resource. Failure to provide a fallback will likely
+mean that some clients fail authentication and cannot perform the desired
+action, such as loading a web page or accessing some other resource.
 
 For example, consider a scenario in which the client is a web browser, and the
 origin can accept either a token or a solution to a puzzle intended to
@@ -470,12 +509,15 @@ either do not support tokens or are unable to fetch tokens at a particular
 time can present the user with the puzzle.
 
 To mitigate the risk of deployments becoming dependent on tokens, clients and
-servers SHOULD grease their behavior unless explicitly configured not to. In
+origins SHOULD grease their behavior unless explicitly configured not to. In
 particular, clients SHOULD ignore token challenges with some non-zero
-probability. Likewise, origins SHOULD randomly choose to not challenge clients
-for tokens with some non-zero probability. Moreover, origins SHOULD include
-random token types, from the Reserved list of "greased" types (defined in
-{{token-types}}), with some non-zero probability.
+probability. From the origin's perspective, ignoring a token challenge is
+indistinguishable from the issuance protocol failing for arbitrary reasons
+(excluding what can be inferred from latency between the client and origin interaction).
+Likewise, origins SHOULD randomly choose to not challenge clients for tokens
+with some non-zero probability. Moreover, origins SHOULD include random token
+types, from the Reserved list of "greased" types (defined in {{token-types}}),
+with some non-zero probability.
 
 # Security Considerations {#sec-considerations}
 
@@ -592,17 +634,14 @@ ensure that the token type is sufficiently clearly defined to be used for both
 token issuance and redemption, and meets the common security and privacy
 requirements for issuance protocols defined in {{Section 3.2 of ARCHITECTURE}}.
 
-This registry also will also allow provisional registrations to allow for
-experimentation with protocols being developed. Designated experts review,
-approve, and revoke provisional registrations.
-
-Values 0xFF00-0xFFFF are reserved for private use, to enable proprietary uses
-and limited experimentation.
+Values 0xFF00-0xFFFF are reserved for private use. Implementers can use values
+in this range for experimentation with new token type protocols, as well as other
+proprietary uses that do not require interoperability.
 
 This document defines several Reserved values, which can be used by clients
 and servers to send "greased" values in token challenges and responses to
 ensure that implementations remain able to handle unknown token types
-gracefully (this technique is inspired by {{?RFC8701}}). Implemenations SHOULD
+gracefully (this technique is inspired by {{?RFC8701}}). Implementations SHOULD
 select reserved values at random when including them in greased messages.
 Servers can include these in TokenChallenge structures, either as the only
 challenge when no real token type is desired, or as one challenge in a list of
@@ -615,7 +654,7 @@ The initial contents for this registry consist of the following Values.
 For each Value, the Name is "RESERVED", the Publicly Verifiable, Public
 Metadata, Private Metadata, Nk, and Nid attributes are all assigned "N/A",
 the Reference is this document, and the Notes attribute is "None". The
-iniital list of Values is as follows:
+initial list of Values is as follows:
 
 - 0x0000
 - 0x02AA
