@@ -252,7 +252,10 @@ responding to it. Validation requirements are as follows:
 - The token_type is recognized and supported by the client;
 - The TokenChallenge structure is well-formed; and
 - If the origin_info field is non-empty, the name of the origin that issued the
-  authentication challenge is included in the list of origin names.
+  authentication challenge is included in the list of origin names. Comparison
+  of the origin name that issued the authentication challenge against elements
+  in the origin_info list is done via exact match; case-insensitive matching
+  as is common for comparison of DNS names does not apply.
 
 If validation fails, the client MUST NOT process or respond to the
 challenge. Clients MAY have further restrictions and requirements around
@@ -374,8 +377,9 @@ above.
 - "challenge_digest" is a 32-octet value containing the hash of the
 original TokenChallenge, SHA-256(TokenChallenge), where SHA-256 is as defined
 in {{!SHS=DOI.10.6028/NIST.FIPS.180-4}}. Changing the hash function to something
-other than SHA-256 would require defining a new token type and token structure (since the contents of challenge_digest would be computed differently), which can be
-done in a future specification.
+other than SHA-256 would require defining a new token type and token structure
+(since the contents of challenge_digest would be computed differently),
+which can be done in a future specification.
 
 - "token_key_id" is a Nid-octet identifier for the token authentication
 key. The value of this field is defined by the token_type and corresponding
