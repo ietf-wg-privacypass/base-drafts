@@ -938,9 +938,9 @@ authorize Clients that successfully authenticate with a token, prohibiting acces
 to all other Clients.
 
 The type of attestation procedures supported for a particular deployment depends
-greatly on the use case. For example, proprietary deployments of Privacy Pass that
-use to authorize clients to access a resource such as an anonymization service,
-it is reasonable to only support specific types of attestation procedures that
+greatly on the use case. For example, consider a proprietary deployment of Privacy Pass
+that authorizes clients to access a resource such as an anonymization service. In this
+context, it is reasonable to support specific types of attestation procedures that
 demonstrate Clients can access the resource, such as with an account or specific
 type of device. However, in open deployments of Privacy Pass that are used to
 safeguard access to otherwise open or publicly accessible resources, diversity
