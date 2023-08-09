@@ -32,9 +32,11 @@ author:
 
 --- abstract
 
-This document defines an HTTP authentication scheme that can be used by clients
-to redeem Privacy Pass tokens with an origin. It can also be used by origins to
-challenge clients to present an acceptable Privacy Pass token.
+This document defines an HTTP authentication scheme for Privacy Pass,
+a privacy-preserving authentication mechanism used for authorization.
+The authentication scheme in this document can be used by clients
+to redeem Privacy Pass tokens with an origin. It can also be used by
+origins to challenge clients to present Privacy Pass tokens.
 
 --- middle
 
@@ -296,17 +298,16 @@ This list is not exhaustive.
 
 - Context bound to a given time window: Construct redemption context as
   F(current time window), where F is a pseudorandom function.
-- Context bound to a client location: Construct redemption context as
-  F(client IP address prefix), where F is a pseudorandom function.
-- Context bound to a given time window and location: Construct redemption
-  context as F(current time window, client IP address prefix), where F is
-  a pseudorandom function.
+- Context bound to a client network: Construct redemption context as
+  F(client ASN), where F is a pseudorandom function.
+- Context bound to a given time window and client network: Construct redemption
+  context as F(current time window, client ASN), where F is a pseudorandom function.
 
 An empty redemption context is not bound to any property of the client session.
 Preventing double spending on tokens requires the origin to keep state
 associated with the redemption context. The size of this state varies based on
 the size of the redemption context. For example, double spend state for unique,
-per-request redemption contexts does only needs to exist within the scope of
+per-request redemption contexts only needs to exist within the scope of
 the request connection or session. In contrast, double spend state for empty
 redemption contexts must be stored and shared across all requests until
 token-key expiration or rotation.
@@ -379,7 +380,7 @@ in {{!SHS=DOI.10.6028/NIST.FIPS.180-4}}. Changing the hash function to something
 other than SHA-256 would require defining a new token type and token structure (since the contents of challenge_digest would be computed differently), which can be
 done in a future specification.
 
-- "token_key_id" is an Nid-octet identifier for the token authentication
+- "token_key_id" is a Nid-octet identifier for the token authentication
 key. The value of this field is defined by the token_type and corresponding
 issuance protocol.
 
@@ -429,7 +430,7 @@ When used in contexts like websites, origins that challenge clients for
 tokens need to consider how to optimize their interaction model to ensure a
 good user experience.
 
-Tokens challenges can be performed without explicit user involvement, depending
+Token challenges can be performed without explicit user involvement, depending
 on the issuance protocol. If tokens are scoped to a specific origin,
 there is no need for per-challenge user interaction. Note that the issuance
 protocol may separately involve user interaction if the client needs to be
@@ -596,17 +597,14 @@ ensure that the token type is sufficiently clearly defined to be used for both
 token issuance and redemption, and meets the common security and privacy
 requirements for issuance protocols defined in {{Section 3.2 of ARCHITECTURE}}.
 
-This registry also will also allow provisional registrations to allow for
-experimentation with protocols being developed. Designated experts review,
-approve, and revoke provisional registrations.
-
-Values 0xFF00-0xFFFF are reserved for private use, to enable proprietary uses
-and limited experimentation.
+Values 0xFF00-0xFFFF are reserved for private use. Implementers can use values
+in this range for experimentation with new token type protocols, as well as other
+proprietary uses that do not require interoperability.
 
 This document defines several Reserved values, which can be used by clients
 and servers to send "greased" values in token challenges and responses to
 ensure that implementations remain able to handle unknown token types
-gracefully (this technique is inspired by {{?RFC8701}}). Implemenations SHOULD
+gracefully (this technique is inspired by {{?RFC8701}}). Implementations SHOULD
 select reserved values at random when including them in greased messages.
 Servers can include these in TokenChallenge structures, either as the only
 challenge when no real token type is desired, or as one challenge in a list of
@@ -619,7 +617,7 @@ The initial contents for this registry consist of the following Values.
 For each Value, the Name is "RESERVED", the Publicly Verifiable, Public
 Metadata, Private Metadata, Nk, and Nid attributes are all assigned "N/A",
 the Reference is this document, and the Notes attribute is "None". The
-iniital list of Values is as follows:
+initial list of Values is as follows:
 
 - 0x0000
 - 0x02AA
