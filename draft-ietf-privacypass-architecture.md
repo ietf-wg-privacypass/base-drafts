@@ -216,7 +216,7 @@ Token Response, the Client computes a token from the token challenge and Token
 Response. This token can be validated by anyone with the per-Issuer key, but
 cannot be linked to the content of the Token Request or Token Response.
 
-6. If the Client has a token, it includes it in a subsequent, retried request to
+6. If the Client has a token, it includes it in a subsequent request to
    the Origin, as authorization. This token is sent only once in response to a
    challenge; Clients do not send tokens more than once, even if they receive
    duplicate or redundant challenges. The Origin
