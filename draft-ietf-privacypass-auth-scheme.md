@@ -440,10 +440,10 @@ If a client cannot use cached tokens to respond to a challenge, either because
 it has run out of cached tokens or the associated context is unique, the token
 issuance process can add user-perceivable latency. Origins need not block
 useful work such as loading the contents of a web page on token authentication.
-Instead, token authentication can be used in similar ways to CAPTCHA validation
-today, wherein validation sometimes proceeds alongside useful work, e.g., when
-loading contents of a web page, but without the need for user interaction.
-If issuance is taking a long time, an origin could fall back to another method
+Instead, token authentication can be used in similar ways to existing CAPTCHA
+validation flows, wherein validation sometimes proceeds alongside useful work,
+e.g., when loading contents of a web page, but without the need for user interaction.
+If issuance is taking a long time, an origin can fall back to another method
 of user validation.
 
 An origin MUST NOT use more than one redemption context value for a given token
