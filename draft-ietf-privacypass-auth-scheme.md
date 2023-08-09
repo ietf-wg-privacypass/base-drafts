@@ -32,9 +32,11 @@ author:
 
 --- abstract
 
-This document defines an HTTP authentication scheme that can be used by clients
-to redeem Privacy Pass tokens with an origin. It can also be used by origins to
-challenge clients to present an acceptable Privacy Pass token.
+This document defines an HTTP authentication scheme for Privacy Pass,
+a privacy-preserving authentication mechanism used for authorization.
+The authentication scheme in this document can be used by clients
+to redeem Privacy Pass tokens with an origin. It can also be used by
+origins to challenge clients to present Privacy Pass tokens.
 
 --- middle
 
@@ -296,10 +298,10 @@ This list is not exhaustive.
 
 - Context bound to a given time window: Construct redemption context as
   SHA256(current time window).
-- Context bound to a client location: Construct redemption context as
-  SHA256(client IP address prefix).
-- Context bound to a given time window and location: Construct redemption
-  context as SHA256(current time window, client IP address prefix).
+- Context bound to a client network: Construct redemption context as
+  SHA256(client ASN).
+- Context bound to a given time window and network: Construct redemption
+  context as SHA256(current time window, client ASN).
 
 An empty redemption context is not bound to any property of the client session.
 Preventing double spending on tokens requires the origin to keep state
