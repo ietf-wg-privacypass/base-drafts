@@ -265,7 +265,7 @@ current connection is not authoritative (according to the TLS certificate).
 Caching and pre-fetching of tokens is discussed in {{caching}}.
 
 Note that it is possible for the WWW-Authenticate header field to include
-multiple challenges. This allows the origin to indicate support for different
+multiple challenges ({{!RFC9110, Section 11.6.1}}). This allows the origin to indicate support for different
 token types, issuers, or to include multiple redemption contexts. For example,
 the WWW-Authenticate header field could look like this:
 
