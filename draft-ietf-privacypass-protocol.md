@@ -169,10 +169,10 @@ defined in {{tokenkeys-values}}.
 
 Each "token-keys" JSON object may also contain the optional field "not-before".
 The value of this field is the UNIX timestamp (number of seconds since
-January 1, 1970, UTC) at which the key can be used. If this field is present,
-Clients SHOULD NOT use a token key before this timestamp, as doing so may
-lead to issuance failures. The purpose of this field is to assist in scheduled
-key rotations.
+January 1, 1970, UTC -- see {{Section 4.2.1 of !TIMESTAMP=RFC8877}}) at which
+the key can be used. If this field is present, Clients SHOULD NOT use a token
+key before this timestamp, as doing so can lead to issuance failures. The
+purpose of this field is to assist in scheduled key rotations.
 
 Beyond staging keys with the "not-before" value, Issuers MAY advertise multiple
 "token-keys" for the same token-type to facilitate key rotation. In this case,
@@ -223,7 +223,7 @@ differentiated correctly.
 Issuers SHOULD use HTTP caching to permit caching of this resource
 {{!RFC5861}}. The cache lifetime depends on the Issuer's key rotation schedule.
 Regular rotation of token keys is recommended to minimize the risk of key
-compromise.
+compromise and any harmful effects that happen due to key compromise.
 
 Issuers can control cache lifetime with the Cache-Control header, as follows:
 
@@ -321,7 +321,9 @@ The structure fields are defined as follows:
 
 - "truncated_token_key_id" is the least significant byte of the `token_key_id`
   ({{issuer-configuration}}) in network byte order (in other words, the last 8
-  bits of `token_key_id`).
+  bits of `token_key_id`). This value is truncated so that Issuers cannot use
+  `token_key_id` as a way of uniquely identifying Clients; see {{security}}
+  and referenced information for more details.
 
 - "blinded_msg" is the Ne-octet blinded message defined above, computed as
   `SerializeElement(blinded_element)`.
@@ -355,8 +357,10 @@ Upon receipt of the request, the Issuer validates the following conditions:
 - The TokenRequest.blinded_msg is of the correct size.
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
-to the client. The Issuer then tries to deseralize
-TokenRequest.blinded_msg using DeserializeElement from {{Section 2.1 of OPRF}},
+to the client.
+
+If these conditions are met, the Issuer then tries to deseralize TokenRequest.blinded_msg
+using DeserializeElement from {{Section 2.1 of OPRF}},
 yielding `blinded_element`. If this fails, the Issuer MUST return an HTTP 400
 error to the client. Otherwise, if the Issuer is willing to produce a token to
 the Client, the Issuer completes the issuance flow by computing a blinded
@@ -428,7 +432,7 @@ struct {
 } Token;
 ~~~
 
-The Token.nonce value is that which was sampled in {{private-request}}.
+The Token.nonce value is that which was created in {{private-request}}.
 If the Finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
@@ -469,7 +473,7 @@ as follows:
 token_key_id = SHA256(SerializeElement(pkI))
 ~~~
 
-Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers should
+Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers SHOULD
 ensure that the truncated form of new key IDs do not collide with other
 truncated key IDs in rotation.
 
@@ -552,7 +556,9 @@ The structure fields are defined as follows:
 
 - "truncated_token_key_id" is the least significant byte of the `token_key_id`
   ({{public-issuer-configuration}}) in network byte order (in other words, the
-  last 8 bits of `token_key_id`).
+  last 8 bits of `token_key_id`). This value is truncated so that Issuers cannot use
+  `token_key_id` as a way of uniquely identifying Clients; see {{security}}
+  and referenced information for more details.
 
 - "blinded_msg" is the Nk-octet request defined above.
 
@@ -584,7 +590,7 @@ Upon receipt of the request, the Issuer validates the following conditions:
 
 If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
 to the Client. Otherwise, if the
-Issuer is willing to produce a token token to the Client, the Issuer
+Issuer is willing to produce a token to the Client, the Issuer
 completes the issuance flow by computing a blinded response as follows:
 
 ~~~
@@ -662,9 +668,9 @@ valid = RSASSA-PSS-VERIFY(pkI,
 ## Issuer Configuration {#public-issuer-configuration}
 
 Issuers are configured with Private and Public Key pairs, each denoted skI and
-pkI, respectively, used to produce tokens. Each key pair SHALL be generated as
-as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}. These key
-pairs MUST NOT be reused in other protocols.
+pkI, respectively, used to produce tokens. Each key pair SHALL be generated
+securely, for example as specified in FIPS 186-5 {{?DSS=DOI.10.6028/NIST.FIPS.186-5}}.
+These key pairs MUST NOT be reused in other protocols.
 
 The key identifier for a keypair (skI, pkI), denoted `token_key_id`, is
 computed as SHA256(encoded_key), where encoded_key is a DER-encoded
@@ -700,7 +706,7 @@ Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers should
 ensure that the truncated form of new key IDs do not collide with other
 truncated key IDs in rotation.
 
-# Security considerations
+# Security considerations {#security}
 
 This document outlines how to instantiate the Issuance protocol
 based on the VOPRF defined in {{OPRF}} and blind RSA protocol defined in
@@ -708,11 +714,10 @@ based on the VOPRF defined in {{OPRF}} and blind RSA protocol defined in
 documents also apply in the Privacy Pass use-case. Considerations related to
 broader privacy and security concerns in a multi-Client and multi-Issuer
 setting are deferred to the Architecture document {{ARCHITECTURE}}. In
-particular, the privacy considerations in
-{{Section 4 and Section 5 of ARCHITECTURE}}, particularly those pertaining to
-Issuer Public Key rotation and consistency (where consistency is as described
-in {{?CONSISTENCY=I-D.ietf-privacypass-key-consistency}}) and Issuer selection, are
-relevant for implementations of the protocols in this document.
+particular, {{Section 4 and Section 5 of ARCHITECTURE}} discuss relevant
+privacy considerations. Notable considerations include those pertaining to
+Issuer Public Key rotation and consistency, where consistency is as described
+in {{?CONSISTENCY=I-D.ietf-privacypass-key-consistency}}, and Issuer selection.
 
 # IANA considerations
 
@@ -730,8 +735,8 @@ following values.
 
 ## Token Type Registry Updates {#token-type}
 
-This document updates the "Token Type" Registry from
-{{AUTHSCHEME, Section 5.2}} with the following entries.
+This document updates the "Privacy Pass Token Type" Registry with the
+following entries.
 
 ### Token Type VOPRF (P-384, SHA-384) {#private-token-type}
 
