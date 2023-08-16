@@ -878,7 +878,7 @@ Encoding considerations:
 
 Security considerations:
 
-: see {{security-considerations}}
+: see {{security}}
 
 Interoperability considerations:
 
@@ -950,7 +950,7 @@ Encoding considerations:
 
 Security considerations:
 
-: see {{security-considerations}}
+: see {{security}}
 
 Interoperability considerations:
 
