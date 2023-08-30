@@ -671,9 +671,10 @@ ensure that the token type is sufficiently clearly defined to be used for both
 token issuance and redemption, and meets the common security and privacy
 requirements for issuance protocols defined in {{Section 3.2 of ARCHITECTURE}}.
 
-Values 0xFF00-0xFFFF are reserved for private use. Implementers can use values
-in this range for experimentation with new token type protocols, as well as other
-proprietary uses that do not require interoperability.
+{{ISSUANCE}} defines entries for this registry.
+
+
+### Reserved Values
 
 This document defines several Reserved values, which can be used by clients
 and servers to send "greased" values in token challenges and responses to
@@ -728,8 +729,14 @@ Notes:
 : None
 {: spacing="compact"}
 
-Additionally, the registry is to be initialized with the following entry
-for Private Use.
+
+### Private Use Values
+
+Values 0xFF00-0xFFFF are reserved for private use. Implementers can use values
+in this range for experimentation with new token type protocols, as well as other
+proprietary uses that do not require interoperability.
+
+The registry is to be initialized with the following entry for Private Use:
 
 Value:
 : 0xFF00-0xFFFF
@@ -768,7 +775,6 @@ Notes:
 : None
 {: spacing="compact"}
 
-{{ISSUANCE}} defines other non-grease entries for this registry.
 
 --- back
 
