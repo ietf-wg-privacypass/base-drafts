@@ -622,23 +622,48 @@ defined for use with the Privacy Pass token authentication scheme. These
 identifiers are two-byte values, so the maximum possible value is
 0xFFFF = 65535.
 
-Template:
+New registrations need to list the following attributes:
 
-* Value: The two-byte identifier for the algorithm
-* Name: Name of the issuance protocol
-* Token Structure: The contents of the Token structure in {{redemption}}
-* Token Key Encoding: The encoding of the "token-key" parameter in {{redemption}}
-* TokenChallenge Structure: The contents of the TokenChallenge structure in {{challenge}}
-* Publicly Verifiable: A Y/N value indicating if the output tokens are
+Value:
+: The two-byte identifier for the algorithm
+
+Name:
+: Name of the issuance protocol
+
+Token Structure:
+: The contents of the Token structure in {{redemption}}
+
+Token Key Encoding:
+: The encoding of the "token-key" parameter in {{redemption}}
+
+TokenChallenge Structure:
+: The contents of the TokenChallenge structure in {{challenge}}
+
+Publicly Verifiable:
+: A Y/N value indicating if the output tokens are
   publicly verifiable
-* Public Metadata: A Y/N value indicating if the output tokens can contain
+
+Public Metadata:
+: A Y/N value indicating if the output tokens can contain
   public metadata.
-* Private Metadata: A Y/N value indicating if the output tokens can contain
+
+Private Metadata:
+: A Y/N value indicating if the output tokens can contain
   private metadata.
-* Nk: The length in bytes of an output authenticator
-* Nid: The length of the token key identifier
-* Reference: Where this algorithm is defined
-* Notes: Any notes associated with the entry
+
+Nk:
+: The length in bytes of an output authenticator
+
+Nid:
+: The length of the token key identifier
+
+Reference:
+: Where this algorithm is defined
+
+Notes:
+: Any notes associated with the entry
+{: spacing="compact"}
+
 
 New entries in this registry are subject to the Specification Required
 registration policy ({{!RFC8126, Section 4.6}}). Designated experts need to
@@ -689,18 +714,42 @@ initial list of Values is as follows:
 Additionally, the registry is to be initialized with the following entry
 for Private Use.
 
-* Value: 0xFF00-0xFFFF
-* Name: Private Use
-* Token Structure: The contents of the Token structure in {{redemption}}
-* Token Key Encoding: N/A
-* TokenChallenge Structure: The contents of the TokenChallenge structure in {{challenge}}
-* Publicly Verifiable: N/A
-* Public Metadata: N/A
-* Private Metadata: N/A
-* Nk: N/A
-* Nid: N/A
-* Reference: This document
-* Notes: None
+Value:
+: 0xFF00-0xFFFF
+
+Name:
+: Private Use
+
+Token Structure:
+: The contents of the Token structure in {{redemption}}
+
+Token Key Encoding:
+: N/A
+
+TokenChallenge Structure:
+: The contents of the TokenChallenge structure in {{challenge}}
+
+Publicly Verifiable:
+: N/A
+
+Public Metadata:
+: N/A
+
+Private Metadata:
+: N/A
+
+Nk:
+: N/A
+
+Nid:
+: N/A
+
+Reference:
+: This document
+
+Notes:
+: None
+{: spacing="compact"}
 
 {{ISSUANCE}} defines other non-grease entries for this registry.
 
