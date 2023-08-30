@@ -267,7 +267,7 @@ responding to it. Validation requirements are as follows:
 If validation fails, the client MUST NOT process or respond to the
 challenge. Clients MAY have further restrictions and requirements around
 validating when a challenge is considered acceptable or valid. For example,
-clients can choose to ignore challenges that list origin names for which
+clients can choose to ignore challenges that list origin names for which the
 current connection is not authoritative (according to the TLS certificate).
 
 Caching and pre-fetching of tokens is discussed in {{caching}}.
