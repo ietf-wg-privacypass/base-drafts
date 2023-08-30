@@ -163,7 +163,7 @@ All token challenges MUST begin with a 2-octet integer that defines the
 token type, in network byte order. This type indicates the issuance protocol
 used to generate the token and determines the structure and semantics of the rest of
 the structure. Values are registered in an IANA registry, {{token-types}}. Client MUST
-ignore challenges with token_types they do not support.
+ignore challenges with token types they do not support.
 
 This document defines the default challenge structure that can be used across
 token types, although future token types MAY extend or modify the structure
