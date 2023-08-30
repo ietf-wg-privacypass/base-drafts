@@ -687,29 +687,46 @@ structures when they are not able to present a real token response. The
 contents of the Token structure SHOULD be filled with random bytes when
 using greased values.
 
-The initial contents for this registry consist of the following Values.
-For each Value, the Name is "RESERVED", the Publicly Verifiable, Public
-Metadata, Private Metadata, Nk, and Nid attributes are all assigned "N/A",
-the Reference is this document, and the Notes attribute is "None". The
-initial list of Values is as follows:
+The initial contents for this registry consists of multiple reserved values,
+with the following attributes, which are repeated for each registration:
 
-- 0x0000
-- 0x02AA
-- 0x1132
-- 0x2E96
-- 0x3CD3
-- 0x4473
-- 0x5A63
-- 0x6D32
-- 0x7F3F
-- 0x8D07
-- 0x916B
-- 0xA6A4
-- 0xBEAB
-- 0xC3F3
-- 0xDA42
-- 0xE944
-- 0xF057
+Value:
+: 0x0000, 0x02AA, 0x1132, 0x2E96, 0x3CD3, 0x4473, 0x5A63, 0x6D32, 0x7F3F,
+  0x8D07, 0x916B, 0xA6A4, 0xBEAB, 0xC3F3, 0xDA42, 0xE944, 0xF057
+
+Name:
+: RESERVED
+
+Token Structure:
+: Random bytes
+
+Token Key Encoding:
+: Random bytes
+
+TokenChallenge Structure:
+: Random bytes
+
+Publicly Verifiable:
+: N/A
+
+Public Metadata:
+: N/A
+
+Private Metadata:
+: N/A
+
+Nk:
+: N/A
+
+Nid:
+: N/A
+
+Reference:
+: This document
+
+Notes:
+: None
+{: spacing="compact"}
 
 Additionally, the registry is to be initialized with the following entry
 for Private Use.
