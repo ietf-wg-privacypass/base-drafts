@@ -109,10 +109,12 @@ uses the following terms in more specific ways:
 - Issuer key: Keying material that can be used with an issuance protocol
 to create a signed token.
 
-- Token challenge: A requirement for tokens sent from an origin to a client,
-using the "WWW-Authenticate" HTTP header field. This challenge is bound to a
-specific token issuer and issuance protocol, and may be additionally bound to
-a specific context or origin name.
+- Token challenge: A request for tokens sent from an origin to a client, using
+the "WWW-Authenticate" HTTP header field. This challenge identifies a specific
+token issuer and issuance protocol. Token challenges optionally include
+identifier for one or both of: a redemption context (see
+{{context-construction}}), and the origin. These optional identifiers are then
+be bound to the token that is issued.
 
 - Token redemption: An action by which a client presents a token to an origin
 in an HTTP request, using the "Authorization" HTTP header field.
