@@ -3,9 +3,13 @@ title: The Privacy Pass HTTP Authentication Scheme
 abbrev: Privacy Pass Authentication
 docname: draft-ietf-privacypass-auth-scheme-latest
 category: std
+v: 3
 
 ipr: trust200902
-keyword: Internet-Draft
+keyword:
+ - anonymous
+ - authorization
+ - crypto
 
 stand_alone: yes
 pi: [toc, sortrefs, symrefs]
@@ -75,8 +79,10 @@ interaction between client and origin is shown below.
 +---+----+                              +---+----+
     |                                       |
     +-- WWW-Authenticate: TokenChallenge -->|
-    |                                       | // Run issuance protocol
-    <------- Authorization: Token ----------+
+    |                                       |
+    |                            (Run issuance protocol)
+    |                                       |
+    |<------ Authorization: Token ----------+
     |                                       |
 ~~~
 {: #fig-overview title="Challenge-response redemption protocol flow"}
@@ -530,14 +536,15 @@ challenge is per-origin or not. For example, cross-origin tokens with empty
 contexts can be replayed from one party by another, as shown below.
 
 ~~~ aasvg
-+--------+                            +----------+                 +--------+
-| Origin |                            | Attacker |                 | Client |
-+---+----+                            +-----+----+                 +---+----+
-    |                                       |                          |
-    +-- WWW-Authenticate: TokenChallenge -->|                          |
-    |                                       +--- (replay challenge) --->
-    |                                       <-- Authorization: Token --+
-    <----------- (replay token) ------------+
++--------+           +----------+               +--------+
+| Origin |           | Attacker |               | Client |
++---+----+           +----+-----+               +---+----+
+    |                     |                         |
+    +-- TokenChallenge -->|                         |
+    |                     +-- (replay challenge) -->|
+    |                     |<-------- Token ---------+
+    |<-- (replay token) --+                         |
+    |                     |
 ~~~
 {: #fig-replay title="Replay attack example"}
 
