@@ -610,9 +610,11 @@ This document registers the "PrivateToken" authentication scheme in the
 "Hypertext Transfer Protocol (HTTP) Authentication Scheme Registry" defined
 in {{!RFC9110, Section 16.4}}.
 
-Authentication Scheme Name: PrivateToken
+Authentication Scheme Name:
+: PrivateToken
 
-Pointer to specification text: {{challenge-redemption}} of this document
+Pointer to specification text:
+: {{challenge-redemption}} of this document
 
 ## Token Type Registry {#token-types}
 
