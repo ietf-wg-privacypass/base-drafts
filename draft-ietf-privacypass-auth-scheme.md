@@ -214,8 +214,7 @@ value. This document follows the default padding behavior described in
 As an Authentication Parameter (`auth-param` from {{!RFC9110, Section 11.2}}),
 the value can be either a token or a quoted-string, and might be required to
 be a quoted-string if the base64url string includes "=" characters. This
-challenge value MUST be unique for every 401 HTTP response to prevent replay
-attacks. This parameter is required for all challenges.
+parameter is required for all challenges.
 
 - "token-key", which contains a base64url encoding of the public key for
 use with the issuance protocol indicated by the challenge. See {{ISSUANCE}}
