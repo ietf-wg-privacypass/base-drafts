@@ -17,6 +17,7 @@ Additional information:
 | -------------------------------------------------------------------------- | :------- | :-----------------------------| :-------- |
 | [pat-app](https://github.com/cloudflare/pat-app)                           | Go       | VOPRF (P-384, SHA-384) (0x0001), Blind RSA (SHA-384, 2048-bit) (0x0002) | draft-06  |
 | [privacypass](https://github.com/raphaelrobert/privacypass)                | Rust     | VOPRF (P-384, SHA-384) (0x0001), Blind RSA (SHA-384, 2048-bit) (0x0002) | draft-06  |
+| [privacypass-ts](https://github.com/cloudflare/privacypass-ts)             | Typescript | Blind RSA (SHA-384, 2048-bit) (0x0002) | draft-11  |
 
 ## Building Drafts
 
