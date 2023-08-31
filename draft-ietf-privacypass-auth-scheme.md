@@ -600,7 +600,7 @@ mitigate the harm of such replays. See {{TLS13, Section 8}} and
 HTTP data.
 
 All random values in the challenge and token MUST be generated using a
-cryptographically secure source of randomness.
+cryptographically secure source of randomness ({{?RFC4086}}).
 
 # IANA Considerations {#iana}
 
