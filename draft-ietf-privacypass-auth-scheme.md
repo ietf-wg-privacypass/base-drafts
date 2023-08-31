@@ -112,8 +112,8 @@ to create a signed token.
 - Token challenge: A request for tokens sent from an origin to a client, using
 the "WWW-Authenticate" HTTP header field. This challenge identifies a specific
 token issuer and issuance protocol. Token challenges optionally include
-identifier for one or both of: a redemption context (see
-{{context-construction}}), and the origin. These optional identifiers are then
+one or both of: a redemption context (see {{context-construction}}), and
+a list of associated origins. These optional values are then
 be bound to the token that is issued.
 
 - Token redemption: An action by which a client presents a token to an origin
