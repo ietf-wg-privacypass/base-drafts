@@ -302,14 +302,13 @@ This list is not exhaustive.
 - Context bound to a given time window and client network: Construct redemption
   context as F(current time window, client ASN), where F is a pseudorandom function.
 
-An empty redemption context is not bound to any property of the client session.
 Preventing double spending on tokens requires the origin to keep state
-associated with the redemption context. The size of this state varies based on
-the size of the redemption context. For example, double spend state for unique,
-per-request redemption contexts only needs to exist within the scope of
-the request connection or session. In contrast, double spend state for empty
-redemption contexts must be stored and shared across all requests until
-token-key expiration or rotation.
+associated with the redemption context. An empty redemption context is not
+bound to any property of the client request, so state to prevent double spending
+needs to be stored and shared across all servers that can accept request until
+token-key expiration or rotation. For a non-empty redemption context, the
+double spend state only needs to be stored across the set of servers that will
+accept tokens with that redemption context.
 
 Origins that share redemption contexts, i.e., by using the same redemption
 context, choosing the same issuer, and providing the same origin_info field in
