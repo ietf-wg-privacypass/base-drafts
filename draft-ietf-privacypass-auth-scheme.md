@@ -336,7 +336,8 @@ has a unique client nonce, which is sent in token redemption ({{redemption}}).
 If a client fetches a batch of multiple tokens for future use that are bound
 to a specific redemption context (the redemption_context in the TokenChallenge
 was not empty), clients SHOULD discard these tokens upon flushing state such as
-HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or changing networks.
+HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or if there is a network
+change and the client does not have any origin-specific state like HTTP cookies.
 Using these tokens in a context that otherwise would not be linkable to the
 original context could allow the origin to recognize a client.
 
