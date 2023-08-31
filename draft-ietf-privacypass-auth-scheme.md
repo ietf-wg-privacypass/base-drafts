@@ -3,9 +3,13 @@ title: The Privacy Pass HTTP Authentication Scheme
 abbrev: Privacy Pass Authentication
 docname: draft-ietf-privacypass-auth-scheme-latest
 category: std
+v: 3
 
 ipr: trust200902
-keyword: Internet-Draft
+keyword:
+ - anonymous
+ - authorization
+ - crypto
 
 stand_alone: yes
 pi: [toc, sortrefs, symrefs]
@@ -75,8 +79,10 @@ interaction between client and origin is shown below.
 +---+----+                              +---+----+
     |                                       |
     +-- WWW-Authenticate: TokenChallenge -->|
-    |                                       | // Run issuance protocol
-    <------- Authorization: Token ----------+
+    |                                       |
+    |                            (Run issuance protocol)
+    |                                       |
+    |<------ Authorization: Token ----------+
     |                                       |
 ~~~
 {: #fig-overview title="Challenge-response redemption protocol flow"}
@@ -103,10 +109,12 @@ uses the following terms in more specific ways:
 - Issuer key: Keying material that can be used with an issuance protocol
 to create a signed token.
 
-- Token challenge: A requirement for tokens sent from an origin to a client,
-using the "WWW-Authenticate" HTTP header field. This challenge is bound to a
-specific token issuer and issuance protocol, and may be additionally bound to
-a specific context or origin name.
+- Token challenge: A request for tokens sent from an origin to a client, using
+the "WWW-Authenticate" HTTP header field. This challenge identifies a specific
+token issuer and issuance protocol. Token challenges optionally include
+one or both of: a redemption context (see {{context-construction}}), and
+a list of associated origins. These optional values are then
+be bound to the token that is issued.
 
 - Token redemption: An action by which a client presents a token to an origin
 in an HTTP request, using the "Authorization" HTTP header field.
@@ -155,7 +163,7 @@ All token challenges MUST begin with a 2-octet integer that defines the
 token type, in network byte order. This type indicates the issuance protocol
 used to generate the token and determines the structure and semantics of the rest of
 the structure. Values are registered in an IANA registry, {{token-types}}. Client MUST
-ignore challenges with token_types they do not support.
+ignore challenges with token types they do not support.
 
 This document defines the default challenge structure that can be used across
 token types, although future token types MAY extend or modify the structure
@@ -259,7 +267,7 @@ responding to it. Validation requirements are as follows:
 If validation fails, the client MUST NOT process or respond to the
 challenge. Clients MAY have further restrictions and requirements around
 validating when a challenge is considered acceptable or valid. For example,
-clients can choose to ignore challenges that list origin names for which
+clients can choose to ignore challenges that list origin names for which the
 current connection is not authoritative (according to the TLS certificate).
 
 Caching and pre-fetching of tokens is discussed in {{caching}}.
@@ -530,14 +538,15 @@ challenge is per-origin or not. For example, cross-origin tokens with empty
 contexts can be replayed from one party by another, as shown below.
 
 ~~~ aasvg
-+--------+                            +----------+                 +--------+
-| Origin |                            | Attacker |                 | Client |
-+---+----+                            +-----+----+                 +---+----+
-    |                                       |                          |
-    +-- WWW-Authenticate: TokenChallenge -->|                          |
-    |                                       +--- (replay challenge) --->
-    |                                       <-- Authorization: Token --+
-    <----------- (replay token) ------------+
++--------+           +----------+               +--------+
+| Origin |           | Attacker |               | Client |
++---+----+           +----+-----+               +---+----+
+    |                     |                         |
+    +-- TokenChallenge -->|                         |
+    |                     +-- (replay challenge) -->|
+    |                     |<-------- Token ---------+
+    |<-- (replay token) --+                         |
+    |                     |
 ~~~
 {: #fig-replay title="Replay attack example"}
 
@@ -601,9 +610,11 @@ This document registers the "PrivateToken" authentication scheme in the
 "Hypertext Transfer Protocol (HTTP) Authentication Scheme Registry" defined
 in {{!RFC9110, Section 16.4}}.
 
-Authentication Scheme Name: PrivateToken
+Authentication Scheme Name:
+: PrivateToken
 
-Pointer to specification text: {{challenge-redemption}} of this document
+Pointer to specification text:
+: {{challenge-redemption}} of this document
 
 ## Token Type Registry {#token-types}
 
@@ -613,23 +624,48 @@ defined for use with the Privacy Pass token authentication scheme. These
 identifiers are two-byte values, so the maximum possible value is
 0xFFFF = 65535.
 
-Template:
+New registrations need to list the following attributes:
 
-* Value: The two-byte identifier for the algorithm
-* Name: Name of the issuance protocol
-* Token Structure: The contents of the Token structure in {{redemption}}
-* Token Key Encoding: The encoding of the "token-key" parameter in {{redemption}}
-* TokenChallenge Structure: The contents of the TokenChallenge structure in {{challenge}}
-* Publicly Verifiable: A Y/N value indicating if the output tokens are
+Value:
+: The two-byte identifier for the algorithm
+
+Name:
+: Name of the issuance protocol
+
+Token Structure:
+: The contents of the Token structure in {{redemption}}
+
+Token Key Encoding:
+: The encoding of the "token-key" parameter in {{redemption}}
+
+TokenChallenge Structure:
+: The contents of the TokenChallenge structure in {{challenge}}
+
+Publicly Verifiable:
+: A Y/N value indicating if the output tokens are
   publicly verifiable
-* Public Metadata: A Y/N value indicating if the output tokens can contain
+
+Public Metadata:
+: A Y/N value indicating if the output tokens can contain
   public metadata.
-* Private Metadata: A Y/N value indicating if the output tokens can contain
+
+Private Metadata:
+: A Y/N value indicating if the output tokens can contain
   private metadata.
-* Nk: The length in bytes of an output authenticator
-* Nid: The length of the token key identifier
-* Reference: Where this algorithm is defined
-* Notes: Any notes associated with the entry
+
+Nk:
+: The length in bytes of an output authenticator
+
+Nid:
+: The length of the token key identifier
+
+Reference:
+: Where this algorithm is defined
+
+Notes:
+: Any notes associated with the entry
+{: spacing="compact"}
+
 
 New entries in this registry are subject to the Specification Required
 registration policy ({{!RFC8126, Section 4.6}}). Designated experts need to
@@ -637,9 +673,10 @@ ensure that the token type is sufficiently clearly defined to be used for both
 token issuance and redemption, and meets the common security and privacy
 requirements for issuance protocols defined in {{Section 3.2 of ARCHITECTURE}}.
 
-Values 0xFF00-0xFFFF are reserved for private use. Implementers can use values
-in this range for experimentation with new token type protocols, as well as other
-proprietary uses that do not require interoperability.
+{{ISSUANCE}} defines entries for this registry.
+
+
+### Reserved Values
 
 This document defines several Reserved values, which can be used by clients
 and servers to send "greased" values in token challenges and responses to
@@ -653,47 +690,93 @@ structures when they are not able to present a real token response. The
 contents of the Token structure SHOULD be filled with random bytes when
 using greased values.
 
-The initial contents for this registry consist of the following Values.
-For each Value, the Name is "RESERVED", the Publicly Verifiable, Public
-Metadata, Private Metadata, Nk, and Nid attributes are all assigned "N/A",
-the Reference is this document, and the Notes attribute is "None". The
-initial list of Values is as follows:
+The initial contents for this registry consists of multiple reserved values,
+with the following attributes, which are repeated for each registration:
 
-- 0x0000
-- 0x02AA
-- 0x1132
-- 0x2E96
-- 0x3CD3
-- 0x4473
-- 0x5A63
-- 0x6D32
-- 0x7F3F
-- 0x8D07
-- 0x916B
-- 0xA6A4
-- 0xBEAB
-- 0xC3F3
-- 0xDA42
-- 0xE944
-- 0xF057
+Value:
+: 0x0000, 0x02AA, 0x1132, 0x2E96, 0x3CD3, 0x4473, 0x5A63, 0x6D32, 0x7F3F,
+  0x8D07, 0x916B, 0xA6A4, 0xBEAB, 0xC3F3, 0xDA42, 0xE944, 0xF057
 
-Additionally, the registry is to be initialized with the following entry
-for Private Use.
+Name:
+: RESERVED
 
-* Value: 0xFF00-0xFFFF
-* Name: Private Use
-* Token Structure: The contents of the Token structure in {{redemption}}
-* Token Key Encoding: N/A
-* TokenChallenge Structure: The contents of the TokenChallenge structure in {{challenge}}
-* Publicly Verifiable: N/A
-* Public Metadata: N/A
-* Private Metadata: N/A
-* Nk: N/A
-* Nid: N/A
-* Reference: This document
-* Notes: None
+Token Structure:
+: Random bytes
 
-{{ISSUANCE}} defines other non-grease entries for this registry.
+Token Key Encoding:
+: Random bytes
+
+TokenChallenge Structure:
+: Random bytes
+
+Publicly Verifiable:
+: N/A
+
+Public Metadata:
+: N/A
+
+Private Metadata:
+: N/A
+
+Nk:
+: N/A
+
+Nid:
+: N/A
+
+Reference:
+: This document
+
+Notes:
+: None
+{: spacing="compact"}
+
+
+### Private Use Values
+
+Values 0xFF00-0xFFFF are reserved for private use. Implementers can use values
+in this range for experimentation with new token type protocols, as well as other
+proprietary uses that do not require interoperability.
+
+The registry is to be initialized with the following entry for Private Use:
+
+Value:
+: 0xFF00-0xFFFF
+
+Name:
+: Private Use
+
+Token Structure:
+: The contents of the Token structure in {{redemption}}
+
+Token Key Encoding:
+: N/A
+
+TokenChallenge Structure:
+: The contents of the TokenChallenge structure in {{challenge}}
+
+Publicly Verifiable:
+: N/A
+
+Public Metadata:
+: N/A
+
+Private Metadata:
+: N/A
+
+Nk:
+: N/A
+
+Nid:
+: N/A
+
+Reference:
+: This document
+
+Notes:
+: None
+{: spacing="compact"}
+
 
 --- back
 
