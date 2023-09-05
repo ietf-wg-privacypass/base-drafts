@@ -922,7 +922,9 @@ the token-key parameter for the first challenge in the list, whereas
 token-key-1 denotes the token-key for the second challenge in the list.
 
 The resulting wire-encoded WWW-Authentication header based on this
-list of challenges is then listed at the end.
+list of challenges is then listed at the end. Line folding is only
+used to fit the document formatting constraints and not unsupported
+in actual requests.
 
 ~~~
 token-type-0: 0x0002
