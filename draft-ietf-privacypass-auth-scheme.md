@@ -117,12 +117,13 @@ Token redemption is performed using HTTP Authentication
 ({{!RFC9110, Section 11}}), with the scheme "PrivateToken". Origins challenge
 clients to present a token from a specific issuer ({{challenge}}). Once a
 client has received a token from that issuer, or already has a valid token
-available, it presents the token to the origin ({{redemption}}).
+available, it presents the token to the origin ({{redemption}}). The process of
+presenting a token in response to a challenge is also referred to as "spending" a token.
 
 In order to prevent linkability across different transactions, clients
-will often present a particular "PrivateToken" only once. Spending the same
-token value more than once allows the origin to link multiple transactions to
-the same client. In deployment scenarios where origins send token challenges
+will often present a particular "PrivateToken" only once. Origins can link multiple
+transactions to the same client if that client spends the same token value more
+than once. In deployment scenarios where origins send token challenges
 to request tokens, origins ought to expect at most one request containing a
 token from the client in reaction to a particular challenge.
 
