@@ -305,9 +305,9 @@ This list is not exhaustive.
 Preventing double spending on tokens requires the origin to keep state
 associated with the redemption context. An empty redemption context is not
 bound to any property of the client request, so state to prevent double spending
-needs to be stored and shared across all servers that can accept request until
+needs to be stored and shared across all origin servers that can accept tokens until
 token-key expiration or rotation. For a non-empty redemption context, the
-double spend state only needs to be stored across the set of servers that will
+double spend state only needs to be stored across the set of origin servers that will
 accept tokens with that redemption context.
 
 Origins that share redemption contexts, i.e., by using the same redemption
