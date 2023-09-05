@@ -236,8 +236,9 @@ Clients MAY ignore the challenge, e.g., because the token-key is
 invalid or otherwise untrusted.
 
 The header field MAY also include the standard "realm" parameter, if desired.
-Issuance protocols MAY require other parameters. Clients MUST ignore unknown
-parameters in challenges.
+Issuance protocols MAY define other parameters, some of which might be required.
+Clients MUST ignore parameters in challenges that are not defined for the issuance
+protocol corresponding to the token type in the challenge.
 
 As an example, the WWW-Authenticate header field could look like this:
 
