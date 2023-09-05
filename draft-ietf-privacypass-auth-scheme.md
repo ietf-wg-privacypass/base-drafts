@@ -726,53 +726,6 @@ Notes:
 : None
 {: spacing="compact"}
 
-
-### Private Use Values
-
-Values 0xFF00-0xFFFF are reserved for private use. Implementers can use values
-in this range for experimentation with new token type protocols, as well as other
-proprietary uses that do not require interoperability.
-
-The registry is to be initialized with the following entry for Private Use:
-
-Value:
-: 0xFF00-0xFFFF
-
-Name:
-: Private Use
-
-Token Structure:
-: The contents of the Token structure in {{redemption}}
-
-Token Key Encoding:
-: N/A
-
-TokenChallenge Structure:
-: The contents of the TokenChallenge structure in {{challenge}}
-
-Publicly Verifiable:
-: N/A
-
-Public Metadata:
-: N/A
-
-Private Metadata:
-: N/A
-
-Nk:
-: N/A
-
-Nid:
-: N/A
-
-Reference:
-: This document
-
-Notes:
-: None
-{: spacing="compact"}
-
-
 --- back
 
 # Test Vectors
