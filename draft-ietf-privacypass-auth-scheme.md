@@ -239,8 +239,9 @@ using an out-of-band mechanism.
 which the challenge will be accepted by the origin.
 
 The header field MAY also include the standard "realm" parameter, if desired.
-Issuance protocols MAY require other parameters. Clients SHOULD ignore unknown
-parameters in challenges, except if otherwise specified by issuance protocols.
+Issuance protocols MAY define other parameters, some of which might be required.
+Clients MUST ignore parameters in challenges that are not defined for the issuance
+protocol corresponding to the token type in the challenge.
 
 As an example, the WWW-Authenticate header field could look like this:
 
