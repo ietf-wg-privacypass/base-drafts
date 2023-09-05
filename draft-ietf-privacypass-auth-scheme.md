@@ -123,9 +123,8 @@ presenting a token in response to a challenge is also referred to as "spending" 
 In order to prevent linkability across different transactions, clients
 will often present a particular "PrivateToken" only once. Origins can link multiple
 transactions to the same client if that client spends the same token value more
-than once. In deployment scenarios where origins send token challenges
-to request tokens, origins ought to expect at most one request containing a
-token from the client in reaction to a particular challenge.
+than once. As such, origins ought to expect at most one unique token
+value, carried in one request, for each challenge.
 
 The rest of this section describes the token challenge and redemption interactions
 in more detail.
