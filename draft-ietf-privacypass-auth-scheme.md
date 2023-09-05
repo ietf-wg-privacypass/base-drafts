@@ -664,9 +664,10 @@ Notes:
 
 New entries in this registry are subject to the Specification Required
 registration policy ({{!RFC8126, Section 4.6}}). Designated experts need to
-ensure that the token type is sufficiently clearly defined to be used for both
-token issuance and redemption, and meets the common security and privacy
-requirements for issuance protocols defined in {{Section 3.2 of ARCHITECTURE}}.
+ensure that the token type is defined to be used for both token issuance and
+redemption. Additionally, the experts can reject registrations on the basis
+that they do not meet the security and privacy requirements for issuance
+protocols defined in {{Section 3.2 of ARCHITECTURE}}.
 
 {{ISSUANCE}} defines entries for this registry.
 
