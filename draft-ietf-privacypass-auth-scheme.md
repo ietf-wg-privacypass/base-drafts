@@ -486,7 +486,7 @@ clients will regularly encounter challenges for which they cannot redeem a token
 even clients that could redeem a token can choose not to. In order to mitigate the risk
 of these services relying on always receiving tokens, clients can ignore token
 challenges (and thus not redeem a token on a subsequent request) with some
-non-zero probability. See {{Section 5.1 of ARCHITECTURE}} for further considerations
+non-trivial probability. See {{Section 5.1 of ARCHITECTURE}} for further considerations
 on avoiding discriminatory behavior across clients when using Privacy Pass tokens.
 
 Clients might also choose to not redeem tokens in subsequent requests when the
