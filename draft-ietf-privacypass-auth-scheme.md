@@ -454,77 +454,92 @@ token, e.g., the probability that one can forge an authenticator value without
 invoking the issuance protocol, depend on the cryptographic algorithm used by
 the issuance protocol as determined by the token type.
 
-# User Interaction {#interaction}
+# Client Behavior {#client-behavior}
 
-When used in contexts like websites, origins that challenge clients for
-tokens need to consider how to optimize their interaction model to ensure a
-good user experience.
+When a client receives one or more token challenges in response to a request,
+the client has a set of choices to make:
 
-Origins SHOULD minimize the number of challenges sent on a particular client
-session, such as a unique TLS session between a client and origin
-(referred to as the "redemption context" in {{ARCHITECTURE}}). Similarly, clients
-SHOULD have some implementation-specific policy to minimize the number of tokens
-that can be retrieved by origins. One possible implementation of this policy is
-to bound the number of token challenges a given origin can provide for a given
-session.
+- Whether or not to redeem a token via a new request to the origin.
+- Whether to use a cached token, or fetch one or more new tokens using
+   the issuance protocol.
+- If multiple challenges were sent, which challenge to use for redeeming a
+  token on a subsequent request.
 
-Token challenges can be performed without explicit user involvement, depending
-on the issuance protocol. If tokens are scoped to a specific origin,
-there is no need for per-challenge user interaction. Note that the issuance
-protocol may separately involve user interaction if the client needs to be
-newly validated.
+The approach to these choices depends on the use case of the application, as
+well as the deployment model (see {{Section 4 of ARCHITECTURE}} for discussion
+of the different deployment models).
 
-If a client cannot use cached tokens to respond to a challenge, either because
-it has run out of cached tokens or the associated context is unique, the token
-issuance process can add user-perceivable latency. Origins need not block
-useful work such as loading the contents of a web page on token authentication.
-Instead, token authentication can be used in similar ways to existing CAPTCHA
-validation flows, wherein validation sometimes proceeds alongside useful work,
-e.g., when loading contents of a web page, but without the need for user interaction.
-If issuance is taking a long time, an origin can fall back to another method
-of user validation.
+## Choosing to Redeem Tokens
 
-An origin MUST NOT use more than one redemption context value for a given token
-type and issuer per client request. If an origin issues a large number of
-challenges with unique contexts, such as more than once for each request, this
-can indicate that the origin is either not functioning correctly or is trying
-to attack or overload the client or issuance server. In such cases, a client
-MUST ignore redundant token challenges for the same request and SHOULD alert
-the user if possible.
+Some applications of tokens might require clients to always present a token
+as authentication in order to successfully make requests. For example, a restricted
+service that wants to only allow access to valid users, but do so without learning
+specific user Identities, could use tokens that are based on attesting user
+credentials. In these kinds of use cases, clients will need to always redeem a
+token in order to successfully make a request.
 
-Origins MAY include multiple challenges, where each challenge refers to a
-different issuer or a different token type, to allow clients to choose a
-preferred issuer or type.
+Many other use cases for Privacy Pass tokens involve open services that interact
+with some clients that either cannot redeem tokens, or can only sometimes redeem
+tokens. For example, a service can use tokens as a way to reduce the incidence of
+presenting CAPTCHAs to users. In such use cases that are meant for open services,
+clients will regularly encounter challenges for which they cannot redeem a token; and,
+even clients that could redeem a token can choose not to. In order to mitigate the risk
+of these services relying on always receiving tokens, clients can ignore token
+challenges (and thus not redeem a token on a subsequent request) with some
+non-zero probability. See {{Section 5.1 of ARCHITECTURE}} for further considerations
+on avoiding discriminatory behavior across clients when using Privacy Pass tokens.
 
-An origin MUST NOT assume that token challenges will always yield a valid
-token. Clients might experience issues running the issuance protocol, e.g.,
-because the attester or issuer is unavailable, or clients might simply not
-support the requested token type. Origins SHOULD account for such operational
-or interoperability failures by offering clients a fallback challenge such
-as CAPTCHA for accessing a resource. Failure to provide a fallback will likely
-mean that some clients fail authentication and cannot perform the desired
-action, such as loading a web page or accessing some other resource.
+Clients might also choose to not redeem tokens in subsequent requests when the
+token challenges indicate erroneous or malicious behavior on the part of the
+challenging origin. For example, if a client’s ability to generate tokens via an
+attester and issuer is limited to a certain rate, a malicious origin could send
+an excessive number of token challenges with unique redemption contexts
+in order to cause the client to exhaust its ability to generate new tokens, or
+to overwhelm issuance servers. The limits here will vary based on the specific
+deployment, but clients SHOULD have some implementation-specific policy
+to minimize the number of tokens that can be retrieved by origins.
 
-For example, consider a scenario in which the client is a web browser, and the
-origin can accept either a token or a solution to a puzzle intended to
-determine if the client is a real human user. The origin would send clients a
-401 HTTP response that contains a token challenge in a "WWW-Authenticate"
-header field along with content that contains the puzzle to display to the
-user. Clients that are able to respond with a token will be able to
-automatically return the token and not show the puzzle, while clients that
-either do not support tokens or are unable to fetch tokens at a particular
-time can present the user with the puzzle.
+## Choosing Between Multiple Challenges
 
-To mitigate the risk of deployments becoming dependent on tokens, clients and
-origins SHOULD grease their behavior unless explicitly configured not to. In
-particular, clients SHOULD ignore token challenges with some non-zero
-probability. From the origin's perspective, ignoring a token challenge is
-indistinguishable from the issuance protocol failing for arbitrary reasons
-(excluding what can be inferred from latency between the client and origin interaction).
-Likewise, origins SHOULD randomly choose to not challenge clients for tokens
-with some non-zero probability. Moreover, origins SHOULD include random token
-types, from the Reserved list of "greased" types (defined in {{token-types}}),
-with some non-zero probability.
+A single response from an origin can include multiple token challenges.
+For example, a set of challenges could include different token types
+and issuers, to allow clients to choose a preferred issuer or type.
+
+The choice of which challenge to use for redeeming tokens is up to
+client policy. This can involve which token types are supported or preferred,
+which issuers are supported or preferred, or whether or not the
+client is able to use cached tokens based on the redemption context
+or origin information in the challenge. See {{caching}} for more discussion
+on token caching.
+
+# Origin Behavior {#origin-behavior}
+
+Origins choose what token challenges to send to clients, which will vary
+depending on the use case and deployment model. The origin chooses
+which token types, issuers, redemption contexts, and origin info to include
+in challenges. If an origin sends multiple challenges, each challenge SHOULD
+be equivalent in terms of acceptability for token redemption, since clients
+are free to choose to generate tokens based on any of the challenges.
+
+Origins ought to consider the time involved in token issuance. Particularly,
+a challenge that includes a unique redemption context will prevent a client
+from using cached tokens, and thus can add more latency before the client
+is able to redeem a token.
+
+Origins SHOULD minimize the number of challenges sent to a particular client
+context (referred to as the "redemption context" in
+{{Section 3.3 of ARCHITECTURE}}), to avoid overwhelming clients and issuers
+with token requests that might cause clients to hit rate limits.
+
+## Greasing
+
+In order to prevent clients becoming incompatible with new token challenges,
+origins SHOULD include random token types, from the Reserved list of "greased"
+types (defined in {{token-types}}), with some non-zero probability.
+
+Additionally, for deployments where tokens are not required (such as when tokens
+are used as a way to avoiding showing CAPTCHAs), origins SHOULD randomly 
+choose to not challenge clients for tokens with some non-zero probability.
 
 # Security Considerations {#sec-considerations}
 
