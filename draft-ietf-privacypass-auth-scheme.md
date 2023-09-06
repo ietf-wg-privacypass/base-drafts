@@ -535,7 +535,7 @@ with token requests that might cause clients to hit rate limits.
 
 In order to prevent clients becoming incompatible with new token challenges,
 origins SHOULD include random token types, from the Reserved list of "greased"
-types (defined in {{token-types}}), with some non-zero probability.
+types (defined in {{token-types}}), with some non-trivial probability.
 
 Additionally, for deployments where tokens are not required (such as when tokens
 are used as a way to avoiding showing CAPTCHAs), origins SHOULD randomly 
