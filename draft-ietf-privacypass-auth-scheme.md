@@ -483,8 +483,9 @@ tokens. For example, a service can use tokens as a way to reduce the incidence o
 presenting CAPTCHAs to users. In such use cases, services will regularly encounter
 clients that cannot redeem a token or choose not to. In order to mitigate the risk
 of these services relying on always receiving tokens, clients that are capable of
-redeeming tokens can ignore token challenges (and thus not redeem a token on
-a subsequent request) with some
+redeeming tokens can ignore token challenges (and instead behave as if they were a client
+that either doesn't support redeeming tokens or is unable to generate a new token, by not
+sending a new request that contains a token to redeem) with some
 non-trivial probability. See {{Section 5.1 of ARCHITECTURE}} for further considerations
 on avoiding discriminatory behavior across clients when using Privacy Pass tokens.
 
