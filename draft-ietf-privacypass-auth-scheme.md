@@ -460,8 +460,7 @@ When a client receives one or more token challenges in response to a request,
 the client has a set of choices to make:
 
 - Whether or not to redeem a token via a new request to the origin.
-- Whether to use a cached token, or fetch one or more new tokens using
-   the issuance protocol.
+- Whether to redeem a previously issued and cached token, or redeem a token freshly issued from the issuance protocol.
 - If multiple challenges were sent, which challenge to use for redeeming a
   token on a subsequent request.
 
@@ -474,18 +473,18 @@ of the different deployment models).
 Some applications of tokens might require clients to always present a token
 as authentication in order to successfully make requests. For example, a restricted
 service that wants to only allow access to valid users, but do so without learning
-specific user Identities, could use tokens that are based on attesting user
+specific user credential information, could use tokens that are based on attesting user
 credentials. In these kinds of use cases, clients will need to always redeem a
 token in order to successfully make a request.
 
-Many other use cases for Privacy Pass tokens involve open services that interact
-with some clients that either cannot redeem tokens, or can only sometimes redeem
+Many other use cases for Privacy Pass tokens involve open services that must work
+with any client, including those that either cannot redeem tokens, or can only sometimes redeem
 tokens. For example, a service can use tokens as a way to reduce the incidence of
-presenting CAPTCHAs to users. In such use cases that are meant for open services,
-clients will regularly encounter challenges for which they cannot redeem a token; and,
-even clients that could redeem a token can choose not to. In order to mitigate the risk
-of these services relying on always receiving tokens, clients can ignore token
-challenges (and thus not redeem a token on a subsequent request) with some
+presenting CAPTCHAs to users. In such use cases, services will regularly encounter
+clients that cannot redeem a token or choose not to. In order to mitigate the risk
+of these services relying on always receiving tokens, clients that are capable of
+redeeming tokens can ignore token challenges (and thus not redeem a token on
+a subsequent request) with some
 non-trivial probability. See {{Section 5.1 of ARCHITECTURE}} for further considerations
 on avoiding discriminatory behavior across clients when using Privacy Pass tokens.
 
@@ -510,7 +509,10 @@ client policy. This can involve which token types are supported or preferred,
 which issuers are supported or preferred, or whether or not the
 client is able to use cached tokens based on the redemption context
 or origin information in the challenge. See {{caching}} for more discussion
-on token caching.
+on token caching. Regardless of how the choice is made, it SHOULD be done in a
+consistent manner to ensure that the choice does not reveal information about the
+specific client; see {{Section 6.2 of ARCHITECTURE}} for more details on the privacy
+implications of issuance consistency.
 
 # Origin Behavior {#origin-behavior}
 
@@ -523,7 +525,7 @@ are free to choose to generate tokens based on any of the challenges.
 
 Origins ought to consider the time involved in token issuance. Particularly,
 a challenge that includes a unique redemption context will prevent a client
-from using cached tokens, and thus can add more latency before the client
+from using cached tokens, and thus can add more delay before the client
 is able to redeem a token.
 
 Origins SHOULD minimize the number of challenges sent to a particular client
