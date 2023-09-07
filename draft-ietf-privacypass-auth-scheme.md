@@ -541,7 +541,9 @@ types (defined in {{token-types}}), with some non-trivial probability.
 
 Additionally, for deployments where tokens are not required (such as when tokens
 are used as a way to avoiding showing CAPTCHAs), origins SHOULD randomly 
-choose to not challenge clients for tokens with some non-zero probability.
+choose to not challenge clients for tokens with some non-trivial probability.
+This helps origins ensure that their behavior for handling clients that cannot
+redeem tokens is maintained and exercised consistently.
 
 # Security Considerations {#sec-considerations}
 
