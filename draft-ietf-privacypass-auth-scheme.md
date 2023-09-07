@@ -191,8 +191,8 @@ The structure fields are defined as follows:
 - "token_type" is a 2-octet integer, in network byte order, as described
 above.
 
-- "issuer_name" is an ASCII string that identifies the issuer using the format of the authority portion of a URI
-as defined in {{Section 3.2 of !URI=RFC3986}}. This name identifies the issuer that is allowed to
+- "issuer_name" is an ASCII string that identifies the issuer using the format
+of a server name described below. This name identifies the issuer that is allowed to
 issue tokens that can be redeemed by this origin. The field that stores this string in the challenge
 is prefixed with a 2-octet integer indicating the length, in network byte order.
 
@@ -205,12 +205,19 @@ practice. Challenges with redemption_context values of invalid lengths MUST be i
 
 - "origin_info" is an ASCII string that is either empty, or contains one or more
 origin names that allow a token to be scoped to a specific set of origins. Each
-origin name uses the format of the authority portion of a URI as defined in
-{{Section 3.2 of URI}}. The string is prefixed with a 2-octet integer indicating
-the length, in network byte order. If empty, any non-origin-specific token can be
-redeemed. If the string contains multiple origin names, they are delimited with
-commas "," without any whitespace. If this field is not empty, the Origin MUST
-include its own name as one of the names in the list.
+origin name uses the format of a server name described below. The string is
+prefixed with a 2-octet integer indicating the length, in network byte order.
+If empty, any non-origin-specific token can be redeemed. If the string contains
+multiple origin names, they are delimited with commas "," without any whitespace.
+If this field is not empty, the Origin MUST include its own name as one of the
+names in the list.
+
+The server names used in the "issuer_name" and "origin_info" fields are ASCII strings
+that contain a hostname and optional port, where the port is implied to be "443" if
+missing. The names use the format of the authority portion of a URI as defined in
+{{Section 3.2 of !URI=RFC3986}}. The names MUST NOT include a "userinfo" portion of
+an authority. For example, a server name used in one of these fields might be
+"issuer.example.com" or "issuer.example.com:8443".
 
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following parameters:
