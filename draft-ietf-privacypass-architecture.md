@@ -1115,9 +1115,12 @@ for malicious Clients to collude and share tokens in a so-called "hoarding
 attack." As an example of this attack, many distributed Clients could obtain
 cacheable tokens and them share them with a single Client to redeem in a way
 that would violate an Origin's attempt to limit tokens to any one particular
-Client. Depending on the deployment model, it can be possible to detect these
-types of attacks by comparing issuance and redemption contexts; for example,
-this is possible in the Joint Origin and Issuer model.
+Client. In general, mechanisms for mitigating hoarding attacks depend on the
+deployment model and use case. For example, in the Joint Origin and Issuer model,
+comparing the issuance and redemption contexts can help detect hoarding attacks,
+i.e., if the distribution of redemption contexts is noticeably different from the
+distribution of issuance contexts. Rate limiting issuance, either at the Client,
+Attester, or Issuer, can also help mitigate these attacks.
 
 # IANA Considerations {#iana}
 
