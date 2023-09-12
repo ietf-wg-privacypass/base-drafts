@@ -162,9 +162,11 @@ containing the origin itself. See {{Section 3.4 of ARCHITECTURE}} for more
 information about the difference between cross-origin and per-origin tokens.
 
 Once these decisions are made, origins construct the WWW-Authenticate header
-by first constructing the token challenge as follows.
+by first constructing the token challenge as described in {{challenge-structure}}.
+Origins send challenges as described in {{send-challenge}}, and clients process
+them as described in {{process-challenge}} and {{caching}}.
 
-### Token Challenge Structure
+### Token Challenge Structure {#challenge-structure}
 
 This document defines the default challenge structure that can be used across
 token types, although future token types MAY extend or modify the structure
@@ -220,7 +222,15 @@ multiple origin names, they are delimited with commas "," without any whitespace
 If this field is not empty, the Origin MUST include its own name as one of the
 names in the list.
 
-### Server Name Encoding {#server-name}
+If "origin_info" contains multiple origin names, this means the challenge is valid
+for any of the origins in the list, including the origin which issued the challenge
+(which must always be present in the list if it is non-empty; see {{process-challenge}}).
+This can be useful in settings where clients pre-fetch and cache tokens for a particular
+challenge -- including the "origin_info" field -- and then later redeem these tokens
+at one of the origins in the list. See {{caching}} for more discussion about
+token caching.
+
+#### Server Name Encoding {#server-name}
 
 Server names contained in a token challenge are ASCII strings that contain a hostname
 and optional port, where the port is implied to be "443" if missing. The names use the
@@ -229,7 +239,40 @@ The names MUST NOT include a "userinfo" portion of an authority. For example, a 
 server name might be "issuer.example.com" or "issuer.example.com:8443",
 but not "issuer@example.com".
 
-### Sending Token Challenges
+#### Redemption Context Construction {#context-construction}
+
+The TokenChallenge redemption context allows the origin to determine the
+context in which a given token can be redeemed. This value can be a unique
+per-request nonce, constructed from 32 freshly generated random bytes. It
+can also represent state or properties of the client session. Some example
+properties and methods for constructing the corresponding context are below.
+This list is not exhaustive.
+
+- Context bound to a given time window: Construct redemption context as
+  F(current time window), where F is a pseudorandom function.
+- Context bound to a client network: Construct redemption context as
+  F(client ASN), where F is a pseudorandom function.
+- Context bound to a given time window and client network: Construct redemption
+  context as F(current time window, client ASN), where F is a pseudorandom function.
+
+Preventing double spending on tokens requires the origin to keep state
+associated with the redemption context. An empty redemption context is not
+bound to any property of the client request, so state to prevent double spending
+needs to be stored and shared across all origin servers that can accept tokens until
+token-key expiration or rotation. For a non-empty redemption context, the
+double spend state only needs to be stored across the set of origin servers that will
+accept tokens with that redemption context.
+
+Origins that share redemption contexts, i.e., by using the same redemption
+context, choosing the same issuer, and providing the same origin_info field in
+the TokenChallenge, must necessarily share state required to enforce double
+spend prevention. Origins should consider the operational complexity of this
+shared state before choosing to share redemption contexts. Failure to
+successfully synchronize this state and use it for double spend prevention can
+allow Clients to redeem tokens to one Origin that were issued after an
+interaction with another Origin that shares the context.
+
+### Sending Token Challenges {#send-challenge}
 
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following parameters:
@@ -269,7 +312,7 @@ WWW-Authenticate:
   PrivateToken challenge="abc...", token-key="123..."
 ~~~
 
-### Sending Multiple Token Challenges
+#### Sending Multiple Token Challenges
 
 It is possible for the WWW-Authenticate header field to include multiple
 challenges ({{!RFC9110, Section 11.6.1}}). This allows the origin to indicate
@@ -293,7 +336,7 @@ for one challenge over another (for example, if one uses a token type
 that is faster to verify), it can sort it to be first in the list
 of challenges as a hint to the client.
 
-### Process Token Challenges
+### Process Token Challenges {#process-challenge}
 
 Upon receipt of a challenge, a client validates the TokenChallenge structure
 before taking any action, such as fetching a new token or redeeming a token
@@ -334,39 +377,6 @@ HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or if there is a network
 change and the client does not have any origin-specific state like HTTP cookies.
 Using these tokens in a context that otherwise would not be linkable to the
 original context could allow the origin to recognize a client.
-
-### Redemption Context Construction {#context-construction}
-
-The TokenChallenge redemption context allows the origin to determine the
-context in which a given token can be redeemed. This value can be a unique
-per-request nonce, constructed from 32 freshly generated random bytes. It
-can also represent state or properties of the client session. Some example
-properties and methods for constructing the corresponding context are below.
-This list is not exhaustive.
-
-- Context bound to a given time window: Construct redemption context as
-  F(current time window), where F is a pseudorandom function.
-- Context bound to a client network: Construct redemption context as
-  F(client ASN), where F is a pseudorandom function.
-- Context bound to a given time window and client network: Construct redemption
-  context as F(current time window, client ASN), where F is a pseudorandom function.
-
-Preventing double spending on tokens requires the origin to keep state
-associated with the redemption context. An empty redemption context is not
-bound to any property of the client request, so state to prevent double spending
-needs to be stored and shared across all origin servers that can accept tokens until
-token-key expiration or rotation. For a non-empty redemption context, the
-double spend state only needs to be stored across the set of origin servers that will
-accept tokens with that redemption context.
-
-Origins that share redemption contexts, i.e., by using the same redemption
-context, choosing the same issuer, and providing the same origin_info field in
-the TokenChallenge, must necessarily share state required to enforce double
-spend prevention. Origins should consider the operational complexity of this
-shared state before choosing to share redemption contexts. Failure to
-successfully synchronize this state and use it for double spend prevention can
-allow Clients to redeem tokens to one Origin that were issued after an
-interaction with another Origin that shares the context.
 
 ## Token Redemption {#redemption}
 
