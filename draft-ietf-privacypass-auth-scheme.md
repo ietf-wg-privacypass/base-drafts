@@ -142,8 +142,7 @@ in more detail.
 Origins send a token challenge to clients in an "WWW-Authenticate" header field
 with the "PrivateToken" scheme. This authentication scheme has two mandatory parameters:
 one containing a token challenge and another containing the token-key used for
-producing (and verifying) a corresponding token. The challenge parameter can be
-repeated in the header field.
+producing (and verifying) a corresponding token.
 
 Origins that support the "PrivateToken" authentication scheme need to handle
 the following tasks in constructing the WWW-Authenticate header field:
