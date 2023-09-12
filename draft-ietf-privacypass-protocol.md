@@ -337,9 +337,9 @@ content. The media type for this request is
 
 ~~~
 POST /request HTTP/1.1
-accept = application/private-token-response
-content-type = application/private-token-request
-content-length = <Length of TokenRequest>
+Accept = application/private-token-response
+Content-Type = application/private-token-request
+Content-Length = <Length of TokenRequest>
 
 <Bytes containing the TokenRequest>
 ~~~
@@ -396,8 +396,8 @@ consists of TokenResponse, with the content type set as
 
 ~~~
 HTTP/1.1 200 OK
-content-type = application/private-token-response
-content-length = <Length of TokenResponse>
+Content-Type = application/private-token-response
+Content-Length = <Length of TokenResponse>
 
 <Bytes containing the TokenResponse>
 ~~~
@@ -567,9 +567,9 @@ Request URL "https://issuer.example.net/request" is shown below.
 
 ~~~
 POST /request HTTP/1.1
-accept = application/private-token-response
-content-type = application/private-token-request
-content-length = <Length of TokenRequest>
+Accept = application/private-token-response
+Content-Type = application/private-token-request
+Content-Length = <Length of TokenRequest>
 
 <Bytes containing the TokenRequest>
 ~~~
@@ -608,8 +608,8 @@ consists of TokenResponse, with the content type set as
 
 ~~~
 HTTP/1.1 200 OK
-content-type = application/private-token-response
-content-length = <Length of TokenResponse>
+Content-Type = application/private-token-response
+Content-Length = <Length of TokenResponse>
 
 <Bytes containing the TokenResponse>
 ~~~
