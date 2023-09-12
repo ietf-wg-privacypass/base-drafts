@@ -63,7 +63,7 @@ tokens that prove nothing other than that they have been created by a given
 server in the past {{?ARCHITECTURE=I-D.ietf-privacypass-architecture}}.
 
 This document describes the issuance protocol for Privacy Pass built on
-{{?HTTP=RFC9110}}. It specifies two variants: one that is privately verifiable
+{{!HTTP=RFC9110}}. It specifies two variants: one that is privately verifiable
 using the issuance private key based on the oblivious pseudorandom function from
 {{!OPRF=I-D.irtf-cfrg-voprf}}, and one that is publicly verifiable using the
 issuance public key based on the blind RSA signature scheme
@@ -214,13 +214,13 @@ information for this well-known URI. The reason that this resource is located
 at a well-known URI is that Issuers are defined by an origin name in TokenChallenge
 structures; see {{Section 2.1 of AUTHSCHEME}}.
 
-The Issuer directory and Issuer resources SHOULD be available on the same domain. If
+The Issuer directory and Issuer resources SHOULD be available on the same origin. If
 an Issuer wants to service multiple different Issuer directories they MUST create
 unique subdomains for each so the TokenChallenge defined in
 {{Section 2.1 of !AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}} can be
 differentiated correctly.
 
-Issuers SHOULD use HTTP caching to permit caching of this resource
+Issuers SHOULD use HTTP cache directives to permit caching of this resource
 {{!RFC5861}}. The cache lifetime depends on the Issuer's key rotation schedule.
 Regular rotation of token keys is recommended to minimize the risk of key
 compromise and any harmful effects that happen due to key compromise.
@@ -332,15 +332,12 @@ The values `token_input` and `blinded_element` are stored locally and used
 later as described in {{private-finalize}}. The Client then generates an HTTP
 POST request to send to the Issuer Request URL, with the TokenRequest as the
 content. The media type for this request is
-"application/private-token-request". An example request is shown below.
+"application/private-token-request". An example request for the Issuer Request URL
+"https://issuer.example.net/request" is shown below.
 
 ~~~
-:method = POST
-:scheme = https
-:authority = issuer.example.net
-:path = /request
+POST /request HTTP/1.1
 accept = application/private-token-response
-cache-control = no-cache, no-store
 content-type = application/private-token-request
 content-length = <Length of TokenRequest>
 
@@ -356,15 +353,16 @@ Upon receipt of the request, the Issuer validates the following conditions:
   of a Public Key owned by the Issuer.
 - The TokenRequest.blinded_msg is of the correct size.
 
-If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
-to the client.
+If any of these conditions is not met, the Issuer MUST return an HTTP 422
+(Unprocessable Content) error to the client.
 
-If these conditions are met, the Issuer then tries to deseralize TokenRequest.blinded_msg
-using DeserializeElement from {{Section 2.1 of OPRF}},
-yielding `blinded_element`. If this fails, the Issuer MUST return an HTTP 400
-error to the client. Otherwise, if the Issuer is willing to produce a token to
-the Client, the Issuer completes the issuance flow by computing a blinded
-response as follows:
+If these conditions are met, the Issuer then tries to deseralize
+TokenRequest.blinded_msg using DeserializeElement from
+{{Section 2.1 of OPRF}}, yielding `blinded_element`. If this fails, the
+Issuer MUST return an HTTP 422 (Unprocessable Content) error to the
+client. Otherwise, if the Issuer is willing to produce a token to the Client,
+the Issuer completes the issuance flow by computing a blinded response as
+follows:
 
 ~~~
 server_context = SetupVOPRFServer("P384-SHA384", skI)
@@ -372,9 +370,9 @@ evaluate_element, proof =
   server_context.BlindEvaluate(skI, pkI, blinded_element)
 ~~~
 
-SetupVOPRFServer is defined in {{OPRF, Section 3.2}} and BlindEvaluate is defined in
-{{OPRF, Section 3.3.2}}. The Issuer then creates a TokenResponse structured
-as follows:
+SetupVOPRFServer is defined in {{OPRF, Section 3.2}} and BlindEvaluate is
+defined in {{OPRF, Section 3.3.2}}. The Issuer then creates a TokenResponse
+structured as follows:
 
 ~~~
 struct {
@@ -397,7 +395,7 @@ consists of TokenResponse, with the content type set as
 "application/private-token-response".
 
 ~~~
-:status = 200
+HTTP/1.1 200 OK
 content-type = application/private-token-response
 content-length = <Length of TokenResponse>
 
@@ -564,15 +562,12 @@ The structure fields are defined as follows:
 
 The Client then generates an HTTP POST request to send to the Issuer Request
 URL, with the TokenRequest as the content. The media type for this request
-is "application/private-token-request". An example request is shown below:
+is "application/private-token-request". An example request for the Issuer
+Request URL "https://issuer.example.net/request" is shown below.
 
 ~~~
-:method = POST
-:scheme = https
-:authority = issuer.example.net
-:path = /request
+POST /request HTTP/1.1
 accept = application/private-token-response
-cache-control = no-cache, no-store
 content-type = application/private-token-request
 content-length = <Length of TokenRequest>
 
@@ -588,8 +583,8 @@ Upon receipt of the request, the Issuer validates the following conditions:
   ID of an Issuer Public Key.
 - The TokenRequest.blinded_msg is of the correct size.
 
-If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
-to the Client. Otherwise, if the
+If any of these conditions is not met, the Issuer MUST return an HTTP 422
+(Unprocessable Content) error to the Client. Otherwise, if the
 Issuer is willing to produce a token to the Client, the Issuer
 completes the issuance flow by computing a blinded response as follows:
 
@@ -612,7 +607,7 @@ consists of TokenResponse, with the content type set as
 "application/private-token-response".
 
 ~~~
-:status = 200
+HTTP/1.1 200 OK
 content-type = application/private-token-response
 content-length = <Length of TokenResponse>
 
