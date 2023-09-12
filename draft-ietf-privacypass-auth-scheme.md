@@ -65,12 +65,12 @@ kinds of Privacy Pass tokens.
 Clients and relying parties (origins) interact using this scheme to perform the
 token challenge and token redemption flow. In particular, origins challenge
 clients for a token with an HTTP Authentication challenge (using the
-WWW-Authenticate response header field). Clients then respond to that challenge
-with an HTTP authentication response (using the Authorization request header
-field). Clients produce an authentication response based on the origin's token
+WWW-Authenticate response header field). Clients can then react to that
+challenge by issuing a new request with a corresponding token (using the Authorization
+request header field). Clients generate tokens that match the origin's token
 challenge by running the token issuance protocol
 {{?ISSUANCE=I-D.ietf-privacypass-protocol}}. The act of presenting a token in an
-Authorization request header is referred to as token redemption. This
+Authorization request header field is referred to as token redemption. This
 interaction between client and origin is shown below.
 
 ~~~ aasvg
@@ -85,7 +85,7 @@ interaction between client and origin is shown below.
     |<------ Authorization: Token ----------+
     |                                       |
 ~~~
-{: #fig-overview title="Challenge-response redemption protocol flow"}
+{: #fig-overview title="Challenge and redemption protocol flow"}
 
 In addition to working with different token issuance protocols, this scheme
 optionally supports use of tokens that are associated with origin-chosen
@@ -126,7 +126,8 @@ Token redemption is performed using HTTP Authentication
 clients to present a token from a specific issuer ({{challenge}}). Once a
 client has received a token from that issuer, or already has a valid token
 available, it presents the token to the origin ({{redemption}}). The process of
-presenting a token in response to a challenge is also referred to as "spending" a token.
+presenting a token as authentication to an origin is also referred to
+as "spending" a token.
 
 In order to prevent linkability across different transactions, clients
 will often present a particular "PrivateToken" only once. Origins can link multiple
@@ -454,9 +455,6 @@ for previous challenges. See {{replay-attacks}} for more information about repla
 attacks. For context-bound tokens, this double-spend prevention can require no state
 or minimal state, since the context can be used to verify token uniqueness.
 
-If a client is unable to fetch a token, it MUST react to the challenge as
-if it could not produce a valid Authorization response.
-
 ### Token Verification {#verification}
 
 A token consists of some input cryptographically bound to an authenticator
@@ -744,14 +742,14 @@ protocols defined in {{Section 3.2 of ARCHITECTURE}}.
 ### Reserved Values
 
 This document defines several Reserved values, which can be used by clients
-and servers to send "greased" values in token challenges and responses to
+and servers to send "greased" values in token challenges and redemptions to
 ensure that implementations remain able to handle unknown token types
 gracefully (this technique is inspired by {{?RFC8701}}). Implementations SHOULD
 select reserved values at random when including them in greased messages.
 Servers can include these in TokenChallenge structures, either as the only
 challenge when no real token type is desired, or as one challenge in a list of
 challenges that include real values. Clients can include these in Token
-structures when they are not able to present a real token response. The
+structures when they are not able to present a real token. The
 contents of the Token structure SHOULD be filled with random bytes when
 using greased values.
 
