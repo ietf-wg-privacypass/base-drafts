@@ -217,7 +217,7 @@ that contain a hostname and optional port, where the port is implied to be "443"
 missing. The names use the format of the authority portion of a URI as defined in
 {{Section 3.2 of !URI=RFC3986}}. The names MUST NOT include a "userinfo" portion of
 an authority. For example, a server name used in one of these fields might be
-"issuer.example.com" or "issuer.example.com:8443".
+"issuer.example.com" or "issuer.example.com:8443", but not "issuer@example.com".
 
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following parameters:
