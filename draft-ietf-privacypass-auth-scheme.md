@@ -140,23 +140,29 @@ in more detail.
 ## Token Challenge {#challenge}
 
 Origins send a token challenge to clients in an "WWW-Authenticate" header field
-with the "PrivateToken" scheme. This challenge includes a TokenChallenge
-message, along with information about what keys to use when requesting a token
-from the issuer.
+with the "PrivateToken" scheme. This authentication scheme has two mandatory parameters:
+one containing a token challenge and another containing the token-key used for
+producing (and verifying) a corresponding token.
 
-Origins that support this authentication scheme need to handle the following
-tasks:
+Origins that support the "PrivateToken" authentication scheme need to handle
+the following tasks in constructing the WWW-Authenticate header field:
 
 1. Select which issuer to use, and configure the issuer name and token-key to
-include in WWW-Authenticate challenges.
+include in WWW-Authenticate token challenges. The issuer name is included in
+the token challenge, and the issuer token-key is used to populate the
+WWW-Authenticate header parameter.
 
 1. Determine a redemption context construction to include in the
-TokenChallenge, as discussed in {{context-construction}}.
+token challenge, as discussed in {{context-construction}}.
 
-1. Select the origin information to include in the TokenChallenge. This can
+1. Select the origin information to include in the token challenge. This can
 be empty to allow fully cross-origin tokens, a single origin name that
-matches the origin itself, or a list of origin names containing the origin
-itself.
+matches the origin itself for per-origin tokens, or a list of origin names
+containing the origin itself. See {{Section 3.4 of ARCHITECTURE}} for more
+information about the difference between cross-origin and per-origin tokens.
+
+Once these decisions are made, origins construct the WWW-Authenticate header
+by first constructing the token challenge as follows.
 
 ### Token Challenge Structure
 
