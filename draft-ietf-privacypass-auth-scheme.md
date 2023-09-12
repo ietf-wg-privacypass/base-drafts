@@ -78,7 +78,7 @@ interaction between client and origin is shown below.
 | Origin |                              | Client |
 +---+----+                              +---+----+
     |                                       |
-    +-- WWW-Authenticate: TokenChallenge -->|
+    +-- WWW-Authenticate: PrivateToken ---->|
     |                                       |
     |                            (Run issuance protocol)
     |                                       |
