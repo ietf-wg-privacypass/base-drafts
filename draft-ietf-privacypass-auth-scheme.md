@@ -588,7 +588,7 @@ generated using a cryptographically secure source of randomness ({{?RFC4086}}).
 ## Replay Attacks
 
 Applications SHOULD constrain tokens to a single origin unless the use case can
-accommodate such replay attacks. Replaying tokens is not necessarily a security
+accommodate replay attacks. Replaying tokens is not necessarily a security
 or privacy problem. As an example, it is reasonable for clients to replay tokens
 in contexts where token redemption does not induce side effects and in which
 client requests are already linkable. One possible setting where this applies
