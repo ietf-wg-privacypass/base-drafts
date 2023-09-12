@@ -158,11 +158,7 @@ be empty to allow fully cross-origin tokens, a single origin name that
 matches the origin itself, or a list of origin names containing the origin
 itself.
 
-All token challenges MUST begin with a 2-octet integer that defines the
-token type, in network byte order. This type indicates the issuance protocol
-used to generate the token and determines the structure and semantics of the rest of
-the structure. Values are registered in an IANA registry, {{token-types}}. Client MUST
-ignore challenges with token types they do not support.
+### Token Challenge Structure
 
 This document defines the default challenge structure that can be used across
 token types, although future token types MAY extend or modify the structure
@@ -170,7 +166,13 @@ of the challenge; see {{token-types}} for the registry information
 which establishes and defines the relationship between "token_type" and the
 contents of the TokenChallenge message.
 
-Even when a given token type uses the default challenge, structure,
+All token challenges MUST begin with a 2-octet integer that defines the
+token type, in network byte order. This type indicates the issuance protocol
+used to generate the token and determines the structure and semantics of the rest of
+the structure. Values are registered in an IANA registry, {{token-types}}. Client MUST
+ignore challenges with token types they do not support.
+
+Even when a given token type uses the default challenge structure,
 the requirements on the presence or interpretation of the fields can differ
 across token types. For example, some token types might require that "origin_info"
 is non-empty, while others allow it to be empty.
@@ -191,8 +193,8 @@ The structure fields are defined as follows:
 - "token_type" is a 2-octet integer, in network byte order, as described
 above.
 
-- "issuer_name" is an ASCII string that identifies the issuer using the format of the authority portion of a URI
-as defined in {{Section 3.2 of !URI=RFC3986}}. This name identifies the issuer that is allowed to
+- "issuer_name" is an ASCII string that identifies the issuer using the format of a
+server name defined in {{server-name}}. This name identifies the issuer that is allowed to
 issue tokens that can be redeemed by this origin. The field that stores this string in the challenge
 is prefixed with a 2-octet integer indicating the length, in network byte order.
 
@@ -205,12 +207,23 @@ practice. Challenges with redemption_context values of invalid lengths MUST be i
 
 - "origin_info" is an ASCII string that is either empty, or contains one or more
 origin names that allow a token to be scoped to a specific set of origins. Each
-origin name uses the format of the authority portion of a URI as defined in
-{{Section 3.2 of URI}}. The string is prefixed with a 2-octet integer indicating
-the length, in network byte order. If empty, any non-origin-specific token can be
-redeemed. If the string contains multiple origin names, they are delimited with
-commas "," without any whitespace. If this field is not empty, the Origin MUST
-include its own name as one of the names in the list.
+origin name uses the format of a server name defined in {{server-name}}. The string
+is prefixed with a 2-octet integer indicating the length, in network byte order.
+If empty, any non-origin-specific token can be redeemed. If the string contains
+multiple origin names, they are delimited with commas "," without any whitespace.
+If this field is not empty, the Origin MUST include its own name as one of the
+names in the list.
+
+### Server Name Encoding {#server-name}
+
+Server names contained in a token challenge are ASCII strings that contain a hostname
+and optional port, where the port is implied to be "443" if missing. The names use the
+format of the authority portion of a URI as defined in {{Section 3.2 of !URI=RFC3986}}.
+The names MUST NOT include a "userinfo" portion of an authority. For example, a valid
+server name might be "issuer.example.com" or "issuer.example.com:8443",
+but not "issuer@example.com".
+
+### Sending Token Challenges
 
 When used in an authentication challenge, the "PrivateToken" scheme uses the
 following parameters:
@@ -250,28 +263,12 @@ WWW-Authenticate:
   PrivateToken challenge="abc...", token-key="123..."
 ~~~
 
-Upon receipt of this challenge, a client validates the TokenChallenge before
-responding to it. Validation requirements are as follows:
+### Sending Multiple Token Challenges
 
-- The token_type is recognized and supported by the client;
-- The TokenChallenge structure is well-formed; and
-- If the origin_info field is non-empty, the name of the origin that issued the
-  authentication challenge is included in the list of origin names. Comparison
-  of the origin name that issued the authentication challenge against elements
-  in the origin_info list is done via case-insensitive equality checks.
-
-If validation fails, the client MUST NOT process or respond to the
-challenge. Clients MAY have further restrictions and requirements around
-validating when a challenge is considered acceptable or valid. For example,
-clients can choose to ignore challenges that list origin names for which the
-current connection is not authoritative (according to the TLS certificate).
-
-Caching and pre-fetching of tokens is discussed in {{caching}}.
-
-Note that it is possible for the WWW-Authenticate header field to include
-multiple challenges ({{!RFC9110, Section 11.6.1}}). This allows the origin to indicate support for different
-token types, issuers, or to include multiple redemption contexts. For example,
-the WWW-Authenticate header field could look like this:
+It is possible for the WWW-Authenticate header field to include multiple
+challenges ({{!RFC9110, Section 11.6.1}}). This allows the origin to indicate
+support for different token types, issuers, or to include multiple redemption
+contexts. For example, the WWW-Authenticate header field could look like this:
 
 ~~~
 WWW-Authenticate:
@@ -289,6 +286,48 @@ properties for one use case is nonsensical. If the origin has a preference
 for one challenge over another (for example, if one uses a token type
 that is faster to verify), it can sort it to be first in the list
 of challenges as a hint to the client.
+
+### Process Token Challenges
+
+Upon receipt of a challenge, a client validates the TokenChallenge structure
+before taking any action, such as fetching a new token or redeeming a token
+in a new request. Validation requirements are as follows:
+
+- The token_type is recognized and supported by the client;
+- The TokenChallenge structure is well-formed; and
+- If the origin_info field is non-empty, the name of the origin that issued the
+  authentication challenge is included in the list of origin names. Comparison
+  of the origin name that issued the authentication challenge against elements
+  in the origin_info list is done via case-insensitive equality checks.
+
+If validation fails, the client MUST NOT fetch or redeem a token based on the
+challenge. Clients MAY have further restrictions and requirements around
+validating when a challenge is considered acceptable or valid. For example,
+clients can choose to ignore challenges that list origin names for which the
+current connection is not authoritative (according to the TLS certificate).
+
+Caching and pre-fetching of tokens is discussed in {{caching}}.
+
+### Token Caching {#caching}
+
+Clients can generate multiple tokens from a single TokenChallenge, and cache
+them for future use. This improves privacy by separating the time of token
+issuance from the time of token redemption, and also allows clients to avoid
+any overhead of receiving new tokens via the issuance protocol.
+
+Cached tokens can only be redeemed when they match all of the fields in the
+TokenChallenge: token_type, issuer_name, redemption_context, and origin_info.
+Clients ought to store cached tokens based on all of these fields, to
+avoid trying to redeem a token that does not match. Note that each token
+has a unique client nonce, which is sent in token redemption ({{redemption}}).
+
+If a client fetches a batch of multiple tokens for future use that are bound
+to a specific redemption context (the redemption_context in the TokenChallenge
+was not empty), clients SHOULD discard these tokens upon flushing state such as
+HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or if there is a network
+change and the client does not have any origin-specific state like HTTP cookies.
+Using these tokens in a context that otherwise would not be linkable to the
+original context could allow the origin to recognize a client.
 
 ### Redemption Context Construction {#context-construction}
 
@@ -323,34 +362,16 @@ successfully synchronize this state and use it for double spend prevention can
 allow Clients to redeem tokens to one Origin that were issued after an
 interaction with another Origin that shares the context.
 
-### Token Caching {#caching}
-
-Clients can generate multiple tokens from a single TokenChallenge, and cache
-them for future use. This improves privacy by separating the time of token
-issuance from the time of token redemption, and also allows clients to avoid
-any overhead of receiving new tokens via the issuance protocol.
-
-Cached tokens can only be redeemed when they match all of the fields in the
-TokenChallenge: token_type, issuer_name, redemption_context, and origin_info.
-Clients ought to store cached tokens based on all of these fields, to
-avoid trying to redeem a token that does not match. Note that each token
-has a unique client nonce, which is sent in token redemption ({{redemption}}).
-
-If a client fetches a batch of multiple tokens for future use that are bound
-to a specific redemption context (the redemption_context in the TokenChallenge
-was not empty), clients SHOULD discard these tokens upon flushing state such as
-HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or if there is a network
-change and the client does not have any origin-specific state like HTTP cookies.
-Using these tokens in a context that otherwise would not be linkable to the
-original context could allow the origin to recognize a client.
-
 ## Token Redemption {#redemption}
 
 The output of the issuance protocol is a token that corresponds to the origin's
-challenge (see {{challenge}}). A token is a structure that begins with a
-two-octet field that indicates a token type, which MUST match the token_type in
-the TokenChallenge structure. This value determines the structure and semantics
-of the rest of token structure.
+challenge (see {{challenge}}).
+
+### Token Structure
+
+A token is a structure that begins with a two-octet field that indicates a token
+type, which MUST match the token_type in the TokenChallenge structure. This value
+determines the structure and semantics of the rest of token structure.
 
 This document defines the default token structure that can be used across
 token types, although future token types MAY extend or modify the structure
@@ -398,6 +419,8 @@ The authenticator value in the Token structure is computed over the token_type,
 nonce, challenge_digest, and token_key_id fields. A token is considered a valid
 if token verification using succeeds; see {{verification}} for details about
 verifying the token and its authenticator value.
+
+### Sending Tokens
 
 When used for client authorization, the "PrivateToken" authentication
 scheme defines one parameter, "token", which contains the base64url-encoded
