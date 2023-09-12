@@ -337,6 +337,7 @@ content. The media type for this request is
 
 ~~~
 POST /request HTTP/1.1
+Host = issuer.example.net
 Accept = application/private-token-response
 Content-Type = application/private-token-request
 Content-Length = <Length of TokenRequest>
@@ -567,6 +568,7 @@ Request URL "https://issuer.example.net/request" is shown below.
 
 ~~~
 POST /request HTTP/1.1
+Host = issuer.example.net
 Accept = application/private-token-response
 Content-Type = application/private-token-request
 Content-Length = <Length of TokenRequest>
