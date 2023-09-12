@@ -548,6 +548,16 @@ redeem tokens is maintained and exercised consistently.
 
 # Security Considerations {#sec-considerations}
 
+This section contains security considerations for the PrivateToken authentication
+scheme described in this document.
+
+## Randomness Requirements
+
+Unless otherwise stated, all random values in the challenge and token MUST be
+generated using a cryptographically secure source of randomness ({{?RFC4086}}).
+
+## Replay Attacks
+
 The security properties of token challenges vary depending on whether the
 challenge contains a redemption context or not, as well as whether the
 challenge is per-origin or not. For example, cross-origin tokens with empty
@@ -566,7 +576,18 @@ contexts can be replayed from one party by another, as shown below.
 ~~~
 {: #fig-replay title="Replay attack example"}
 
-Moreover, when a Client holds cross-origin tokens with empty contexts, it
+Applications SHOULD constrain tokens to a single origin unless the use case can
+accommodate such replay attacks. Replays are also possible if the client
+redeems a token sent as part of 0-RTT data. If successful token redemption
+produces side effects, origins SHOULD implement an anti-replay mechanism to
+mitigate the harm of such replays. See {{TLS13, Section 8}} and
+{{?RFC9001, Section 9.2}} for details about anti-replay mechanisms, as well as
+{{?RFC8470, Section 3}} for discussion about safety considerations for 0-RTT
+HTTP data.
+
+## Token Exhaustion Attacks
+
+When a Client holds cross-origin tokens with empty contexts, it
 is possible for any Origin in the cross-origin set to deplete that Client
 set of tokens. To prevent this from happening, tokens can be scoped to single
 Origins (with non-empty origin_info) such that they can only be redeemed for
@@ -589,6 +610,8 @@ origin_info string of "b.example.com" or "b.example.com,a.example.com" or
 "a.example.com,b.example.com,c.example.com", the string would not match and the
 client would need to use a different token.
 
+## Timing Correlation Attacks
+
 Context-bound token challenges require clients to obtain matching tokens when
 challenged, rather than presenting a token that was obtained from a different
 context in the past. This can make it more likely that issuance and redemption
@@ -602,21 +625,11 @@ being challenged and redeeming a token to make this sort of linkability more
 difficult. For more discussion on correlation risks between token issuance and
 redemption, see {{ARCHITECTURE}}.
 
+## Cross-Context Linkability Attacks
+
 As discussed in {{challenge}}, clients SHOULD discard any context-bound tokens
 upon flushing cookies or changing networks, to prevent an origin using the
 redemption context state as a cookie to recognize clients.
-
-Applications SHOULD constrain tokens to a single origin unless the use case can
-accommodate such replay attacks. Replays are also possible if the client
-redeems a token sent as part of 0-RTT data. If successful token redemption
-produces side effects, origins SHOULD implement an anti-replay mechanism to
-mitigate the harm of such replays. See {{TLS13, Section 8}} and
-{{?RFC9001, Section 9.2}} for details about anti-replay mechanisms, as well as
-{{?RFC8470, Section 3}} for discussion about safety considerations for 0-RTT
-HTTP data.
-
-All random values in the challenge and token MUST be generated using a
-cryptographically secure source of randomness ({{?RFC4086}}).
 
 # IANA Considerations {#iana}
 
