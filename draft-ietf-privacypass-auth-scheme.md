@@ -450,9 +450,9 @@ be bound to a specific TLS session with a client, but origins can also accept
 tokens for valid challenges in new sessions. Origins SHOULD implement some form
 of double-spend prevention that prevents a token with the same nonce from being
 redeemed twice. Double-spend prevention ensures that clients cannot replay tokens
-for previous challenges. For context-bound tokens, this double-spend prevention
-can require no state or minimal state, since the context can be used to verify
-token uniqueness.
+for previous challenges. See {{replay-attacks}} for more information about replay
+attacks. For context-bound tokens, this double-spend prevention can require no state
+or minimal state, since the context can be used to verify token uniqueness.
 
 If a client is unable to fetch a token, it MUST react to the challenge as
 if it could not produce a valid Authorization response.
@@ -587,10 +587,25 @@ generated using a cryptographically secure source of randomness ({{?RFC4086}}).
 
 ## Replay Attacks
 
+Applications SHOULD constrain tokens to a single origin unless the use case can
+accommodate such replay attacks. Replaying tokens is not necessarily a security
+or privacy problem. As an example, it is reasonable for clients to replay tokens
+in contexts where token redemption does not induce side effects and in which
+client requests are already linkable. One possible setting where this applies
+is where tokens are sent as part of 0-RTT data.
+
+If successful token redemption produces side effects, origins SHOULD implement an
+anti-replay mechanism to mitigate the harm of such replays. See {{TLS13, Section 8}}
+and {{?RFC9001, Section 9.2}} for details about anti-replay mechanisms, as well as
+{{?RFC8470, Section 3}} for discussion about safety considerations for 0-RTT
+HTTP data.
+
+## Reflection Attacks
+
 The security properties of token challenges vary depending on whether the
 challenge contains a redemption context or not, as well as whether the
 challenge is per-origin or not. For example, cross-origin tokens with empty
-contexts can be replayed from one party by another, as shown below.
+contexts can be reflected from one party by another, as shown below.
 
 ~~~ aasvg
 +--------+           +----------+               +--------+
@@ -598,21 +613,12 @@ contexts can be replayed from one party by another, as shown below.
 +---+----+           +----+-----+               +---+----+
     |                     |                         |
     +-- TokenChallenge -->|                         |
-    |                     +-- (replay challenge) -->|
+    |                     +-- (reflect challenge) ->|
     |                     |<-------- Token ---------+
-    |<-- (replay token) --+                         |
+    |<-- (reflect token) -+                         |
     |                     |
 ~~~
 {: #fig-replay title="Replay attack example"}
-
-Applications SHOULD constrain tokens to a single origin unless the use case can
-accommodate such replay attacks. Replays are also possible if the client
-redeems a token sent as part of 0-RTT data. If successful token redemption
-produces side effects, origins SHOULD implement an anti-replay mechanism to
-mitigate the harm of such replays. See {{TLS13, Section 8}} and
-{{?RFC9001, Section 9.2}} for details about anti-replay mechanisms, as well as
-{{?RFC8470, Section 3}} for discussion about safety considerations for 0-RTT
-HTTP data.
 
 ## Token Exhaustion Attacks
 
