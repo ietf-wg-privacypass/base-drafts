@@ -227,7 +227,7 @@ for any of the origins in the list, including the origin which issued the challe
 (which must always be present in the list if it is non-empty; see {{process-challenge}}).
 This can be useful in settings where clients pre-fetch and cache tokens for a particular
 challenge -- including the "origin_info" field -- and then later redeem these tokens
-at one of the origins in the list. See {{caching}} for more discussion about
+with one of the origins in the list. See {{caching}} for more discussion about
 token caching.
 
 #### Server Name Encoding {#server-name}
