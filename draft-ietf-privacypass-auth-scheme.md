@@ -140,8 +140,7 @@ in more detail.
 ## Token Challenge {#challenge}
 
 Origins send a token challenge to clients in an "WWW-Authenticate" header field
-with the "PrivateToken" scheme. This field is a series of key-value pairs, where
-values are base64url-encoded binary data. Each field has two mandatory parameters,
+with the "PrivateToken" scheme. This field is a series parameters, each a key-value pair. There are two mandatory parameters:
 one containing a token challenge and another containing the token-key used for
 producing (and verifying) a corresponding token. The challenge parameter can be
 repeated in the header field.
