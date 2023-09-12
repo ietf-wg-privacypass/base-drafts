@@ -336,7 +336,7 @@ for one challenge over another (for example, if one uses a token type
 that is faster to verify), it can sort it to be first in the list
 of challenges as a hint to the client.
 
-### Process Token Challenges {#process-challenge}
+### Processing Token Challenges {#process-challenge}
 
 Upon receipt of a challenge, a client validates the TokenChallenge structure
 before taking any action, such as fetching a new token or redeeming a token
