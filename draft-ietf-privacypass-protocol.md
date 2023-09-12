@@ -745,7 +745,7 @@ following entries.
 * Token Structure: As defined in {{Section 2.2 of AUTHSCHEME}}
 * Token Key Encoding: Serialized using SerializeElement from {{Section 2.1 of OPRF}}
 * TokenChallenge Structure: As defined in {{Section 2.1 of AUTHSCHEME}}
-* Publicly Verifiable: N
+* Public Verifiability: N
 * Public Metadata: N
 * Private Metadata: N
 * Nk: 48
@@ -760,7 +760,7 @@ following entries.
 * Token Structure: As defined in {{Section 2.2 of AUTHSCHEME}}
 * Token Key Encoding: Serialized as a DER-encoded SubjectPublicKeyInfo (SPKI) object using the RSASSA-PSS OID {{!RFC5756}}
 * TokenChallenge Structure: As defined in {{Section 2.1 of AUTHSCHEME}}
-* Publicly Verifiable: Y
+* Public Verifiability: Y
 * Public Metadata: N
 * Private Metadata: N
 * Nk: 256

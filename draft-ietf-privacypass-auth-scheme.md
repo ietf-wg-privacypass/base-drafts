@@ -713,17 +713,20 @@ Token Key Encoding:
 TokenChallenge Structure:
 : The contents of the TokenChallenge structure in {{challenge}}
 
-Publicly Verifiable:
-: A Y/N value indicating if the output tokens are
-  publicly verifiable
+Public Verifiability:
+: A Y/N value indicating if the output tokens have the
+  public verifiability property; see {{Section 3.5 of ARCHITECTURE}}
+  for more details about this property.
 
 Public Metadata:
 : A Y/N value indicating if the output tokens can contain
-  public metadata.
+  public metadata; see {{Section 3.5 of ARCHITECTURE}}
+  for more details about this property.
 
 Private Metadata:
 : A Y/N value indicating if the output tokens can contain
-  private metadata.
+  private metadata; see {{Section 3.5 of ARCHITECTURE}}
+  for more details about this property.
 
 Nk:
 : The length in bytes of an output authenticator
