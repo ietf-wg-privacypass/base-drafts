@@ -553,7 +553,7 @@ scheme described in this document.
 
 ## Randomness Requirements
 
-Unless otherwise stated, all random values in the challenge and token MUST be
+All random values in the challenge and token MUST be
 generated using a cryptographically secure source of randomness ({{?RFC4086}}).
 
 ## Replay Attacks
