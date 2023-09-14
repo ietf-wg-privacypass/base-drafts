@@ -710,9 +710,11 @@ based on the VOPRF defined in {{OPRF}} and blind RSA protocol defined in
 {{BLINDRSA}}. All security considerations described in the VOPRF and blind RSA
 documents also apply in the Privacy Pass use-case. Considerations related to
 broader privacy and security concerns in a multi-Client and multi-Issuer
-setting are deferred to the Architecture document {{ARCHITECTURE}}. In
-particular, {{Section 4 and Section 5 of ARCHITECTURE}} discuss relevant
-privacy considerations. Notable considerations include those pertaining to
+setting are deferred to the architecture document {{ARCHITECTURE}}. In
+particular, {{Section 4 and Section 5 of ARCHITECTURE}} discuss
+relevant privacy considerations influenced by the Privacy Pass deployment
+model, and {{Section 6 of ARCHITECTURE}} discusses privacy considerations that
+apply regardless of deployment model. Notable considerations include those pertaining to
 Issuer Public Key rotation and consistency, where consistency is as described
 in {{?CONSISTENCY=I-D.ietf-privacypass-key-consistency}}, and Issuer selection.
 
@@ -815,7 +817,10 @@ Published specification:
 
 Applications that use this media type:
 
-: N/A
+: Services that implement the Privacy Pass issuer role, and client
+  applications that interact with the issuer for the purposes of
+  issuing or redeeming tokens.
+
 
 Fragment identifier considerations:
 
@@ -887,7 +892,8 @@ Published specification:
 
 Applications that use this media type:
 
-: N/A
+: Applications that want to issue or facilitate issuance of Privacy Pass tokens,
+  including Privacy Pass issuer applications themselves.
 
 Fragment identifier considerations:
 
@@ -959,7 +965,8 @@ Published specification:
 
 Applications that use this media type:
 
-: N/A
+: Applications that want to issue or facilitate issuance of Privacy Pass tokens,
+  including Privacy Pass issuer applications themselves.
 
 Fragment identifier considerations:
 
