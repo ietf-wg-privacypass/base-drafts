@@ -780,7 +780,6 @@ registry:
 The templates for these entries are listed below and the
 reference should be this RFC.
 
-
 ### "application/private-token-issuer-directory" media type
 
 Type name:
@@ -853,7 +852,7 @@ Author:
 
 Change controller:
 
-: IESG
+: IETF
 {: spacing="compact"}
 
 ### "application/private-token-request" media type
@@ -926,7 +925,7 @@ Author:
 
 Change controller:
 
-: IESG
+: IETF
 {: spacing="compact"}
 
 ### "application/private-token-response" media type
@@ -999,7 +998,7 @@ Author:
 
 Change controller:
 
-: IESG
+: IETF
 {: spacing="compact"}
 
 --- back
