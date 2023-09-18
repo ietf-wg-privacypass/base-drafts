@@ -142,9 +142,6 @@ Clients implement the RATS Attester role.
 Token:
 : A cryptographic authentication message used for authorization decisions.
 
-Token:
-: A privacy-preserving authenticator that is used for authorization.
-
 Origin:
 : An entity that consumes tokens presented by Clients and uses them to make authorization decisions.
 
