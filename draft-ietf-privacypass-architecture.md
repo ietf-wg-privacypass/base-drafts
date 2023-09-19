@@ -179,7 +179,7 @@ of Privacy Pass, a high-level description of the threat model and
 privacy goals of the architecture, and the goals and requirements of
 the redemption and issuance protocols. Deployment variations for the
 Origin, Issuer, and Attester in this architecture, including
-considerations for implements these entities, are further discussed
+considerations for implementing these entities, are further discussed
 in {{deployment}}.
 
 ## Overview
@@ -997,7 +997,7 @@ the size of anonymity sets in which Clients or Origins are
 unlinkable. For example, consider two different deployments, one wherein
 there exists a redemption anonymity set of size two and another
 wherein there redemption anonymity set of size 2<sup>32</sup>. Although
-Origin-Client unlinkabiity guarantees that the Origin cannot link any two
+Origin-Client unlinkability guarantees that the Origin cannot link any two
 requests to the same Client based on these contexts, respectively, the
 probability of determining the "true" Client is higher the smaller these
 sets become.
@@ -1053,7 +1053,7 @@ Issuers (though with more potential targeting).
 The number of active Issuer configurations also contributes to anonymity set
 partitioning. In particular, when an Issuer updates their configuration and
 the corresponding key pair, any Client that invokes the issuance protocol with
-this configuration becomes be part of a set of Clients which also ran the
+this configuration becomes part of a set of Clients which also ran the
 issuance protocol using the same configuration. Issuer configuration updates,
 e.g., due to key rotation, are an important part of hedging against long-term
 private key compromise. In general, key rotations represent a trade-off between
@@ -1124,7 +1124,7 @@ challenges.
 Moreover, since tokens are not intrinsically bound to Clients, it is possible
 for malicious Clients to collude and share tokens in a so-called "hoarding
 attack." As an example of this attack, many distributed Clients could obtain
-cacheable tokens and them share them with a single Client to redeem in a way
+cacheable tokens and then share them with a single Client to redeem in a way
 that would violate an Origin's attempt to limit tokens to any one particular
 Client. In general, mechanisms for mitigating hoarding attacks depend on the
 deployment model and use case. For example, in the Joint Origin and Issuer model,
