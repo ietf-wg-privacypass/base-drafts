@@ -255,12 +255,12 @@ architecture described in this document also work for this use case. However,
 for added clarity, some more possible use cases are described below.
 
 - Low-quality, anti-fraud signal for open Internet services. Tokens can attest that
-  the client behind the user agent is likely not a bot attempting to perform some
+  the Client behind the user agent is likely not a bot attempting to perform some
   form of automated attack such as credential stuffing. Example attestation procedures
   for this use case might be solving some form of CAPTCHA or presenting evidence of a
   valid, unlocked device in good standing.
 - Privacy-preserving authentication for proprietary services. Tokens can attest that
-  the client is a valid subscriber for a propietary service, such as a deployment of
+  the Client is a valid subscriber for a propietary service, such as a deployment of
   Oblivious HTTP {{?OHTTP=I-D.ietf-ohai-ohttp}}.
 
 ## Privacy Goals and Threat Model {#privacy-and-trust}
