@@ -256,7 +256,7 @@ Clients provide the following as input to the issuance protocol:
   Issuer's directory resource, or it can be another Client-configured URL. The value
   of this parameter depends on the Client configuration and deployment model.
   For example, in the 'Joint Origin and Issuer' deployment model, the Issuer
-  Request URL might be correspond to the Client's configured Attester, and the
+  Request URL might correspond to the Client's configured Attester, and the
   Attester is configured to relay requests to the Issuer.
 - Issuer name: An identifier for the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
@@ -357,7 +357,7 @@ Upon receipt of the request, the Issuer validates the following conditions:
 If any of these conditions is not met, the Issuer MUST return an HTTP 422
 (Unprocessable Content) error to the client.
 
-If these conditions are met, the Issuer then tries to deseralize
+If these conditions are met, the Issuer then tries to deserialize
 TokenRequest.blinded_msg using DeserializeElement from
 {{Section 2.1 of OPRF}}, yielding `blinded_element`. If this fails, the
 Issuer MUST return an HTTP 422 (Unprocessable Content) error to the
@@ -504,7 +504,7 @@ Clients provide the following as input to the issuance protocol:
   Issuer's directory resource, or it can be another Client-configured URL. The value
   of this parameter depends on the Client configuration and deployment model.
   For example, in the 'Split Origin, Attester, Issuer' deployment model, the
-  Issuer Request URL might be correspond to the Client's configured Attester,
+  Issuer Request URL might correspond to the Client's configured Attester,
   and the Attester is configured to relay requests to the Issuer.
 - Issuer name: An identifier for the Issuer. This is typically a host name that
   can be used to construct HTTP requests to the Issuer.
