@@ -98,7 +98,7 @@ Privacy Pass is an architecture for authorization based on privacy-preserving
 authentication mechanisms. In other words, relying parties authenticate clients
 in a privacy-preserving way, i.e., without learning any unique, per-client
 information through the authentication protocol, and then make authorization
-decisions on the basis of that authentication suceeding or failing. Possible
+decisions on the basis of that authentication succeeding or failing. Possible
 authorization decisions might be to provide clients with read access to a
 particular resource or write access to a particular resource.
 
@@ -140,16 +140,24 @@ Client:
 Clients implement the RATS Attester role.
 
 Token:
-: A cryptographic authentication message used for authorization decisions.
+: A cryptographic authentication message used for authorization decisions,
+  produced as output from an issuance mechanism or protocol.
 
 Origin:
 : An entity that consumes tokens presented by Clients and uses them to make authorization decisions.
 
-Challenge:
-: The mechanism by which Origins request tokens from Clients.
+Token challenge:
+: The mechanism by which Origins request tokens from Clients, often denoted TokenChallenge.
+
+Token request:
+: A message used by Clients to request a token from an Issuer, often denoted TokenRequest.
+
+Token response:
+: A message used by Issuers to send tokens to a Client, often denoted TokenResponse.
 
 Redemption:
-: The mechanism by which Clients present tokens to Origins for consumption.
+: The mechanism by which Clients present tokens to Origins for the
+  purposes of authorization.
 
 Issuer:
 : An entity that issues tokens to Clients for properties
@@ -184,7 +192,7 @@ in {{deployment}}.
 
 ## Overview
 
-The typical interaction flow for Privacy Pass uses the following steps:
+This section describes the typical interaction flow for Privacy Pass.
 
 1. A Client interacts with an Origin by sending a request or otherwise
 interacting with the Origin in a way that triggers a response containing
@@ -204,20 +212,20 @@ CAPTCHA, checking device or hardware attestation validity, etc.; see
 {{attester}} for more details.
 
 4. If the attestation process completes successfully, the client creates a
-Token Request to send to the designated Issuer (generally via the Attester,
+token request to send to the designated Issuer (generally via the Attester,
 though it is not required to be sent through the Attester).
 The Attester and Issuer might be functions on the same server, depending on the
 deployment model (see {{deployment}}). Depending on the attestation process, it
 is possible for attestation to run alongside the issuance protocol, e.g., where
 Clients send necessary attestation information to the Attester along with their
-Token Request. If the attestation process fails, the Client receives an error
+token request. If the attestation process fails, the Client receives an error
 and issuance aborts without a token.
 
-5. The Issuer generates a Token Response based on the Token Request, which
+5. The Issuer generates a token response based on the token request, which
 is returned to the Client (generally via the Attester). Upon receiving the
-Token Response, the Client computes a token from the token challenge and Token
-Response. This token can be validated by anyone with the per-Issuer key, but
-cannot be linked to the content of the Token Request or Token Response.
+token response, the Client computes a token from the token challenge and token
+response. This token can be validated by anyone with the per-Issuer key, but
+cannot be linked to the content of the token request or token response.
 
 6. If the Client has a token, it includes it in a subsequent request to
    the Origin, as authorization. This token is sent only once in reaction to a
@@ -260,7 +268,7 @@ for added clarity, some more possible use cases are described below.
   for this use case might be solving some form of CAPTCHA or presenting evidence of a
   valid, unlocked device in good standing.
 - Privacy-preserving authentication for proprietary services. Tokens can attest that
-  the Client is a valid subscriber for a propietary service, such as a deployment of
+  the Client is a valid subscriber for a proprietary service, such as a deployment of
   Oblivious HTTP {{?OHTTP=I-D.ietf-ohai-ohttp}}.
 
 ## Privacy Goals and Threat Model {#privacy-and-trust}
@@ -428,8 +436,10 @@ including:
   which the challenge originated (referred to as per-Origin tokens), or
   can be used across multiple Origins (referred to as cross-Origin tokens).
   The set of Origins for which a cross-Origin token is applicable is referred
-  to as the cross-Origin set. Every Origin in a cross-Origin set implicitly agrees
-  to being in the set by supporting cross-Origin challenges.
+  to as the cross-Origin set. Opting into this set is done by explicitly agreeing
+  on the contents of the set. Every Origin in a cross-Origin set, by opting in,
+  agrees to admit tokens for any other Origin in the set. See
+  {{Section 2.1.1 of AUTHSCHEME}} for more information on how this set is created.
 
 Origins that admit cross-Origin tokens bear some risk of allowing tokens
 issued for one Origin to be spent in an interaction with another Origin.
@@ -549,13 +559,13 @@ running on trusted hardware. Supporting multiple attestation procedures is
 an important step towards ensuring equitable access for Clients; see {{discrimination}}.
 
 The role of the Attester in the issuance protocol and its impact on privacy
-depends on the type of attestation procedure, issuance protocol, deployment
-model. For instance, requiring a conjunction of attestation procedures could
-decrease the overall anonymity set size. As an example, the number of Clients
+depends on the type of attestation procedure, issuance protocol, and deployment
+model. For instance, increasing the number of required attestation procedures
+could decrease the overall anonymity set size. As an example, the number of Clients
 that have solved a CAPTCHA in the past day, that have a valid account, and that
 are running on a trusted device is less than the number of Clients that have
-solved a CAPTCHA in the past day. Attesters SHOULD NOT be based on attestation
-procedures that result in small anonymity sets.
+solved a CAPTCHA in the past day. See {{rotation-and-consistency}} for more discussion
+of how the variety of attestation procedures can negatively impact Client privacy.
 
 Depending on the issuance protocol, the Issuer might learn
 information about the Origin. To ensure Issuer-Client unlinkability, the Issuer
@@ -566,17 +576,20 @@ Client-specific information (such as application-layer account information)
 or for deployment models where the Attester learns Client-specific information
 (such as Client IP addresses), Clients trust the Attester to not share any
 Client-specific information with the Issuer. In deployments where the Attester
-does not learn Client-specific information, the Client does not need to
-explicitly trust the Attester in this regard.
+does not learn Client-specific information, or where the Attester and Issuer are
+operated by the same entity (such as in the Joint Attester and Issuer model
+described in {{deploy-joint-issuer}}), the Client does not need to explicitly
+trust the Attester in this regard.
 
 Issuers trust Attesters to correctly and reliably perform attestation. However,
 certain types of attestation can vary in value over time, e.g., if the
 attestation procedure is compromised. Broken
 attestation procedures are considered exceptional events and require
 configuration changes to address the underlying cause. For example, if
-attestation is compromised because of a zero-day exploit on compliant devices,
-then the corresponding attestation procedure should be untrusted until the
-exploit is patched. Addressing changes in attestation quality is therefore a
+an attestation procedure is compromised or subverted because of a zero-day
+exploit on devices that implement the attestation procedure, then the
+corresponding attestation procedure should be untrusted until the exploit is
+patched. Addressing changes in attestation quality is therefore a
 deployment-specific task. In Split Attester and Issuer deployments (see
 {{deploy-split}}), Issuers can choose to remove compromised Attesters from
 their trusted set until the compromise is patched.
@@ -634,8 +647,7 @@ the client can check for correctness. Opaque public metadata is metadata
 the client can see but cannot check for correctness. As an example, the
 opaque public metadata might be a "fraud detection signal", computed on
 behalf of the Issuer, during token issuance. Generally speaking, Clients
-cannot determine if this value is generated honestly or otherwise a
-tracking vector.
+cannot determine if this value is generated in a way that permits tracking.
 
 Private metadata is that which Clients cannot observe as part of the token
 issuance flow. Such instantiations can be built on the Private Metadata Bit
@@ -847,13 +859,15 @@ a trusted entity. In this model, the Attester and Issuer share an attestation
 and issuance context for the Client, which is separate from the Origin's
 redemption context.
 
-For certain types of issuance protocols, this model achieves
-Origin-Client, Issuer-Client, and Attester-Origin
-unlinkability. However, issuance protocols that require the Issuer to
-learn information about the Origin, such as that which is described in
-{{?RATE-LIMITED=I-D.privacypass-rate-limit-tokens}}, are not appropriate since
-they could lead to Attester-Origin unlinkability violations through the Origin
-name.
+Similar to the Shared Origin, Attester, Issuer model, Issuer-Client and
+Origin-Client unlinkability in this model requires issuance and redemption
+events, respectively, be separated over time or space. Attester-Origin
+unlinkability requires that the Attester and Issuer do not learn the Origin
+for a particular token request. For this reason, issuance protocols that
+require the Issuer to learn information about the Origin, such as that which
+is described in {{?RATE-LIMITED=I-D.privacypass-rate-limit-tokens}}, are not
+appropriate since they could lead to Attester-Origin unlinkability violations
+through the Origin name.
 
 ## Joint Origin and Issuer {#deploy-joint-origin}
 
@@ -962,7 +976,10 @@ In principle, Issuers should strive to mitigate discriminatory behavior by
 providing equitable access to all Clients. This can be done by working with a
 set of Attesters that are suitable for all Clients. In practice, this may require
 tradeoffs in what type of attestation Issuers are willing to trust so as to
-enable more widespread support.
+enable more widespread support. In other words, trusting a variety of Attesters
+with a diverse set of attestation procedures would presumably increase support
+among Clients, though most likely at the expense of decreasing the overall value
+of tokens issued by the Issuer.
 
 For example, to disallow discriminatory behavior between Clients with and
 without device attestation support, an Issuer may wish to support Attesters
@@ -1024,18 +1041,18 @@ the tracked Client it would set the bit to `1`, and `0` otherwise. Adding
 additional bits provides an exponential increase in tracking granularity
 similarly to introducing more Issuers (though with more potential targeting).
 
-For this reason, the amount of metadata used by an Issuer in creating
-redemption tokens must be taken into account -- together with the bits
+For this reason, deployments should take amount of metadata used by an Issuer
+in creating redemption tokens must into account -- together with the bits
 of information that Issuers may learn about Clients otherwise. Since this
 metadata may be useful for practical deployments of Privacy Pass, Issuers
 must balance this against the reduction in Client privacy.
 
-In general, limiting the amount of metadata permitted helps limit the extent
-to which metadata can uniquely identify individual Clients. Clients SHOULD
-bound the number of possible metadata values in practice. Most token types do
-not admit any metadata, so this bound is implicitly enforced. Moreover,
-Privacy Pass deployments SHOULD NOT use metadata unless its value has been
-assessed and weighed against the corresponding reduction in Client privacy.
+The number of permitted metadata values often depends on deployment specific
+details. In general, limiting the amount of metadata permitted helps limit the
+extent to which metadata can uniquely identify individual Clients. Failure to
+bound the number of possible metadata values can therefore lead to reduction in
+Client privacy. Most token types do not admit any metadata, so this bound is
+implicitly enforced.
 
 ## Partitioning by Issuance Consistency {#rotation-and-consistency}
 
@@ -1063,12 +1080,14 @@ compromise.
 
 Lastly, if Clients are willing to issue and redeem tokens from a large number
 of Issuers for a specific Origin, and that Origin accepts tokens from all
-Issuers, segregation can occur. In particular, if a Client obtains tokens from
+Issuers, partitioning can occur. As an example, if a Client obtains tokens from
 many Issuers and an Origin later challenges that Client for a token from each
-Issuer, the Origin can learn information about the Client. Each per-Issuer
-token that a Client holds essentially corresponds to a bit of information about
-the Client that Origin learns. Therefore, there is an exponential loss in
-privacy relative to the number of Issuers.
+Issuer, the Origin can learn information about the Client. This arrangement
+might happen if Clients request tokens from different Issuers, each of which
+have different Attester preferences. Each per-Issuer token that a Client holds
+essentially corresponds to a bit of information about the Client that Origin
+learns. Therefore, there is an exponential loss in privacy relative to the
+number of Issuers.
 
 The fundamental problem here is that the number of possible issuance
 configurations, including the keys in use and the Issuer identities themselves,
