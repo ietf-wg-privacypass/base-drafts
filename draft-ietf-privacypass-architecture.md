@@ -1047,7 +1047,7 @@ of information that Issuers may learn about Clients otherwise. Since this
 metadata may be useful for practical deployments of Privacy Pass, Issuers
 must balance this against the reduction in Client privacy.
 
-The number of permitted metadata values often depends on deployment specific
+The number of permitted metadata values often depends on deployment-specific
 details. In general, limiting the amount of metadata permitted helps limit the
 extent to which metadata can uniquely identify individual Clients. Failure to
 bound the number of possible metadata values can therefore lead to reduction in
