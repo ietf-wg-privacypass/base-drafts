@@ -313,7 +313,7 @@ are deployment specific. For example, in settings where Clients interact with
 Issuers through an Attester, Attesters and Issuers might use
 mutually authenticated TLS to authenticate one another. In settings where
 Clients do not communicate with Issuers through an Attester, the Attesters
-might convey this trust via a digital signature over that Issuers can verify.
+might convey this trust via a digital signature that Issuers can verify.
 
 Clients explicitly trust Attesters to perform attestation correctly and in a
 way that does not violate their privacy. In particular, this means that Attesters
