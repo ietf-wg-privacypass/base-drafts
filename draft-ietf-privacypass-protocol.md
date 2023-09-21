@@ -179,7 +179,8 @@ Beyond staging keys with the "not-before" value, Issuers MAY advertise multiple
 Issuers indicate preference for which token key to use based on the order of
 keys in the list, with preference given to keys earlier in the list. Clients
 SHOULD use the first key in the "token-keys" list that either does not have a
-"not-before" value or has a "not-before" value in the past. Origins can attempt
+"not-before" value or has a "not-before" value in the past, as this key is most
+likely to be valid in the given time window. Origins can attempt
 to use any key in the "token-keys" list to verify tokens, starting with the most
 preferred key in the list. Trial verification like this can help deal with Client
 clock skew.
@@ -236,8 +237,10 @@ Consumers of the Issuer directory resource SHOULD follow the usual HTTP caching
 result in use of stale Issuer configuration information, whereas short
 lifetimes may result in decreased performance. When use of an Issuer
 configuration results in token issuance failures, e.g., because the
-Issuer has invalidated its directory resource before its expiration time and issuance requests using this
-configuration are unsuccessful, the directory SHOULD be fetched and revalidated.
+Issuer has invalidated its directory resource before its expiration
+time and issuance requests using this configuration are unsuccessful,
+the directory SHOULD be fetched and revalidated. Issuance will continue
+to fail until the Issuer configuration is updated.
 
 # Issuance Protocol for Privately Verifiable Tokens {#private-flow}
 
@@ -245,9 +248,9 @@ The privately verifiable issuance protocol allows Clients to produce Token
 values that verify using the Issuer Private Key. This protocol is based
 on the oblivious pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}.
 
-Issuers provide a Private and Public Key, denoted `skI` and `pkI` respectively,
+Issuers provide a Issuer Private and Public Key, denoted `skI` and `pkI` respectively,
 used to produce tokens as input to the protocol. See {{issuer-configuration}}
-for how this key pair is generated.
+for how these keys are generated.
 
 Clients provide the following as input to the issuance protocol:
 
@@ -454,9 +457,9 @@ valid = (token_authenticator == Token.authenticator)
 
 ## Issuer Configuration
 
-Issuers are configured with Private and Public Key pairs, each denoted `skI`
+Issuers are configured with Issuer Private and Public Keys, each denoted `skI`
 and `pkI`, respectively, used to produce tokens. These keys MUST NOT be reused
-in other protocols. A RECOMMENDED method for generating key pairs is as
+in other protocols. A RECOMMENDED method for generating keys is as
 follows:
 
 ~~~
@@ -474,7 +477,10 @@ token_key_id = SHA256(SerializeElement(pkI))
 
 Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers SHOULD
 ensure that the truncated form of new key IDs do not collide with other
-truncated key IDs in rotation.
+truncated key IDs in rotation. Collisions can cause the Issuer to use
+the wrong Issuer Private Key for issuance, which will in turn cause the
+resulting tokens to be invalid. There is no known security consequence of
+using the the wrong Issuer Private Key.
 
 # Issuance Protocol for Publicly Verifiable Tokens {#public-flow}
 
@@ -493,9 +499,9 @@ does not learn the Origin that requested the token during the issuance protocol.
 
 Beyond this difference, the publicly verifiable issuance protocol variant is
 nearly identical to the privately verifiable issuance protocol variant. In
-particular, Issuers provide a Private and Public Key, denoted skI and pkI,
+particular, Issuers provide an Issuer Private and Public Key, denoted skI and pkI,
 respectively, used to produce tokens as input to the protocol. See
-{{public-issuer-configuration}} for how this key pair is generated.
+{{public-issuer-configuration}} for how these keys are generated.
 
 Clients provide the following as input to the issuance protocol:
 
@@ -664,13 +670,13 @@ valid = RSASSA-PSS-VERIFY(pkI,
 
 ## Issuer Configuration {#public-issuer-configuration}
 
-Issuers are configured with Private and Public Key pairs, each denoted skI and
-pkI, respectively, used to produce tokens. Each key pair SHALL be generated
+Issuers are configured with Issuer Private and Public Keys, each denoted skI and
+pkI, respectively, used to produce tokens. Each key SHALL be generated
 securely, for example as specified in FIPS 186-5 {{?DSS=DOI.10.6028/NIST.FIPS.186-5}}.
-These key pairs MUST NOT be reused in other protocols.
+These keys MUST NOT be reused in other protocols.
 
-The key identifier for a keypair (skI, pkI), denoted `token_key_id`, is
-computed as SHA256(encoded_key), where encoded_key is a DER-encoded
+The key identifier for an Issuer Private and Public Key (skI, pkI), denoted `token_key_id`,
+is computed as SHA256(encoded_key), where encoded_key is a DER-encoded
 SubjectPublicKeyInfo (SPKI) object carrying pkI. The SPKI object MUST use the
 RSASSA-PSS OID {{!RFC5756}}, which specifies the hash algorithm and salt size.
 The salt size MUST match the output size of the hash function associated with
@@ -701,7 +707,10 @@ $ cat spki.bin | xxd -r -p | openssl asn1parse -dump -inform DER
 
 Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers SHOULD
 ensure that the truncated form of new key IDs do not collide with other
-truncated key IDs in rotation.
+truncated key IDs in rotation. Collisions can cause the Issuer to use
+the wrong Issuer Private Key for issuance, which will in turn cause the
+resulting tokens to be invalid. There is no known security consequence of
+using the the wrong Issuer Private Key.
 
 # Security considerations {#security}
 
@@ -796,7 +805,7 @@ Required parameters:
 
 Optional parameters:
 
-: None
+: N/A
 
 Encoding considerations:
 
@@ -871,7 +880,7 @@ Required parameters:
 
 Optional parameters:
 
-: None
+: N/A
 
 Encoding considerations:
 
@@ -944,7 +953,7 @@ Required parameters:
 
 Optional parameters:
 
-: None
+: N/A
 
 Encoding considerations:
 
@@ -1020,7 +1029,7 @@ test vectors for token issuance protocol 2 (0x0002).
 
 The test vector below lists the following values:
 
-- skS: The Issuer private Key, serialized using SerializeScalar from
+- skS: The Issuer Private Key, serialized using SerializeScalar from
   {{Section 2.1 of OPRF}} and represented as a hexadecimal string.
 - pkS: The Issuer Public Key, serialized according to the encoding in {{private-token-type}}.
 - token_challenge: A randomly generated TokenChallenge structure, represented
