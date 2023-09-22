@@ -784,11 +784,11 @@ unlinkability.
 This section covers some expected deployment models and their corresponding
 security and privacy considerations. Each deployment model is described in
 terms of the trust relationships and communication patterns between Client,
-Attester, Issuer, and Origin. Entities encapsulated by a bounding box are
-assumed to be operated by the same party and therefore collude. Collusion
-can enable linking of attestation, issuance, and redemption contexts.
-Entities that are not encapsulated by a bounding box are assumed to not
-collude, meaning that entities operated by separate parties do not collude.
+Attester, Issuer, and Origin. Entities drawn within the same bounding box are
+assumed to be operated by the same party and are therefore able to collude.
+Collusion can enable linking of attestation, issuance, and redemption contexts.
+Entities not drawn within the same bounding box are assumed to not
+collude, meaning that entities operated by separate parties that do not collude.
 Mechanisms for enforcing non-collusion are out of scope for this architecture.
 
 ## Shared Origin, Attester, Issuer {#deploy-shared}
