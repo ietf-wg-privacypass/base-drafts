@@ -60,7 +60,7 @@ that are publicly verifiable using the issuance public key.
 The Privacy Pass protocol provides a privacy-preserving authorization
 mechanism. In essence, the protocol allows clients to provide cryptographic
 tokens that prove nothing other than that they have been created by a given
-server in the past {{?ARCHITECTURE=I-D.ietf-privacypass-architecture}}.
+server in the past {{!ARCHITECTURE=I-D.ietf-privacypass-architecture}}.
 
 This document describes the issuance protocol for Privacy Pass built on
 {{!HTTP=RFC9110}}. It specifies two variants: one that is privately verifiable
@@ -77,19 +77,14 @@ for protecting client privacy. This information is covered in {{ARCHITECTURE}}.
 
 {::boilerplate bcp14}
 
-The following terms are used throughout this document.
+This document uses the terms Origin, Client, Issuer, and Token as defined in
+{{Section 2 of ARCHITECTURE}}. Moreover, the following additional terms are
+used throughout this document.
 
-- Client: An entity that runs the Issuance protocol with an Issuer to produce
-  Tokens that can be later used for redemption (see
-  {{Section 2.2 of !AUTHSCHEME=I-D.ietf-privacypass-auth-scheme}}).
-- Issuer: A service that provides Tokens to Clients.
 - Issuer Public Key: The public key (from a private-public key pair) used by
   the Issuer for issuing and verifying Tokens.
 - Issuer Private Key: The private key (from a private-public key pair) used by
   the Issuer for issuing and verifying Tokens.
-
-This document additionally uses the terms "Origin" and "Token" as defined in
-{{ARCHITECTURE}}.
 
 Unless otherwise specified, this document encodes protocol messages in TLS
 notation from {{Section 3 of !TLS13=RFC8446}}. Moreover, all constants are in
@@ -164,7 +159,7 @@ defined in {{tokenkeys-values}}.
 | Field Name   | Value                                                  |
 |:-------------|:-------------------------------------------------------|
 | token-type   | Integer value of the Token Type, as defined in {{token-type}}, represented as a JSON number ({{RFC8259, Section 6}}) |
-| token-key    | The base64url encoding of the Public Key for use with the issuance protocol, including padding, represented as a JSON string ({{RFC8259, Section 7}}) |
+| token-key    | The base64url-encoded {{!RFC4648}} Public Key for use with the issuance protocol as determined by the token-type field, including padding, represented as a JSON string ({{RFC8259, Section 7}}) |
 {: #tokenkeys-values title="Issuer 'token-keys' object description'"}
 
 Each "token-keys" JSON object may also contain the optional field "not-before".
@@ -185,7 +180,8 @@ to use any key in the "token-keys" list to verify tokens, starting with the most
 preferred key in the list. Trial verification like this can help deal with Client
 clock skew.
 
-Altogether, the Issuer's directory could look like:
+Altogether, the Issuer's directory could look like the following (with the
+"token-key" fields abbreviated):
 
 ~~~
  {
@@ -207,6 +203,41 @@ Altogether, the Issuer's directory could look like:
 Clients that use this directory resource before 1686913811 in UNIX time would use the
 second key in the "token-keys" list, whereas Clients that use this directory after
 1686913811 in UNIX time would use the first key in the "token-keys" list.
+
+A complete "token-key" value, encoded as it would be in the Issuer directory,
+would look like the following (line breaks are inserted to fit within the per-line
+character limits):
+
+~~~
+$ echo MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqGSIb3DQEBCDAL \
+ BglghkgBZQMEAgKiAwIBMAOCAQ8AMIIBCgKCAQEAmKHGAMyeoJt1pj3n7xTtqAPr_DhZAPhJM7 \
+ Pc8ENR2BzdZwPTTF7KFKms5wt-mL01at0SC-cdBuIj6WYK8Ovz0AyaBuvTvW6SKCh7ZPXEqCGR \
+ sq5I0nthREtrYkGo113oMVPVp3sy4VHPgzd8KdzTLGzOrjiUOsSFWbjf21iaVjXJ2VdwdS-8O- \
+ 430wkucYjGeOJwi8rWx_ZkcHtav0S67Q_SlExJel6nyRzpuuID9OQm1nxfs1Z4PhWBzt93T2oz \
+ Tnda3OklF5n0pIXD6bttmTekIw_8Xx2LMis0jfJ1QL99aA-muXRFN4ZUwORrF7cAcCUD_-56_6 \
+ fh9s34FmqBGwIDAQAB | sed s/-/+/g | sed s/_/\\//g | openssl base64 -d  | xxd
+00000000: 3082 0152 303d 0609 2a86 4886 f70d 0101  0..R0=..*.H.....
+00000010: 0a30 30a0 0d30 0b06 0960 8648 0165 0304  .00..0...`.H.e..
+00000020: 0202 a11a 3018 0609 2a86 4886 f70d 0101  ....0...*.H.....
+00000030: 0830 0b06 0960 8648 0165 0304 0202 a203  .0...`.H.e......
+00000040: 0201 3003 8201 0f00 3082 010a 0282 0101  ..0.....0.......
+00000050: 0098 a1c6 00cc 9ea0 9b75 a63d e7ef 14ed  .........u.=....
+00000060: a803 ebfc 3859 00f8 4933 b3dc f043 51d8  ....8Y..I3...CQ.
+00000070: 1cdd 6703 d34c 5eca 14a9 ace7 0b7e 98bd  ..g..L^......~..
+00000080: 356a dd12 0be7 1d06 e223 e966 0af0 ebf3  5j.......#.f....
+00000090: d00c 9a06 ebd3 bd6e 9228 287b 64f5 c4a8  .......n.(({d...
+000000a0: 2191 b2ae 48d2 7b61 444b 6b62 41a8 d75d  !...H.{aDKkbA..]
+000000b0: e831 53d5 a77b 32e1 51cf 8337 7c29 dcd3  .1S..{2.Q..7|)..
+000000c0: 2c6c ceae 3894 3ac4 8559 b8df db58 9a56  ,l..8.:..Y...X.V
+000000d0: 35c9 d957 7075 2fbc 3bee 37d3 092e 7188  5..Wpu/.;.7...q.
+000000e0: c678 e270 8bca d6c7 f664 707b 5abf 44ba  .x.p.....dp{Z.D.
+000000f0: ed0f d294 4c49 7a5e a7c9 1ce9 bae2 03f4  ....LIz^........
+00000100: e426 d67c 5fb3 5678 3e15 81ce df77 4f6a  .&.|_.Vx>....wOj
+00000110: 334e 775a dce9 2517 99f4 a485 c3e9 bb6d  3NwZ..%........m
+00000120: 9937 a423 0ffc 5f1d 8b32 2b34 8df2 7540  .7.#.._..2+4..u@
+00000130: bf7d 680f a6b9 7445 3786 54c0 e46b 17b7  .}h...tE7.T..k..
+00000140: 0070 2503 ffee 7aff a7e1 f6cd f816 6a81  .p%...z.......j.
+~~~
 
 Issuer directory resources have the media type
 "application/private-token-issuer-directory" and are located at the well-known location
@@ -289,7 +320,7 @@ Here, "P384-SHA384" is the identifier corresponding to the
 OPRF(P-384, SHA-384) ciphersuite in {{OPRF}}. SetupVOPRFClient
 is defined in {{OPRF, Section 3.2}}.
 
-The Client then creates an issuance request message for a random value `nonce`
+The Client then creates an issuance request message for a random 32-byte value `nonce`
 with the input challenge and Issuer key identifier as described below:
 
 ~~~
@@ -340,10 +371,10 @@ content. The media type for this request is
 
 ~~~
 POST /request HTTP/1.1
-Host = issuer.example.net
-Accept = application/private-token-response
-Content-Type = application/private-token-request
-Content-Length = <Length of TokenRequest>
+Host: issuer.example.net
+Accept: application/private-token-response
+Content-Type: application/private-token-request
+Content-Length: <Length of TokenRequest>
 
 <Bytes containing the TokenRequest>
 ~~~
@@ -400,8 +431,8 @@ consists of TokenResponse, with the content type set as
 
 ~~~
 HTTP/1.1 200 OK
-Content-Type = application/private-token-response
-Content-Length = <Length of TokenResponse>
+Content-Type: application/private-token-response
+Content-Length: <Length of TokenResponse>
 
 <Bytes containing the TokenResponse>
 ~~~
@@ -525,7 +556,7 @@ this protocol are described below. The constant `Nk` is defined by
 
 ## Client-to-Issuer Request {#public-request}
 
-The Client first creates an issuance request message for a random value
+The Client first creates an issuance request message for a random 32-byte value
 `nonce` using the input challenge and Issuer key identifier as follows:
 
 ~~~
@@ -574,10 +605,10 @@ Request URL "https://issuer.example.net/request" is shown below.
 
 ~~~
 POST /request HTTP/1.1
-Host = issuer.example.net
-Accept = application/private-token-response
-Content-Type = application/private-token-request
-Content-Length = <Length of TokenRequest>
+Host: issuer.example.net
+Accept: application/private-token-response
+Content-Type: application/private-token-request
+Content-Length: <Length of TokenRequest>
 
 <Bytes containing the TokenRequest>
 ~~~
@@ -616,8 +647,8 @@ consists of TokenResponse, with the content type set as
 
 ~~~
 HTTP/1.1 200 OK
-Content-Type = application/private-token-response
-Content-Length = <Length of TokenResponse>
+Content-Type: application/private-token-response
+Content-Length: <Length of TokenResponse>
 
 <Bytes containing the TokenResponse>
 ~~~
@@ -677,11 +708,13 @@ These keys MUST NOT be reused in other protocols.
 
 The key identifier for an Issuer Private and Public Key (skI, pkI), denoted `token_key_id`,
 is computed as SHA256(encoded_key), where encoded_key is a DER-encoded
-SubjectPublicKeyInfo (SPKI) object carrying pkI. The SPKI object MUST use the
-RSASSA-PSS OID {{!RFC5756}}, which specifies the hash algorithm and salt size.
-The salt size MUST match the output size of the hash function associated with
-the public key and token type. The parameters field for the digest used in the
-mask generation function and the digest being signed MUST be omitted.
+SubjectPublicKeyInfo {{?RFC5280}} (SPKI) object carrying pkI as a DER-encoded
+RSAPublicKey value in the the subjectPublicKey field. Additionally, the SPKI object
+MUST use the id-RSASSA-PSS object identifier in the algorithm field within the
+SPKI object, the parameters field MUST contain a RSASSA-PSS-params value,
+and MUST include the hashAlgorithm, maskGenAlgorithm, and saltLength values.
+The saltLength MUST match the output size of the hash function associated with
+the public key and token type.
 
 An example sequence of the SPKI object (in ASN.1 format) for a 2048-bit key is
 below:
