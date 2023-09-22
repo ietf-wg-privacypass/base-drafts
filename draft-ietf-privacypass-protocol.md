@@ -215,28 +215,41 @@ $ echo MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqGSIb3DQEBCDAL \
  sq5I0nthREtrYkGo113oMVPVp3sy4VHPgzd8KdzTLGzOrjiUOsSFWbjf21iaVjXJ2VdwdS-8O- \
  430wkucYjGeOJwi8rWx_ZkcHtav0S67Q_SlExJel6nyRzpuuID9OQm1nxfs1Z4PhWBzt93T2oz \
  Tnda3OklF5n0pIXD6bttmTekIw_8Xx2LMis0jfJ1QL99aA-muXRFN4ZUwORrF7cAcCUD_-56_6 \
- fh9s34FmqBGwIDAQAB | sed s/-/+/g | sed s/_/\\//g | openssl base64 -d  | xxd
-00000000: 3082 0152 303d 0609 2a86 4886 f70d 0101  0..R0=..*.H.....
-00000010: 0a30 30a0 0d30 0b06 0960 8648 0165 0304  .00..0...`.H.e..
-00000020: 0202 a11a 3018 0609 2a86 4886 f70d 0101  ....0...*.H.....
-00000030: 0830 0b06 0960 8648 0165 0304 0202 a203  .0...`.H.e......
-00000040: 0201 3003 8201 0f00 3082 010a 0282 0101  ..0.....0.......
-00000050: 0098 a1c6 00cc 9ea0 9b75 a63d e7ef 14ed  .........u.=....
-00000060: a803 ebfc 3859 00f8 4933 b3dc f043 51d8  ....8Y..I3...CQ.
-00000070: 1cdd 6703 d34c 5eca 14a9 ace7 0b7e 98bd  ..g..L^......~..
-00000080: 356a dd12 0be7 1d06 e223 e966 0af0 ebf3  5j.......#.f....
-00000090: d00c 9a06 ebd3 bd6e 9228 287b 64f5 c4a8  .......n.(({d...
-000000a0: 2191 b2ae 48d2 7b61 444b 6b62 41a8 d75d  !...H.{aDKkbA..]
-000000b0: e831 53d5 a77b 32e1 51cf 8337 7c29 dcd3  .1S..{2.Q..7|)..
-000000c0: 2c6c ceae 3894 3ac4 8559 b8df db58 9a56  ,l..8.:..Y...X.V
-000000d0: 35c9 d957 7075 2fbc 3bee 37d3 092e 7188  5..Wpu/.;.7...q.
-000000e0: c678 e270 8bca d6c7 f664 707b 5abf 44ba  .x.p.....dp{Z.D.
-000000f0: ed0f d294 4c49 7a5e a7c9 1ce9 bae2 03f4  ....LIz^........
-00000100: e426 d67c 5fb3 5678 3e15 81ce df77 4f6a  .&.|_.Vx>....wOj
-00000110: 334e 775a dce9 2517 99f4 a485 c3e9 bb6d  3NwZ..%........m
-00000120: 9937 a423 0ffc 5f1d 8b32 2b34 8df2 7540  .7.#.._..2+4..u@
-00000130: bf7d 680f a6b9 7445 3786 54c0 e46b 17b7  .}h...tE7.T..k..
-00000140: 0070 2503 ffee 7aff a7e1 f6cd f816 6a81  .p%...z.......j.
+ fh9s34FmqBGwIDAQAB \
+ | sed s/-/+/g | sed s/_/\\//g | openssl base64 -d \
+ | openssl asn1parse -dump -inform DER
+    0:d=0  hl=4 l= 338 cons: SEQUENCE
+    4:d=1  hl=2 l=  61 cons: SEQUENCE
+    6:d=2  hl=2 l=   9 prim: OBJECT            :rsassaPss
+   17:d=2  hl=2 l=  48 cons: SEQUENCE
+   19:d=3  hl=2 l=  13 cons: cont [ 0 ]
+   21:d=4  hl=2 l=  11 cons: SEQUENCE
+   23:d=5  hl=2 l=   9 prim: OBJECT            :sha384
+   34:d=3  hl=2 l=  26 cons: cont [ 1 ]
+   36:d=4  hl=2 l=  24 cons: SEQUENCE
+   38:d=5  hl=2 l=   9 prim: OBJECT            :mgf1
+   49:d=5  hl=2 l=  11 cons: SEQUENCE
+   51:d=6  hl=2 l=   9 prim: OBJECT            :sha384
+   62:d=3  hl=2 l=   3 cons: cont [ 2 ]
+   64:d=4  hl=2 l=   1 prim: INTEGER           :30
+   67:d=1  hl=4 l= 271 prim: BIT STRING
+      0000 - 00 30 82 01 0a 02 82 01-01 00 98 a1 c6 00 cc 9e   .0..............
+      0010 - a0 9b 75 a6 3d e7 ef 14-ed a8 03 eb fc 38 59 00   ..u.=........8Y.
+      0020 - f8 49 33 b3 dc f0 43 51-d8 1c dd 67 03 d3 4c 5e   .I3...CQ...g..L^
+      0030 - ca 14 a9 ac e7 0b 7e 98-bd 35 6a dd 12 0b e7 1d   ......~..5j.....
+      0040 - 06 e2 23 e9 66 0a f0 eb-f3 d0 0c 9a 06 eb d3 bd   ..#.f...........
+      0050 - 6e 92 28 28 7b 64 f5 c4-a8 21 91 b2 ae 48 d2 7b   n.(({d...!...H.{
+      0060 - 61 44 4b 6b 62 41 a8 d7-5d e8 31 53 d5 a7 7b 32   aDKkbA..].1S..{2
+      0070 - e1 51 cf 83 37 7c 29 dc-d3 2c 6c ce ae 38 94 3a   .Q..7|)..,l..8.:
+      0080 - c4 85 59 b8 df db 58 9a-56 35 c9 d9 57 70 75 2f   ..Y...X.V5..Wpu/
+      0090 - bc 3b ee 37 d3 09 2e 71-88 c6 78 e2 70 8b ca d6   .;.7...q..x.p...
+      00a0 - c7 f6 64 70 7b 5a bf 44-ba ed 0f d2 94 4c 49 7a   ..dp{Z.D.....LIz
+      00b0 - 5e a7 c9 1c e9 ba e2 03-f4 e4 26 d6 7c 5f b3 56   ^.........&.|_.V
+      00c0 - 78 3e 15 81 ce df 77 4f-6a 33 4e 77 5a dc e9 25   x>....wOj3NwZ..%
+      00d0 - 17 99 f4 a4 85 c3 e9 bb-6d 99 37 a4 23 0f fc 5f   ........m.7.#.._
+      00e0 - 1d 8b 32 2b 34 8d f2 75-40 bf 7d 68 0f a6 b9 74   ..2+4..u@.}h...t
+      00f0 - 45 37 86 54 c0 e4 6b 17-b7 00 70 25 03 ff ee 7a   E7.T..k...p%...z
+      0100 - ff a7 e1 f6 cd f8 16 6a-81 1b 02 03 01 00 01      .......j.......
 ~~~
 
 Issuer directory resources have the media type
@@ -716,8 +729,8 @@ and MUST include the hashAlgorithm, maskGenAlgorithm, and saltLength values.
 The saltLength MUST match the output size of the hash function associated with
 the public key and token type.
 
-An example sequence of the SPKI object (in ASN.1 format) for a 2048-bit key is
-below:
+An example sequence of the SPKI object (in ASN.1 format, with the actual public key
+bytes truncated) for a 2048-bit key is below:
 
 ~~~
 $ cat spki.bin | xxd -r -p | openssl asn1parse -dump -inform DER
