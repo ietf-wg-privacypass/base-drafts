@@ -787,7 +787,7 @@ terms of the trust relationships and communication patterns between Client,
 Attester, Issuer, and Origin. Entities encapsulated by a bounding box are
 assumed to be operated by the same party and therefore collude. Collusion
 can enable linking of attestation, issuance, and redemption contexts.
-Entities that are not encapsualted by a bounding box are assumed to not
+Entities that are not encapsulated by a bounding box are assumed to not
 collude, meaning that entities operated by separate parties do not collude.
 Mechanisms for enforcing non-collusion are out of scope for this architecture.
 
