@@ -233,23 +233,7 @@ $ echo MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqGSIb3DQEBCDAL \
    62:d=3  hl=2 l=   3 cons: cont [ 2 ]
    64:d=4  hl=2 l=   1 prim: INTEGER           :30
    67:d=1  hl=4 l= 271 prim: BIT STRING
-      0000 - 00 30 82 01 0a 02 82 01-01 00 98 a1 c6 00 cc 9e   .0..............
-      0010 - a0 9b 75 a6 3d e7 ef 14-ed a8 03 eb fc 38 59 00   ..u.=........8Y.
-      0020 - f8 49 33 b3 dc f0 43 51-d8 1c dd 67 03 d3 4c 5e   .I3...CQ...g..L^
-      0030 - ca 14 a9 ac e7 0b 7e 98-bd 35 6a dd 12 0b e7 1d   ......~..5j.....
-      0040 - 06 e2 23 e9 66 0a f0 eb-f3 d0 0c 9a 06 eb d3 bd   ..#.f...........
-      0050 - 6e 92 28 28 7b 64 f5 c4-a8 21 91 b2 ae 48 d2 7b   n.(({d...!...H.{
-      0060 - 61 44 4b 6b 62 41 a8 d7-5d e8 31 53 d5 a7 7b 32   aDKkbA..].1S..{2
-      0070 - e1 51 cf 83 37 7c 29 dc-d3 2c 6c ce ae 38 94 3a   .Q..7|)..,l..8.:
-      0080 - c4 85 59 b8 df db 58 9a-56 35 c9 d9 57 70 75 2f   ..Y...X.V5..Wpu/
-      0090 - bc 3b ee 37 d3 09 2e 71-88 c6 78 e2 70 8b ca d6   .;.7...q..x.p...
-      00a0 - c7 f6 64 70 7b 5a bf 44-ba ed 0f d2 94 4c 49 7a   ..dp{Z.D.....LIz
-      00b0 - 5e a7 c9 1c e9 ba e2 03-f4 e4 26 d6 7c 5f b3 56   ^.........&.|_.V
-      00c0 - 78 3e 15 81 ce df 77 4f-6a 33 4e 77 5a dc e9 25   x>....wOj3NwZ..%
-      00d0 - 17 99 f4 a4 85 c3 e9 bb-6d 99 37 a4 23 0f fc 5f   ........m.7.#.._
-      00e0 - 1d 8b 32 2b 34 8d f2 75-40 bf 7d 68 0f a6 b9 74   ..2+4..u@.}h...t
-      00f0 - 45 37 86 54 c0 e4 6b 17-b7 00 70 25 03 ff ee 7a   E7.T..k...p%...z
-      0100 - ff a7 e1 f6 cd f8 16 6a-81 1b 02 03 01 00 01      .......j.......
+   ... truncated public key bytes ...
 ~~~
 
 Issuer directory resources have the media type
@@ -749,6 +733,7 @@ $ cat spki.bin | xxd -r -p | openssl asn1parse -dump -inform DER
    62:d=3  hl=2 l=   3 cons: cont [ 2 ]
    64:d=4  hl=2 l=   1 prim: INTEGER           :30
    67:d=1  hl=4 l= 271 prim: BIT STRING
+   ... truncated public key bytes ...
 ~~~
 
 Since Clients truncate `token_key_id` in each `TokenRequest`, Issuers SHOULD
