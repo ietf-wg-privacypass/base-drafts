@@ -206,7 +206,7 @@ token; see {{hoarding}} for security considerations of cached tokens.
 3. If the Client does not have a token available and decides it wants to
 obtain one (or more) bound to the token challenge, it then invokes the
 issuance protocol. As a prerequisite to the issuance protocol, the Client
-runs the deployment specific attestation process that is required for the
+runs the deployment-specific attestation process that is required for the
 designated Issuer. Client attestation can be done via proof of solving a
 CAPTCHA, checking device or hardware attestation validity, etc.; see
 {{attester}} for more details.
@@ -257,7 +257,7 @@ cannot be linked to the content of the token request or token response.
 
 Use cases for Privacy Pass are broad and depend greatly on the deployment model
 as discussed in {{deployment}}. The initial motivating use case for Privacy Pass
-{{PrivacyPassCloudflare}} was to help rate limit malicious or otherwise abusive
+{{PrivacyPassCloudflare}} was to help rate-limit malicious or otherwise abusive
 traffic from services such as Tor {{DMS2004}}. The generalized and evolved
 architecture described in this document also work for this use case. However,
 for added clarity, some more possible use cases are described below.
@@ -282,14 +282,14 @@ between the Client and Origin, i.e., the information that is provided or
 otherwise available to the Origin during redemption that might be used
 to identify a Client and construct a token challenge. This context includes all
 information associated with redemption, such as the timestamp of the event,
-Client visible information (including the IP address), and the Origin name.
+Client-visible information (including the IP address), and the Origin name.
 
 Issuance context:
 : The interactions and set of information shared between the Client, Attester,
 and Issuer, i.e., the information that is provided or otherwise available
 to Attester and Issuer during issuance that might be used to identify a Client.
 This context includes all information associated with issuance, such as the
-timestamp of the event, any Client visible information (including the IP
+timestamp of the event, any Client-visible information (including the IP
 address), and the Origin name (if revealed during issuance). This does not
 include the token challenge in its entirety, as that is kept secret from the
 Issuer during the issuance protocol.
@@ -299,8 +299,8 @@ Attestation context:
 the Client and Attester only, for the purposes of attesting the validity of
 the Client, that is provided or otherwise available during attestation that
 might be used to identify the Client. This context includes all information
-associated with attestation, such as the timestamp of the event and any Client
-visible information, including information needed for the attestation
+associated with attestation, such as the timestamp of the event and any
+Client-visible information, including information needed for the attestation
 procedure to complete.
 
 The privacy goals of Privacy Pass assume a threat model in which Origins trust
@@ -317,7 +317,7 @@ necessary preconditions for context unlinkability, depends on the deployment
 model; see {{deployment}} for more details.
 
 The mechanisms for establishing trust between each entity in this arrangement
-are deployment specific. For example, in settings where Clients interact with
+are deployment-specific. For example, in settings where Clients interact with
 Issuers through an Attester, Attesters and Issuers might use
 mutually authenticated TLS to authenticate one another. In settings where
 Clients do not communicate with Issuers through an Attester, the Attesters
@@ -326,7 +326,8 @@ might convey this trust via a digital signature that Issuers can verify.
 Clients explicitly trust Attesters to perform attestation correctly and in a
 way that does not violate their privacy. In particular, this means that Attesters
 which may be privy to private information about Clients are trusted to not disclose
-this information to non-colluding parties; see {{deployment}} for more about different
+this information to non-colluding parties. Colluding parties are assumed to have
+access to the same information; see {{deployment}} for more about different
 deployment models and non-collusion assumptions. However, Clients assume Issuers and
 Origins are malicious.
 
@@ -476,7 +477,7 @@ Clients interact with the Attester and Issuer to produce a token for
 a challenge. The context in which an Attester vouches for a Client during
 issuance is referred to as the attestation context. This context includes all
 information associated with the issuance event, such as the timestamp of the
-event and Client visible information, including the IP address or other
+event and Client-visible information, including the IP address or other
 information specific to the type of attestation done.
 
 Each issuance protocol may be different, e.g., in the number and types of
@@ -783,14 +784,12 @@ unlinkability.
 This section covers some expected deployment models and their corresponding
 security and privacy considerations. Each deployment model is described in
 terms of the trust relationships and communication patterns between Client,
-Attester, Issuer, and Origin.
-
-The discussion below assumes non-collusion between entities that have access to
-the attestation, issuance, and redemption contexts, as collusion between such
-entities would enable linking of these contexts and may lead to unlinkability
-violations. Generally, this means that entities operated by separate parties do
-not collude. Mechanisms for enforcing non-collusion are out of scope for this
-architecture.
+Attester, Issuer, and Origin. Entities drawn within the same bounding box are
+assumed to be operated by the same party and are therefore able to collude.
+Collusion can enable linking of attestation, issuance, and redemption contexts.
+Entities not drawn within the same bounding box are assumed to not
+collude, meaning that entities operated by separate parties that do not collude.
+Mechanisms for enforcing non-collusion are out of scope for this architecture.
 
 ## Shared Origin, Attester, Issuer {#deploy-shared}
 
