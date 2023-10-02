@@ -706,7 +706,7 @@ These keys MUST NOT be reused in other protocols.
 The key identifier for an Issuer Private and Public Key (skI, pkI),
 denoted `token_key_id`, is computed as SHA256(encoded_key), where encoded_key
 is a DER-encoded SubjectPublicKeyInfo {{?RFC5280}} (SPKI) object carrying pkI
-as a DER-encoded RSAPublicKey value {{?RFC5756}} in the the subjectPublicKey
+as a DER-encoded RSAPublicKey value {{?RFC5756}} in the subjectPublicKey
 field. Additionally, the SPKI object MUST use the id-RSASSA-PSS object
 identifier in the algorithm field within the SPKI object, the parameters field
 MUST contain a RSASSA-PSS-params value, and MUST include the hashAlgorithm,
