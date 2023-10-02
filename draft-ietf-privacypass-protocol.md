@@ -703,15 +703,15 @@ pkI, respectively, used to produce tokens. Each key SHALL be generated
 securely, for example as specified in FIPS 186-5 {{?DSS=DOI.10.6028/NIST.FIPS.186-5}}.
 These keys MUST NOT be reused in other protocols.
 
-The key identifier for an Issuer Private and Public Key (skI, pkI), denoted `token_key_id`,
-is computed as SHA256(encoded_key), where encoded_key is a DER-encoded
-SubjectPublicKeyInfo {{?RFC5280}} (SPKI) object carrying pkI as a DER-encoded
-RSAPublicKey value in the the subjectPublicKey field. Additionally, the SPKI object
-MUST use the id-RSASSA-PSS object identifier in the algorithm field within the
-SPKI object, the parameters field MUST contain a RSASSA-PSS-params value,
-and MUST include the hashAlgorithm, maskGenAlgorithm, and saltLength values.
-The saltLength MUST match the output size of the hash function associated with
-the public key and token type.
+The key identifier for an Issuer Private and Public Key (skI, pkI),
+denoted `token_key_id`, is computed as SHA256(encoded_key), where encoded_key
+is a DER-encoded SubjectPublicKeyInfo {{?RFC5280}} (SPKI) object carrying pkI
+as a DER-encoded RSAPublicKey value {{?RFC5756}} in the the subjectPublicKey
+field. Additionally, the SPKI object MUST use the id-RSASSA-PSS object
+identifier in the algorithm field within the SPKI object, the parameters field
+MUST contain a RSASSA-PSS-params value, and MUST include the hashAlgorithm,
+maskGenAlgorithm, and saltLength values. The saltLength MUST match the output
+size of the hash function associated with the public key and token type.
 
 An example sequence of the SPKI object (in ASN.1 format, with the actual public key
 bytes truncated) for a 2048-bit key is below:
