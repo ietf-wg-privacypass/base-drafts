@@ -666,7 +666,7 @@ the number of issuance events at time T2 increases. Depending on the "max-age"
 token challenge parameter, clients MAY try to add delay to the time between
 being challenged and redeeming a token to make this sort of linkability more
 difficult. For more discussion on correlation risks between token issuance and
-redemption, see {{ARCHITECTURE}}.
+redemption, see {{Section 6.3 of ARCHITECTURE}}.
 
 ## Cross-Context Linkability Attacks
 
