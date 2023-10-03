@@ -508,7 +508,10 @@ ensure that the truncated form of new key IDs do not collide with other
 truncated key IDs in rotation. Collisions can cause the Issuer to use
 the wrong Issuer Private Key for issuance, which will in turn cause the
 resulting tokens to be invalid. There is no known security consequence of
-using the the wrong Issuer Private Key.
+using the the wrong Issuer Private Key. A possible exception to this constraint
+would be a colliding key that is still in use but in the process of being
+rotated out, in which case the collision cannot reasonably be avoided but it
+is expected to be transient.
 
 # Issuance Protocol for Publicly Verifiable Tokens {#public-flow}
 
@@ -741,7 +744,10 @@ ensure that the truncated form of new key IDs do not collide with other
 truncated key IDs in rotation. Collisions can cause the Issuer to use
 the wrong Issuer Private Key for issuance, which will in turn cause the
 resulting tokens to be invalid. There is no known security consequence of
-using the the wrong Issuer Private Key.
+using the the wrong Issuer Private Key. A possible exception to this constraint
+would be a colliding key that is still in use but in the process of being
+rotated out, in which case the collision cannot reasonably be avoided but it
+is expected to be transient.
 
 # Security considerations {#security}
 
