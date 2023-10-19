@@ -542,9 +542,9 @@ A single response from an origin can include multiple token challenges.
 For example, a set of challenges could include different token types
 and issuers, to allow clients to choose a preferred issuer or type.
 
-If clients choose to respond, clients should satisfy exactly one of 
-the challenges presented. The choice of which challenge to use for redeeming 
-tokens is up to client policy. This can involve which token types are 
+If clients choose to respond, clients should satisfy exactly one of
+the challenges presented. The choice of which challenge to use for redeeming
+tokens is up to client policy. This can involve which token types are
 supported or preferred, which issuers are supported or preferred, or whether
 or not the client is able to use cached tokens based on the redemption context
 or origin information in the challenge. See {{caching}} for more discussion
