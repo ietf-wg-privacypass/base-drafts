@@ -536,7 +536,7 @@ to overwhelm issuance servers. The limits here will vary based on the specific
 deployment, but clients SHOULD have some implementation-specific policy
 to minimize the number of tokens that can be retrieved by origins.
 
-## Choosing Between Multiple Challenges
+## Choosing Between Multiple Challenges {#choosing-between-multiple-challenges}
 
 A single response from an origin can include multiple token challenges.
 For example, a set of challenges could include different token types
@@ -852,6 +852,7 @@ configurations:
 3. TokenChallenge with an empty origin and redemption context
 4. TokenChallenge with an empty origin and non-empty redemption context
 5. TokenChallenge with a multiple origins and non-empty redemption context
+6. TokenChallenge for greasing
 
 These test vectors are below.
 
@@ -939,16 +940,32 @@ token_authenticator_input: 0002e01978182c469e5e026d66558ee1865686
 14f235e41ef7e2378e6f202688ababa2a775866b6ae0f98944910c8f48728d8a2
 735b9157762ddbf803f70e2e8ba3eca572f8982a9ca248a3056186322d93ca147
 266121ddeb5632c07f1f71cd2708
+
+// Test vector 6:
+//   token_type(0000), structure(random_bytes)
+token_type: 0000
+token_authenticator_input: 000058405ad31e286e874cb42d0ef9d50461ae
+703bb71a21178beb429c43c0effe587456d856f0f2bdfc216ef93d5c225e2a93e
+84cb686e63919788087f7ab1054aa817f09dcb919a0ed6f90fe887e8b08cd1eee
+44d5be8d813eda9f2656db61c932db8d73f8690604ded0120157923bbd19d5549
+e639e4de07530aee1d370f5187b678685715bd878dde24346751eb532a87b71ea
+40bbe5a13218658e303c648eb03817453690bfcbe8255081bf27ff0891cd02ee2
+483e48a2c494bdef696f943fa992a65303292c25d0d3f62da86a70d0b020f0ff5
+b90d0ff0f6abdb097d321fde04f3a1994e63bcd35a88c21236c7dc67600482223
+f54b25e39a250439f27ecb5ae9eb8ed548a3ec1f1d6f510d08281929c8fe08834
+2959e35ea9b3b6f6a96fc1a8edba4ed297f4cf02d0e4482b79a11f671745d7b7d
+b120eddd8a4c2b6501bbc895b2160b8071615d9c1b18f32e056bfee29deac6a7d
+6cf7b522a5badd63b9cb
 ~~~
 
 ## HTTP Header Test Vectors
 
 This section includes test vectors the contents of the HTTP authentication
 headers. Each test vector consists of one or more challenges that comprise
-a WWW-Authenticate header. For each challenge, the token-type, token-key,
-max-age, and token-challenge parameters are listed. Each challenge also
-includes an unknown (not specified) parameter that implementations are meant
-to ignore.
+a WWW-Authenticate header, as defined in {(choosing-between-multiple-challenges}}.
+For each challenge, the token-type, token-key, max-age, and token-challenge
+parameters are listed. Each challenge also includes an unknown (not specified)
+parameter that implementations are meant to ignore.
 
 The parameters for each challenge are indexed by their position
 in the WWW-Authentication challenge list. For example, token-key-0 denotes
@@ -959,6 +976,10 @@ The resulting wire-encoded WWW-Authentication header based on this
 list of challenges is then listed at the end. Line folding is only
 used to fit the document formatting constraints and not supported
 in actual requests.
+
+The last challenge on this list includes Basic authentication, a grease
+challenge, and a valid challenge for token type `0x0001`. Correct client
+implementations will ignore the Basic and grease challenges.
 
 ~~~
 token-type-0: 0x0002
@@ -1027,4 +1048,30 @@ e="AAEADmlzc3Vlci5leGFtcGxlIIo-g6M9mABdLzC-9Bn6a_TNXGAF42sShbu0zNQPp
 LODAA5vcmlnaW4uZXhhbXBsZQ==", token-key="67H-0zgxA2HAjQx1dpaWcSluBem
 aF9eSbfwopT-r1In6wPgryoYkmmaPOlv6s3TJ",unknownChallengeAttribute="ig
 nore-me", max-age="10"
+
+token-type-0: 0x0000
+token-key-0: 856de3c710b892e7cca1ae5eb121af42ca8e779137a11224228c9b9
+9b0729bf84d5057d030000309b8f0d06ccffa17561f9eacd4c312e985a6bc60ffbea
+0610264dcb1726255313da81d665692686a1d8644f1516bf612cea009e6dff6d9a9a
+959fb538e1b5b2343c092992942382bdde22d5b324b1e4618ed21d7806286c2ce
+token-challenge-0: 0000acc3b25795c636fd9dd8b12982394abba8777d35978e8
+77fc8848892a217233045ac25a3d55c07c54efe6372973fee0073e77fc61bf19ab88
+0f20edf5d627502
+token-type-1: 0x0001
+token-key-1: ebb1fed338310361c08d0c7576969671296e05e99a17d7926dfc28a
+53fabd489fac0f82bca86249a668f3a5bfab374c9
+max-age-1: 10
+token-challenge-1: 0001000e6973737565722e6578616d706c65208a3e83a33d9
+8005d2f30bef419fa6bf4cd5c6005e36b1285bbb4ccd40fa4b383000e6f726967696
+e2e6578616d706c65
+
+WWW-Authenticate: Basic realm="grease", PrivateToken challenge="AACs
+w7JXlcY2_Z3YsSmCOUq7qHd9NZeOh3_IhIiSohcjMEWsJaPVXAfFTv5jcpc_7gBz53_G
+G_GauIDyDt9dYnUC",token-key="hW3jxxC4kufMoa5esSGvQsqOd5E3oRIkIoybmbB
+ym_hNUFfQMAADCbjw0GzP-hdWH56s1MMS6YWmvGD_vqBhAmTcsXJiVTE9qB1mVpJoah2
+GRPFRa_YSzqAJ5t_22ampWftTjhtbI0PAkpkpQjgr3eItWzJLHkYY7SHXgGKGws4=",
+PrivateToken challenge="AAEADmlzc3Vlci5leGFtcGxlIIo-g6M9mABdLzC-9Bn6
+a_TNXGAF42sShbu0zNQPpLODAA5vcmlnaW4uZXhhbXBsZQ==", token-key="67H-0z
+gxA2HAjQx1dpaWcSluBemaF9eSbfwopT-r1In6wPgryoYkmmaPOlv6s3TJ",unknownC
+hallengeAttribute="ignore-me", max-age="10"
 ~~~
