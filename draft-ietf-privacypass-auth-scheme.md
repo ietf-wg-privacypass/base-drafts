@@ -574,7 +574,7 @@ with token requests that might cause clients to hit rate limits.
 
 ## Greasing
 
-In order to prevent clients becoming incompatible with new token challenges,
+In order to prevent clients from becoming incompatible with new token challenges,
 origins SHOULD include random token types, from the Reserved list of "greased"
 types (defined in {{token-types}}), with some non-trivial probability.
 
