@@ -1041,7 +1041,7 @@ additional bits provides an exponential increase in tracking granularity
 similarly to introducing more Issuers (though with more potential targeting).
 
 For this reason, deployments should take the amount of metadata used by an Issuer
-in creating redemption tokens must into account -- together with the bits
+in creating redemption tokens into account -- together with the bits
 of information that Issuers may learn about Clients otherwise. Since this
 metadata may be useful for practical deployments of Privacy Pass, Issuers
 must balance this against the reduction in Client privacy.
