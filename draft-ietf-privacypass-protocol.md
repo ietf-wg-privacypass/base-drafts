@@ -660,7 +660,7 @@ content as follows:
 
 ~~~
 authenticator =
-  Finalize(pkI, nonce, blind_sig, blind_inv)
+  Finalize(pkI, PrepareIdentity(token_input), blind_sig, blind_inv)
 ~~~
 
 The Finalize function is defined in {{Section 4.4 of BLINDRSA}}. If this
@@ -677,7 +677,7 @@ struct {
 } Token;
 ~~~
 
-The Token.nonce value is that which was sampled in {{private-request}}.
+The Token.nonce value is that which was sampled in {{public-request}}.
 If the Finalize function fails, the Client aborts the protocol.
 
 ## Token Verification
