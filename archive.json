@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-12-17T01:07:45.890034+00:00",
+  "timestamp": "2023-12-19T01:03:16.456426+00:00",
   "repo": "ietf-wg-privacypass/base-drafts",
   "labels": [
     {
@@ -6686,6 +6686,24 @@
           "updatedAt": "2023-10-19T00:09:24Z"
         }
       ]
+    },
+    {
+      "number": 504,
+      "id": "I_kwDODeTEy856Blfh",
+      "title": "Typos in protocol document",
+      "url": "https://github.com/ietf-wg-privacypass/base-drafts/issues/504",
+      "state": "OPEN",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "protocol"
+      ],
+      "body": "From a reviewer of the protocol doc:\r\n\r\n> https://datatracker.ietf.org/doc/draft-ietf-privacypass-protocol/\r\n> Section 6.3 has probably two errors:\r\n> First one:\r\n> authenticator =\r\n>      Finalize(pkI, nonce, blind_sig, blind_inv)\r\n> I think that instead of nonce we need to pass token_input to the Finalize:\r\n>    token_input = concat(0x0002, // Token type field is 2 bytes long\r\n>                         nonce,\r\n>                         challenge_digest,\r\n>                         token_key_id)\r\n> Otherwise the Finalize function fails to verify the signature.\r\n> Second:\r\n> The Token.nonce value is that which was sampled in Section 5.1\r\n> I think this one should be:\r\n> ... sampled in Section 6.1",
+      "createdAt": "2023-12-18T18:45:51Z",
+      "updatedAt": "2023-12-18T18:46:01Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
