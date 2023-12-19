@@ -15,24 +15,24 @@ for Privacy Pass tokens: one that produces tokens that are privately
 verifiable using the issuance private key, and another that produces tokens
 that are publicly verifiable using the issuance public key. 
     " name="description">
-<meta content="xml2rfc 3.18.2" name="generator">
+<meta content="xml2rfc 3.19.0" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-ietf-privacypass-protocol-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.18.2
+  xml2rfc 3.19.0
     Python 3.11.6
-    ConfigArgParse 1.5.3
+    ConfigArgParse 1.7
     google-i18n-address 3.1.0
     intervaltree 3.1.0
     Jinja2 3.1.2
     lxml 4.9.3
-    platformdirs 3.11.0
+    platformdirs 4.1.0
     pycountry 22.3.5
-    PyYAML 6.0
+    PyYAML 6.0.1
     requests 2.31.0
-    setuptools 67.7.2
+    setuptools 68.2.2
     six 1.16.0
-    wcwidth 0.2.8
+    wcwidth 0.2.12
 -->
 <link href="draft-ietf-privacypass-protocol.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1031,11 +1031,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Privacy Pass Issuance</td>
-<td class="right">October 2023</td>
+<td class="right">December 2023</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Celi, et al.</td>
-<td class="center">Expires 25 April 2024</td>
+<td class="center">Expires 21 June 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1048,12 +1048,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-privacypass-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-10-23" class="published">23 October 2023</time>
+<time datetime="2023-12-19" class="published">19 December 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-04-25">25 April 2024</time></dd>
+<dd class="expires"><time datetime="2024-06-21">21 June 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1102,7 +1102,7 @@ that are publicly verifiable using the issuance public key.<a href="#section-abs
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 25 April 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 21 June 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1306,8 +1306,8 @@ network byte order.<a href="#section-2-4" class="pilcrow">¶</a></p>
       </h2>
 <p id="section-3-1">The issuance protocols defined in this document embody the core of Privacy Pass.
 Clients receive TokenChallenge inputs from the redemption protocol
-(<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.1" class="relref">Section 2.1</a></span>) and use the issuance protocols to produce
-corresponding Token values (<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.2" class="relref">Section 2.2</a></span>). The issuance protocol
+(<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1" class="relref">Section 2.1</a></span>) and use the issuance protocols to produce
+corresponding Token values (<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.2" class="relref">Section 2.2</a></span>). The issuance protocol
 describes how Clients and Issuers interact to compute a token using a one-round
 protocol consisting of a TokenRequest from the Client and TokenResponse from
 the Issuer. This interaction is shown below.<a href="#section-3-1" class="pilcrow">¶</a></p>
@@ -1539,11 +1539,11 @@ $ echo MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqGSIb3DQEBCDAL \
 /.well-known/private-token-issuer-directory; see <a href="#wkuri-reg" class="auto internal xref">Section 8.1</a> for the registration
 information for this well-known URI. The reason that this resource is located
 at a well-known URI is that Issuers are defined by an origin name in TokenChallenge
-structures; see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.1" class="relref">Section 2.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span>.<a href="#section-4-14" class="pilcrow">¶</a></p>
+structures; see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1" class="relref">Section 2.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span>.<a href="#section-4-14" class="pilcrow">¶</a></p>
 <p id="section-4-15">The Issuer directory and Issuer resources SHOULD be available on the same origin. If
 an Issuer wants to service multiple different Issuer directories they MUST create
 unique subdomains for each so the TokenChallenge defined in
-<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.1" class="relref">Section 2.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> can be
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1" class="relref">Section 2.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> can be
 differentiated correctly.<a href="#section-4-15" class="pilcrow">¶</a></p>
 <p id="section-4-16">Issuers SHOULD use HTTP cache directives to permit caching of this resource
 <span>[<a href="#RFC5861" class="cite xref">RFC5861</a>]</span>. The cache lifetime depends on the Issuer's key rotation schedule.
@@ -2027,7 +2027,7 @@ content as follows:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-6.3-2">
 <pre>
 authenticator =
-  Finalize(pkI, nonce, blind_sig, blind_inv)
+  Finalize(pkI, PrepareIdentity(token_input), blind_sig, blind_inv)
 </pre><a href="#section-6.3-2" class="pilcrow">¶</a>
 </div>
 <p id="section-6.3-3">The Finalize function is defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-rsa-blind-signatures-14#section-4.4" class="relref">Section 4.4</a> of [<a href="#BLINDRSA" class="cite xref">BLINDRSA</a>]</span>. If this
@@ -2044,7 +2044,7 @@ struct {
 } Token;
 </pre><a href="#section-6.3-4" class="pilcrow">¶</a>
 </div>
-<p id="section-6.3-5">The Token.nonce value is that which was sampled in <a href="#private-request" class="auto internal xref">Section 5.1</a>.
+<p id="section-6.3-5">The Token.nonce value is that which was sampled in <a href="#public-request" class="auto internal xref">Section 6.1</a>.
 If the Finalize function fails, the Client aborts the protocol.<a href="#section-6.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2206,13 +2206,13 @@ following entries.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
               <p id="section-8.2.1-1.2.1">Name: VOPRF (P-384, SHA-384)<a href="#section-8.2.1-1.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.1-1.3">
-              <p id="section-8.2.1-1.3.1">Token Structure: As defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.2" class="relref">Section 2.2</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span><a href="#section-8.2.1-1.3.1" class="pilcrow">¶</a></p>
+              <p id="section-8.2.1-1.3.1">Token Structure: As defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.2" class="relref">Section 2.2</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span><a href="#section-8.2.1-1.3.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.1-1.4">
               <p id="section-8.2.1-1.4.1">Token Key Encoding: Serialized using SerializeElement from <span><a href="https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-voprf-21#section-2.1" class="relref">Section 2.1</a> of [<a href="#OPRF" class="cite xref">OPRF</a>]</span><a href="#section-8.2.1-1.4.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.1-1.5">
-              <p id="section-8.2.1-1.5.1">TokenChallenge Structure: As defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.1" class="relref">Section 2.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span><a href="#section-8.2.1-1.5.1" class="pilcrow">¶</a></p>
+              <p id="section-8.2.1-1.5.1">TokenChallenge Structure: As defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1" class="relref">Section 2.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span><a href="#section-8.2.1-1.5.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.1-1.6">
               <p id="section-8.2.1-1.6.1">Public Verifiability: N<a href="#section-8.2.1-1.6.1" class="pilcrow">¶</a></p>
@@ -2251,13 +2251,13 @@ following entries.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
               <p id="section-8.2.2-1.2.1">Name: Blind RSA (2048-bit)<a href="#section-8.2.2-1.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.2-1.3">
-              <p id="section-8.2.2-1.3.1">Token Structure: As defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.2" class="relref">Section 2.2</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span><a href="#section-8.2.2-1.3.1" class="pilcrow">¶</a></p>
+              <p id="section-8.2.2-1.3.1">Token Structure: As defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.2" class="relref">Section 2.2</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span><a href="#section-8.2.2-1.3.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.2-1.4">
               <p id="section-8.2.2-1.4.1">Token Key Encoding: Serialized as a DER-encoded SubjectPublicKeyInfo (SPKI) object using the RSASSA-PSS OID <span>[<a href="#RFC5756" class="cite xref">RFC5756</a>]</span><a href="#section-8.2.2-1.4.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.2-1.5">
-              <p id="section-8.2.2-1.5.1">TokenChallenge Structure: As defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.1" class="relref">Section 2.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span><a href="#section-8.2.2-1.5.1" class="pilcrow">¶</a></p>
+              <p id="section-8.2.2-1.5.1">TokenChallenge Structure: As defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1" class="relref">Section 2.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span><a href="#section-8.2.2-1.5.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.2-1.6">
               <p id="section-8.2.2-1.6.1">Public Verifiability: Y<a href="#section-8.2.2-1.6.1" class="pilcrow">¶</a></p>
@@ -2648,7 +2648,7 @@ including Privacy Pass issuer applications themselves.<a href="#section-8.3.3-1.
 <dd class="break"></dd>
 <dt id="AUTHSCHEME">[AUTHSCHEME]</dt>
         <dd>
-<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Valdez, S.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"The Privacy Pass HTTP Authentication Scheme"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-auth-scheme-14</span>, <time datetime="2023-09-25" class="refDate">25 September 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14</a>&gt;</span>. </dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Valdez, S.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"The Privacy Pass HTTP Authentication Scheme"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-auth-scheme-15</span>, <time datetime="2023-10-23" class="refDate">23 October 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="BLINDRSA">[BLINDRSA]</dt>
         <dd>
@@ -2721,7 +2721,7 @@ including Privacy Pass issuer applications themselves.<a href="#section-8.3.3-1.
 <dd class="break"></dd>
 <dt id="DSS">[DSS]</dt>
         <dd>
-<span class="refAuthor">Moody, D.</span>, <span class="refTitle">"Digital Signature Standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-5</span>, <time datetime="2023" class="refDate">2023</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-5">https://doi.org/10.6028/nist.fips.186-5</a>&gt;</span>. </dd>
+<span class="refAuthor">Chen, L.</span>, <span class="refAuthor">Moody, D.</span>, <span class="refAuthor">Regenscheid, A.</span>, and <span class="refAuthor">A. Robinson</span>, <span class="refTitle">"Digital Signature Standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-5</span>, <time datetime="2023-02" class="refDate">February 2023</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-5">https://doi.org/10.6028/nist.fips.186-5</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC5280">[RFC5280]</dt>
       <dd>

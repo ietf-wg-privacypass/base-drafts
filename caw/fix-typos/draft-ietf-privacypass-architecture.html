@@ -16,24 +16,24 @@ and its protocols, its security and privacy goals, practical deployment models,
 and recommendations for each deployment model that helps ensure the desired
 security and privacy goals are fulfilled. 
     " name="description">
-<meta content="xml2rfc 3.18.2" name="generator">
+<meta content="xml2rfc 3.19.0" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-ietf-privacypass-architecture-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.18.2
+  xml2rfc 3.19.0
     Python 3.11.6
-    ConfigArgParse 1.5.3
+    ConfigArgParse 1.7
     google-i18n-address 3.1.0
     intervaltree 3.1.0
     Jinja2 3.1.2
     lxml 4.9.3
-    platformdirs 3.11.0
+    platformdirs 4.1.0
     pycountry 22.3.5
-    PyYAML 6.0
+    PyYAML 6.0.1
     requests 2.31.0
-    setuptools 67.7.2
+    setuptools 68.2.2
     six 1.16.0
-    wcwidth 0.2.8
+    wcwidth 0.2.12
 -->
 <link href="draft-ietf-privacypass-architecture.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1032,11 +1032,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Privacy Pass Architecture</td>
-<td class="right">October 2023</td>
+<td class="right">December 2023</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Davidson, et al.</td>
-<td class="center">Expires 25 April 2024</td>
+<td class="center">Expires 21 June 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1049,12 +1049,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-privacypass-architecture-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-10-23" class="published">23 October 2023</time>
+<time datetime="2023-12-19" class="published">19 December 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-04-25">25 April 2024</time></dd>
+<dd class="expires"><time datetime="2024-06-21">21 June 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1101,7 +1101,7 @@ security and privacy goals are fulfilled.<a href="#section-abstract-1" class="pi
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 25 April 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 21 June 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1679,8 +1679,8 @@ through these protocols.<a href="#section-3.3-10" class="pilcrow">¶</a></p>
 <span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span>, is an authorization protocol
 wherein Clients present tokens to Origins for authorization. Normally,
 redemption is preceded by a challenge, wherein the Origin challenges
-Clients for a token with a TokenChallenge (<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.1" class="relref">Section 2.1</a></span>) and,
-if possible, Clients present a valid Token (<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.2" class="relref">Section 2.2</a></span>)
+Clients for a token with a TokenChallenge (<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1" class="relref">Section 2.1</a></span>) and,
+if possible, Clients present a valid Token (<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.2" class="relref">Section 2.2</a></span>)
 in reaction to the challenge. This interaction is shown below.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
 <span id="name-challenge-and-redemption-pr"></span><div id="fig-redemption">
 <figure id="figure-2">
@@ -1757,7 +1757,7 @@ which influences a client's ability to pre-fetch and cache tokens. For
 example, an empty redemption context always allows tokens to be issued and
 redeemed non-interactively, whereas a fresh and random redemption context
 means that the redeemed token must be issued only after the client receives
-the challenge. See <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for more details.<a href="#section-3.4-6.3.1" class="pilcrow">¶</a></p>
+the challenge. See <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for more details.<a href="#section-3.4-6.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.4-6.4">
             <p id="section-3.4-6.4.1">Per-Origin or cross-Origin. Challenges can be constrained to the Origin for
@@ -1767,7 +1767,7 @@ The set of Origins for which a cross-Origin token is applicable is referred
 to as the cross-Origin set. Opting into this set is done by explicitly agreeing
 on the contents of the set. Every Origin in a cross-Origin set, by opting in,
 agrees to admit tokens for any other Origin in the set. See
-<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for more information on how this set is created.<a href="#section-3.4-6.4.1" class="pilcrow">¶</a></p>
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for more information on how this set is created.<a href="#section-3.4-6.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-3.4-7">Origins that admit cross-Origin tokens bear some risk of allowing tokens
@@ -1782,7 +1782,7 @@ redemption contexts, since these tokens can be issued and then spent multiple
 times for any such challenge. Note that Clients which redeem the
 same token to multiple Origins do risk those Origins being able to link
 Client activity together, which can disincentivize this behavior. See
-<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for discussion.<a href="#section-3.4-7" class="pilcrow">¶</a></p>
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for discussion.<a href="#section-3.4-7" class="pilcrow">¶</a></p>
 <p id="section-3.4-8">How Clients respond to token challenges can have privacy implications.
 For example, if an Origin allows the Client to choose an Issuer, then the choice
 of Issuer can reveal information about the Client used to partition anonymity
@@ -1797,8 +1797,8 @@ considerations.<a href="#section-3.4-8" class="pilcrow">¶</a></p>
         </h3>
 <p id="section-3.5-1">The Privacy Pass issuance protocol, described in <span>[<a href="#ISSUANCE" class="cite xref">ISSUANCE</a>]</span>, is a two-message
 protocol that takes as input a TokenChallenge from the redemption protocol
-(<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.1" class="relref">Section 2.1</a></span>) and produces a Token
-(<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.2" class="relref">Section 2.2</a></span>), as shown in <a href="#fig-overview" class="auto internal xref">Figure 1</a>.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+(<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1" class="relref">Section 2.1</a></span>) and produces a Token
+(<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.2" class="relref">Section 2.2</a></span>), as shown in <a href="#fig-overview" class="auto internal xref">Figure 1</a>.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
 <p id="section-3.5-2">The structure and semantics of the TokenRequest and TokenResponse messages
 depend on the issuance protocol and token type being used; see <span>[<a href="#ISSUANCE" class="cite xref">ISSUANCE</a>]</span>
 for more information.<a href="#section-3.5-2" class="pilcrow">¶</a></p>
@@ -1814,7 +1814,7 @@ and even privacy properties.<a href="#section-3.5-4" class="pilcrow">¶</a></p>
 <p id="section-3.5-5">Clients initiate the issuance protocol using the token challenge, a randomly
 generated nonce, and public key for the Issuer, all of which are the Client's
 private input to the protocol and ultimately bound to an output Token;
-see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14#section-2.2" class="relref">Section 2.2</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for details. Future specifications
+see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.2" class="relref">Section 2.2</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for details. Future specifications
 may change or extend the Client's input to the issuance protocol to produce
 Tokens with a different structure.<a href="#section-3.5-5" class="pilcrow">¶</a></p>
 <p id="section-3.5-6">Token properties vary based on the issuance protocol. Important properties
@@ -2615,7 +2615,7 @@ the tracked Client it would set the bit to <code>1</code>, and <code>0</code> ot
 additional bits provides an exponential increase in tracking granularity
 similarly to introducing more Issuers (though with more potential targeting).<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.1-2">For this reason, deployments should take the amount of metadata used by an Issuer
-in creating redemption tokens must into account -- together with the bits
+in creating redemption tokens into account -- together with the bits
 of information that Issuers may learn about Clients otherwise. Since this
 metadata may be useful for practical deployments of Privacy Pass, Issuers
 must balance this against the reduction in Client privacy.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
@@ -2757,7 +2757,7 @@ Attester, or Issuer, can also help mitigate these attacks.<a href="#section-7.1-
 <dl class="references">
 <dt id="AUTHSCHEME">[AUTHSCHEME]</dt>
         <dd>
-<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Valdez, S.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"The Privacy Pass HTTP Authentication Scheme"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-auth-scheme-14</span>, <time datetime="2023-09-25" class="refDate">25 September 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-14</a>&gt;</span>. </dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Valdez, S.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"The Privacy Pass HTTP Authentication Scheme"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-auth-scheme-15</span>, <time datetime="2023-10-23" class="refDate">23 October 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>

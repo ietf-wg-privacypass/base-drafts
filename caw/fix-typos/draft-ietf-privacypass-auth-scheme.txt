@@ -5,10 +5,10 @@
 Network Working Group                                           T. Pauly
 Internet-Draft                                                Apple Inc.
 Intended status: Standards Track                               S. Valdez
-Expires: 25 April 2024                                        Google LLC
+Expires: 21 June 2024                                         Google LLC
                                                               C. A. Wood
                                                               Cloudflare
-                                                         23 October 2023
+                                                        19 December 2023
 
 
               The Privacy Pass HTTP Authentication Scheme
@@ -37,7 +37,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 April 2024.
+   This Internet-Draft will expire on 21 June 2024.
 
 Copyright Notice
 
@@ -675,7 +675,7 @@ Table of Contents
 
 4.1.  Greasing
 
-   In order to prevent clients becoming incompatible with new token
+   In order to prevent clients from becoming incompatible with new token
    challenges, origins SHOULD include random token types, from the
    Reserved list of "greased" types (defined in Section 6.2), with some
    non-trivial probability.
@@ -924,9 +924,9 @@ Table of Contents
 
    [COOKIES]  Bingler, S., West, M., and J. Wilander, "Cookies: HTTP
               State Management Mechanism", Work in Progress, Internet-
-              Draft, draft-ietf-httpbis-rfc6265bis-12, 10 May 2023,
+              Draft, draft-ietf-httpbis-rfc6265bis-13, 15 November 2023,
               <https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-
-              rfc6265bis-12>.
+              rfc6265bis-13>.
 
    [ISSUANCE] Celi, S., Davidson, A., Valdez, S., and C. A. Wood,
               "Privacy Pass Issuance Protocol", Work in Progress,

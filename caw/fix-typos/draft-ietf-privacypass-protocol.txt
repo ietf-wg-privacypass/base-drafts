@@ -5,11 +5,11 @@
 Network Working Group                                            S. Celi
 Internet-Draft                                               A. Davidson
 Intended status: Standards Track                          Brave Software
-Expires: 25 April 2024                                         S. Valdez
+Expires: 21 June 2024                                          S. Valdez
                                                               Google LLC
                                                               C. A. Wood
                                                               Cloudflare
-                                                         23 October 2023
+                                                        19 December 2023
 
 
                      Privacy Pass Issuance Protocol
@@ -38,7 +38,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 April 2024.
+   This Internet-Draft will expire on 21 June 2024.
 
 Copyright Notice
 
@@ -719,7 +719,7 @@ $ echo MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqGSIb3DQEBCDAL \
    processes the content as follows:
 
    authenticator =
-     Finalize(pkI, nonce, blind_sig, blind_inv)
+     Finalize(pkI, PrepareIdentity(token_input), blind_sig, blind_inv)
 
    The Finalize function is defined in Section 4.4 of [BLINDRSA].  If
    this succeeds, the Client then constructs a Token as described in
@@ -733,7 +733,7 @@ $ echo MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqGSIb3DQEBCDAL \
      uint8_t authenticator[Nk];
    } Token;
 
-   The Token.nonce value is that which was sampled in Section 5.1.  If
+   The Token.nonce value is that which was sampled in Section 6.1.  If
    the Finalize function fails, the Client aborts the protocol.
 
 6.4.  Token Verification
@@ -1006,9 +1006,9 @@ $ echo MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqGSIb3DQEBCDAL \
    [AUTHSCHEME]
               Pauly, T., Valdez, S., and C. A. Wood, "The Privacy Pass
               HTTP Authentication Scheme", Work in Progress, Internet-
-              Draft, draft-ietf-privacypass-auth-scheme-14, 25 September
+              Draft, draft-ietf-privacypass-auth-scheme-15, 23 October
               2023, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              privacypass-auth-scheme-14>.
+              privacypass-auth-scheme-15>.
 
    [BLINDRSA] Denis, F., Jacobs, F., and C. A. Wood, "RSA Blind
               Signatures", Work in Progress, Internet-Draft, draft-irtf-
@@ -1089,9 +1089,10 @@ $ echo MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqGSIb3DQEBCDAL \
               10 July 2023, <https://datatracker.ietf.org/doc/html/
               draft-ietf-privacypass-key-consistency-01>.
 
-   [DSS]      Moody, D., "Digital Signature Standard (DSS)", National
-              Institute of Standards and Technology,
-              DOI 10.6028/nist.fips.186-5, 2023,
+   [DSS]      Chen, L., Moody, D., Regenscheid, A., and A. Robinson,
+              "Digital Signature Standard (DSS)", National Institute of
+              Standards and Technology (U.S.),
+              DOI 10.6028/nist.fips.186-5, February 2023,
               <https://doi.org/10.6028/nist.fips.186-5>.
 
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
