@@ -5,11 +5,11 @@
 Network Working Group                                            S. Celi
 Internet-Draft                                               A. Davidson
 Intended status: Standards Track                          Brave Software
-Expires: 19 May 2024                                           S. Valdez
+Expires: 21 June 2024                                          S. Valdez
                                                               Google LLC
                                                               C. A. Wood
                                                               Cloudflare
-                                                        16 November 2023
+                                                        19 December 2023
 
 
                      Privacy Pass Issuance Protocol
@@ -38,7 +38,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 May 2024.
+   This Internet-Draft will expire on 21 June 2024.
 
 Copyright Notice
 
@@ -719,7 +719,7 @@ $ echo MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqGSIb3DQEBCDAL \
    processes the content as follows:
 
    authenticator =
-     Finalize(pkI, nonce, blind_sig, blind_inv)
+     Finalize(pkI, PrepareIdentity(token_input), blind_sig, blind_inv)
 
    The Finalize function is defined in Section 4.4 of [BLINDRSA].  If
    this succeeds, the Client then constructs a Token as described in
@@ -733,7 +733,7 @@ $ echo MIIBUjA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAqEaMBgGCSqGSIb3DQEBCDAL \
      uint8_t authenticator[Nk];
    } Token;
 
-   The Token.nonce value is that which was sampled in Section 5.1.  If
+   The Token.nonce value is that which was sampled in Section 6.1.  If
    the Finalize function fails, the Client aborts the protocol.
 
 6.4.  Token Verification
