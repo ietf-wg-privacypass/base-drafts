@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-12-19T01:03:16.456426+00:00",
+  "timestamp": "2023-12-21T01:02:23.859208+00:00",
   "repo": "ietf-wg-privacypass/base-drafts",
   "labels": [
     {
@@ -6692,17 +6692,19 @@
       "id": "I_kwDODeTEy856Blfh",
       "title": "Typos in protocol document",
       "url": "https://github.com/ietf-wg-privacypass/base-drafts/issues/504",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "tfpauly",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "chris-wood"
+      ],
       "labels": [
         "protocol"
       ],
       "body": "From a reviewer of the protocol doc:\r\n\r\n> https://datatracker.ietf.org/doc/draft-ietf-privacypass-protocol/\r\n> Section 6.3 has probably two errors:\r\n> First one:\r\n> authenticator =\r\n>      Finalize(pkI, nonce, blind_sig, blind_inv)\r\n> I think that instead of nonce we need to pass token_input to the Finalize:\r\n>    token_input = concat(0x0002, // Token type field is 2 bytes long\r\n>                         nonce,\r\n>                         challenge_digest,\r\n>                         token_key_id)\r\n> Otherwise the Finalize function fails to verify the signature.\r\n> Second:\r\n> The Token.nonce value is that which was sampled in Section 5.1\r\n> I think this one should be:\r\n> ... sampled in Section 6.1",
       "createdAt": "2023-12-18T18:45:51Z",
-      "updatedAt": "2023-12-18T18:46:01Z",
-      "closedAt": null,
+      "updatedAt": "2023-12-19T16:47:37Z",
+      "closedAt": "2023-12-19T16:47:37Z",
       "comments": []
     }
   ],
@@ -28136,6 +28138,56 @@
           "body": "",
           "createdAt": "2023-10-19T03:06:49Z",
           "updatedAt": "2023-10-19T03:06:49Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 505,
+      "id": "PR_kwDODeTEy85iY8Zv",
+      "title": "Fix typos in protocol spec",
+      "url": "https://github.com/ietf-wg-privacypass/base-drafts/pull/505",
+      "state": "MERGED",
+      "author": "chris-wood",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #504",
+      "createdAt": "2023-12-19T16:37:44Z",
+      "updatedAt": "2023-12-19T21:03:25Z",
+      "baseRepository": "ietf-wg-privacypass/base-drafts",
+      "baseRefName": "main",
+      "baseRefOid": "26e0aa4d9ec8e86889968bbaaaaaa1aaa394e6b4",
+      "headRepository": "ietf-wg-privacypass/base-drafts",
+      "headRefName": "caw/fix-typos",
+      "headRefOid": "bfd536b47a24cfa93f088c5df36aa2e0fac0595b",
+      "closedAt": "2023-12-19T16:47:36Z",
+      "mergedAt": "2023-12-19T16:47:36Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "ad684be430702e7010fff2d6103344461bf4640f"
+      },
+      "comments": [
+        {
+          "author": "paulwouters",
+          "authorAssociation": "NONE",
+          "body": "Note that I wouldn\u2019t call this change a \u201ctypo\u201d. It\u2019s a substantive change of the nonce parameter.Sent using a virtual keyboard on a phoneOn Dec 19, 2023, at 11:47, Tommy Pauly ***@***.***> wrote:\ufeff\r\nMerged #505 into main.\r\n\r\n\u2014Reply to this email directly, view it on GitHub, or unsubscribe.You are receiving this because you are subscribed to this thread.Message ID: ***@***.***>",
+          "createdAt": "2023-12-19T21:03:24Z",
+          "updatedAt": "2023-12-19T21:03:24Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDODeTEy85qpsNI",
+          "commit": {
+            "abbreviatedOid": "bfd536b"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-12-19T16:47:25Z",
+          "updatedAt": "2023-12-19T16:47:25Z",
           "comments": []
         }
       ]
