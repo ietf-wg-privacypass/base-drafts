@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-01-28T01:04:20.578045+00:00",
+  "timestamp": "2024-01-30T00:59:40.944305+00:00",
   "repo": "ietf-wg-privacypass/base-drafts",
   "labels": [
     {
@@ -6652,9 +6652,17 @@
       "labels": [],
       "body": "The token response is composed of a zk-proof, which is a randomized procedure.\r\n\r\n```c\r\nstruct {\r\n   uint8_t evaluate_msg[Ne];\r\n   uint8_t evaluate_proof[Ns+Ns];\r\n} TokenResponse;\r\n```\r\n\r\nIn order to reproduce the test vectors for VOPRF, the `ProofRandomScalar` should be included as part of the test vectors, just like the [VOPRF draft](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-voprf-21#name-test-vectors) does:\r\n\r\n> \"Proof\": The serialized Proof output from GenerateProof() composed of two serialized scalar values, each Ns bytes long. Only present for VOPRF and POPRF test vectors.\r\n> \r\n> \"ProofRandomScalar\": The random scalar r computed in GenerateProof(), a serialized scalar of Ns bytes long. Only present for VOPRF and POPRF test vectors.\r\n\r\nThe proof attached in the current `TokenResponse` field can be tested as a valid proof; but the generation of the proof cannot be reproduced without the random scalar.\r\n",
       "createdAt": "2023-10-09T23:26:31Z",
-      "updatedAt": "2023-10-09T23:26:31Z",
+      "updatedAt": "2024-01-29T16:04:59Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "heathdutton",
+          "authorAssociation": "NONE",
+          "body": "Agreed. This will make the test vectors more complete and align them with the existing standards in VOPRF and POPRF test vectors, facilitating better interoperability and consistency across implementations.\r\n\r\n```\r\nstruct {\r\n   uint8_t evaluate_msg[Ne];\r\n   uint8_t evaluate_proof[Ns+Ns];\r\n   uint8_t proof_random_scalar[Ns];\r\n} TokenResponse;\r\n```",
+          "createdAt": "2024-01-29T16:04:59Z",
+          "updatedAt": "2024-01-29T16:04:59Z"
+        }
+      ]
     },
     {
       "number": 501,
