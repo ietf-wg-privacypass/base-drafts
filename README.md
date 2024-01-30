@@ -1,3 +1,5 @@
+![IETF-Badge-PRIVACY-PASS-Color@3x (1)](https://github.com/ietf-wg-privacypass/base-drafts/assets/191945/5254697a-1d66-4a19-93d5-ca36879d5c02)
+
 # privacy-pass-ietf
 
 The current home for material associated with Privacy Pass documentation associated with the IETF. Current WG documents are below:
