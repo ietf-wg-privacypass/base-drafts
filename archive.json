@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-02-08T00:58:52.415965+00:00",
+  "timestamp": "2024-02-11T01:04:05.396472+00:00",
   "repo": "ietf-wg-privacypass/base-drafts",
   "labels": [
     {
@@ -28199,6 +28199,32 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 506,
+      "id": "PR_kwDODeTEy85mW4js",
+      "title": "Update existing implementation token types support",
+      "url": "https://github.com/ietf-wg-privacypass/base-drafts/pull/506",
+      "state": "OPEN",
+      "author": "thibmeu",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "[raphaelrobert/privacypass](https://github.com/raphaelrobert/privacypass) supports Batched tokens (type 63770).\r\n[cloudflare/privacypass-ts](https://github.com/cloudflare/privacypass-ts) supports VOPRF tokens (type 1).",
+      "createdAt": "2024-02-08T10:33:33Z",
+      "updatedAt": "2024-02-08T10:33:33Z",
+      "baseRepository": "ietf-wg-privacypass/base-drafts",
+      "baseRefName": "main",
+      "baseRefOid": "2f66ebde518485e190014dcd3b44070a462233bb",
+      "headRepository": "thibmeu/base-drafts",
+      "headRefName": "update-token-support",
+      "headRefOid": "ed02d453ccfb3462fef77150efb9f7e191792076",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
