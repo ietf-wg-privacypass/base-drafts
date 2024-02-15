@@ -1,0 +1,2884 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>The Privacy Pass Architecture</title>
+<meta content="Alex Davidson" name="author">
+<meta content="Jana Iyengar" name="author">
+<meta content="Christopher A. Wood" name="author">
+<meta content="
+       This document specifies the Privacy Pass architecture and requirements for
+its constituent protocols used for authorization based on privacy-preserving
+authentication mechanisms. It describes the conceptual model of Privacy Pass
+and its protocols, its security and privacy goals, practical deployment models,
+and recommendations for each deployment model that helps ensure the desired
+security and privacy goals are fulfilled. 
+    " name="description">
+<meta content="xml2rfc 3.19.0" name="generator">
+<meta content="Internet-Draft" name="keyword">
+<meta content="draft-ietf-privacypass-architecture-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.19.0
+    Python 3.11.6
+    ConfigArgParse 1.7
+    google-i18n-address 3.1.0
+    intervaltree 3.1.0
+    Jinja2 3.1.2
+    lxml 4.9.3
+    platformdirs 4.1.0
+    pycountry 22.3.5
+    PyYAML 6.0.1
+    requests 2.31.0
+    setuptools 68.2.2
+    six 1.16.0
+    wcwidth 0.2.12
+-->
+<link href="draft-ietf-privacypass-architecture.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabin Condensed", sans-serif;
+  font-weight: 600;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+}
+:is(ol, ul) :is(ol, ul) {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  line-height: 1;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+}
+dl.olPercent {
+  --indent: 5ch;
+}
+dl > dt {
+  float: left;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+dl.olPercent > dt {
+  min-width: calc(var(--indent) - 2ch);
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:first-child, .break:first-child + *) {
+  margin-top: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:last-child) {
+  margin-bottom: 0;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    overflow-x: auto;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+}
+a.pilcrow[href] { color: var(--pilcrow-weak); }
+a.pilcrow[href]:hover { text-decoration: none; }
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+}
+#identifiers dt {
+  width: var(--identifier-width);
+  min-width: var(--identifier-width);
+  clear: left;
+  float: left;
+  text-align: right;
+  margin-right: 1ch;
+}
+#identifiers dd {
+  margin: 0;
+  margin-left: calc(1em + var(--identifier-width)) !important;
+  min-width: 5em;
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+#toc nav ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#toc nav li {
+  line-height: 1.3em;
+  margin: 2px 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+#toc a.xref {
+  white-space: normal;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 10ch;
+  margin-right: 1.5ch;
+}
+.references dt:target::before {
+  content: "⇒";
+  width: 15px;
+  margin: 0 10px 0 -25px;
+}
+.references dd {
+  margin-left: 12ch !important;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc.active {
+      opacity: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 8px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active nav {
+    display: block;
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin-top: 2px;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #toc nav > ul  {
+    margin-bottom: 2em;
+  }
+  #toc ul {
+    margin: 0 0 0 4px;
+    font-size: var(--small-font-size);
+  }
+  #toc ul :is(p, li) {
+    margin: 2px 0;
+    line-height: 22px;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+  .toplink {
+    display: none;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Changes introduced to fix issues found during implementation */
+
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin: 8px 0.5em 0;
+}
+
+/* Provide styling for table cell text alignment */
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 20em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([fill="white"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">Privacy Pass Architecture</td>
+<td class="right">December 2023</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Davidson, et al.</td>
+<td class="center">Expires 21 June 2024</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Network Working Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-ietf-privacypass-architecture-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2023-12-19" class="published">19 December 2023</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2024-06-21">21 June 2024</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">A. Davidson</div>
+<div class="org">LIP</div>
+</div>
+<div class="author">
+      <div class="author-name">J. Iyengar</div>
+<div class="org">Fastly</div>
+</div>
+<div class="author">
+      <div class="author-name">C. A. Wood</div>
+<div class="org">Cloudflare</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">The Privacy Pass Architecture</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document specifies the Privacy Pass architecture and requirements for
+its constituent protocols used for authorization based on privacy-preserving
+authentication mechanisms. It describes the conceptual model of Privacy Pass
+and its protocols, its security and privacy goals, practical deployment models,
+and recommendations for each deployment model that helps ensure the desired
+security and privacy goals are fulfilled.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 21 June 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2023 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-architecture" class="internal xref">Architecture</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-use-cases" class="internal xref">Use Cases</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-privacy-goals-and-threat-mo" class="internal xref">Privacy Goals and Threat Model</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-redemption-protocol" class="internal xref">Redemption Protocol</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-issuance-protocol" class="internal xref">Issuance Protocol</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5.2.1">
+                    <p id="section-toc.1-1.3.2.5.2.1.1"><a href="#section-3.5.1" class="auto internal xref">3.5.1</a>.  <a href="#name-attester-role" class="internal xref">Attester Role</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5.2.2">
+                    <p id="section-toc.1-1.3.2.5.2.2.1"><a href="#section-3.5.2" class="auto internal xref">3.5.2</a>.  <a href="#name-issuer-role" class="internal xref">Issuer Role</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5.2.3">
+                    <p id="section-toc.1-1.3.2.5.2.3.1"><a href="#section-3.5.3" class="auto internal xref">3.5.3</a>.  <a href="#name-issuance-metadata" class="internal xref">Issuance Metadata</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5.2.4">
+                    <p id="section-toc.1-1.3.2.5.2.4.1"><a href="#section-3.5.4" class="auto internal xref">3.5.4</a>.  <a href="#name-future-issuance-protocol-re" class="internal xref">Future Issuance Protocol Requirements</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6">
+                <p id="section-toc.1-1.3.2.6.1"><a href="#section-3.6" class="auto internal xref">3.6</a>.  <a href="#name-information-flow" class="internal xref">Information Flow</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6.2.1">
+                    <p id="section-toc.1-1.3.2.6.2.1.1"><a href="#section-3.6.1" class="auto internal xref">3.6.1</a>.  <a href="#name-token-challenge-flow" class="internal xref">Token Challenge Flow</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6.2.2">
+                    <p id="section-toc.1-1.3.2.6.2.2.1"><a href="#section-3.6.2" class="auto internal xref">3.6.2</a>.  <a href="#name-attestation-flow" class="internal xref">Attestation Flow</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6.2.3">
+                    <p id="section-toc.1-1.3.2.6.2.3.1"><a href="#section-3.6.3" class="auto internal xref">3.6.3</a>.  <a href="#name-issuance-flow" class="internal xref">Issuance Flow</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6.2.4">
+                    <p id="section-toc.1-1.3.2.6.2.4.1"><a href="#section-3.6.4" class="auto internal xref">3.6.4</a>.  <a href="#name-token-redemption-flow" class="internal xref">Token Redemption Flow</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-deployment-models" class="internal xref">Deployment Models</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-shared-origin-attester-issu" class="internal xref">Shared Origin, Attester, Issuer</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-joint-attester-and-issuer" class="internal xref">Joint Attester and Issuer</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-joint-origin-and-issuer" class="internal xref">Joint Origin and Issuer</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-split-origin-attester-issue" class="internal xref">Split Origin, Attester, Issuer</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-deployment-considerations" class="internal xref">Deployment Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-discriminatory-treatment" class="internal xref">Discriminatory Treatment</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-centralization" class="internal xref">Centralization</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-partitioning-by-issuance-me" class="internal xref">Partitioning by Issuance Metadata</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-partitioning-by-issuance-co" class="internal xref">Partitioning by Issuance Consistency</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-partitioning-by-side-channe" class="internal xref">Partitioning by Side-Channels</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-token-caching" class="internal xref">Token Caching</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">Privacy Pass is an architecture for authorization based on privacy-preserving
+authentication mechanisms. In other words, relying parties authenticate clients
+in a privacy-preserving way, i.e., without learning any unique, per-client
+information through the authentication protocol, and then make authorization
+decisions on the basis of that authentication succeeding or failing. Possible
+authorization decisions might be to provide clients with read access to a
+particular resource or write access to a particular resource.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Typical approaches for authorizing clients, such as through the use of long-term
+state (cookies), are not privacy-friendly since they allow servers to track
+clients across sessions and interactions. Privacy Pass takes a different
+approach: instead of presenting linkable state-carrying information to servers,
+e.g., a cookie indicating whether or not the client is an authorized user or
+has completed some prior challenge, clients present unlinkable proofs that
+attest to this information. These proofs, or tokens, are private in the sense
+that a given token cannot be linked to the protocol interaction where that
+token was initially issued.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">At a high level, the Privacy Pass architecture consists of two protocols:
+redemption and issuance. The redemption protocol, described in
+<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span>, runs between Clients and
+Origins (servers). It allows Origins to challenge Clients to present tokens
+for consumption. Origins verify the token to authenticate the Client -- without
+learning any specific information about the Client -- and then make an authorization
+decision on the basis of the token verifying successfully or not. Depending
+on the type of token, e.g., whether or not it can be cached, the Client
+either presents a previously obtained token or invokes an issuance protocol,
+such as <span>[<a href="#ISSUANCE" class="cite xref">ISSUANCE</a>]</span>, to acquire a token to
+present as authorization.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document describes requirements for both redemption and issuance
+protocols and how they interact. It also provides recommendations on how
+the architecture should be deployed to ensure the privacy of clients and
+the security of all participating entities.<a href="#section-1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="terminology">
+<section id="section-2">
+      <h2 id="name-terminology">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+      </h2>
+<p id="section-2-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
+"MAY", and "OPTIONAL" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">The following terms are used throughout this document:<a href="#section-2-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2-3">
+        <dt id="section-2-3.1">Client:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.2">
+          <p id="section-2-3.2.1">An entity that seeks authorization to an Origin. Using <span>[<a href="#RFC9334" class="cite xref">RFC9334</a>]</span> terminology,
+Clients implement the RATS Attester role.<a href="#section-2-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.3">Token:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.4">
+          <p id="section-2-3.4.1">A cryptographic authentication message used for authorization decisions,
+produced as output from an issuance mechanism or protocol.<a href="#section-2-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.5">Origin:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.6">
+          <p id="section-2-3.6.1">An entity that consumes tokens presented by Clients and uses them to make authorization decisions.<a href="#section-2-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.7">Token challenge:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.8">
+          <p id="section-2-3.8.1">The mechanism by which Origins request tokens from Clients, often denoted TokenChallenge.<a href="#section-2-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.9">Token request:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.10">
+          <p id="section-2-3.10.1">A message used by Clients to request a token from an Issuer, often denoted TokenRequest.<a href="#section-2-3.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.11">Token response:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.12">
+          <p id="section-2-3.12.1">A message used by Issuers to send tokens to a Client, often denoted TokenResponse.<a href="#section-2-3.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.13">Redemption:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.14">
+          <p id="section-2-3.14.1">The mechanism by which Clients present tokens to Origins for the
+purposes of authorization.<a href="#section-2-3.14.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.15">Issuer:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.16">
+          <p id="section-2-3.16.1">An entity that issues tokens to Clients for properties
+attested to by the Attester.<a href="#section-2-3.16.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.17">Issuance:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.18">
+          <p id="section-2-3.18.1">The mechanism by which an Issuer produces tokens for Clients.<a href="#section-2-3.18.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.19">Attester:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.20">
+          <p id="section-2-3.20.1">An entity that attests to properties of Clients for the
+purposes of token issuance. Using <span>[<a href="#RFC9334" class="cite xref">RFC9334</a>]</span> terminology, Attesters implement
+the RATS Verifier role.<a href="#section-2-3.20.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.21">Attestation procedure:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.22">
+          <p id="section-2-3.22.1">The procedure by which an Attester determines whether or not a Client
+has the specific set of properties that are necessary for token issuance.<a href="#section-2-3.22.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-2-4">The trust relationships between each of the entities in this list is further
+elaborated upon in <a href="#privacy-and-trust" class="auto internal xref">Section 3.3</a>.<a href="#section-2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="architecture">
+<section id="section-3">
+      <h2 id="name-architecture">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-architecture" class="section-name selfRef">Architecture</a>
+      </h2>
+<p id="section-3-1">The Privacy Pass architecture consists of four logical entities --
+Client, Origin, Issuer, and Attester -- that work in concert
+for token redemption and issuance. This section presents an overview
+of Privacy Pass, a high-level description of the threat model and
+privacy goals of the architecture, and the goals and requirements of
+the redemption and issuance protocols. Deployment variations for the
+Origin, Issuer, and Attester in this architecture, including
+considerations for implementing these entities, are further discussed
+in <a href="#deployment" class="auto internal xref">Section 4</a>.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<div id="overview">
+<section id="section-3.1">
+        <h3 id="name-overview">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
+        </h3>
+<p id="section-3.1-1">This section describes the typical interaction flow for Privacy Pass.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.1-2">
+<li id="section-3.1-2.1">
+            <p id="section-3.1-2.1.1">A Client interacts with an Origin by sending a request or otherwise
+interacting with the Origin in a way that triggers a response containing
+a token challenge. The token challenge indicates a specific Issuer to use.<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.1-2.2">
+            <p id="section-3.1-2.2.1">If the Client already has a token available that satisfies the token
+challenge, e.g., because the Client has a cache of previously issued tokens,
+it can skip to <a href="#step-redemption" class="internal xref">step 6</a> and redeem its
+token; see <a href="#hoarding" class="auto internal xref">Section 7.1</a> for security considerations of cached tokens.<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.1-2.3">
+            <p id="section-3.1-2.3.1">If the Client does not have a token available and decides it wants to
+obtain one (or more) bound to the token challenge, it then invokes the
+issuance protocol. As a prerequisite to the issuance protocol, the Client
+runs the deployment-specific attestation process that is required for the
+designated Issuer. Client attestation can be done via proof of solving a
+CAPTCHA, checking device or hardware attestation validity, etc.; see
+<a href="#attester" class="auto internal xref">Section 3.5.1</a> for more details.<a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.1-2.4">
+            <p id="section-3.1-2.4.1">If the attestation process completes successfully, the client creates a
+token request to send to the designated Issuer (generally via the Attester,
+though it is not required to be sent through the Attester).
+The Attester and Issuer might be functions on the same server, depending on the
+deployment model (see <a href="#deployment" class="auto internal xref">Section 4</a>). Depending on the attestation process, it
+is possible for attestation to run alongside the issuance protocol, e.g., where
+Clients send necessary attestation information to the Attester along with their
+token request. If the attestation process fails, the Client receives an error
+and issuance aborts without a token.<a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.1-2.5">
+            <p id="section-3.1-2.5.1">The Issuer generates a token response based on the token request, which
+is returned to the Client (generally via the Attester). Upon receiving the
+token response, the Client computes a token from the token challenge and token
+response. This token can be validated by anyone with the per-Issuer key, but
+cannot be linked to the content of the token request or token response.<a href="#section-3.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.1-2.6">
+            <div id="step-redemption">
+<p id="section-3.1-2.6.1">If the Client has a token, it includes it in a subsequent request to
+the Origin, as authorization. This token is sent only once in reaction to a
+challenge; Clients do not send tokens more than once, even if they receive
+duplicate or redundant challenges. The Origin
+validates that the token was generated by the expected Issuer and has not
+already been redeemed for the corresponding token challenge.  If the Client
+does not have a token, perhaps because issuance failed, the client does not
+reply to the Origin's challenge with a new request.<a href="#section-3.1-2.6.1" class="pilcrow">¶</a></p>
+</div>
+</li>
+        </ol>
+<span id="name-privacy-pass-redemption-and"></span><div id="fig-overview">
+<figure id="figure-1">
+          <div id="section-3.1-3.1">
+            <div class="alignLeft art-svg artwork" id="section-3.1-3.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="224" width="520" viewBox="0 0 520 224" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,32 L 8,64" fill="none" stroke="black"></path>
+                <path d="M 40,64 L 40,208" fill="none" stroke="black"></path>
+                <path d="M 80,32 L 80,64" fill="none" stroke="black"></path>
+                <path d="M 184,32 L 184,64" fill="none" stroke="black"></path>
+                <path d="M 216,64 L 216,208" fill="none" stroke="black"></path>
+                <path d="M 256,32 L 256,64" fill="none" stroke="black"></path>
+                <path d="M 336,32 L 336,64" fill="none" stroke="black"></path>
+                <path d="M 376,64 L 376,144" fill="none" stroke="black"></path>
+                <path d="M 376,192 L 376,208" fill="none" stroke="black"></path>
+                <path d="M 424,32 L 424,64" fill="none" stroke="black"></path>
+                <path d="M 440,32 L 440,64" fill="none" stroke="black"></path>
+                <path d="M 472,64 L 472,208" fill="none" stroke="black"></path>
+                <path d="M 512,32 L 512,64" fill="none" stroke="black"></path>
+                <path d="M 8,32 L 80,32" fill="none" stroke="black"></path>
+                <path d="M 184,32 L 256,32" fill="none" stroke="black"></path>
+                <path d="M 336,32 L 424,32" fill="none" stroke="black"></path>
+                <path d="M 440,32 L 512,32" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 80,64" fill="none" stroke="black"></path>
+                <path d="M 184,64 L 256,64" fill="none" stroke="black"></path>
+                <path d="M 336,64 L 424,64" fill="none" stroke="black"></path>
+                <path d="M 440,64 L 512,64" fill="none" stroke="black"></path>
+                <path d="M 48,96 L 88,96" fill="none" stroke="black"></path>
+                <path d="M 168,96 L 216,96" fill="none" stroke="black"></path>
+                <path d="M 40,112 L 56,112" fill="none" stroke="black"></path>
+                <path d="M 192,112 L 208,112" fill="none" stroke="black"></path>
+                <path d="M 224,126 L 240,126" fill="none" stroke="black"></path>
+                <path d="M 224,130 L 240,130" fill="none" stroke="black"></path>
+                <path d="M 352,126 L 368,126" fill="none" stroke="black"></path>
+                <path d="M 352,130 L 368,130" fill="none" stroke="black"></path>
+                <path d="M 216,160 L 288,160" fill="none" stroke="black"></path>
+                <path d="M 408,160 L 464,160" fill="none" stroke="black"></path>
+                <path d="M 224,176 L 288,176" fill="none" stroke="black"></path>
+                <path d="M 416,176 L 472,176" fill="none" stroke="black"></path>
+                <path d="M 48,192 L 64,192" fill="none" stroke="black"></path>
+                <path d="M 192,192 L 216,192" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="472,160 460,154.4 460,165.6" fill="black" transform="rotate(0,464,160)"></polygon>
+                <polygon class="arrowhead" points="376,128 364,122.4 364,133.6" fill="black" transform="rotate(0,368,128)"></polygon>
+                <polygon class="arrowhead" points="232,176 220,170.4 220,181.6" fill="black" transform="rotate(180,224,176)"></polygon>
+                <polygon class="arrowhead" points="232,128 220,122.4 220,133.6" fill="black" transform="rotate(180,224,128)"></polygon>
+                <polygon class="arrowhead" points="216,112 204,106.4 204,117.6" fill="black" transform="rotate(0,208,112)"></polygon>
+                <polygon class="arrowhead" points="56,192 44,186.4 44,197.6" fill="black" transform="rotate(180,48,192)"></polygon>
+                <polygon class="arrowhead" points="56,96 44,90.4 44,101.6" fill="black" transform="rotate(180,48,96)"></polygon>
+                <g class="text">
+                  <text x="44" y="52">Origin</text>
+                  <text x="220" y="52">Client</text>
+                  <text x="380" y="52">Attester</text>
+                  <text x="476" y="52">Issuer</text>
+                  <text x="128" y="100">Request</text>
+                  <text x="124" y="116">TokenChallenge</text>
+                  <text x="296" y="132">Attestation</text>
+                  <text x="348" y="164">TokenRequest</text>
+                  <text x="352" y="180">TokenResponse</text>
+                  <text x="128" y="196">Request+Token</text>
+                </g>
+              </svg><a href="#section-3.1-3.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-privacy-pass-redemption-and" class="selfRef">Privacy pass redemption and issuance protocol interaction</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="use-cases">
+<section id="section-3.2">
+        <h3 id="name-use-cases">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-use-cases" class="section-name selfRef">Use Cases</a>
+        </h3>
+<p id="section-3.2-1">Use cases for Privacy Pass are broad and depend greatly on the deployment model
+as discussed in <a href="#deployment" class="auto internal xref">Section 4</a>. The initial motivating use case for Privacy Pass
+<span>[<a href="#PrivacyPassCloudflare" class="cite xref">PrivacyPassCloudflare</a>]</span> was to help rate-limit malicious or otherwise abusive
+traffic from services such as Tor <span>[<a href="#DMS2004" class="cite xref">DMS2004</a>]</span>. The generalized and evolved
+architecture described in this document also work for this use case. However,
+for added clarity, some more possible use cases are described below.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-2.1">
+            <p id="section-3.2-2.1.1">Low-quality, anti-fraud signal for open Internet services. Tokens can attest that
+the Client behind the user agent is likely not a bot attempting to perform some
+form of automated attack such as credential stuffing. Example attestation procedures
+for this use case might be solving some form of CAPTCHA or presenting evidence of a
+valid, unlocked device in good standing.<a href="#section-3.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.2-2.2">
+            <p id="section-3.2-2.2.1">Privacy-preserving authentication for proprietary services. Tokens can attest that
+the Client is a valid subscriber for a proprietary service, such as a deployment of
+Oblivious HTTP <span>[<a href="#OHTTP" class="cite xref">OHTTP</a>]</span>.<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="privacy-and-trust">
+<section id="section-3.3">
+        <h3 id="name-privacy-goals-and-threat-mo">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-privacy-goals-and-threat-mo" class="section-name selfRef">Privacy Goals and Threat Model</a>
+        </h3>
+<p id="section-3.3-1">The end-to-end flow for Privacy Pass described in <a href="#overview" class="auto internal xref">Section 3.1</a> involves three
+different types of contexts:<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-3.3-2">
+          <dt id="section-3.3-2.1">Redemption context:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.3-2.2">
+            <p id="section-3.3-2.2.1">The interactions and set of information shared
+between the Client and Origin, i.e., the information that is provided or
+otherwise available to the Origin during redemption that might be used
+to identify a Client and construct a token challenge. This context includes all
+information associated with redemption, such as the timestamp of the event,
+Client-visible information (including the IP address), and the Origin name.<a href="#section-3.3-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.3-2.3">Issuance context:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.3-2.4">
+            <p id="section-3.3-2.4.1">The interactions and set of information shared between the Client, Attester,
+and Issuer, i.e., the information that is provided or otherwise available
+to Attester and Issuer during issuance that might be used to identify a Client.
+This context includes all information associated with issuance, such as the
+timestamp of the event, any Client-visible information (including the IP
+address), and the Origin name (if revealed during issuance). This does not
+include the token challenge in its entirety, as that is kept secret from the
+Issuer during the issuance protocol.<a href="#section-3.3-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.3-2.5">Attestation context:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.3-2.6">
+            <p id="section-3.3-2.6.1">The interactions and set of information shared between
+the Client and Attester only, for the purposes of attesting the validity of
+the Client, that is provided or otherwise available during attestation that
+might be used to identify the Client. This context includes all information
+associated with attestation, such as the timestamp of the event and any
+Client-visible information, including information needed for the attestation
+procedure to complete.<a href="#section-3.3-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-3.3-3">The privacy goals of Privacy Pass assume a threat model in which Origins trust
+specific Issuers to produce tokens, and Issuers in turn trust one or more
+Attesters to correctly run the attestation procedure with Clients. This
+arrangement ensures that tokens which validate for a given Issuer were only
+issued to a Client that successfully completed attestation with an Attester
+that the Issuer trusts. Moreover, this arrangement means that if an Origin
+accepts tokens issued by an Issuer that trusts multiple Attesters, then a
+Client can use any one of these Attesters to issue and redeem tokens for the
+Origin. Whether or not these different entities in the architecture collude
+for learning redemption, issuance, or attestation contexts, as well as the
+necessary preconditions for context unlinkability, depends on the deployment
+model; see <a href="#deployment" class="auto internal xref">Section 4</a> for more details.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.3-4">The mechanisms for establishing trust between each entity in this arrangement
+are deployment-specific. For example, in settings where Clients interact with
+Issuers through an Attester, Attesters and Issuers might use
+mutually authenticated TLS to authenticate one another. In settings where
+Clients do not communicate with Issuers through an Attester, the Attesters
+might convey this trust via a digital signature that Issuers can verify.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
+<p id="section-3.3-5">Clients explicitly trust Attesters to perform attestation correctly and in a
+way that does not violate their privacy. In particular, this means that Attesters
+which may be privy to private information about Clients are trusted to not disclose
+this information to non-colluding parties. Colluding parties are assumed to have
+access to the same information; see <a href="#deployment" class="auto internal xref">Section 4</a> for more about different
+deployment models and non-collusion assumptions. However, Clients assume Issuers and
+Origins are malicious.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
+<p id="section-3.3-6">Given this threat model, the privacy goals of Privacy Pass are oriented around
+unlinkability based on redemption, issuance, and attestation contexts, as
+described below.<a href="#section-3.3-6" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.3-7">
+<li id="section-3.3-7.1">
+            <p id="section-3.3-7.1.1">Origin-Client unlinkability. This means that given two redemption contexts,
+the Origin cannot determine if both redemption contexts correspond to the same
+Client or two different Clients. Informally, this means that a Client in a
+redemption context is indistinguishable from any other Client that might use
+the same redemption context. The set of Clients that share the same redemption
+context is referred to as a redemption anonymity set.<a href="#section-3.3-7.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.3-7.2">
+            <p id="section-3.3-7.2.1">Issuer-Client unlinkability. This is similar to Origin-Client unlinkability
+in that a Client in an issuance context is indistinguishable from any other
+Client that might use the same issuance context. The set of Clients that share
+the same issuance context is referred to as an issuance anonymity set.<a href="#section-3.3-7.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.3-7.3">
+            <p id="section-3.3-7.3.1">Attester-Origin unlinkability. This is similar to Origin-Client and
+Issuer-Client unlinkability. It means that given two attestation contexts,
+the Attester cannot determine if both contexts correspond to the same Origin
+or two different Origins. The set of Origins that share the same attestation
+context is referred to as an attestation anonymity set.<a href="#section-3.3-7.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.3-7.4">
+            <p id="section-3.3-7.4.1">Redemption context unlinkability. Given two redemption contexts, the Origin
+cannot determine which issuance and attestation contexts each redemption
+corresponds to, even with the collaboration of the Issuer and Attester (should
+these be different parties). This means that any information that may be learned
+about the Client during the issuance and attestation flows cannot be used by the
+Origin to compromise Client privacy.<a href="#section-3.3-7.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-3.3-8">These unlinkability properties ensure that only the Client is able to correlate
+information that might be used to identify them with activity on the Origin.
+The Attester, Issuer, and Origin only receive the information necessary to perform
+their respective functions.<a href="#section-3.3-8" class="pilcrow">¶</a></p>
+<p id="section-3.3-9">The manner in which these unlinkability properties are achieved depends on the
+deployment model, type of attestation, and issuance protocol details. For example,
+as discussed in <a href="#deployment" class="auto internal xref">Section 4</a>, in some cases it is necessary to use an anonymization
+service such as Tor <span>[<a href="#DMS2004" class="cite xref">DMS2004</a>]</span> which hides Clients IP addresses. In general,
+anonymization services ensures that all Clients which use the service are indistinguishable
+from one another, though in practice there may be small distinguishing features
+(TLS fingerprints, HTTP headers, etc). Moreover, Clients generally trust these services
+to not disclose private Client information (such as IP addresses) to untrusted parties.
+Failure to use an anonymization service when interacting with Attesters, Issuers, or
+Origins can allow the set of possible Clients to be partitioned by the Client's IP address,
+and can therefore lead to unlinkability violations. Similarly, malicious Origins
+may attempt to link two redemption contexts together by using Client-specific
+Issuer public keys. See <a href="#deployment-considerations" class="auto internal xref">Section 5</a> and <a href="#privacy" class="auto internal xref">Section 6</a> for more
+information.<a href="#section-3.3-9" class="pilcrow">¶</a></p>
+<p id="section-3.3-10">The remainder of this section describes the functional properties and security
+requirements of the redemption and issuance protocols in more detail. <a href="#flow" class="auto internal xref">Section 3.6</a>
+describes how information flows between Issuer, Origin, Client, and Attester
+through these protocols.<a href="#section-3.3-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="redemption">
+<section id="section-3.4">
+        <h3 id="name-redemption-protocol">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-redemption-protocol" class="section-name selfRef">Redemption Protocol</a>
+        </h3>
+<p id="section-3.4-1">The Privacy Pass redemption protocol, described in
+<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span>, is an authorization protocol
+wherein Clients present tokens to Origins for authorization. Normally,
+redemption is preceded by a challenge, wherein the Origin challenges
+Clients for a token with a TokenChallenge (<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1" class="relref">Section 2.1</a></span>) and,
+if possible, Clients present a valid Token (<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.2" class="relref">Section 2.2</a></span>)
+in reaction to the challenge. This interaction is shown below.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<span id="name-challenge-and-redemption-pr"></span><div id="fig-redemption">
+<figure id="figure-2">
+          <div id="section-3.4-2.1">
+            <div class="alignLeft art-svg artwork" id="section-3.4-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="432" viewBox="0 0 432 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,32 L 8,64" fill="none" stroke="black"></path>
+                <path d="M 40,64 L 40,160" fill="none" stroke="black"></path>
+                <path d="M 80,32 L 80,64" fill="none" stroke="black"></path>
+                <path d="M 184,32 L 184,64" fill="none" stroke="black"></path>
+                <path d="M 216,64 L 216,160" fill="none" stroke="black"></path>
+                <path d="M 256,32 L 256,64" fill="none" stroke="black"></path>
+                <path d="M 8,32 L 80,32" fill="none" stroke="black"></path>
+                <path d="M 184,32 L 256,32" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 80,64" fill="none" stroke="black"></path>
+                <path d="M 184,64 L 256,64" fill="none" stroke="black"></path>
+                <path d="M 48,96 L 88,96" fill="none" stroke="black"></path>
+                <path d="M 168,96 L 216,96" fill="none" stroke="black"></path>
+                <path d="M 40,112 L 56,112" fill="none" stroke="black"></path>
+                <path d="M 192,112 L 208,112" fill="none" stroke="black"></path>
+                <path d="M 232,126 L 248,126" fill="none" stroke="black"></path>
+                <path d="M 232,130 L 248,130" fill="none" stroke="black"></path>
+                <path d="M 408,126 L 424,126" fill="none" stroke="black"></path>
+                <path d="M 408,130 L 424,130" fill="none" stroke="black"></path>
+                <path d="M 48,144 L 64,144" fill="none" stroke="black"></path>
+                <path d="M 192,144 L 216,144" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="432,128 420,122.4 420,133.6" fill="black" transform="rotate(0,424,128)"></polygon>
+                <polygon class="arrowhead" points="240,128 228,122.4 228,133.6" fill="black" transform="rotate(180,232,128)"></polygon>
+                <polygon class="arrowhead" points="216,112 204,106.4 204,117.6" fill="black" transform="rotate(0,208,112)"></polygon>
+                <polygon class="arrowhead" points="56,144 44,138.4 44,149.6" fill="black" transform="rotate(180,48,144)"></polygon>
+                <polygon class="arrowhead" points="56,96 44,90.4 44,101.6" fill="black" transform="rotate(180,48,96)"></polygon>
+                <g class="text">
+                  <text x="44" y="52">Origin</text>
+                  <text x="220" y="52">Client</text>
+                  <text x="128" y="100">Request</text>
+                  <text x="124" y="116">TokenChallenge</text>
+                  <text x="292" y="132">Issuance</text>
+                  <text x="364" y="132">protocol</text>
+                  <text x="128" y="148">Request+Token</text>
+                </g>
+              </svg><a href="#section-3.4-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-challenge-and-redemption-pr" class="selfRef">Challenge and redemption protocol interaction</a>
+          </figcaption></figure>
+</div>
+<p id="section-3.4-3">Alternatively, when configured to do so, Clients may opportunistically present
+Token values to Origins without a corresponding TokenChallenge.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
+<p id="section-3.4-4">The structure and semantics of the TokenChallenge and Token messages depend
+on the issuance protocol and token type being used; see <span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for
+more information.<a href="#section-3.4-4" class="pilcrow">¶</a></p>
+<p id="section-3.4-5">The challenge provides the client with the information necessary to obtain
+tokens that the server might subsequently accept in the redemption context.
+There are a number of ways in which the token may vary based on this challenge,
+including:<a href="#section-3.4-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.4-6.1">
+            <p id="section-3.4-6.1.1">Issuance protocol. The challenge identifies the type of issuance protocol
+required for producing the token. Different issuance protocols have different
+security properties, e.g., some issuance protocols may produce tokens that
+are publicly verifiable, whereas others may not have this property.<a href="#section-3.4-6.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.4-6.2">
+            <p id="section-3.4-6.2.1">Issuer identity. Token challenges identify which Issuers are trusted for a
+given issuance protocol. As described in <a href="#privacy-and-trust" class="auto internal xref">Section 3.3</a>, the choice
+of Issuer determines the type of Attesters and attestation procedures possible
+for a token from the specified Issuer, but the Origin does not learn exactly
+which Attester was used for a given token issuance event.<a href="#section-3.4-6.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.4-6.3">
+            <p id="section-3.4-6.3.1">Redemption context. Challenges can be bound to a given redemption context,
+which influences a client's ability to pre-fetch and cache tokens. For
+example, an empty redemption context always allows tokens to be issued and
+redeemed non-interactively, whereas a fresh and random redemption context
+means that the redeemed token must be issued only after the client receives
+the challenge. See <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for more details.<a href="#section-3.4-6.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.4-6.4">
+            <p id="section-3.4-6.4.1">Per-Origin or cross-Origin. Challenges can be constrained to the Origin for
+which the challenge originated (referred to as per-Origin tokens), or
+can be used across multiple Origins (referred to as cross-Origin tokens).
+The set of Origins for which a cross-Origin token is applicable is referred
+to as the cross-Origin set. Opting into this set is done by explicitly agreeing
+on the contents of the set. Every Origin in a cross-Origin set, by opting in,
+agrees to admit tokens for any other Origin in the set. See
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for more information on how this set is created.<a href="#section-3.4-6.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.4-7">Origins that admit cross-Origin tokens bear some risk of allowing tokens
+issued for one Origin to be spent in an interaction with another Origin.
+In particular, cross-Origin tokens issued based on a challenge for
+one Origin can be redeemed at another Origin in the cross-Origin set,
+which can make it difficult to regulate token consumption. Depending on the
+use case, Origins may need to maintain state to track redeemed tokens. For
+example, Origins that accept cross-Origin tokens across shared redemption
+contexts SHOULD track which tokens have been redeemed already in those
+redemption contexts, since these tokens can be issued and then spent multiple
+times for any such challenge. Note that Clients which redeem the
+same token to multiple Origins do risk those Origins being able to link
+Client activity together, which can disincentivize this behavior. See
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for discussion.<a href="#section-3.4-7" class="pilcrow">¶</a></p>
+<p id="section-3.4-8">How Clients respond to token challenges can have privacy implications.
+For example, if an Origin allows the Client to choose an Issuer, then the choice
+of Issuer can reveal information about the Client used to partition anonymity
+sets; see <a href="#rotation-and-consistency" class="auto internal xref">Section 6.2</a> for more information about these privacy
+considerations.<a href="#section-3.4-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="issuance-protocol">
+<section id="section-3.5">
+        <h3 id="name-issuance-protocol">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-issuance-protocol" class="section-name selfRef">Issuance Protocol</a>
+        </h3>
+<p id="section-3.5-1">The Privacy Pass issuance protocol, described in <span>[<a href="#ISSUANCE" class="cite xref">ISSUANCE</a>]</span>, is a two-message
+protocol that takes as input a TokenChallenge from the redemption protocol
+(<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.1" class="relref">Section 2.1</a></span>) and produces a Token
+(<span>[<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>], <a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.2" class="relref">Section 2.2</a></span>), as shown in <a href="#fig-overview" class="auto internal xref">Figure 1</a>.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+<p id="section-3.5-2">The structure and semantics of the TokenRequest and TokenResponse messages
+depend on the issuance protocol and token type being used; see <span>[<a href="#ISSUANCE" class="cite xref">ISSUANCE</a>]</span>
+for more information.<a href="#section-3.5-2" class="pilcrow">¶</a></p>
+<p id="section-3.5-3">Clients interact with the Attester and Issuer to produce a token for
+a challenge. The context in which an Attester vouches for a Client during
+issuance is referred to as the attestation context. This context includes all
+information associated with the issuance event, such as the timestamp of the
+event and Client-visible information, including the IP address or other
+information specific to the type of attestation done.<a href="#section-3.5-3" class="pilcrow">¶</a></p>
+<p id="section-3.5-4">Each issuance protocol may be different, e.g., in the number and types of
+participants, underlying cryptographic constructions used when issuing tokens,
+and even privacy properties.<a href="#section-3.5-4" class="pilcrow">¶</a></p>
+<p id="section-3.5-5">Clients initiate the issuance protocol using the token challenge, a randomly
+generated nonce, and public key for the Issuer, all of which are the Client's
+private input to the protocol and ultimately bound to an output Token;
+see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15#section-2.2" class="relref">Section 2.2</a> of [<a href="#AUTHSCHEME" class="cite xref">AUTHSCHEME</a>]</span> for details. Future specifications
+may change or extend the Client's input to the issuance protocol to produce
+Tokens with a different structure.<a href="#section-3.5-5" class="pilcrow">¶</a></p>
+<p id="section-3.5-6">Token properties vary based on the issuance protocol. Important properties
+supported in this architecture are described below.<a href="#section-3.5-6" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.5-7">
+<li id="section-3.5-7.1">
+            <p id="section-3.5-7.1.1">Public verifiability. This means the Token can be verified using the Issuer
+public key. A Token that does not have public verifiability can only be verified
+using the Issuer secret key.<a href="#section-3.5-7.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.5-7.2">
+            <p id="section-3.5-7.2.1">Public metadata. This means that the Token can be cryptographically bound to
+arbitrary public information. See <a href="#metadata-privacy" class="auto internal xref">Section 6.1</a> for privacy considerations
+of public metadata.<a href="#section-3.5-7.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.5-7.3">
+            <p id="section-3.5-7.3.1">Private metadata. This means that the Token can be cryptographically bound to
+arbitrary private information, i.e., information that the Client does not observe
+during Token issuance or redemption. See <a href="#metadata-privacy" class="auto internal xref">Section 6.1</a> for privacy
+considerations of private metadata.<a href="#section-3.5-7.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-3.5-8">The issuance protocol itself can be any interactive protocol between Client,
+Issuer, or other parties that produces a valid token bound to the Client's
+private input, subject to the following security requirements.<a href="#section-3.5-8" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.5-9">
+<li id="section-3.5-9.1">
+            <p id="section-3.5-9.1.1">Unconditional input secrecy. The issuance protocol MUST NOT reveal anything
+about the Client's private input, including the challenge and nonce, to the
+Attester or Issuer, regardless of the hardness assumptions of the underlying
+cryptographic protocol(s). This property is sometimes also referred to as
+blindness.<a href="#section-3.5-9.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.5-9.2">
+            <p id="section-3.5-9.2.1">One-more forgery security. The issuance protocol MUST NOT allow malicious
+Clients or Attesters (acting as Clients) to forge tokens offline or otherwise
+without interacting with the Issuer directly.<a href="#section-3.5-9.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.5-9.3">
+            <p id="section-3.5-9.3.1">Concurrent security. The issuance protocol MUST be safe to run concurrently
+with arbitrarily many Clients, Attesters and Issuers.<a href="#section-3.5-9.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-3.5-10">See <a href="#extensions" class="auto internal xref">Section 3.5.4</a> for requirements on new issuance protocol variants and
+related extensions.<a href="#section-3.5-10" class="pilcrow">¶</a></p>
+<p id="section-3.5-11">In the sections below, we describe the Attester and Issuer roles in more
+detail.<a href="#section-3.5-11" class="pilcrow">¶</a></p>
+<div id="attester">
+<section id="section-3.5.1">
+          <h4 id="name-attester-role">
+<a href="#section-3.5.1" class="section-number selfRef">3.5.1. </a><a href="#name-attester-role" class="section-name selfRef">Attester Role</a>
+          </h4>
+<p id="section-3.5.1-1">In Privacy Pass, attestation is the process by which an Attester bears
+witness to, confirms, or authenticates a Client so as to verify properties
+about the Client that are required for Issuance. Issuers trust Attesters
+to perform attestation correctly, i.e., to implement attestation procedures
+in a way that are not subverted or bypassed by malicious Clients.<a href="#section-3.5.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.5.1-2"><span>[<a href="#RFC9334" class="cite xref">RFC9334</a>]</span> describes an architecture for attestation procedures. Using
+that architecture as a conceptual basis, Clients are RATS attesters that
+produce attestation evidence, and Attesters are RATS verifiers that
+appraise the validity of attestation evidence.<a href="#section-3.5.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.5.1-3">The type of attestation procedure is a deployment-specific option and outside
+the scope of the issuance protocol. Example attestation procedures are below.<a href="#section-3.5.1-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.5.1-4.1">
+              <p id="section-3.5.1-4.1.1">Solving a CAPTCHA. Clients that solve CAPTCHA challenges can be attested to
+have this capability for the purpose of being ruled out as a bot or otherwise
+automated Client.<a href="#section-3.5.1-4.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.5.1-4.2">
+              <p id="section-3.5.1-4.2.1">Presenting evidence of Client device validity. Some Clients run on trusted
+hardware that are capable of producing device-level attestation evidence.<a href="#section-3.5.1-4.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.5.1-4.3">
+              <p id="section-3.5.1-4.3.1">Proving properties about Client state. Clients can be associated with state
+and the Attester can verify this state. Examples of state include the
+Client's geographic region and whether the Client has a valid
+application-layer account.<a href="#section-3.5.1-4.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-3.5.1-5">Attesters may support different types of attestation procedures.<a href="#section-3.5.1-5" class="pilcrow">¶</a></p>
+<p id="section-3.5.1-6">Each attestation procedure has different security properties. For
+example, attesting to having a valid account is different from attesting to
+running on trusted hardware. Supporting multiple attestation procedures is
+an important step towards ensuring equitable access for Clients; see <a href="#discrimination" class="auto internal xref">Section 5.1</a>.<a href="#section-3.5.1-6" class="pilcrow">¶</a></p>
+<p id="section-3.5.1-7">The role of the Attester in the issuance protocol and its impact on privacy
+depends on the type of attestation procedure, issuance protocol, and deployment
+model. For instance, increasing the number of required attestation procedures
+could decrease the overall anonymity set size. As an example, the number of Clients
+that have solved a CAPTCHA in the past day, that have a valid account, and that
+are running on a trusted device is less than the number of Clients that have
+solved a CAPTCHA in the past day. See <a href="#rotation-and-consistency" class="auto internal xref">Section 6.2</a> for more discussion
+of how the variety of attestation procedures can negatively impact Client privacy.<a href="#section-3.5.1-7" class="pilcrow">¶</a></p>
+<p id="section-3.5.1-8">Depending on the issuance protocol, the Issuer might learn
+information about the Origin. To ensure Issuer-Client unlinkability, the Issuer
+should be unable to link that information to a specific Client. For such
+issuance protocols where the Attester has access to Client-specific
+information, such as is the case for attestation procedures that involve
+Client-specific information (such as application-layer account information)
+or for deployment models where the Attester learns Client-specific information
+(such as Client IP addresses), Clients trust the Attester to not share any
+Client-specific information with the Issuer. In deployments where the Attester
+does not learn Client-specific information, or where the Attester and Issuer are
+operated by the same entity (such as in the Joint Attester and Issuer model
+described in <a href="#deploy-joint-issuer" class="auto internal xref">Section 4.2</a>), the Client does not need to explicitly
+trust the Attester in this regard.<a href="#section-3.5.1-8" class="pilcrow">¶</a></p>
+<p id="section-3.5.1-9">Issuers trust Attesters to correctly and reliably perform attestation. However,
+certain types of attestation can vary in value over time, e.g., if the
+attestation procedure is compromised. Broken
+attestation procedures are considered exceptional events and require
+configuration changes to address the underlying cause. For example, if
+an attestation procedure is compromised or subverted because of a zero-day
+exploit on devices that implement the attestation procedure, then the
+corresponding attestation procedure should be untrusted until the exploit is
+patched. Addressing changes in attestation quality is therefore a
+deployment-specific task. In Split Attester and Issuer deployments (see
+<a href="#deploy-split" class="auto internal xref">Section 4.4</a>), Issuers can choose to remove compromised Attesters from
+their trusted set until the compromise is patched.<a href="#section-3.5.1-9" class="pilcrow">¶</a></p>
+<p id="section-3.5.1-10">From the perspective of an Origin, tokens produced by an Issuer with at least
+one compromised Attester cannot be trusted assuming the Origin does not know
+which attestation procedure was used for issuance. This is because the Origin
+cannot distinguish between tokens that were issued via compromised Attesters
+and tokens that were issued via uncompromised Attesters absent some
+distinguishing information in the tokens themselves or from the Issuer. As a
+result, until the attestation procedure is fixed, the Issuer cannot be trusted
+by Origins. Moreover, as a consequence, any tokens issued by an Issuer with a
+compromised attester may no longer be trusted by Origins, even if those tokens
+were issued to Clients interacting with an uncompromised Attester.<a href="#section-3.5.1-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="issuer-role">
+<section id="section-3.5.2">
+          <h4 id="name-issuer-role">
+<a href="#section-3.5.2" class="section-number selfRef">3.5.2. </a><a href="#name-issuer-role" class="section-name selfRef">Issuer Role</a>
+          </h4>
+<p id="section-3.5.2-1">In Privacy Pass, the Issuer is responsible for completing the issuance protocol
+for Clients that complete attestation through a trusted Attester. As described
+in <a href="#attester" class="auto internal xref">Section 3.5.1</a>, Issuers explicitly trust Attesters to correctly and reliably
+perform attestation. Origins explicitly trust Issuers to only issue tokens
+from trusted Attesters. Clients do not explicitly trust Issuers.<a href="#section-3.5.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.5.2-2">Depending on the deployment model case, issuance may require some form of
+Client anonymization service, similar to an IP-hiding proxy, so that Issuers
+cannot learn information about Clients. This can be provided by an explicit
+participant in the issuance protocol, or it can be provided via external means,
+such as through the use of an IP-hiding proxy service like Tor <span>[<a href="#DMS2004" class="cite xref">DMS2004</a>]</span>.
+In general, Clients SHOULD minimize or remove identifying
+information where possible when invoking the issuance protocol.<a href="#section-3.5.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.5.2-3">Issuers are uniquely identifiable by all Clients with a consistent
+identifier. In a web context, this identifier might be the Issuer host name.
+Issuers maintain one or more configurations, including issuance key pairs, for
+use in the issuance protocol. Each configuration is assumed to have a unique
+and canonical identifier, sometimes referred to as a key identifier or key ID.
+Issuers can rotate these configurations as needed to mitigate risk of compromise;
+see <a href="#rotation-and-consistency" class="auto internal xref">Section 6.2</a> for more considerations around configuration
+rotation. The Issuer public key for each active configuration is made available
+to Origins and Clients for use in the issuance and redemption protocols.<a href="#section-3.5.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="metadata">
+<section id="section-3.5.3">
+          <h4 id="name-issuance-metadata">
+<a href="#section-3.5.3" class="section-number selfRef">3.5.3. </a><a href="#name-issuance-metadata" class="section-name selfRef">Issuance Metadata</a>
+          </h4>
+<p id="section-3.5.3-1">Certain instantiations of the issuance protocol may permit public or private
+metadata to be cryptographically bound to a token. As an example, one
+trivial way to include public metadata is to assign a unique Issuer
+public key for each value of metadata, such that N keys yields
+log<sub>2</sub>(N) bits of metadata. Metadata may be public or private.<a href="#section-3.5.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.5.3-2">Public metadata is that which clients can observe as part of the token
+issuance flow. Public metadata can either be transparent or opaque. For
+example, transparent public metadata is a value that the client either
+generates itself, or the Issuer provides during the issuance flow and
+the client can check for correctness. Opaque public metadata is metadata
+the client can see but cannot check for correctness. As an example, the
+opaque public metadata might be a "fraud detection signal", computed on
+behalf of the Issuer, during token issuance. Generally speaking, Clients
+cannot determine if this value is generated in a way that permits tracking.<a href="#section-3.5.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.5.3-3">Private metadata is that which Clients cannot observe as part of the token
+issuance flow. Such instantiations can be built on the Private Metadata Bit
+construction from Kreuter et al. <span>[<a href="#KLOR20" class="cite xref">KLOR20</a>]</span>
+or the attribute-based VOPRF from Huang et al. <span>[<a href="#HIJK21" class="cite xref">HIJK21</a>]</span>.<a href="#section-3.5.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.5.3-4">Metadata can be arbitrarily long or bounded in length. The amount of permitted
+metadata may be determined by application or by the underlying cryptographic
+protocol. The total amount of metadata bits included in a token is the sum of
+public and private metadata bits. Every bit of metadata can be used to
+partition the Client issuance or redemption anonymity sets; see
+<a href="#metadata-privacy" class="auto internal xref">Section 6.1</a> for more information.<a href="#section-3.5.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="extensions">
+<section id="section-3.5.4">
+          <h4 id="name-future-issuance-protocol-re">
+<a href="#section-3.5.4" class="section-number selfRef">3.5.4. </a><a href="#name-future-issuance-protocol-re" class="section-name selfRef">Future Issuance Protocol Requirements</a>
+          </h4>
+<p id="section-3.5.4-1">The Privacy Pass architecture and ecosystem are both intended to be receptive
+to extensions that expand the current set of functionalities through new
+issuance protocols. Each new issuance protocol and extension MUST adhere
+to the following requirements:<a href="#section-3.5.4-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.5.4-2">
+<li id="section-3.5.4-2.1">
+              <p id="section-3.5.4-2.1.1">Include a detailed analysis of the privacy impacts of the extension, why
+these impacts are justified, and guidelines on how to use the protocol
+to mitigate or minimize negative deployment or privacy consequences
+discussed in <a href="#deployment-considerations" class="auto internal xref">Section 5</a> and <a href="#privacy" class="auto internal xref">Section 6</a>, respectively.<a href="#section-3.5.4-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-3.5.4-2.2">
+              <p id="section-3.5.4-2.2.1">Adhere to the guidelines specified in <a href="#issuer-role" class="auto internal xref">Section 3.5.2</a> for managing Issuer
+public key data.<a href="#section-3.5.4-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-3.5.4-2.3">
+              <p id="section-3.5.4-2.3.1">Clearly specify how to interpret and validate TokenChallenge and Token
+messages that are exchanged during the redemption protocol.<a href="#section-3.5.4-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+</section>
+</div>
+</section>
+</div>
+<div id="flow">
+<section id="section-3.6">
+        <h3 id="name-information-flow">
+<a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-information-flow" class="section-name selfRef">Information Flow</a>
+        </h3>
+<p id="section-3.6-1">The end-to-end process of redemption and issuance protocols involves information
+flowing between Issuer, Origin, Client, and Attester. That information can
+have implications on the privacy goals that Privacy Pass aims to provide
+as outlined in <a href="#privacy-and-trust" class="auto internal xref">Section 3.3</a>. In this section, we describe the flow
+of information between each party. How this information affects the privacy
+goals in particular deployment models is further discussed in <a href="#deployment" class="auto internal xref">Section 4</a>.<a href="#section-3.6-1" class="pilcrow">¶</a></p>
+<div id="challenge-flow">
+<section id="section-3.6.1">
+          <h4 id="name-token-challenge-flow">
+<a href="#section-3.6.1" class="section-number selfRef">3.6.1. </a><a href="#name-token-challenge-flow" class="section-name selfRef">Token Challenge Flow</a>
+          </h4>
+<p id="section-3.6.1-1">To use Privacy Pass, Origins choose an Issuer from which they are willing to
+accept tokens. Origins then construct a token challenge using this specified
+Issuer and information from the redemption context it shares with the Client.
+This token challenge is then delivered to a Client. The token challenge conveys
+information about the Issuer and the redemption context, such as whether the
+Origin desires a per-Origin or cross-Origin token. Any entity that sees
+the token challenge might learn things about the Client as known to the Origin.
+This is why input secrecy is a requirement for issuance protocols, as it
+ensures that the challenge is not directly available to the Issuer.<a href="#section-3.6.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="attestation-flow">
+<section id="section-3.6.2">
+          <h4 id="name-attestation-flow">
+<a href="#section-3.6.2" class="section-number selfRef">3.6.2. </a><a href="#name-attestation-flow" class="section-name selfRef">Attestation Flow</a>
+          </h4>
+<p id="section-3.6.2-1">Clients interact with the Attester to prove that they meet some required
+set of properties. In doing so, Clients contribute information to the
+attestation context, which might include sensitive information such as
+application-layer identities, IP addresses, and so on. Clients can choose
+whether or not to contribute this information based on local policy or
+preference.<a href="#section-3.6.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="issue-flow">
+<section id="section-3.6.3">
+          <h4 id="name-issuance-flow">
+<a href="#section-3.6.3" class="section-number selfRef">3.6.3. </a><a href="#name-issuance-flow" class="section-name selfRef">Issuance Flow</a>
+          </h4>
+<p id="section-3.6.3-1">Clients use the issuance protocol to produce a token bound to a token
+challenge. In doing so, there are several ways in which the issuance protocol
+contributes information to the attestation or issuance contexts. For example, a
+token request may contribute information to the attestation or issuance
+contexts as described below.<a href="#section-3.6.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.6.3-2.1">
+              <p id="section-3.6.3-2.1.1">Issuance protocol. The type of issuance protocol can contribute information
+about the Issuer's capabilities to the attestation or issuance contexts, as
+well as the capabilities of a given Client. For example, if a Client is
+presented with multiple issuance protocol options, then the choice of which
+issuance protocol to use can contribute information about the Client's
+capabilities.<a href="#section-3.6.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.6.3-2.2">
+              <p id="section-3.6.3-2.2.1">Issuer configuration. Information about the Issuer configuration, such as
+its identity or the public key used to validate tokens it creates, can be
+revealed during issuance and contribute to the attestation or issuance
+contexts.<a href="#section-3.6.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.6.3-2.3">
+              <p id="section-3.6.3-2.3.1">Attestation information. The issuance protocol can contribute information to
+the attestation or issuance contexts based on what attestation procedure the
+Issuer uses to trust a token request. In particular, a token request that is
+validated by a given Attester means that the Client which generated the token
+request must be capable of the completing the designated attestation procedure.<a href="#section-3.6.3-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.6.3-2.4">
+              <p id="section-3.6.3-2.4.1">Origin information. The issuance protocol can contribute information about
+the Origin that challenged the Client in <a href="#challenge-flow" class="auto internal xref">Section 3.6.1</a>. In particular,
+a token request designated for a specific Issuer might imply that the resulting
+token is for an Origin that trusts the specified Issuer. However, this is not
+always true, as some token requests can correspond to cross-Origin tokens,
+i.e., they are tokens that would be accepted at any Origin that accepts the
+cross-Origin token.<a href="#section-3.6.3-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-3.6.3-3">Moreover, a token may contribute information to the issuance attestation or
+contexts as described below.<a href="#section-3.6.3-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.6.3-4.1">
+              <p id="section-3.6.3-4.1.1">Origin information. The issuance protocol can contribute information about
+the Origin in how it responds to a token request. For example, if an Issuer
+learns the Origin during issuance and is also configured to respond in some way
+on the basis of that information, and the Client interacts with the Issuer
+transitively through the Attester, that response can reveal information to the
+Attester.<a href="#section-3.6.3-4.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.6.3-4.2">
+              <p id="section-3.6.3-4.2.1">Token. The token produced by the issuance protocol can contain information
+from the issuance context. In particular, depending on the issuance protocol,
+tokens can contain public or private metadata, and Issuers can choose that
+metadata on the basis of information in the issuance context.<a href="#section-3.6.3-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-3.6.3-5">Exceptional cases in the issuance protocol, such as when either the
+Attester or Issuer aborts the protocol, can contribute information to the
+attestation or issuance contexts. The extent to which information in this
+context harms the Issuer-Client or Attester-Origin unlinkability goals in
+<a href="#privacy-and-trust" class="auto internal xref">Section 3.3</a> depends on deployment model; see <a href="#deployment" class="auto internal xref">Section 4</a>.
+Clients can choose whether or not to contribute information to these contexts
+based on local policy or preference.<a href="#section-3.6.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="redemption-flow">
+<section id="section-3.6.4">
+          <h4 id="name-token-redemption-flow">
+<a href="#section-3.6.4" class="section-number selfRef">3.6.4. </a><a href="#name-token-redemption-flow" class="section-name selfRef">Token Redemption Flow</a>
+          </h4>
+<p id="section-3.6.4-1">Clients send tokens to Origins during the redemption protocol. Any information
+that is added to the token during issuance can therefore be sent to the Origin.
+Information can either be explicitly passed in a token, or it can be implicit
+in the way the Client responds to a token challenge. For example, if a Client
+fails to complete issuance, and consequently fails to redeem a token for
+a token challenge, this can reveal information to the Origin that
+it might not otherwise have access to. However, an Origin cannot necessarily
+distinguish between a Client that fails to complete issuance and one that
+ignores the token challenge altogether.<a href="#section-3.6.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="deployment">
+<section id="section-4">
+      <h2 id="name-deployment-models">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-deployment-models" class="section-name selfRef">Deployment Models</a>
+      </h2>
+<p id="section-4-1">The Origin, Attester, and Issuer portrayed in <a href="#fig-overview" class="auto internal xref">Figure 1</a> can be
+instantiated and deployed in a number of ways. The deployment model directly
+influences the manner in which attestation, issuance, and redemption contexts
+are separated to achieve Origin-Client, Issuer-Client, and Attester-Origin
+unlinkability.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">This section covers some expected deployment models and their corresponding
+security and privacy considerations. Each deployment model is described in
+terms of the trust relationships and communication patterns between Client,
+Attester, Issuer, and Origin. Entities drawn within the same bounding box are
+assumed to be operated by the same party and are therefore able to collude.
+Collusion can enable linking of attestation, issuance, and redemption contexts.
+Entities not drawn within the same bounding box are assumed to not
+collude, meaning that entities operated by separate parties that do not collude.
+Mechanisms for enforcing non-collusion are out of scope for this architecture.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<div id="deploy-shared">
+<section id="section-4.1">
+        <h3 id="name-shared-origin-attester-issu">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-shared-origin-attester-issu" class="section-name selfRef">Shared Origin, Attester, Issuer</a>
+        </h3>
+<p id="section-4.1-1">In this model, the Origin, Attester, and Issuer are all operated by the same
+entity, as shown in <a href="#fig-deploy-shared" class="auto internal xref">Figure 3</a>.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<span id="name-shared-deployment-model"></span><div id="fig-deploy-shared">
+<figure id="figure-3">
+          <div id="section-4.1-2.1">
+            <div class="alignLeft art-svg artwork" id="section-4.1-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="528" viewBox="0 0 528 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,48 L 8,80" fill="none" stroke="black"></path>
+                <path d="M 40,80 L 40,240" fill="none" stroke="black"></path>
+                <path d="M 80,48 L 80,80" fill="none" stroke="black"></path>
+                <path d="M 144,32 L 144,80" fill="none" stroke="black"></path>
+                <path d="M 168,48 L 168,80" fill="none" stroke="black"></path>
+                <path d="M 216,80 L 216,104" fill="none" stroke="black"></path>
+                <path d="M 216,120 L 216,160" fill="none" stroke="black"></path>
+                <path d="M 256,48 L 256,80" fill="none" stroke="black"></path>
+                <path d="M 304,48 L 304,80" fill="none" stroke="black"></path>
+                <path d="M 344,80 L 344,96" fill="none" stroke="black"></path>
+                <path d="M 344,128 L 344,192" fill="none" stroke="black"></path>
+                <path d="M 376,48 L 376,80" fill="none" stroke="black"></path>
+                <path d="M 424,48 L 424,80" fill="none" stroke="black"></path>
+                <path d="M 456,80 L 456,208" fill="none" stroke="black"></path>
+                <path d="M 496,48 L 496,80" fill="none" stroke="black"></path>
+                <path d="M 520,48 L 520,80" fill="none" stroke="black"></path>
+                <path d="M 144,32 L 504,32" fill="none" stroke="black"></path>
+                <path d="M 8,48 L 80,48" fill="none" stroke="black"></path>
+                <path d="M 168,48 L 256,48" fill="none" stroke="black"></path>
+                <path d="M 304,48 L 376,48" fill="none" stroke="black"></path>
+                <path d="M 424,48 L 496,48" fill="none" stroke="black"></path>
+                <path d="M 8,80 L 80,80" fill="none" stroke="black"></path>
+                <path d="M 168,80 L 256,80" fill="none" stroke="black"></path>
+                <path d="M 304,80 L 376,80" fill="none" stroke="black"></path>
+                <path d="M 424,80 L 496,80" fill="none" stroke="black"></path>
+                <path d="M 160,96 L 208,96" fill="none" stroke="black"></path>
+                <path d="M 224,96 L 336,96" fill="none" stroke="black"></path>
+                <path d="M 352,96 L 448,96" fill="none" stroke="black"></path>
+                <path d="M 464,96 L 504,96" fill="none" stroke="black"></path>
+                <path d="M 48,112 L 304,112" fill="none" stroke="black"></path>
+                <path d="M 440,112 L 456,112" fill="none" stroke="black"></path>
+                <path d="M 48,142 L 72,142" fill="none" stroke="black"></path>
+                <path d="M 48,146 L 72,146" fill="none" stroke="black"></path>
+                <path d="M 184,142 L 208,142" fill="none" stroke="black"></path>
+                <path d="M 184,146 L 208,146" fill="none" stroke="black"></path>
+                <path d="M 40,176 L 128,176" fill="none" stroke="black"></path>
+                <path d="M 248,176 L 336,176" fill="none" stroke="black"></path>
+                <path d="M 48,192 L 128,192" fill="none" stroke="black"></path>
+                <path d="M 256,192 L 344,192" fill="none" stroke="black"></path>
+                <path d="M 40,224 L 208,224" fill="none" stroke="black"></path>
+                <path d="M 272,224 L 456,224" fill="none" stroke="black"></path>
+                <path d="M 504,32 C 512.83064,32 520,39.16936 520,48" fill="none" stroke="black"></path>
+                <path d="M 160,96 C 151.16936,96 144,88.83064 144,80" fill="none" stroke="black"></path>
+                <path d="M 504,96 C 512.83064,96 520,88.83064 520,80" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="464,224 452,218.4 452,229.6" fill="black" transform="rotate(0,456,224)"></polygon>
+                <polygon class="arrowhead" points="344,176 332,170.4 332,181.6" fill="black" transform="rotate(0,336,176)"></polygon>
+                <polygon class="arrowhead" points="216,144 204,138.4 204,149.6" fill="black" transform="rotate(0,208,144)"></polygon>
+                <polygon class="arrowhead" points="56,192 44,186.4 44,197.6" fill="black" transform="rotate(180,48,192)"></polygon>
+                <polygon class="arrowhead" points="56,144 44,138.4 44,149.6" fill="black" transform="rotate(180,48,144)"></polygon>
+                <polygon class="arrowhead" points="56,112 44,106.4 44,117.6" fill="black" transform="rotate(180,48,112)"></polygon>
+                <g class="text">
+                  <text x="44" y="68">Client</text>
+                  <text x="212" y="68">Attester</text>
+                  <text x="340" y="68">Issuer</text>
+                  <text x="460" y="68">Origin</text>
+                  <text x="372" y="116">TokenChallenge</text>
+                  <text x="128" y="148">Attestation</text>
+                  <text x="188" y="180">TokenRequest</text>
+                  <text x="192" y="196">TokenResponse</text>
+                  <text x="240" y="228">Token</text>
+                  <text x="456" y="244">|</text>
+                </g>
+              </svg><a href="#section-4.1-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-shared-deployment-model" class="selfRef">Shared Deployment Model</a>
+          </figcaption></figure>
+</div>
+<p id="section-4.1-3">This model represents the initial deployment of Privacy Pass, as described in
+<span>[<a href="#PrivacyPassCloudflare" class="cite xref">PrivacyPassCloudflare</a>]</span>. In this model, the Attester, Issuer, and Origin
+share the attestation, issuance, and redemption contexts. As a result,
+attestation mechanisms that can uniquely identify a Client, e.g., requiring
+that Clients authenticate with some type of application-layer account, are
+not appropriate, as they could lead to unlinkability violations.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">Origin-Client, Issuer-Client, and Attester-Origin unlinkability requires that
+issuance and redemption events be separated over time, such as through the use
+of tokens that correspond to token challenges with an empty redemption context
+(see <a href="#redemption" class="auto internal xref">Section 3.4</a>), or be separated over space, such as through the use of an
+anonymizing service when connecting to the Origin.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="deploy-joint-issuer">
+<section id="section-4.2">
+        <h3 id="name-joint-attester-and-issuer">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-joint-attester-and-issuer" class="section-name selfRef">Joint Attester and Issuer</a>
+        </h3>
+<p id="section-4.2-1">In this model, the Attester and Issuer are operated by the same entity
+that is separate from the Origin. The Origin trusts the joint Attester
+and Issuer to perform attestation and issue Tokens. Clients interact
+with the joint Attester and Issuer for attestation and issuance. This
+arrangement is shown in <a href="#fig-deploy-joint-issuer" class="auto internal xref">Figure 4</a>.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<span id="name-joint-attester-and-issuer-d"></span><div id="fig-deploy-joint-issuer">
+<figure id="figure-4">
+          <div id="section-4.2-2.1">
+            <div class="alignLeft art-svg artwork" id="section-4.2-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="520" viewBox="0 0 520 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,48 L 8,80" fill="none" stroke="black"></path>
+                <path d="M 40,80 L 40,240" fill="none" stroke="black"></path>
+                <path d="M 80,48 L 80,80" fill="none" stroke="black"></path>
+                <path d="M 160,32 L 160,80" fill="none" stroke="black"></path>
+                <path d="M 184,48 L 184,80" fill="none" stroke="black"></path>
+                <path d="M 232,80 L 232,104" fill="none" stroke="black"></path>
+                <path d="M 232,120 L 232,160" fill="none" stroke="black"></path>
+                <path d="M 272,48 L 272,80" fill="none" stroke="black"></path>
+                <path d="M 320,48 L 320,80" fill="none" stroke="black"></path>
+                <path d="M 360,80 L 360,96" fill="none" stroke="black"></path>
+                <path d="M 360,128 L 360,192" fill="none" stroke="black"></path>
+                <path d="M 392,48 L 392,80" fill="none" stroke="black"></path>
+                <path d="M 416,48 L 416,80" fill="none" stroke="black"></path>
+                <path d="M 440,48 L 440,80" fill="none" stroke="black"></path>
+                <path d="M 472,80 L 472,208" fill="none" stroke="black"></path>
+                <path d="M 512,48 L 512,80" fill="none" stroke="black"></path>
+                <path d="M 160,32 L 400,32" fill="none" stroke="black"></path>
+                <path d="M 8,48 L 80,48" fill="none" stroke="black"></path>
+                <path d="M 184,48 L 272,48" fill="none" stroke="black"></path>
+                <path d="M 320,48 L 392,48" fill="none" stroke="black"></path>
+                <path d="M 440,48 L 512,48" fill="none" stroke="black"></path>
+                <path d="M 8,80 L 80,80" fill="none" stroke="black"></path>
+                <path d="M 184,80 L 272,80" fill="none" stroke="black"></path>
+                <path d="M 320,80 L 392,80" fill="none" stroke="black"></path>
+                <path d="M 440,80 L 512,80" fill="none" stroke="black"></path>
+                <path d="M 176,96 L 224,96" fill="none" stroke="black"></path>
+                <path d="M 240,96 L 352,96" fill="none" stroke="black"></path>
+                <path d="M 368,96 L 400,96" fill="none" stroke="black"></path>
+                <path d="M 48,112 L 320,112" fill="none" stroke="black"></path>
+                <path d="M 456,112 L 472,112" fill="none" stroke="black"></path>
+                <path d="M 48,142 L 80,142" fill="none" stroke="black"></path>
+                <path d="M 48,146 L 80,146" fill="none" stroke="black"></path>
+                <path d="M 192,142 L 224,142" fill="none" stroke="black"></path>
+                <path d="M 192,146 L 224,146" fill="none" stroke="black"></path>
+                <path d="M 40,176 L 144,176" fill="none" stroke="black"></path>
+                <path d="M 264,176 L 352,176" fill="none" stroke="black"></path>
+                <path d="M 48,192 L 136,192" fill="none" stroke="black"></path>
+                <path d="M 264,192 L 360,192" fill="none" stroke="black"></path>
+                <path d="M 40,224 L 224,224" fill="none" stroke="black"></path>
+                <path d="M 288,224 L 472,224" fill="none" stroke="black"></path>
+                <path d="M 400,32 C 408.83064,32 416,39.16936 416,48" fill="none" stroke="black"></path>
+                <path d="M 176,96 C 167.16936,96 160,88.83064 160,80" fill="none" stroke="black"></path>
+                <path d="M 400,96 C 408.83064,96 416,88.83064 416,80" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="480,224 468,218.4 468,229.6" fill="black" transform="rotate(0,472,224)"></polygon>
+                <polygon class="arrowhead" points="360,176 348,170.4 348,181.6" fill="black" transform="rotate(0,352,176)"></polygon>
+                <polygon class="arrowhead" points="232,144 220,138.4 220,149.6" fill="black" transform="rotate(0,224,144)"></polygon>
+                <polygon class="arrowhead" points="56,192 44,186.4 44,197.6" fill="black" transform="rotate(180,48,192)"></polygon>
+                <polygon class="arrowhead" points="56,144 44,138.4 44,149.6" fill="black" transform="rotate(180,48,144)"></polygon>
+                <polygon class="arrowhead" points="56,112 44,106.4 44,117.6" fill="black" transform="rotate(180,48,112)"></polygon>
+                <g class="text">
+                  <text x="44" y="68">Client</text>
+                  <text x="228" y="68">Attester</text>
+                  <text x="356" y="68">Issuer</text>
+                  <text x="476" y="68">Origin</text>
+                  <text x="388" y="116">TokenChallenge</text>
+                  <text x="136" y="148">Attestation</text>
+                  <text x="204" y="180">TokenRequest</text>
+                  <text x="200" y="196">TokenResponse</text>
+                  <text x="256" y="228">Token</text>
+                  <text x="472" y="244">|</text>
+                </g>
+              </svg><a href="#section-4.2-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-joint-attester-and-issuer-d" class="selfRef">Joint Attester and Issuer Deployment Model</a>
+          </figcaption></figure>
+</div>
+<p id="section-4.2-3">This model is useful if an Origin wants to offload attestation and issuance to
+a trusted entity. In this model, the Attester and Issuer share an attestation
+and issuance context for the Client, which is separate from the Origin's
+redemption context.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-4">Similar to the Shared Origin, Attester, Issuer model, Issuer-Client and
+Origin-Client unlinkability in this model requires issuance and redemption
+events, respectively, be separated over time or space. Attester-Origin
+unlinkability requires that the Attester and Issuer do not learn the Origin
+for a particular token request. For this reason, issuance protocols that
+require the Issuer to learn information about the Origin, such as that which
+is described in <span>[<a href="#RATE-LIMITED" class="cite xref">RATE-LIMITED</a>]</span>, are not
+appropriate since they could lead to Attester-Origin unlinkability violations
+through the Origin name.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="deploy-joint-origin">
+<section id="section-4.3">
+        <h3 id="name-joint-origin-and-issuer">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-joint-origin-and-issuer" class="section-name selfRef">Joint Origin and Issuer</a>
+        </h3>
+<p id="section-4.3-1">In this model, the Origin and Issuer are operated by the same entity, separate
+from the Attester, as shown in the figure below. The Issuer accepts token
+requests that come from trusted Attesters. Since the Attester and Issuer are
+separate entities, this model requires some mechanism by which Issuers
+establish trust in the Attester (as described in <a href="#privacy-and-trust" class="auto internal xref">Section 3.3</a>).
+For example, in settings where the Attester is a Client-trusted service that
+directly communicates with the Issuer, one way to establish this trust is via
+mutually-authenticated TLS. However, alternative authentication mechanisms are
+possible. This arrangement is shown in <a href="#fig-deploy-joint-origin" class="auto internal xref">Figure 5</a>.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<span id="name-joint-origin-and-issuer-dep"></span><div id="fig-deploy-joint-origin">
+<figure id="figure-5">
+          <div id="section-4.3-2.1">
+            <div class="alignLeft art-svg artwork" id="section-4.3-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="528" viewBox="0 0 528 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,48 L 8,80" fill="none" stroke="black"></path>
+                <path d="M 40,80 L 40,240" fill="none" stroke="black"></path>
+                <path d="M 80,48 L 80,80" fill="none" stroke="black"></path>
+                <path d="M 168,48 L 168,80" fill="none" stroke="black"></path>
+                <path d="M 216,80 L 216,104" fill="none" stroke="black"></path>
+                <path d="M 216,120 L 216,160" fill="none" stroke="black"></path>
+                <path d="M 256,48 L 256,80" fill="none" stroke="black"></path>
+                <path d="M 280,32 L 280,80" fill="none" stroke="black"></path>
+                <path d="M 304,48 L 304,80" fill="none" stroke="black"></path>
+                <path d="M 344,80 L 344,96" fill="none" stroke="black"></path>
+                <path d="M 344,128 L 344,192" fill="none" stroke="black"></path>
+                <path d="M 376,48 L 376,80" fill="none" stroke="black"></path>
+                <path d="M 424,48 L 424,80" fill="none" stroke="black"></path>
+                <path d="M 456,80 L 456,208" fill="none" stroke="black"></path>
+                <path d="M 496,48 L 496,80" fill="none" stroke="black"></path>
+                <path d="M 520,48 L 520,80" fill="none" stroke="black"></path>
+                <path d="M 280,32 L 504,32" fill="none" stroke="black"></path>
+                <path d="M 8,48 L 80,48" fill="none" stroke="black"></path>
+                <path d="M 168,48 L 256,48" fill="none" stroke="black"></path>
+                <path d="M 304,48 L 376,48" fill="none" stroke="black"></path>
+                <path d="M 424,48 L 496,48" fill="none" stroke="black"></path>
+                <path d="M 8,80 L 80,80" fill="none" stroke="black"></path>
+                <path d="M 168,80 L 256,80" fill="none" stroke="black"></path>
+                <path d="M 304,80 L 376,80" fill="none" stroke="black"></path>
+                <path d="M 424,80 L 496,80" fill="none" stroke="black"></path>
+                <path d="M 296,96 L 336,96" fill="none" stroke="black"></path>
+                <path d="M 352,96 L 448,96" fill="none" stroke="black"></path>
+                <path d="M 464,96 L 504,96" fill="none" stroke="black"></path>
+                <path d="M 48,112 L 304,112" fill="none" stroke="black"></path>
+                <path d="M 440,112 L 456,112" fill="none" stroke="black"></path>
+                <path d="M 48,142 L 72,142" fill="none" stroke="black"></path>
+                <path d="M 48,146 L 72,146" fill="none" stroke="black"></path>
+                <path d="M 184,142 L 208,142" fill="none" stroke="black"></path>
+                <path d="M 184,146 L 208,146" fill="none" stroke="black"></path>
+                <path d="M 40,176 L 136,176" fill="none" stroke="black"></path>
+                <path d="M 256,176 L 336,176" fill="none" stroke="black"></path>
+                <path d="M 48,192 L 128,192" fill="none" stroke="black"></path>
+                <path d="M 256,192 L 344,192" fill="none" stroke="black"></path>
+                <path d="M 40,224 L 208,224" fill="none" stroke="black"></path>
+                <path d="M 272,224 L 456,224" fill="none" stroke="black"></path>
+                <path d="M 504,32 C 512.83064,32 520,39.16936 520,48" fill="none" stroke="black"></path>
+                <path d="M 296,96 C 287.16936,96 280,88.83064 280,80" fill="none" stroke="black"></path>
+                <path d="M 504,96 C 512.83064,96 520,88.83064 520,80" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="464,224 452,218.4 452,229.6" fill="black" transform="rotate(0,456,224)"></polygon>
+                <polygon class="arrowhead" points="344,176 332,170.4 332,181.6" fill="black" transform="rotate(0,336,176)"></polygon>
+                <polygon class="arrowhead" points="216,144 204,138.4 204,149.6" fill="black" transform="rotate(0,208,144)"></polygon>
+                <polygon class="arrowhead" points="56,192 44,186.4 44,197.6" fill="black" transform="rotate(180,48,192)"></polygon>
+                <polygon class="arrowhead" points="56,144 44,138.4 44,149.6" fill="black" transform="rotate(180,48,144)"></polygon>
+                <polygon class="arrowhead" points="56,112 44,106.4 44,117.6" fill="black" transform="rotate(180,48,112)"></polygon>
+                <g class="text">
+                  <text x="44" y="68">Client</text>
+                  <text x="212" y="68">Attester</text>
+                  <text x="340" y="68">Issuer</text>
+                  <text x="460" y="68">Origin</text>
+                  <text x="372" y="116">TokenChallenge</text>
+                  <text x="128" y="148">Attestation</text>
+                  <text x="196" y="180">TokenRequest</text>
+                  <text x="192" y="196">TokenResponse</text>
+                  <text x="240" y="228">Token</text>
+                  <text x="456" y="244">|</text>
+                </g>
+              </svg><a href="#section-4.3-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-joint-origin-and-issuer-dep" class="selfRef">Joint Origin and Issuer Deployment Model</a>
+          </figcaption></figure>
+</div>
+<p id="section-4.3-3">This model is useful for Origins that require Client-identifying attestation,
+e.g., through the use of application-layer account information, but do not
+otherwise want to learn information about individual Clients beyond what is
+observed during the token redemption, such as Client IP addresses.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+<p id="section-4.3-4">In this model, attestation contexts are separate from issuer and redemption
+contexts. As a result, any type of attestation is suitable in this model.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
+<p id="section-4.3-5">Moreover, any type of token challenge is suitable assuming there is more than
+one Origin involved, since no single party will have access to the identifying
+Client information and unique Origin information. Issuers that produce tokens
+for a single Origin are not suitable in this model since an Attester can
+infer the Origin from a token request, as described in <a href="#issue-flow" class="auto internal xref">Section 3.6.3</a>. However,
+since the issuance protocol provides input secrecy, the Attester does not learn
+details about the corresponding token challenge, such as whether the token
+challenge is per-Origin or cross-Origin.<a href="#section-4.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="deploy-split">
+<section id="section-4.4">
+        <h3 id="name-split-origin-attester-issue">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-split-origin-attester-issue" class="section-name selfRef">Split Origin, Attester, Issuer</a>
+        </h3>
+<p id="section-4.4-1">In this model, the Origin, Attester, and Issuer are all operated by different
+entities. As with the joint Origin and Issuer model, the Issuer accepts token
+requests that come from trusted Attesters, and the details of that trust
+establishment depend on the issuance protocol and relationship between
+Attester and Issuer; see <a href="#privacy-and-trust" class="auto internal xref">Section 3.3</a>. This arrangement is shown
+in <a href="#fig-overview" class="auto internal xref">Figure 1</a>.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<p id="section-4.4-2">This is the most general deployment model, and is necessary for some
+types of issuance protocols where the Attester plays a role in token
+issuance; see <span>[<a href="#RATE-LIMITED" class="cite xref">RATE-LIMITED</a>]</span> for one such type of issuance protocol.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+<p id="section-4.4-3">In this model, the Attester, Issuer, and Origin have a separate view
+of the Client: the Attester sees potentially sensitive Client identifying
+information, such as account identifiers or IP addresses, the Issuer
+sees only the information necessary for issuance, and the Origin sees
+token challenges, corresponding tokens, and Client source information,
+such as their IP address. As a result, attestation, issuance, and redemption
+contexts are separate, and therefore any type of token challenge is suitable in
+this model as long as there is more than a single Origin.<a href="#section-4.4-3" class="pilcrow">¶</a></p>
+<p id="section-4.4-4">As in the Joint Origin and Issuer model in <a href="#deploy-joint-origin" class="auto internal xref">Section 4.3</a>, and as
+described in <a href="#issue-flow" class="auto internal xref">Section 3.6.3</a>, if the Issuer produces tokens for a single Origin,
+then per-Origin tokens are not appropriate since the Attester can infer the
+Origin from a token request.<a href="#section-4.4-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="deployment-considerations">
+<section id="section-5">
+      <h2 id="name-deployment-considerations">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-deployment-considerations" class="section-name selfRef">Deployment Considerations</a>
+      </h2>
+<p id="section-5-1"><a href="#deployment" class="auto internal xref">Section 4</a> discusses deployment models that are possible in practice.
+Beyond possible implications on security and privacy properties of the
+resulting system, Privacy Pass deployments can impact the overall ecosystem
+in two important ways: (1) discriminatory treatment of Clients and the gated
+access to otherwise open services, and (2) centralization. This section
+describes considerations relevant to these topics.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<div id="discrimination">
+<section id="section-5.1">
+        <h3 id="name-discriminatory-treatment">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-discriminatory-treatment" class="section-name selfRef">Discriminatory Treatment</a>
+        </h3>
+<p id="section-5.1-1">Origins can use tokens as a signal for distinguishing between Clients
+that are capable of completing attestation with one Attester trusted by the
+Origin's chosen Issuer, and Clients that are not capable of doing the same. A
+consequence of this is that Privacy Pass could enable discriminatory treatment
+of Clients based on Attestation support. For example, an Origin could only
+authorize Clients that successfully authenticate with a token, prohibiting access
+to all other Clients.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">The type of attestation procedures supported for a particular deployment depends
+greatly on the use case. For example, consider a proprietary deployment of Privacy Pass
+that authorizes clients to access a resource such as an anonymization service. In this
+context, it is reasonable to support specific types of attestation procedures that
+demonstrate Clients can access the resource, such as with an account or specific
+type of device. However, in open deployments of Privacy Pass that are used to
+safeguard access to otherwise open or publicly accessible resources, diversity
+in attestation procedures is critically important so as to not discriminate against
+Clients that choose certain software, hardware, or identity providers.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">In principle, Issuers should strive to mitigate discriminatory behavior by
+providing equitable access to all Clients. This can be done by working with a
+set of Attesters that are suitable for all Clients. In practice, this may require
+tradeoffs in what type of attestation Issuers are willing to trust so as to
+enable more widespread support. In other words, trusting a variety of Attesters
+with a diverse set of attestation procedures would presumably increase support
+among Clients, though most likely at the expense of decreasing the overall value
+of tokens issued by the Issuer.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">For example, to disallow discriminatory behavior between Clients with and
+without device attestation support, an Issuer may wish to support Attesters
+that support CAPTCHA-based attestation. This means that the overall attestation
+value of a Privacy Pass token is bound by the difficulty in spoofing or
+bypassing either one of these attestation procedures.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="centralization">
+<section id="section-5.2">
+        <h3 id="name-centralization">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-centralization" class="section-name selfRef">Centralization</a>
+        </h3>
+<p id="section-5.2-1">A consequence of limiting the number of participants (Attesters or Issuers) in
+Privacy Pass deployments for meaningful privacy is that it forces concentrated
+centralization amongst those participants.
+<span>[<a href="#CENTRALIZATION" class="cite xref">CENTRALIZATION</a>]</span> discusses
+several ways in which this might be mitigated. For example, a multi-stakeholder
+governance model could be established to determine what candidate participants
+are fit to operate as participants in a Privacy Pass deployment. This is
+precisely the system used to control the Web's trust model.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">Alternatively, Privacy Pass deployments might mitigate this problem through
+implementation. For example, rather than centralize the role of attestation
+in one or few entities, attestation could be a distributed function performed
+by a quorum of many parties, provided that neither Issuers nor Origins learn
+which Attester implementations were chosen. As a result, Clients could have
+more opportunities to switch between attestation participants.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="privacy">
+<section id="section-6">
+      <h2 id="name-privacy-considerations">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+      </h2>
+<p id="section-6-1">The previous section discusses the impact of deployment details on
+Origin-Client, Issuer-Client, and Attester-Origin unlinkability.
+The value these properties affords to end users depends on
+the size of anonymity sets in which Clients or Origins are
+unlinkable. For example, consider two different deployments, one wherein
+there exists a redemption anonymity set of size two and another
+wherein there redemption anonymity set of size 2<sup>32</sup>. Although
+Origin-Client unlinkability guarantees that the Origin cannot link any two
+requests to the same Client based on these contexts, respectively, the
+probability of determining the "true" Client is higher the smaller these
+sets become.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">In practice, there are a number of ways in which the size of anonymity sets
+may be reduced or partitioned, though they all center around the concept of
+consistency. In particular, by definition, all Clients in an anonymity set
+share a consistent view of information needed to run the issuance and
+redemption protocols. An example type of information needed to run these
+protocols is the Issuer public key. When two Clients have inconsistent
+information, these Clients effectively have different redemption contexts and
+therefore belong in different anonymity sets.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">The following sections discuss issues that can influence anonymity set size.
+For each issue, we discuss mitigations or safeguards to protect against the
+underlying problem.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<div id="metadata-privacy">
+<section id="section-6.1">
+        <h3 id="name-partitioning-by-issuance-me">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-partitioning-by-issuance-me" class="section-name selfRef">Partitioning by Issuance Metadata</a>
+        </h3>
+<p id="section-6.1-1">Any public or private metadata bits of information can be used to further
+segment the size of the Client's anonymity set. Any Issuer that wanted to
+track a single Client could add a single metadata bit to Client tokens. For
+the tracked Client it would set the bit to <code>1</code>, and <code>0</code> otherwise. Adding
+additional bits provides an exponential increase in tracking granularity
+similarly to introducing more Issuers (though with more potential targeting).<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">For this reason, deployments should take the amount of metadata used by an Issuer
+in creating redemption tokens into account -- together with the bits
+of information that Issuers may learn about Clients otherwise. Since this
+metadata may be useful for practical deployments of Privacy Pass, Issuers
+must balance this against the reduction in Client privacy.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">The number of permitted metadata values often depends on deployment-specific
+details. In general, limiting the amount of metadata permitted helps limit the
+extent to which metadata can uniquely identify individual Clients. Failure to
+bound the number of possible metadata values can therefore lead to reduction in
+Client privacy. Most token types do not admit any metadata, so this bound is
+implicitly enforced.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="rotation-and-consistency">
+<section id="section-6.2">
+        <h3 id="name-partitioning-by-issuance-co">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-partitioning-by-issuance-co" class="section-name selfRef">Partitioning by Issuance Consistency</a>
+        </h3>
+<p id="section-6.2-1">Anonymity sets can be partitioned by information used for the issuance
+protocol, including: metadata, Issuer configuration (keys), and Issuer
+selection.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">Any issuance metadata bits of information can be used to partition the Client
+anonymity set. For example, any Issuer that wanted to track a single Client
+could add a single metadata bit to Client tokens. For the tracked Client it
+would set the bit to <code>1</code>, and <code>0</code> otherwise. Adding additional bits provides an
+exponential increase in tracking granularity similarly to introducing more
+Issuers (though with more potential targeting).<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-3">The number of active Issuer configurations also contributes to anonymity set
+partitioning. In particular, when an Issuer updates their configuration and
+the corresponding key pair, any Client that invokes the issuance protocol with
+this configuration becomes part of a set of Clients which also ran the
+issuance protocol using the same configuration. Issuer configuration updates,
+e.g., due to key rotation, are an important part of hedging against long-term
+private key compromise. In general, key rotations represent a trade-off between
+Client privacy and Issuer security. Therefore, it is important that key
+rotations occur on a regular cycle to reduce the harm of an Issuer key
+compromise.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.2-4">Lastly, if Clients are willing to issue and redeem tokens from a large number
+of Issuers for a specific Origin, and that Origin accepts tokens from all
+Issuers, partitioning can occur. As an example, if a Client obtains tokens from
+many Issuers and an Origin later challenges that Client for a token from each
+Issuer, the Origin can learn information about the Client. This arrangement
+might happen if Clients request tokens from different Issuers, each of which
+have different Attester preferences. Each per-Issuer token that a Client holds
+essentially corresponds to a bit of information about the Client that Origin
+learns. Therefore, there is an exponential loss in privacy relative to the
+number of Issuers.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.2-5">The fundamental problem here is that the number of possible issuance
+configurations, including the keys in use and the Issuer identities themselves,
+can partition the Client anonymity set. To mitigate this problem, Clients
+SHOULD bound the number of active issuance configurations per Origin as well as
+across Origins. Moreover, Clients SHOULD employ some form of consistency
+mechanism to ensure that they receive the same configuration information and
+are not being actively partitioned into smaller anonymity sets. See
+<span>[<a href="#CONSISTENCY" class="cite xref">CONSISTENCY</a>]</span> for possible consistency
+mechanisms. Depending on the deployment, the Attester might assist the Client
+in applying these consistency checks across clients. Failure to apply a
+consistency check can allow Client-specific keys to violate Origin-Client
+unlinkability.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="partitioning-by-side-channels">
+<section id="section-6.3">
+        <h3 id="name-partitioning-by-side-channe">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-partitioning-by-side-channe" class="section-name selfRef">Partitioning by Side-Channels</a>
+        </h3>
+<p id="section-6.3-1">Side-channel attacks, such as those based on timing correlation, could be
+used to reduce anonymity set size. In particular,
+for interactive tokens that are bound to a Client-specific redemption
+context, the anonymity set of Clients during the issuance protocol consists
+of those Clients that started issuance between the time of the Origin's
+challenge and the corresponding token redemption. Depending on the number
+of Clients using a particular Issuer during that time window, the set can
+be small. Applications should take such side channels into consideration before
+choosing a particular deployment model and type of token challenge and
+redemption context.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security">
+<section id="section-7">
+      <h2 id="name-security-considerations">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-7-1">This document describes security and privacy requirements for the Privacy Pass
+redemption and issuance protocols. It also describes deployment models built
+around non-collusion assumptions and privacy considerations for using Privacy
+Pass within those models. Ensuring Client privacy -- separation of attestation
+and redemption contexts -- requires active work on behalf of the Client,
+especially in the presence of malicious Issuers and Origins. Implementing
+mitigations discussed in <a href="#deployment" class="auto internal xref">Section 4</a> and <a href="#privacy" class="auto internal xref">Section 6</a> is therefore necessary
+to ensure that Privacy Pass offers meaningful privacy improvements to end-users.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<div id="hoarding">
+<section id="section-7.1">
+        <h3 id="name-token-caching">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-token-caching" class="section-name selfRef">Token Caching</a>
+        </h3>
+<p id="section-7.1-1">Depending on the Origin's token challenge, Clients can request and cache more
+than one token using an issuance protocol. Cached tokens help improve privacy by
+separating the time of token issuance from the time of token redemption, and
+also allow Clients to reduce the overhead of receiving new tokens via the
+issuance protocol.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">As a consequence, Origins that send token challenges which are compatible with
+cached tokens need to take precautions to ensure that tokens are not replayed.
+This is typically done via keeping track of tokens that are redeemed for the
+period of time in which cached tokens would be accepted for particular
+challenges.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.1-3">Moreover, since tokens are not intrinsically bound to Clients, it is possible
+for malicious Clients to collude and share tokens in a so-called "hoarding
+attack." As an example of this attack, many distributed Clients could obtain
+cacheable tokens and then share them with a single Client to redeem in a way
+that would violate an Origin's attempt to limit tokens to any one particular
+Client. In general, mechanisms for mitigating hoarding attacks depend on the
+deployment model and use case. For example, in the Joint Origin and Issuer model,
+comparing the issuance and redemption contexts can help detect hoarding attacks,
+i.e., if the distribution of redemption contexts is noticeably different from the
+distribution of issuance contexts. Rate limiting issuance, either at the Client,
+Attester, or Issuer, can also help mitigate these attacks.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana">
+<section id="section-8">
+      <h2 id="name-iana-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-8-1">This document has no IANA actions.<a href="#section-8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<section id="section-9">
+      <h2 id="name-references">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-9.1">
+        <h3 id="name-normative-references">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="AUTHSCHEME">[AUTHSCHEME]</dt>
+        <dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Valdez, S.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"The Privacy Pass HTTP Authentication Scheme"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-auth-scheme-15</span>, <time datetime="2023-10-23" class="refDate">23 October 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-auth-scheme-15</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+      <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-9.2">
+        <h3 id="name-informative-references">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="CENTRALIZATION">[CENTRALIZATION]</dt>
+        <dd>
+<span class="refAuthor">Nottingham, M.</span>, <span class="refTitle">"Centralization, Decentralization, and Internet Standards"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-nottingham-avoiding-internet-centralization-14</span>, <time datetime="2023-09-14" class="refDate">14 September 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-nottingham-avoiding-internet-centralization-14">https://datatracker.ietf.org/doc/html/draft-nottingham-avoiding-internet-centralization-14</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="CONSISTENCY">[CONSISTENCY]</dt>
+        <dd>
+<span class="refAuthor">Davidson, A.</span>, <span class="refAuthor">Finkel, M.</span>, <span class="refAuthor">Thomson, M.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Key Consistency and Discovery"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-key-consistency-01</span>, <time datetime="2023-07-10" class="refDate">10 July 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-key-consistency-01">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-key-consistency-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="DMS2004">[DMS2004]</dt>
+        <dd>
+<span class="refAuthor">Dingledine, R.</span>, <span class="refAuthor">Mathewson, N.</span>, and <span class="refAuthor">P. Syverson</span>, <span class="refTitle">"Tor: The Second-Generation Onion Router"</span>, <time datetime="2004-08" class="refDate">August 2004</time>, <span>&lt;<a href="https://svn.torproject.org/svn/projects/design-paper/tor-design.html">https://svn.torproject.org/svn/projects/design-paper/tor-design.html</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="HIJK21">[HIJK21]</dt>
+        <dd>
+<span class="refAuthor">Huang, S.</span>, <span class="refAuthor">Iyengar, S.</span>, <span class="refAuthor">Jeyaraman, S.</span>, <span class="refAuthor">Kushwah, S.</span>, <span class="refAuthor">Lee, C. K.</span>, <span class="refAuthor">Luo, Z.</span>, <span class="refAuthor">Mohassel, P.</span>, <span class="refAuthor">Raghunathan, A.</span>, <span class="refAuthor">Shaikh, S.</span>, <span class="refAuthor">Sung, Y. C.</span>, and <span class="refAuthor">A. Zhang</span>, <span class="refTitle">"PrivateStats: De-Identified Authenticated Logging at Scale"</span>, <time datetime="2021-01" class="refDate">January 2021</time>, <span>&lt;<a href="https://research.fb.com/privatestats">https://research.fb.com/privatestats</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ISSUANCE">[ISSUANCE]</dt>
+        <dd>
+<span class="refAuthor">Celi, S.</span>, <span class="refAuthor">Davidson, A.</span>, <span class="refAuthor">Valdez, S.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Privacy Pass Issuance Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-protocol-16</span>, <time datetime="2023-10-03" class="refDate">3 October 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-protocol-16">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-protocol-16</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="KLOR20">[KLOR20]</dt>
+        <dd>
+<span class="refAuthor">Kreuter, B.</span>, <span class="refAuthor">Lepoint, T.</span>, <span class="refAuthor">Orrù, M.</span>, and <span class="refAuthor">M. Raykova</span>, <span class="refTitle">"Anonymous Tokens with Private Metadata Bit"</span>, <span class="refContent">Springer International Publishing</span>, <span class="seriesInfo">Advances in Cryptology – CRYPTO 2020 pp. 308-336</span>, <span class="seriesInfo">DOI 10.1007/978-3-030-56784-2_11</span>, <span class="seriesInfo">ISBN ["9783030567835", "9783030567842"]</span>, <time datetime="2020" class="refDate">2020</time>, <span>&lt;<a href="https://doi.org/10.1007/978-3-030-56784-2_11">https://doi.org/10.1007/978-3-030-56784-2_11</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="OHTTP">[OHTTP]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M.</span> and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Oblivious HTTP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ohai-ohttp-10</span>, <time datetime="2023-08-25" class="refDate">25 August 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-ohai-ohttp-10">https://datatracker.ietf.org/doc/html/draft-ietf-ohai-ohttp-10</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="PrivacyPassCloudflare">[PrivacyPassCloudflare]</dt>
+        <dd>
+<span class="refAuthor">Sullivan, N.</span>, <span class="refTitle">"Cloudflare Supports Privacy Pass"</span>, <span>n.d.</span>, <span>&lt;<a href="https://blog.cloudflare.com/cloudflare-supports-privacy-pass/">https://blog.cloudflare.com/cloudflare-supports-privacy-pass/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="PrivacyPassExtension">[PrivacyPassExtension]</dt>
+        <dd>
+<span class="refTitle">"Privacy Pass Browser Extension"</span>, <span>n.d.</span>, <span>&lt;<a href="https://github.com/privacypass/challenge-bypass-extension">https://github.com/privacypass/challenge-bypass-extension</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RATE-LIMITED">[RATE-LIMITED]</dt>
+        <dd>
+<span class="refAuthor">Hendrickson, S.</span>, <span class="refAuthor">Iyengar, J.</span>, <span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Valdez, S.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Rate-Limited Token Issuance Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-privacypass-rate-limit-tokens-03</span>, <time datetime="2022-07-06" class="refDate">6 July 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-privacypass-rate-limit-tokens-03">https://datatracker.ietf.org/doc/html/draft-privacypass-rate-limit-tokens-03</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9334">[RFC9334]</dt>
+      <dd>
+<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Thaler, D.</span>, <span class="refAuthor">Richardson, M.</span>, <span class="refAuthor">Smith, N.</span>, and <span class="refAuthor">W. Pan</span>, <span class="refTitle">"Remote ATtestation procedureS (RATS) Architecture"</span>, <span class="seriesInfo">RFC 9334</span>, <span class="seriesInfo">DOI 10.17487/RFC9334</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9334">https://www.rfc-editor.org/rfc/rfc9334</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+<div id="acknowledgements">
+<section id="appendix-A">
+      <h2 id="name-acknowledgements">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
+      </h2>
+<p id="appendix-A-1">The authors would like to thank Eric Kinnear, Scott Hendrickson, Tommy Pauly,
+Christopher Patton, Benjamin Schwartz, Martin Thomson, Steven Valdez and other
+contributors of the Privacy Pass Working Group for many helpful contributions
+to this document.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Alex Davidson</span></div>
+<div dir="auto" class="left"><span class="org">LIP</span></div>
+<div dir="auto" class="left"><span class="locality">Lisbon</span></div>
+<div dir="auto" class="left"><span class="country-name">Portugal</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:alex.davidson92@gmail.com" class="email">alex.davidson92@gmail.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Jana Iyengar</span></div>
+<div dir="auto" class="left"><span class="org">Fastly</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:jri@fastly.com" class="email">jri@fastly.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Christopher A. Wood</span></div>
+<div dir="auto" class="left"><span class="org">Cloudflare</span></div>
+<div dir="auto" class="left"><span class="street-address">101 Townsend St</span></div>
+<div dir="auto" class="left">
+<span class="locality">San Francisco</span>,  </div>
+<div dir="auto" class="left"><span class="country-name">United States of America</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:caw@heapingbits.net" class="email">caw@heapingbits.net</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
