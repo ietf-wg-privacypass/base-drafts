@@ -340,9 +340,9 @@ The Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
-  uint16_t token_type = 0x0001; /* Type VOPRF(P-384, SHA-384) */
-  uint8_t truncated_token_key_id;
-  uint8_t blinded_msg[Ne];
+  uint16 token_type = 0x0001; /* Type VOPRF(P-384, SHA-384) */
+  uint8 truncated_token_key_id;
+  uint8 blinded_msg[Ne];
 } TokenRequest;
 ~~~
 
@@ -408,8 +408,8 @@ structured as follows:
 
 ~~~
 struct {
-   uint8_t evaluate_msg[Ne];
-   uint8_t evaluate_proof[Ns+Ns];
+   uint8 evaluate_msg[Ne];
+   uint8 evaluate_proof[Ns+Ns];
 } TokenResponse;
 ~~~
 
@@ -454,11 +454,11 @@ succeeds, the Client then constructs a Token as follows:
 
 ~~~
 struct {
-  uint16_t token_type = 0x0001; /* Type VOPRF(P-384, SHA-384) */
-  uint8_t nonce[32];
-  uint8_t challenge_digest[32];
-  uint8_t token_key_id[32];
-  uint8_t authenticator[Nk];
+  uint16 token_type = 0x0001; /* Type VOPRF(P-384, SHA-384) */
+  uint8 nonce[32];
+  uint8 challenge_digest[32];
+  uint8 token_key_id[32];
+  uint8 authenticator[Nk];
 } Token;
 ~~~
 
@@ -580,9 +580,9 @@ The Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
-  uint16_t token_type = 0x0002; /* Type Blind RSA (2048-bit) */
-  uint8_t truncated_token_key_id;
-  uint8_t blinded_msg[Nk];
+  uint16 token_type = 0x0002; /* Type Blind RSA (2048-bit) */
+  uint8 truncated_token_key_id;
+  uint8 blinded_msg[Nk];
 } TokenRequest;
 ~~~
 
@@ -637,7 +637,7 @@ TokenResponse structure:
 
 ~~~
 struct {
-  uint8_t blind_sig[Nk];
+  uint8 blind_sig[Nk];
 } TokenResponse;
 ~~~
 
@@ -669,11 +669,11 @@ follows:
 
 ~~~
 struct {
-  uint16_t token_type = 0x0002; /* Type Blind RSA (2048-bit) */
-  uint8_t nonce[32];
-  uint8_t challenge_digest[32];
-  uint8_t token_key_id[32];
-  uint8_t authenticator[Nk];
+  uint16 token_type = 0x0002; /* Type Blind RSA (2048-bit) */
+  uint8 nonce[32];
+  uint8 challenge_digest[32];
+  uint8 token_key_id[32];
+  uint8 authenticator[Nk];
 } Token;
 ~~~
 
