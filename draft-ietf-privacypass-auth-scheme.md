@@ -371,7 +371,7 @@ Clients ought to store cached tokens based on all of these fields, to
 avoid trying to redeem a token that does not match. Note that each token
 has a unique client nonce, which is sent in token redemption ({{redemption}}).
 
-If a client fetches a batch of multiple tokens for future use that are bound
+If a client fetches multiple tokens for future use that are bound
 to a specific redemption context (the redemption_context in the TokenChallenge
 was not empty), clients SHOULD discard these tokens upon flushing state such as
 HTTP cookies {{?COOKIES=I-D.ietf-httpbis-rfc6265bis}}, or if there is a network
@@ -579,7 +579,7 @@ origins SHOULD include random token types, from the Reserved list of "greased"
 types (defined in {{token-types}}), with some non-trivial probability.
 
 Additionally, for deployments where tokens are not required (such as when tokens
-are used as a way to avoiding showing CAPTCHAs), origins SHOULD randomly 
+are used as a way to avoiding showing CAPTCHAs), origins SHOULD randomly
 choose to not challenge clients for tokens with some non-trivial probability.
 This helps origins ensure that their behavior for handling clients that cannot
 redeem tokens is maintained and exercised consistently.
@@ -729,6 +729,11 @@ Private Metadata:
   private metadata; see {{Section 3.5 of ARCHITECTURE}}
   for more details about this property.
 
+Batched Issuance:
+: A Y/N value indicating if the token type supports batched
+  issuance. see {{Section 3.5 of ARCHITECTURE}} for more
+  details about this property.
+
 Nk:
 : The length in bytes of an output authenticator
 
@@ -793,6 +798,9 @@ Public Metadata:
 : N/A
 
 Private Metadata:
+: N/A
+
+Batched Issuance:
 : N/A
 
 Nk:

@@ -504,6 +504,10 @@ of public metadata.
 arbitrary private information, i.e., information that the Client does not observe
 during Token issuance or redemption. See {{metadata-privacy}} for privacy
 considerations of private metadata.
+1. Batched issuance. This means that Clients can request multiple Tokens in a single
+batch, rather than requesting many Tokens with multiple token requests. Not all
+cryptographic protocols underlying the issuance protocol support batched issuance.
+See {{batch-privacy}} for privacy considerations of batched issuance protocols.
 
 The issuance protocol itself can be any interactive protocol between Client,
 Issuer, or other parties that produces a valid token bound to the Client's
@@ -1101,7 +1105,7 @@ in applying these consistency checks across clients. Failure to apply a
 consistency check can allow Client-specific keys to violate Origin-Client
 unlinkability.
 
-## Partitioning by Side-Channels
+## Partitioning by Side-Channels {#side-channels}
 
 Side-channel attacks, such as those based on timing correlation, could be
 used to reduce anonymity set size. In particular,
@@ -1113,6 +1117,15 @@ of Clients using a particular Issuer during that time window, the set can
 be small. Applications should take such side channels into consideration before
 choosing a particular deployment model and type of token challenge and
 redemption context.
+
+## Partitioning by Batched Issuance {#batch-privacy}
+
+Clients that choose to use a batched version of an issuance protocol allow
+the Issuer to link each of the individual token requests in a batch to the
+same Client. If Clients choose different batch sizes, this may reveal
+information to the Issuer that was not otherwise available (except via timing
+side channels; see {{side-channels}}). Consistency in batch sizes is therefore
+an important mitigation against partitioning attacks; see {{rotation-and-consistency}}.
 
 # Security Considerations {#security}
 

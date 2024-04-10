@@ -138,7 +138,8 @@ Issuers MUST provide two parameters for configuration:
 
 1. Issuer Request URL: A token request URL for generating access tokens.
    For example, an Issuer URL might be
-   https://issuer.example.net/request.
+   https://issuer.example.net/request. Unless otherwise specified and configured, this
+   resource only accepts content with the media type "application/private-token-request".
 2. Issuer Public Key values: A list of Issuer Public Keys for the issuance
    protocol.
 
@@ -793,6 +794,7 @@ following entries.
 * Public Verifiability: N
 * Public Metadata: N
 * Private Metadata: N
+* Batched Issuance: Y
 * Nk: 48
 * Nid: 32
 * Reference: {{private-flow}}
@@ -808,6 +810,7 @@ following entries.
 * Public Verifiability: Y
 * Public Metadata: N
 * Private Metadata: N
+* Batched Issuance: N
 * Nk: 256
 * Nid: 32
 * Reference: {{public-flow}}
