@@ -358,7 +358,7 @@ about the Client during the issuance and attestation flows cannot be used by the
 Origin to compromise Client privacy.
 
 These unlinkability properties ensure that only the Client is able to correlate
-information that might be used to identify them with activity on the Origin.
+information that might be used to identify it with activity on the Origin.
 The Attester, Issuer, and Origin only receive the information necessary to perform
 their respective functions.
 
@@ -572,7 +572,7 @@ Depending on the issuance protocol, the Issuer might learn
 information about the Origin. To ensure Issuer-Client unlinkability, the Issuer
 should be unable to link that information to a specific Client. For such
 issuance protocols where the Attester has access to Client-specific
-information, such as is the case for attestation procedures that involve
+information, such as in the case for attestation procedures that involve
 Client-specific information (such as application-layer account information)
 or for deployment models where the Attester learns Client-specific information
 (such as Client IP addresses), Clients trust the Attester to not share any
@@ -1018,7 +1018,7 @@ requests to the same Client based on these contexts, respectively, the
 probability of determining the "true" Client is higher the smaller these
 sets become.
 
-In practice, there are a number of ways in which the size of anonymity sets
+In practice, there is a number of ways in which the size of anonymity sets
 may be reduced or partitioned, though they all center around the concept of
 consistency. In particular, by definition, all Clients in an anonymity set
 share a consistent view of information needed to run the issuance and
@@ -1067,7 +1067,7 @@ exponential increase in tracking granularity similarly to introducing more
 Issuers (though with more potential targeting).
 
 The number of active Issuer configurations also contributes to anonymity set
-partitioning. In particular, when an Issuer updates their configuration and
+partitioning. In particular, when an Issuer updates its configuration and
 the corresponding key pair, any Client that invokes the issuance protocol with
 this configuration becomes part of a set of Clients which also ran the
 issuance protocol using the same configuration. Issuer configuration updates,
