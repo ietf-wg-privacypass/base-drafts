@@ -617,15 +617,15 @@ challenge is per-origin or not. For example, cross-origin tokens with empty
 contexts can be reflected from one party by another, as shown below.
 
 ~~~ aasvg
-+--------+           +----------+               +--------+
-| Origin |           | Attacker |               | Client |
-+---+----+           +----+-----+               +---+----+
-    |                     |                         |
-    +-- TokenChallenge -->|                         |
-    |                     +-- (reflect challenge) ->|
-    |                     |<-------- Token ---------+
-    |<-- (reflect token) -+                         |
-    |                     |
++--------+            +----------+                +--------+
+| Origin |            | Attacker |                | Client |
++---+----+            +----+-----+                +---+----+
+    |                      |                          |
+    +--- TokenChallenge -->|                          |
+    |                      +-- (reflect challenge) -->|
+    |                      |<-------- Token ----------+
+    |<-- (reflect token) --+                          |
+    |                      |                          |
 ~~~
 {: #fig-replay title="Replay attack example"}
 
