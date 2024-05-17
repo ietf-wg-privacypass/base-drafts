@@ -5,10 +5,10 @@
 Network Working Group                                           T. Pauly
 Internet-Draft                                                Apple Inc.
 Intended status: Standards Track                               S. Valdez
-Expires: 21 June 2024                                         Google LLC
+Expires: 18 November 2024                                     Google LLC
                                                               C. A. Wood
                                                               Cloudflare
-                                                        19 December 2023
+                                                             17 May 2024
 
 
               The Privacy Pass HTTP Authentication Scheme
@@ -37,11 +37,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 June 2024.
+   This Internet-Draft will expire on 18 November 2024.
 
 Copyright Notice
 
-   Copyright (c) 2023 IETF Trust and the persons identified as the
+   Copyright (c) 2024 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -722,15 +722,15 @@ Table of Contents
    origin tokens with empty contexts can be reflected from one party by
    another, as shown below.
 
-   +--------+           +----------+               +--------+
-   | Origin |           | Attacker |               | Client |
-   +---+----+           +----+-----+               +---+----+
-       |                     |                         |
-       +-- TokenChallenge -->|                         |
-       |                     +-- (reflect challenge) ->|
-       |                     |<-------- Token ---------+
-       |<-- (reflect token) -+                         |
-       |                     |
+   +--------+            +----------+                +--------+
+   | Origin |            | Attacker |                | Client |
+   +---+----+            +----+-----+                +---+----+
+       |                      |                          |
+       +--- TokenChallenge -->|                          |
+       |                      +-- (reflect challenge) -->|
+       |                      |<-------- Token ----------+
+       |<-- (reflect token) --+                          |
+       |                      |                          |
 
                       Figure 2: Replay attack example
 
@@ -924,9 +924,9 @@ Table of Contents
 
    [COOKIES]  Bingler, S., West, M., and J. Wilander, "Cookies: HTTP
               State Management Mechanism", Work in Progress, Internet-
-              Draft, draft-ietf-httpbis-rfc6265bis-13, 15 November 2023,
+              Draft, draft-ietf-httpbis-rfc6265bis-14, 2 May 2024,
               <https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-
-              rfc6265bis-13>.
+              rfc6265bis-14>.
 
    [ISSUANCE] Celi, S., Davidson, A., Valdez, S., and C. A. Wood,
               "Privacy Pass Issuance Protocol", Work in Progress,

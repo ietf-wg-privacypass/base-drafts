@@ -5,11 +5,11 @@
 Network Working Group                                            S. Celi
 Internet-Draft                                               A. Davidson
 Intended status: Standards Track                          Brave Software
-Expires: 21 June 2024                                          S. Valdez
+Expires: 18 November 2024                                      S. Valdez
                                                               Google LLC
                                                               C. A. Wood
                                                               Cloudflare
-                                                        19 December 2023
+                                                             17 May 2024
 
 
                      Privacy Pass Issuance Protocol
@@ -38,11 +38,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 June 2024.
+   This Internet-Draft will expire on 18 November 2024.
 
 Copyright Notice
 
-   Copyright (c) 2023 IETF Trust and the persons identified as the
+   Copyright (c) 2024 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
