@@ -190,7 +190,7 @@ The default TokenChallenge message has the following structure:
 
 ~~~
 struct {
-    uint16_t token_type;
+    uint16 token_type;
     opaque issuer_name<1..2^16-1>;
     opaque redemption_context<0..32>;
     opaque origin_info<0..2^16-1>;
@@ -400,11 +400,11 @@ The default Token message has the following structure:
 
 ~~~
 struct {
-    uint16_t token_type;
-    uint8_t nonce[32];
-    uint8_t challenge_digest[32];
-    uint8_t token_key_id[Nid];
-    uint8_t authenticator[Nk];
+    uint16 token_type;
+    uint8 nonce[32];
+    uint8 challenge_digest[32];
+    uint8 token_key_id[Nid];
+    uint8 authenticator[Nk];
 } Token;
 ~~~
 
@@ -476,10 +476,10 @@ protocol corresponding to the token type with the following value as the input:
 
 ~~~
 struct {
-    uint16_t token_type;
-    uint8_t nonce[32];
-    uint8_t challenge_digest[32];
-    uint8_t token_key_id[Nid];
+    uint16 token_type;
+    uint8 nonce[32];
+    uint8 challenge_digest[32];
+    uint8 token_key_id[Nid];
 } AuthenticatorInput;
 ~~~
 
