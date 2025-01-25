@@ -15,11 +15,11 @@ Additional information:
 
 # Existing implementations
 
-| Implementation                                                             | Language | Token Types                   | Version   |
-| -------------------------------------------------------------------------- | :------- | :-----------------------------| :-------- |
-| [pat-app](https://github.com/cloudflare/pat-app)                           | Go       | VOPRF (P-384, SHA-384) (0x0001), Blind RSA (SHA-384, 2048-bit) (0x0002) | draft-06  |
-| [privacypass](https://github.com/raphaelrobert/privacypass)                | Rust     | VOPRF (P-384, SHA-384) (0x0001), Blind RSA (SHA-384, 2048-bit) (0x0002) | draft-06  |
-| [privacypass-ts](https://github.com/cloudflare/privacypass-ts)             | Typescript | Blind RSA (SHA-384, 2048-bit) (0x0002) | draft-11  |
+| Implementation                                                             | Language   | Token Types                                                                                                     | Version   |
+| -------------------------------------------------------------------------- | :--------- | :-------------------------------------------------------------------------------------------------------------- | :-------- |
+| [pat-app](https://github.com/cloudflare/pat-app)                           | Go         | VOPRF (P-384, SHA-384) (0x0001), Blind RSA (SHA-384, 2048-bit) (0x0002)                                         | draft-06  |
+| [privacypass](https://github.com/raphaelrobert/privacypass)                | Rust       | VOPRF (P-384, SHA-384) (0x0001), Blind RSA (SHA-384, 2048-bit) (0x0002), VOPRF (ristretto255, SHA-512) (0xF91A) | draft-06  |
+| [privacypass-ts](https://github.com/cloudflare/privacypass-ts)             | Typescript | VOPRF (P-384, SHA-384) (0x0001), Blind RSA (SHA-384, 2048-bit) (0x0002)                                         | draft-11  |
 
 ## Building Drafts
 
