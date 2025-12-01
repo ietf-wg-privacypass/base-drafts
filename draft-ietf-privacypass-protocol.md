@@ -1,6 +1,6 @@
 ---
-title: "Privacy Pass Protocol Specification"
-abbrev: PP protocol
+title: "Privacy Pass Issuance Protocol"
+abbrev: Privacy Pass Issuance
 docname: draft-ietf-privacypass-protocol-latest
 date:
 category: info
@@ -22,7 +22,7 @@ author:
  -
     ins: A. Davidson
     name: Alex Davidson
-    org: LIP
+    org: Brave Software
     city: Lisbon
     country: Portugal
     email: alex.davidson92@gmail.com
@@ -34,959 +34,820 @@ author:
     city: San Francisco
     country: United States of America
     email: armfazh@cloudflare.com
+ -
+    ins: S. Valdez
+    name: Steven Valdez
+    org: Google LLC
+    email: svaldez@chromium.org
+ -
+    ins: C. A. Wood
+    name: Christopher A. Wood
+    org: Cloudflare
+    street: 101 Townsend St
+    city: San Francisco
+    country: United States of America
+    email: caw@heapingbits.net
 
 normative:
   RFC2119:
-  RFC8446:
-  I-D.irtf-cfrg-voprf:
-  draft-davidson-pp-architecture:
-    title: "Privacy Pass: Architectural Framework"
-    target: https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-davidson-pp-architecture
-    author:
-      ins: A. Davidson
-      org: Cloudflare
-  draft-svaldez-pp-http-api:
-    title: "Privacy Pass: HTTP API"
-    target: https://github.com/alxdavids/privacy-pass-ietf/tree/master/drafts/draft-davidson-pp-architecture
-    author:
-      ins: S. Valdez
-      org: Google
-informative:
-  RFC7049:
-  RFC7159:
-  KLOR20:
-    title: Anonymous Tokens with Private Metadata Bit
-    target: https://eprint.iacr.org/2020/072
-    authors:
-      -
-        ins: B. Kreuter
-        org: Google
-      -
-        ins: T. Lepoint
-        org: Google
-      -
-        ins: M. Orrú
-        org: ENS/INRIA, Paris, France; Recurse Center, NYC, USA
-      -
-        ins: M. Raykova
-        org: Google
-  DGSTV18:
-    title: Privacy Pass, Bypassing Internet Challenges Anonymously
-    target: https://petsymposium.org/2018/files/papers/issue3/popets-2018-0026.pdf
-    authors:
-      -
-        ins: A. Davidson
-        org: RHUL, UK
-      -
-        ins: I. Goldberg
-        org: University of Waterloo, Canada
-      -
-        ins: N. Sullivan
-        org: Cloudflare
-      -
-        ins: G. Tankersley
-        org: Independent
-      -
-        ins: F. Valsorda
-        org: Independent
-  TrustTokenAPI:
-    title: Trust Token API
-    target: https://github.com/WICG/trust-token-api
-    author:
-      name: WICG
-  PrivateStorage:
-    title: The Path from S4 to PrivateStorage
-    target: https://medium.com/least-authority/the-path-from-s4-to-privatestorage-ae9d4a10b2ae
-    author:
-      name: Liz Steininger
-      ins: L. Steininger
-      org: Least Authority
-  OpenPrivacy:
-    title: Token Based Services - Differences from PrivacyPass
-    target: https://openprivacy.ca/assets/towards-anonymous-prepaid-services.pdf
-    authors:
-      -
-        ins: E. Atwater
-        org: OpenPrivacy, Canada
-      -
-        ins: S. J. Lewis
-        org: OpenPrivacy, Canada
-  Brave:
-    title: Brave Rewards
-    target: https://brave.com/brave-rewards/
+  HTTP-Authentication:
+    title: The Privacy Pass HTTP Authentication Scheme
+    target: https://datatracker.ietf.org/doc/html/draft-pauly-privacypass-auth-scheme-00
+  I-D.ietf-privacypass-architecture:
 
 --- abstract
 
-This document specifies the Privacy Pass protocol. This protocol
-provides anonymity-preserving authorization of clients to servers. In
-particular, client re-authorization events cannot be linked to any
-previous initial authorization. Privacy Pass is intended to be used as a
-performant protocol in the application-layer.
+This document specifies two variants of the the two-message issuance protocol
+for Privacy Pass tokens: one that produces tokens that are privately
+verifiable, and another that produces tokens that are publicly verifiable.
+The privately verifiable issuance protocol optionally supports public
+metadata during the issuance flow.
 
 --- middle
 
 # Introduction
 
-A common problem on the Internet is providing an effective mechanism for
-servers to derive trust from clients that they interact with. Typically,
-this can be done by providing some sort of authorization challenge to
-the client. But this also negatively impacts the experience of clients
-that regularly have to solve such challenges.
+The Privacy Pass protocol provides a privacy-preserving authorization
+mechanism. In essence, the protocol allows clients to provide
+cryptographic tokens that prove nothing other than that they have been
+created by a given server in the past {{I-D.ietf-privacypass-architecture}}.
 
-To mitigate accessibility issues, a client that correctly solves the
-challenge can be provided with a cookie. This cookie can be presented
-the next time the client interacts with the server, instead of
-performing the challenge. However, this does not solve the problem of
-reauthorization of clients across multiple domains. Using current tools,
-providing some multi-domain authorization token would allow linking
-client browsing patterns across those domains, and severely reduces
-their online privacy.
-
-The Privacy Pass protocol provides a set of cross-domain authorization
-tokens that protect the client's anonymity in message exchanges with a
-server. This allows clients to communicate an attestation of a
-previously authenticated server action, without having to reauthenticate
-manually. The tokens retain anonymity in the sense that the act of
-revealing them cannot be linked back to the session where they were
-initially issued.
-
-This document lays out the generic description of the protocol, along
-with the data and message formats. We detail an implementation of the
-protocol functionality based on the description of a verifiable
-oblivious pseudorandom function {{I-D.irtf-cfrg-voprf}}.
+This document describes the issuance protocol for Privacy Pass. It specifies
+two variants: one that is privately verifiable based on the oblivious
+pseudorandom function from {{!OPRF=I-D.irtf-cfrg-voprf}}, and one that is
+publicly verifiable based on the blind RSA signature scheme
+{{!BLINDRSA=I-D.irtf-cfrg-rsa-blind-signatures}}.
 
 This document DOES NOT cover the architectural framework required for
 running and maintaining the Privacy Pass protocol in the Internet
 setting. In addition, it DOES NOT cover the choices that are necessary
 for ensuring that client privacy leaks do not occur. Both of these
-considerations are covered in a separate document
-{{draft-davidson-pp-architecture}}. In addition,
-{{draft-svaldez-pp-http-api}} provides an instantiation of this protocol
-intended for the HTTP setting.
+considerations are covered in {{I-D.ietf-privacypass-architecture}}.
 
 # Terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in {{RFC2119}}.
+{::boilerplate bcp14}
 
 The following terms are used throughout this document.
 
-- Server: A service that provides the server-side functionality required
-  by the protocol. May be referred to as the issuer.
-- Client: An entity that seeks authorization from a server that supports
-  interactions in the Privacy Pass protocol.
-- Key: The secret key used by the server for authorizing client data.
+- Client: An entity that provides authorization tokens to services
+  across the Internet, in return for authorization.
+- Issuer: A service produces Privacy Pass tokens to clients.
+- Private Key: The secret key used by the Issuer for issuing tokens.
+- Public Key: The public key used by the Issuer for issuing and verifying
+  tokens.
 
 We assume that all protocol messages are encoded into raw byte format
-before being sent. We use the TLS presentation language {{RFC8446}} to
-describe the structure of protocol data types and messages.
+before being sent across the wire.
 
-# Background
+# Configuration {#setup}
 
-We discuss the core motivation behind the protocol along with the
-guarantees and assumptions that we make in this document.
+Issuers MUST provide two parameters for configuration:
 
-## Motivating use-cases
+1. Issuer Request URI: a token request URL for generating access tokens.
+   For example, an Issuer URL might be https://issuer.example.net/example-token-request.
+   This parameter uses resource media type "text/plain".
+2. Issuer Public Key values: an Issuer Public Key for an issuance protocol.
 
-The Privacy Pass protocol was originally developed to provide anonymous
-authorization of Tor users. In particular, the protocol allows clients
-to reveal authorization tokens that they have been issued without
-linking the authorization to the actual issuance event. This means that
-the tokens cannot be used to link the browsing patterns of clients that
-reveal tokens.
+The Issuer parameters can be obtained from an Issuer via a directory object, which is a JSON
+object whose values are other JSON objects and URLs for the parameters.
 
-Beyond these uses-cases, the Privacy Pass protocol is used in a number
-of practical applications. See {{DGSTV18}}, {{TrustTokenAPI}},
-{{PrivateStorage}}, {{OpenPrivacy}}, and {{Brave}} for examples.
+| Field Name           | Value                                                  |
+|:---------------------|:-------------------------------------------------------|
+| issuer-request-uri   | Issuer Request URI resource URL as a JSON string       |
+| token-keys           | List of Issuer Public Key values, each as JSON objects |
 
-## Anonymity and security guarantees
+Each "token-keys" JSON object contains the following fields and corresponding raw values.
 
-Privacy Pass provides anonymity-preserving authorization tokens for
-clients. Throughout this document, we use the terms "anonymous",
-"anonymous-preserving" and "anonymity" to refer to the core security
-guarantee of the protocol. Informally, this guarantee means that any
-token issued by a server key and subsequently redeemed is
-indistinguishable from any other token issued under the same key.
+| Field Name   | Value                                                  |
+|:-------------|:-------------------------------------------------------|
+| token-type   | Integer value of the Token Type, as defined in {{token-type}}, as a JSON number |
+| token-key    | The base64url encoding of the public key for use with the issuance protocol, including padding, as a JSON string |
 
-Privacy Pass also prohibits clients from forging tokens, as otherwise
-the protocol would have little value as an authorization protocol.
-Informally, this means any client that is issued `N` tokens under a
-given server key cannot redeem more than `N` valid tokens.
+Issuers MAY advertise multiple token-keys for the same token-type to
+support key rotation. In this case, Issuers indicate preference for which
+token key to use based on the order of keys in the list, with preference
+given to keys earlier in the list.
 
-{{sec-reqs}} elaborates on these protocol anonymity and security
-requirements.
-
-## Basic assumptions
-
-We make only a few minimal assumptions about the environment of the
-clients and servers supporting the Privacy Pass protocol.
-
-- At any one time, we assume that the server uses only one configuration
-  containing their ciphersuite choice along with their secret key data.
-  This ensures that all clients are issued tokens under the single key
-  associated with any given epoch.
-- We assume that the client has access to a global directory of the
-  current public parts of the configurations used the server.
-
-The wider ecosystem that this protocol is employed in is described in
-{{draft-davidson-pp-architecture}}.
-
-# Protocol description {#overview}
-
-The Privacy Pass protocol is split into two phases that are built upon
-the functionality described in {{pp-api}} later.
-
-The first phase, "issuance", provides the client with unlinkable tokens
-that can be used to initiate re-authorization with the server in the
-future. The second phase, "redemption", allows the client to redeem a
-given re-authorization token with the server that it interacted with
-during the issuance phase. The protocol must satisfy two cryptographic
-security requirements known as "unlinkability" and "unforgeability".
-These requirements are covered in {{sec-reqs}}.
-
-## Server setup {#server-setup}
-
-Before the protocol takes place, the server chooses a ciphersuite and
-generates a keypair by running `(pkS, skS) = KeyGen()`. This
-configuration must be available to all clients that interact with the
-server (for the purpose of engaging in a Privacy Pass exchange). We
-assume that the server has a public (and unique) identity that the
-client uses to retrieve this configuration.
-
-## Client setup {#client-setup}
-
-The client initialises a global storage system `store` that allows it
-store the tokens that are received during issuance. The storage system
-is a map of server identifiers (`server.id`) to arrays of stored tokens.
-We assume that the client knows the server public key `pkS` ahead of
-time. The client picks a value `m` of tokens to receive during the
-issuance phase. In {{draft-davidson-pp-architecture}} we discuss
-mechanisms that the client can use to ensure that this public key is
-consistent across the entire ecosystem.
-
-## Issuance phase {#issuance-phase}
-
-The issuance phase is a two-round protocol that allows the client to
-receive `m` anonymous authorization tokens from the server. The first
-round sees the server generate a commitment. The second round sees the
-server issue a token to the client.
+Altogether, the Issuer's JSON directory could look like:
 
 ~~~
-  Client(pkS, m, info)                        Server(skS, pkS)
-  ------------------------------------------------------------
-
-  commit_req = Prepare(info)
-
-                           commit_req
-                      ------------------->
-
-                    commit_resp = Commit(skS, pkS, commit_req)
-
-                          commit_resp
-                      <-------------------
-
-  cInput = Generate(m, commit_resp)
-  req = cInput.req
-
-                              req
-                      ------------------->
-
-                              issueResp = Issue(pkS, skS, req)
-
-                           serverResp
-                      <-------------------
-
-  tokens = Process(pkS, cInput, serverResp)
-  store[server.id].push(tokens)
+ {
+    "issuer-request-uri": "https://issuer.example.net/example-token-request",
+    "token-keys": [
+      {
+        "token-type": 2,
+        "token-key": "MI...AB",
+      },
+      {
+        "token-type": 2,
+        "token-key": "MI...AQ",
+      }
+    ]
+ }
 ~~~
 
-Note that the first round of the protocol is only necessitated for
-certain ciphersuites that require client and servers commit to some
-value. When such commitment `commit_resp` is generated and sent to the
-client, the client returns `commit_resp` with the `IssuanceRequest`
-message. The server MUST check that the commitment corresponds to
-`commit_resp` that was previously committed. This requires the
-commitment to either be a reference to some commitment on the server, or
-the commitment be an encrypted (and authenticated) blob that the server
-can use to recover commitment. The mechanism by which servers handle
-this commitment is implementation specific, and similar to how TLS
-session resumption state is managed; see {{RFC8446}} for details. In
-addition, the `Commit` function is implementation-specific and MUST be
-defined by the underlying ciphersuite.
+Issuer directory resources have the media type "application/json"
+and are located at the well-known location /.well-known/token-issuer-directory.
 
-When the server does not need to generate this commitment, the client
-instead DOES NOT send the `CommitRequest` message, and runs:
+# Token Challenge Requirements
+
+Clients receive challenges for tokens, as described in {{!AUTHSCHEME=I-D.pauly-privacypass-auth-scheme}}.
+The basic token issuance protocols described in this document can be
+interactive or non-interactive, and per-origin or cross-origin.
+
+# Issuance Protocol for Privately Verifiable Tokens {#private-flow}
+
+The Privacy Pass issuance protocol is a two message protocol that takes
+as input a challenge from the redemption protocol and produces a token,
+as shown in the figure below.
 
 ~~~
-cInput = Generate(m, "")
+   Origin          Client                   Issuer
+                    (pkI)                 (skI, pkI)
+                  +------------------------------------\
+  Challenge   ----> TokenRequest ------------->        |
+                  |                       (evaluate)   |
+    Token    <----+     <--------------- TokenResponse |
+                  \------------------------------------/
 ~~~
 
-A server that is expecting some non-empty `commit_resp` to be passed
-must abort the protocol on receiving a request containing an empty
-`commit_resp` value.
+Issuers provide a Private and Public Key, denoted skI and pkI, respectively,
+used to produce tokens as input to the protocol. See {{issuer-configuration}}
+for how this key pair is generated.
 
-Note: currently, no ciphersuites are supported that support working with
-empty commitment messages.
+Clients provide the following as input to the issuance protocol:
 
-## Redemption phase {#redemption-phase}
+- Issuer name, identifying the Issuer. This is typically a host name that
+  can be used to construct HTTP requests to the Issuer.
+- Issuer Public Key pkI, with a key identifier `key_id` computed as
+  described in {{issuer-configuration}}.
+- Challenge value `challenge`, an opaque byte string. For example, this might
+  be provided by the redemption protocol in {{HTTP-Authentication}}.
 
-The redemption phase allows the client to anonymously reauthenticate to
-the server, using data that it has received from a previous issuance
-phase.
+Given this configuration and these inputs, the two messages exchanged in
+this protocol are described below. This section uses notation described in
+{{OPRF, Section 4}}, including SerializeElement and DeserializeElement,
+SerializeScalar and DeserializeScalar, and DeriveKeyPair.
 
-~~~
-  Client(info)                                Server(skS, pkS)
-  ------------------------------------------------------------
-  token = store[server.id].pop()
-  req = Redeem(token, info)
+## Client-to-Issuer Request {#private-request}
 
-                               req
-                        ------------------>
-
-                               if (dsIdx.includes(req.data)) {
-                                 raise ERR_DOUBLE_SPEND
-                               }
-                               resp = Verify(pkS, skS, req)
-                               if (resp.success) {
-                                 dsIdx.push(req.data)
-                               }
-
-                                resp
-                        <------------------
-  Output resp
-~~~
-
-### Client info {#client-info}
-
-The client input `info` is arbitrary byte data that is used for linking
-the redemption request to the specific session. We RECOMMEND that `info`
-is constructed as the following concatenated byte-encoded data:
+The Client first creates a context as follows:
 
 ~~~
-len(aux) || aux || len(server.id) || server.id || current_time()
+client_context = SetupVOPRFClient(0x0004, pkI)
 ~~~
 
-where `len(x)` is the length of `x` in bytes, and `aux` is arbitrary
-auxiliary data chosen by the client. The usage of `current_time()`
-allows the server to check that the redemption request has happened in
-an appropriate time window.
+Here, 0x0004 is the two-octet identifier corresponding to the
+OPRF(P-384, SHA-384) ciphersuite in {{OPRF}}. SetupVOPRFClient
+is defined in {{OPRF, Section 3.2}}.
 
-### Double-spend protection
-
-To protect against clients that attempt to spend a value `req.data` more
-than once, the server uses an index, `dsIdx`, to collect valid inputs it
-witnesses. Since this store needs to only be optimized for storage and
-querying, a structure such as a Bloom filter suffices. The storage
-should be parameterized to live as long as the server keypair that is in
-use. See {{sec-reqs}} for more details.
-
-## Handling errors
-
-It is possible for the API functions from {{pp-functions}} to return one
-of the errors indicated in {{errors}} rather than their expected value.
-In these cases, we assume that the entire protocol aborts.
-
-# Functionality {#pp-api}
-
-This section details the data types and API functions that are used to
-construct the protocol in {{overview}}.
-
-We provide an explicit instantiation of the Privacy Pass API in
-{{voprf-api}}, based on the public API provided in
-{{I-D.irtf-cfrg-voprf}}.
-
-## Data structures {#pp-structs}
-
-The following data structures are used throughout the Privacy Pass
-protocol and are written in the TLS presentation language {{RFC8446}}.
-It is intended that any of these data structures can be written into
-widely-adopted encoding schemes such as those detailed in TLS
-{{RFC8446}}, CBOR {{RFC7049}}, and JSON {{RFC7159}}.
-
-### Ciphersuite {#pp-ciphersuite-struct}
-
-The `Ciphersuite` enum provides identifiers for each of the supported
-ciphersuites of the protocol. Some initial values that are supported by
-the core protocol are described in {{pp-ciphersuites}}. Note that the
-list of supported ciphersuites may be expanded by extensions to the core
-protocol description in separate documents.
-
-### Keys {#pp-server-keys}
-
-We use the following types to describe the public and private keys used
-by the server.
+The Client then creates an issuance request message for a random value `nonce`
+using the input challenge and Issuer key identifier as follows:
 
 ~~~
-opaque PublicKey<1..2^16-1>
-opaque PrivateKey<1..2^16-1>
+nonce = random(32)
+context = SHA256(challenge)
+token_input = concat(0x0001, nonce, context, key_id)
+blind, blinded_element = client_context.Blind(token_input)
 ~~~
 
-### CommitRequest {#pp-cli-commit-request}
-
-The `CommitRequest` struct is simply a fixed message allowing opaque
-metadata.
+The Blind function is defined in {{OPRF, Section 3.3.2}}.
+If the Blind function fails, the Client aborts the protocol. Otherwise,
+the Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
-  opaque info<1..2^16-1>
-} CommitRequest;
+   uint16_t token_type = 0x0001;
+   uint8_t token_key_id;
+   uint8_t blinded_msg[Ne];
+} TokenRequest;
 ~~~
 
-### CommitResponse {#pp-cli-commit-response}
+The structure fields are defined as follows:
 
-The `CommitResponse` struct is contains an opaque set of bytes that
-correspond to some commitment that the server has generated. The
-structure and format of this value is implementation specific depending
-on whether the server is stateful.
+- "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-~~~
-struct {
-  opaque commitment<1..2^16-1>
-} CommitResponse;
-~~~
+- "token_key_id" is the least significant byte of the `key_id` in network byte order (in other words, the last 8 bits of `key_id`).
 
-### IssuanceInput {#pp-cli-issue-input}
+- "blinded_msg" is the Ne-octet blinded message defined above, computed as
+  `SerializeElement(blinded_element)`. Ne is as defined in {{OPRF, Section 4}}.
 
-The `IssuanceInput` struct describes the data that is initially
-generated by the client during the issuance phase.
-
-Firstly, we define sequences of bytes that partition the client input.
+The values `token_input` and `blinded_element` are stored locally and used later
+as described in {{finalization}}. The Client then generates an HTTP POST request
+to send to the Issuer, with the TokenRequest as the body. The media type for
+this request is "message/token-request". An example request is shown below.
 
 ~~~
-opaque Internal<1..2^16-1>
-opaque IssuanceRequest<1..2^16-1>
+:method = POST
+:scheme = https
+:authority = issuer.example.net
+:path = /example-token-request
+accept = message/token-response
+cache-control = no-cache, no-store
+content-type = message/token-request
+content-length = <Length of TokenRequest>
+
+<Bytes containing the TokenRequest>
 ~~~
 
-These data types represent members of the wider `IssuanceInput` data
-type.
+Upon receipt of the request, the Issuer validates the following conditions:
+
+- The TokenRequest contains a supported token_type.
+- The TokenRequest.token_key_id corresponds to a key ID of a Public Key owned by the issuer.
+- The TokenRequest.blinded_request is of the correct size.
+
+If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
+to the client.
+
+## Issuer-to-Client Response {#private-response}
+
+Upon receipt of a TokenRequest, the Issuer tries to deseralize TokenRequest.blinded_msg
+using DeserializeElement from {{Section 2.1 of OPRF}}, yielding `blinded_element`.
+If this fails, the Issuer MUST return an HTTP 400 error to the client. Otherwise, if the
+Issuer is willing to produce a token token to the Client, the Issuer completes the issuance
+flow by computing a blinded response as follows:
 
 ~~~
-struct {
-  Internal data[m]
-  IssuanceRequest req[m]
-} IssuanceInput;
+server_context = SetupVOPRFServer(0x0004, skI, pkI)
+evaluate_element, proof = server_context.Evaluate(skI, blinded_element)
 ~~~
 
-Note that a `IssuanceInput` contains equal-length arrays of `Internal`
-and `IssuanceRequest` types corresponding to the number of tokens that
-should be issued.
-
-### IssuanceResponse {#pp-srv-issue-response}
-
-Firstly, the `IssuedToken` type corresponds to a single sequence of
-bytes that represents a single issued token received from the server.
-
-~~~
-opaque IssuedToken<1..2^16-1>
-~~~
-
-Then an `IssuanceResponse` corresponds to a collection of `IssuedTokens`
-as well as a sequence of bytes `proof`.
-
-~~~
-struct {
-  IssuedToken tokens[m]
-  opaque proof<1..2^16-1>
-}
-~~~
-
-The value of `m` is equal to the length of the `IssuanceRequest` vector
-sent by the client.
-
-### RedemptionToken {#pp-redemption-token}
-
-The `RedemptionToken` struct contains the data required to generate the
-client message in the redemption phase of the Privacy Pass protocol.
+SetupVOPRFServer is in {{OPRF, Section 3.2}} and Evaluate is defined in
+{{OPRF, Section 3.3.2}}. The Issuer then creates a TokenResponse structured
+as follows:
 
 ~~~
 struct {
-  opaque data<1..2^16-1>;
-  opaque issued<1..2^16-1>;
-} RedemptionToken;
+   uint8_t evaluate_msg[Nk];
+   uint8_t evaluate_proof[Ns+Ns];
+} TokenResponse;
 ~~~
 
-### RedemptionRequest {#pp-redemption-message}
+The structure fields are defined as follows:
 
-The `RedemptionRequest` struct consists of the data that is sent by the
-client during the redemption phase of the protocol.
+- "evaluate_msg" is the Ne-octet evaluated messaged, computed as
+  `SerializeElement(evaluate_element)`.
+
+- "evaluate_proof" is the (Ns+Ns)-octet serialized proof, which is a pair of Scalar values,
+  computed as `concat(SerializeScalar(proof[0]), SerializeScalar(proof[1]))`,
+  where Ns is as defined in {{OPRF, Section 4}}.
+
+The Issuer generates an HTTP response with status code 200 whose body consists
+of TokenResponse, with the content type set as "message/token-response".
+
+~~~
+:status = 200
+content-type = message/token-response
+content-length = <Length of TokenResponse>
+
+<Bytes containing the TokenResponse>
+~~~
+
+## Finalization
+
+Upon receipt, the Client handles the response and, if successful, deserializes
+the body values TokenResponse.evaluate_response and TokenResponse.evaluate_proof,
+yielding `evaluated_element` and `proof`. If deserialization of either value fails,
+the Client aborts the protocol. Otherwise, the Client processes the response as
+follows:
+
+~~~
+authenticator = client_context.Finalize(token_input, blind, evaluated_element, blinded_element, proof)
+~~~
+
+The Finalize function is defined in {{OPRF, Section 3.3.2}}. If this
+succeeds, the Client then constructs a Token as follows:
 
 ~~~
 struct {
-  opaque data<1..2^16-1>;
-  opaque tag<1..2^16-1>;
-  opaque info<1..2^16-1>;
-} RedemptionRequest;
+    uint16_t token_type = 0x0001
+    uint8_t nonce[32];
+    uint8_t challenge_digest[32];
+    uint8_t token_key_id[32];
+    uint8_t authenticator[Nk];
+} Token;
 ~~~
 
-### RedemptionResponse {#pp-redemption-response}
+Otherwise, the Client aborts the protocol.
 
-The `RedemptionResponse` struct corresponds to a boolean value that
-indicates whether the `RedemptionRequest` sent by the client is valid.
-It can also contain any associated data.
+## Issuer Configuration
+
+Issuers are configured with Private and Public Key pairs, each denoted skI and
+pkI, respectively, used to produce tokens. Each key pair MUST be generated as
+follows:
+
+~~~
+seed = random(Ns)
+(skI, pkI) = DeriveKeyPair(seed, "PrivacyPass")
+~~~
+
+The key identifier for this specific key pair, denoted `key_id`, is computed
+as follows:
+
+~~~
+key_id = SHA256(0x0001 || SerializeElement(pkI))
+~~~
+
+# Issuance Protocol for Publicly Verifiable Tokens {#public-flow}
+
+This section describes a variant of the issuance protocol in {{private-flow}}
+for producing publicly verifiable tokens. It differs from the previous variant
+in two important ways:
+
+1. The output tokens are publicly verifiable by anyone with the Issuer public
+   key; and
+1. The issuance protocol does not admit public or private metadata to bind
+   additional context to tokens.
+
+Otherwise, this variant is nearly identical. In particular, Issuers provide a
+Private and Public Key, denoted skI and pkI, respectively, used to produce tokens
+as input to the protocol. See {{public-issuer-configuration}} for how this key
+pair is generated.
+
+Clients provide the following as input to the issuance protocol:
+
+- Issuer name, identifying the Issuer. This is typically a host name that
+  can be used to construct HTTP requests to the Issuer.
+- Issuer Public Key pkI, with a key identifier `key_id` computed as
+  described in {{public-issuer-configuration}}.
+- Challenge value `challenge`, an opaque byte string. For example, this might
+  be provided by the redemption protocol in {{HTTP-Authentication}}.
+
+Given this configuration and these inputs, the two messages exchanged in
+this protocol are described below.
+
+## Client-to-Issuer Request {#public-request}
+
+The Client first creates an issuance request message for a random value
+`nonce` using the input challenge and Issuer key identifier as follows:
+
+~~~
+nonce = random(32)
+context = SHA256(challenge)
+token_input = concat(0x0002, nonce, context, key_id)
+blinded_msg, blind_inv = rsabssa_blind(pkI, token_input)
+~~~
+
+The rsabssa_blind function is defined in {{BLINDRSA, Section 5.1.1.}}.
+The Client then creates a TokenRequest structured as follows:
 
 ~~~
 struct {
-  boolean success;
-  opaque ad<1..2^16-1>;
-} RedemptionResponse;
+   uint16_t token_type = 0x0002
+   uint8_t token_key_id;
+   uint8_t blinded_msg[Nk];
+} TokenRequest;
 ~~~
 
-## API functions {#pp-functions}
+The structure fields are defined as follows:
 
-The following functions wrap the core of the functionality required in
-the Privacy Pass protocol. For each of the descriptions, we essentially
-provide the function signature, leaving the actual contents to be
-defined by specific instantiations or extensions of the protocol.
+- "token_type" is a 2-octet integer, which matches the type in the challenge.
 
-### Prepare
+- "token_key_id" is the least significant byte of the `key_id` in network byte order (in other words, the last 8 bits of `key_id`).
 
-A function run by the client to prepare for a commitment will used
-during the issuance flow of the Privacy Pass protocol.
+- "blinded_msg" is the Nk-octet request defined above.
 
-Inputs:
-
-`info`: An opaque byte application-specific byte string.
-
-Outputs:
-
-`commit_req`: A `CommitRequest` struct.
-
-This function should be implemented by any ciphersuites that require a
-two-phase issuance protocol (`COMMIT=true`).
-
-### Commit
-
-A function run by the server that generates a commitment in the first
-phase of the issuance protocol.
-
-Inputs:
-
-- `skS`: A server `PrivateKey`.
-- `pkS`: A server `PublicKey`.
-- `commit_req`: A `CommitRequest` struct
-
-Outputs:
-
-- `commit_resp`: A `CommitResponse` struct.
-
-This function should be implemented by any ciphersuites that require a
-two-phase issuance protocol (`COMMIT=true`).
-
-### Generate
-
-A function run by the client to generate the initial data that is used
-as its input in the Privacy Pass protocol.
-
-Inputs:
-
-- `m`:       A `uint8` value corresponding to the number of Privacy Pass
-             tokens to generate.
-
-Outputs:
-
-- `input`: An `IssuanceInput` struct.
-
-### Issue
-
-A function run by the server to issue valid redemption tokens to the
-client.
-
-Inputs:
-
-- `pkS`: A server `PublicKey`.
-- `skS`: A server `PrivateKey`.
-- `req`: An `IssuanceRequest` struct.
-
-Outputs:
-
-- `resp`: An `IssuanceResponse` struct.
-
-Throws:
-
-- `ERR_FAILED_COMMITMENT` ({{errors}})
-
-### Process
-
-Run by the client when processing the server response in the issuance
-phase of the protocol.
-
-Inputs:
-
-- `pkS`: An server `PublicKey`.
-- `input`: An `IssuanceInput` struct.
-- `resp`: An `IssuanceResponse` struct.
-
-Outputs:
-
-- `tokens`: A vector of `RedemptionToken` structs, whose length is equal
-  to length of the internal `ServerEvaluation` vector in the
-  `IssuanceResponse` struct.
-
-Throws:
-
-- `ERR_PROOF_VALIDATION` ({{errors}})
-
-### Redeem
-
-Run by the client in the redemption phase of the protocol to generate
-the client's message.
-
-Inputs:
-
-- `token`: A `RedemptionToken` struct.
-- `info`: An `opaque<1..2^16-1>` type corresponding to data that is
-  linked to the redemption. See {{client-info}} for advice on how to
-  construct this.
-
-Outputs:
-
-- `req`: A `RedemptionRequest` struct.
-
-### Verify
-
-Run by the server in the redemption phase of the protocol. Determines
-whether the data sent by the client is valid.
-
-Inputs:
-
-- `pkS`: An server `PublicKey`.
-- `skS`: An server `PrivateKey`.
-- `req`: A `RedemptionRequest` struct.
-
-Outputs:
-
-- `resp`: A `RedemptionResponse` struct.
-
-## Error types {#errors}
-
-- `ERR_PROOF_VALIDATION`: Error occurred when a client attempted to
-  verify the proof that is part of the server's response.
-- `ERR_DOUBLE_SPEND`: Error occurred when a client has attempted to
-  redeem a token that has already been used for authorization.
-- `ERR_FAILED_COMMITMENT`: Error occurs during issuance phase if
-  non-empty commitment does not match the commitment generated in the
-  first round.
-
-# Security considerations {#sec-reqs}
-
-We discuss the security requirements that are necessary to uphold when
-instantiating the Privacy Pass protocol. In particular, we focus on the
-security requirements of "unlinkability", and "unforgeability".
-Informally, the notion of unlinkability is required to preserve the
-anonymity of the client in the redemption phase of the protocol. The
-notion of unforgeability is to protect against an adversarial client
-that may look to subvert the security of the protocol.
-
-Both requirements are modelled as typical cryptographic security games,
-following the formats laid out in {{DGSTV18}} and {{KLOR20}}.
-
-Note that the privacy requirements of the protocol are covered in the
-architectural framework document {{draft-davidson-pp-architecture}}.
-
-## Unlinkability {#unlinkability}
-
-Formally speaking the security model is the following:
-
-- The adversary runs the server setup and generates a keypair `(pkS,
-  skS)`.
-- The adversary specifies a number `Q` of issuance phases to initiate,
-  where each phase `i in range(Q)` consists of `m_i` Issue evaluations.
-- The adversary runs `Issue` using the keypair that it generated on each
-  of the client messages in the issuance phase.
-- When the adversary wants, it stops the issuance phase, and a random
-  number `l` is picked from `range(Q)`.
-- A redemption phase is initiated with a single token with index `i`
-  randomly sampled from `range(m_l)`.
-- The adversary guesses an index `l_guess` corresponding to the index of
-  the issuance phase that it believes the redemption token was received
-  in.
-- The adversary succeeds if `l == l_guess`.
-
-The security requirement is that the adversary has only a negligible
-probability of success greater than `1/Q`.
-
-## One-more unforgeability {#unforgeability}
-
-The one-more unforgeability requirement states that it is hard for any
-adversarial client that has received `m` valid tokens from the issuance
-phase to redeem `m+1` of them. In essence, this requirement prevents a
-malicious client from being able to forge valid tokens based on the
-Issue responses that it sees.
-
-The security model roughly takes the following form:
-
-- The adversary specifies a number `Q` of issuance phases to initiate
-  with the server, where each phase `i in range(Q)` consists of `m_i`
-  server evaluation. Let `m = sum(m_i)` where `i in range(Q)`.
-- The adversary receives `Q` responses, where the response with index
-  `i` contains `m_i` individual tokens.
-- The adversary initiates `m_adv` redemption sessions with the server
-  and the server verifies that the sessions are successful (return
-  true), and that each request includes a unique token. The adversary
-  succeeds in `m_succ =< m_adv` redemption sessions.
-- The adversary succeeds if `m_succ > m`.
-
-The security requirement is that the adversarial client has only a
-negligible probability of succeeding.
-
-Note that {{KLOR20}} strengthens the capabilities of the adversary, in
-comparison to the original work of {{DGSTV18}}. In {{KLOR20}}, the
-adversary is provided with oracle access that allows it to verify that
-the server responses in the issuance phase are valid.
-
-## Double-spend protection
-
-All issuing servers should implement a robust, global storage-query
-mechanism for checking that tokens sent by clients have not been spent
-before. Such tokens only need to be checked for each server
-individually. This prevents clients from "replaying" previous requests,
-and is necessary for achieving the unforgeability requirement.
-
-## Additional token metadata
-
-Some use-cases of the Privacy Pass protocol benefit from associating a
-limited amount of metadata with tokens that can be read by the server
-when a token is redeemed. Adding metadata to tokens can be used as a
-vector to segment the anonymity of the client in the protocol.
-Therefore, it is important that any metadata that is added is heavily
-limited.
-
-Any additional metadata that can be added to redemption tokens should be
-described in the specific protocol instantiation. Note that any
-additional metadata will have to be justified in light of the privacy
-concerns raised above. For more details on the impacts associated with
-segmenting user privacy, see {{draft-davidson-pp-architecture}}.
-
-Any metadata added to tokens will be considered either "public" or
-"private". Public metadata corresponds to unmodifiable bits that a
-client can read. Private metadata corresponds to unmodifiable private
-bits that should be obscured to the client.
-
-Note that the instantiation in {{voprf-protocol}} provides randomized
-redemption tokens with no additional metadata for an server with a
-single key.
-
-## Maximum number of tokens issued {#max-tokens}
-
-Servers SHOULD impose a hard ceiling on the number of tokens that can be
-issued in a single issuance phase to a client. If there is no limit,
-malicious clients could abuse this and cause excessive computation,
-leading to a Denial-of-Service attack.
-
-# VOPRF instantiation {#voprf-protocol}
-
-In this section, we show how to instantiate the functional API in
-{{pp-api}} with the VOPRF protocol described in {{I-D.irtf-cfrg-voprf}}.
-Moreover, we show that this protocol satisfies the security requirements
-laid out in {{sec-reqs}}, based on the security proofs provided in
-{{DGSTV18}} and {{KLOR20}}.
-
-## Recommended ciphersuites {#voprf-ciph-recs}
-
-The RECOMMENDED server ciphersuites are as follows: detailed in
-{{I-D.irtf-cfrg-voprf}}:
-
-- OPRF(decaf448, SHA-512) (ID = 0x0002);
-- OPRF(P-384, SHA-512) (ID = 0x0004);
-- OPRF(P-521, SHA-512) (ID = 0x0005).
-
-We deliberately avoid the usage of smaller ciphersuites (associated with
-P-256 and ristretto255) due to the potential to reduce security to
-unfavourable levels via static Diffie Hellman attacks. See
-{{I-D.irtf-cfrg-voprf}} for more details.
-
-## Protocol contexts
-
-Note that we must run the verifiable version of the protocol in
-{{I-D.irtf-cfrg-voprf}}. Therefore the `server` takes the role of the
-`Server` running in `modeVerifiable`. In other words, the `server` runs
-`ctxtS = SetupVerifiableServer(suite, skS, pkS)`; where `suite` is one
-of the ciphersuites in {{voprf-ciph-recs}}, `skS` and `pkS` is the
-server's secret and public key respectively (generated by calling
-`KeyGen`). It returns `ctxtS`, which is the Server context. Likewise,
-run `ctxtC = SetupVerifiableClient(suite, pkS)` to generate the Client
-context.
-
-## Functionality {#voprf-api}
-
-We instantiate each functions using the API functions in
-{{I-D.irtf-cfrg-voprf}}. Note that we use the framework mentioned in the
-document to allow for batching multiple tokens into a single VOPRF
-evaluation. For the explicit signatures of each of the functions, refer
-to {{pp-api}}.
-
-### Generate
-
-The generate functionality generates an initial set of tokens and
-blinded representation on the client-side. The function also takes an
-optional (possibly empty) value for a commitment `com` committed to by
-the server.
+The Client then generates an HTTP POST request to send to the Issuer,
+with the TokenRequest as the body. The media type for this request
+is "message/token-request". An example request is shown below, where
+Nk = 512.
 
 ~~~
-def Generate(m, com):
-  tokens = []
-  blindedTokens = []
-  for i in range(m):
-    x = random_bytes()
-    (token, blindedToken) = Blind(x, com)
-    tokens[i] = token
-    blindedTokens[i] = blindedToken
-  return IssuanceInput {
-           data: tokens,
-           req: blindedTokens,
-         }
+:method = POST
+:scheme = https
+:authority = issuer.example.net
+:path = /example-token-request
+accept = message/token-response
+cache-control = no-cache, no-store
+content-type = message/token-request
+content-length = <Length of TokenRequest>
+
+<Bytes containing the TokenRequest>
 ~~~
 
-### Issue
+Upon receipt of the request, the Issuer validates the following conditions:
 
-For this functionality, note that we supply multiple tokens in `req` to
-`Evaluate`. This allows batching a single proof object for multiple
-evaluations. While the construction in {{I-D.irtf-cfrg-voprf}} only
-permits a single input, we follow the advice for providing vectors of
-inputs.
+- The TokenRequest contains a supported token_type.
+- The TokenRequest.token_key_id corresponds to a key ID of a Public Key owned by the issuer.
+- The TokenRequest.blinded_msg is of the correct size.
 
-~~~
-def Issue(pkS, skS, req):
-  elements, proof = Evaluate(skS, pkS, req)
-  return IssuanceResponse {
-           tokens: elements,
-           proof: proof,
-         }
-~~~
+If any of these conditions is not met, the Issuer MUST return an HTTP 400 error
+to the Client, which will forward the error to the client.
 
-### Process
+## Issuer-to-Client Response {#public-response}
 
-Similarly to `Issue`, we follow the advice for providing vectors of
-inputs to the `Unblind` function for verifying the batched proof object.
+If the Issuer is willing to produce a token token to the Client, the Issuer
+completes the issuance flow by computing a blinded response as follows:
 
 ~~~
-Process(pkS, input, resp):
-  unblindedTokens = Unblind(input.data, resp.elements,
-                              input.req, pkS, resp.proof)
-  redemptionTokens = []
-  for bt in unblindedTokens:
-    rt = RedemptionToken { data: input.data, issued: bt }
-    redemptionTokens[i] = rt
-  return redemptionTokens
+blind_sig = rsabssa_blind_sign(skI, TokenRequest.blinded_rmsg)
 ~~~
 
-### Redeem
+This is encoded and transmitted to the client in the following TokenResponse structure:
 
 ~~~
-def Redeem(token, info):
-  tag = Finalize(token.data, token.issued, info)
-  return RedemptionRequest {
-           data: data,
-           tag: tag,
-           info: info,
-         }
+struct {
+   uint8_t blind_sig[Nk];
+} TokenResponse;
 ~~~
 
-### Verify
+The rsabssa_blind_sign function is defined in {{BLINDRSA, Section 5.1.2.}}.
+The Issuer generates an HTTP response with status code 200 whose body consists
+of TokenResponse, with the content type set as "message/token-response".
 
 ~~~
-def Verify(pkS, skS, req):
-  resp = VerifyFinalize(skS, req.data, req.info, req.tag)
-  Output RedemptionResponse {
-           success: resp
-         }
+:status = 200
+content-type = message/token-response
+content-length = <Length of TokenResponse>
+
+<Bytes containing the TokenResponse>
 ~~~
 
-## Security justification
+## Finalization
 
-The protocol devised in {{overview}}, coupled with the API instantiation
-in {{voprf-api}}, are equivalent to the protocol description in
-{{DGSTV18}} and {{KLOR20}} from a security perspective. In {{DGSTV18}},
-it is proven that this protocol satisfies the security requirements of
-unlinkability ({{unlinkability}}) and unforgeability
-({{unforgeability}}).
+Upon receipt, the Client handles the response and, if successful, processes the
+body as follows:
 
-The unlinkability property follows unconditionally as the view of the
-adversary in the redemption phase is distributed independently of the
-issuance phase. The unforgeability property follows from the one-more
-decryption security of the ElGamal cryptosystem {{DGSTV18}}. In
-{{KLOR20}} it is also proven that this protocol satisfies the stronger
-notion of unforgeability, where the adversary is granted a verification
-oracle, under the chosen-target Diffie-Hellman assumption.
+~~~
+authenticator = rsabssa_finalize(pkI, nonce, blind_sig, blind_inv)
+~~~
 
-Note that the existing security proofs do not leverage the VOPRF
-primitive as a black-box in the security reductions. Instead, it relies
-on the underlying operations in a non-black-box manner. Hence, an
-explicit reduction from the generic VOPRF primitive to the Privacy Pass
-protocol would strengthen these security guarantees.
+The rsabssa_finalize function is defined in {{BLINDRSA, Section 5.1.3.}}.
+If this succeeds, the Client then constructs a Token as described in
+{{HTTP-Authentication}} as follows:
 
-# Protocol ciphersuites {#pp-ciphersuites}
+~~~
+struct {
+    uint16_t token_type = 0x0002
+    uint8_t nonce[32];
+    uint8_t challenge_digest[32];
+    uint8_t token_key_id[32];
+    uint8_t authenticator[Nk];
+} Token;
+~~~
 
-The ciphersuites that we describe for the Privacy Pass protocol are
-derived from the core instantiations of the protocol (such as in
-{{voprf-protocol}}).
+Otherwise, the Client aborts the protocol.
 
-In each of the ciphersuites below, the maximum security provided
-corresponds to the maximum difficulty of computing a discrete logarithm
-in the group. Note that the actual security level MAY be lower. See the
-security considerations in {{I-D.irtf-cfrg-voprf}} for examples.
+## Issuer Configuration {#public-issuer-configuration}
 
-The COMMIT parameter refers to whether the first round of the issuance
-phase of the protocol is necessary. When this is false, the client
-ignores the first message and uses an empty value for the commitment
-parameter to `Generate`.
+Issuers are configured with Private and Public Key pairs, each denoted skI and
+pkI, respectively, used to produce tokens. Each key pair SHALL be generated as
+as specified in FIPS 186-4 {{?DSS=DOI.10.6028/NIST.FIPS.186-4}}.
 
-## PP(OPRF2)
+The key identifier for a keypair (skI, pkI), denoted `key_id`, is computed as
+SHA256(encoded_key), where encoded_key is a DER-encoded SubjectPublicKeyInfo
+(SPKI) object carrying pkI. The SPKI object MUST use the RSASSA-PSS OID {{!RFC5756}},
+which specifies the hash algorithm and salt size. The salt size MUST match the
+output size of the hash function associated with the public key and token type.
 
-- OPRF2 = OPRF(decaf448, SHA-512)
-- ID = 0x0001
-- COMMIT = false
-- Maximum security provided: 224 bits
+# Security considerations
 
-## PP(OPRF4)
+This document outlines how to instantiate the Issuance protocol
+based on the VOPRF defined in {{OPRF}} and blind RSA protocol defnied in
+{{BLINDRSA}}. All security considerations described in the VOPRF document also
+apply in the Privacy Pass use-case. Considerations related to broader privacy
+and security concerns in a multi-Client and multi-Issuer setting are deferred
+to the Architecture document {{I-D.ietf-privacypass-architecture}}.
 
-- OPRF4 = OPRF(P-384, SHA-512)
-- ID = 0x0002
-- COMMIT = false
-- Maximum security provided: 192 bits
+# IANA considerations
 
-## PP(OPRF5)
+## Token Type
 
-- OPRF5 = OPRF(P-521, SHA-512)
-- ID = 0x0003
-- COMMIT = false
-- Maximum security provided: 256 bits
+This document updates the "Token Type" Registry with the following values.
 
-# Extensions framework policy {#extensions}
+| Value  | Name                           | Publicly Verifiable | Public Metadata | Private Metadata | Nk  | Reference        |
+|:-------|:-------------------------------|:--------------------|:----------------|:-----------------|:----|:-----------------|
+| 0x0001 | VOPRF (P-384, SHA-384)         | N                   | N               | N                | 48  | {{private-flow}} |
+| 0x0002 | Blind RSA (SHA-384, 2048-bit)  | Y                   | N               | N                | 256 | {{public-flow}}  |
+{: #aeadid-values title="Token Types"}
 
-The intention with providing the Privacy Pass API in {{pp-api}} is to
-allow new instantiations of the Privacy Pass protocol. These
-instantiations may provide either modified VOPRF constructions, or
-simply implement the API in a completely different way.
+## Media Types
 
-Extensions to this initial draft SHOULD be specified as separate
-documents taking one of two possible routes:
+This specification defines the following protocol messages, along with their
+corresponding media types:
 
-- Produce new VOPRF-like primitives that use the same public API
-  provided in {{I-D.irtf-cfrg-voprf}} to implement the Privacy Pass API,
-  but with different internal operations.
-- Implement the Privacy Pass API in a different way to the proposed
-  implementation in {{voprf-protocol}}.
+- TokenRequest: "message/token-request"
+- TokenResponse: "message/token-response"
 
-If an extension requires changing the generic protocol description as
-described in {{overview}}, then the change may have to result in changes
-to the draft specification here also.
+The definition for each media type is in the following subsections.
 
-Each new extension that modifies the internals of the protocol in either
-of the two ways MUST re-justify that the extended protocol still
-satisfies the security requirements in {{sec-reqs}}. Protocol extensions
-MAY put forward new security guarantees if they are applicable.
+### "message/token-request" media type
 
-The extensions MUST also conform with the extension framework policy as
-set out in the architectural framework document. For example, this may
-concern any potential impact on client anonymity that the extension may
-introduce.
+Type name:
+
+: message
+
+Subtype name:
+
+: token-request
+
+Required parameters:
+
+: N/A
+
+Optional parameters:
+
+: None
+
+Encoding considerations:
+
+: only "8bit" or "binary" is permitted
+
+Security considerations:
+
+: see {{security-considerations}}
+
+Interoperability considerations:
+
+: N/A
+
+Published specification:
+
+: this specification
+
+Applications that use this media type:
+
+: N/A
+
+Fragment identifier considerations:
+
+: N/A
+
+Additional information:
+
+: <dl>
+  <dt>Magic number(s):</dt><dd>N/A</dd>
+  <dt>Deprecated alias names for this type:</dt><dd>N/A</dd>
+  <dt>File extension(s):</dt><dd>N/A</dd>
+  <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
+  </dl>
+
+Person and email address to contact for further information:
+
+: see Authors' Addresses section
+
+Intended usage:
+
+: COMMON
+
+Restrictions on usage:
+
+: N/A
+
+Author:
+
+: see Authors' Addresses section
+
+Change controller:
+
+: IESG
+
+### "message/token-response" media type
+
+Type name:
+
+: message
+
+Subtype name:
+
+: access-token-response
+
+Required parameters:
+
+: N/A
+
+Optional parameters:
+
+: None
+
+Encoding considerations:
+
+: only "8bit" or "binary" is permitted
+
+Security considerations:
+
+: see {{security-considerations}}
+
+Interoperability considerations:
+
+: N/A
+
+Published specification:
+
+: this specification
+
+Applications that use this media type:
+
+: N/A
+
+Fragment identifier considerations:
+
+: N/A
+
+Additional information:
+
+: <dl>
+  <dt>Magic number(s):</dt><dd>N/A</dd>
+  <dt>Deprecated alias names for this type:</dt><dd>N/A</dd>
+  <dt>File extension(s):</dt><dd>N/A</dd>
+  <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
+  </dl>
+
+Person and email address to contact for further information:
+
+: see Authors' Addresses section
+
+Intended usage:
+
+: COMMON
+
+Restrictions on usage:
+
+: N/A
+
+Author:
+
+: see Authors' Addresses section
+
+Change controller:
+
+: IESG
 
 --- back
 
-# Document contributors
+# Acknowledgements
 
-- Alex Davidson (alex.davidson92@gmail.com)
-- Sofía Celi (cherenkov@riseup.net)
-- Christopher Wood (caw@heapingbits.net)
+The authors of this document would like to acknowledge the helpful
+feedback and discussions from Benjamin Schwartz, Joseph Salowey, Sofía
+Celi, and Tara Whalen.
+
+# Test Vectors
+
+This section includes test vectors for the two basic issuance protocols
+specified in this document. {{test-vectors-poprf}} contains test vectors
+for token issuance protocol 1 (0x0001), and {{test-vectors-rsa}} contains
+test vectors for token issuance protocol 2 (0x0002).
+
+## Issuance Protocol 1 - VOPRF(P-384, SHA-384) {#test-vectors-poprf}
+
+The test vector below lists the following values:
+
+- skS: The encoded OPRF private key, serialized using SerializeScalar from {{Section 2.1 of OPRF}} and
+  represented as a hexadecimal string.
+- pkS: The encoded OPRF public key, serialized using SerializeElement from {{Section 2.1 of OPRF}} and
+  represented as a hexadecimal string.
+- challenge: A random challenge digest, represented as a hexadecimal string.
+- nonce: The 32-byte client nonce generated according to {{private-request}}, represented as a
+  hexadecimal string.
+- blind: The blind used when computing the OPRF blinded message, serialized using SerializeScalar
+  from {{Section 2.1 of OPRF}} and represented as a hexadecimal string.
+- token_request: The TokenRequest message constructed according to {{private-request}}, represented
+  as a hexadecimal string.
+- token_request: The TokenResponse message constructed according to {{private-response}}, represented
+  as a hexadecimal string.
+- token: The output Token from the protocol, represented as a hexadecimal string.
+
+~~~
+skS: 0177781aeced893dccdf80713d318a801e2a0498240fdcf650304bbbfd0f8d3b5c0
+cf6cfee457aaa983ec02ff283b7a9
+pkS: 022c63f79ac59c0ba3d204245f676a2133bd6120c90d67afa05cd6f8614294b7366
+c252c6458300551b79a4911c2590a36
+challenge:
+a5d46383359ef34e3c4a7b8d1b3165778bffc9b70c9e6a60dd14143e4c9c9fbd
+nonce: 5d4799f8338ddc50a6685f83b8ecd264b2f157015229d12b3384c0f199efe7b8
+blind: 0322fec505230992256296063d989b59cc03e83184eb6187076d264137622d202
+48e4e525bdc007b80d1560e0a6f49d9
+token_request: 00011a02861fd50d14be873611cff0131d2c872c79d0260c6763498a2
+a3f14ca926009c0f247653406e1d52b68d61b7ed2bac9ea
+token_response: 038e3625b6a769668a99680e46cf9479f5dc1e86d57164ab3b4a569d
+dfc486bf1485d4916a5194fdc0518d3e8444968421ba36e8144aa7902705ff0f3cf40586
+3d69451a2a7ba210cc45760c2f1a6045134d877b39e8bcbbf920e5de4a3372557debf211
+765cd969976860bc039f9082d6a3e03f8e891246240173d2cf3d69a4613b0f8415979029
+22e74c7a1f2e4639e4
+token: 00015d4799f8338ddc50a6685f83b8ecd264b2f157015229d12b3384c0f199efe
+7b8742cdfb0ed756ea680868ef109a280a393e001d2fa56b1be46ecb31fa25e76731a5b1
+d698ea7ab843b8e8a71ed9b2fffa70457a43a8fc687939424b29a7554b40fde130ab7a82
+2715909cb73f99a45b640ca1c85180ba9ca1a40bab8b664406a34bcbc63b5e2e5c455cea
+00001a968f7
+~~~
+
+## Issuance Protocol 2 - Blind RSA, 4096 {#test-vectors-rsa}
+
+The test vector below lists the following values:
+
+- skS: The PEM-encoded PKCS#8 RSA private key used for signing tokens, represented
+  as a hexadecimal string.
+- pkS: The DER-encoded SubjectPublicKeyInfo object carrying the public key corresponding
+  to skS, as described in {{public-issuer-configuration}}, represented as a hexadecimal string.
+- challenge: A random challenge digest, represented as a hexadecimal string.
+- nonce: The 32-byte client nonce generated according to {{public-request}}, represented as a
+  hexadecimal string.
+- blind: The blind used when computing the blind RSA blinded message, represented as a hexadecimal string.
+- salt: The randomly generated 48-byte salt used when encoding the blinded token request message,
+  represented as a hexadecimal string.
+- token_request: The TokenRequest message constructed according to {{public-request}}, represented
+  as a hexadecimal string.
+- token_request: The TokenResponse message constructed according to {{public-response}}, represented
+  as a hexadecimal string.
+- token: The output Token from the protocol, represented as a hexadecimal string.
+
+~~~
+skS: 2d2d2d2d2d424547494e2050524956415445204b45592d2d2d2d2d0a4d494945765
+149424144414e42676b71686b6947397730424151454641415343424b63776767536a416
+74541416f49424151444c4775317261705831736334420a4f6b7a38717957355379356b6
+f6a41303543554b66717444774e38366a424b5a4f76457245526b49314c527876734d645
+3327961326333616b4745714c756b440a556a35743561496b3172417643655844644e445
+03442325055707851436e6969396e6b492b6d67725769744444494871386139793137586
+e6c5079596f784f530a646f6558563835464f314a752b62397336356d586d34516a75513
+94559614971383371724450567a50335758712b524e4d636379323269686763624c766d4
+2390a6a41355334475666325a6c74785954736f4c364872377a58696a4e3946374862716
+5676f753967654b524d584645352f2b4a3956595a634a734a624c756570480a544f72535
+a4d4948502b5358514d4166414f454a4547426d6d4430683566672f43473475676a79486
+e4e51383733414e4b6a55716d3676574574413872514c620a4530742b496c706641674d4
+241414543676745414c7a4362647a69316a506435384d6b562b434c6679665351322b726
+6486e7266724665502f566344787275690a3270316153584a596962653645532b4d622f4
+d4655646c485067414c773178513457657266366336444373686c6c784c5753563847734
+2737663386f364750320a6359366f777042447763626168474b556b5030456b623953305
+84c4a57634753473561556e484a585237696e7834635a6c666f4c6e72455165366855787
+34d710a6230644878644844424d644766565777674b6f6a4f6a70532f39386d455579375
+6422f3661326c7265676c766a632f326e4b434b7459373744376454716c47460a787a414
+261577538364d435a342f5131334c762b426566627174493973715a5a776a72645568514
+83856437872793251564d515751696e57684174364d7154340a53425354726f6c5a7a777
+2716a65384d504a393175614e4d6458474c63484c49323673587a76374b53514b4267514
+4766377735055557641395a325a583958350a6d49784d54424e6445467a56625550754b4
+b413179576e31554d444e63556a71682b7a652f376b337946786b6830514633316271363
+0654c393047495369414f0a354b4f574d39454b6f2b7841513262614b314d664f5931472
+b386a7a42585570427339346b353353383879586d4b366e796467763730424a385a68356
+66b55710a5732306f5362686b686a5264537a48326b52476972672b5553774b426751445
+a4a4d6e7279324578612f3345713750626f737841504d69596e6b354a415053470a79327
+a305a375455622b7548514f2f2b78504d376e433075794c494d44396c61544d48776e367
+3372f4c62476f455031575267706f59482f4231346b2f526e360a667577524e3632496f3
+97463392b41434c745542377674476179332b675277597453433262356564386c4969656
+774546b6561306830754453527841745673330a6e356b796132513976514b4267464a754
+67a4f5a742b7467596e576e51554567573850304f494a45484d45345554644f637743784
+b7248527239334a6a7546320a453377644b6f546969375072774f59496f614a5468706a5
+0634a62626462664b792b6e735170315947763977644a724d6156774a637649707756367
+6315570660a56744c61646d316c6b6c7670717336474e4d386a6e4d30587833616a6d6d6
+e66655739794758453570684d727a4c4a6c394630396349324c416f4742414e58760a756
+75658727032627354316f6b6436755361427367704a6a5065774e526433635a4b397a306
+153503144544131504e6b7065517748672f2b36665361564f487a0a79417844733968355
+272627852614e6673542b7241554837783153594456565159564d68555262546f5a65364
+72f6a716e544333664e6648563178745a666f740a306c6f4d4867776570362b53494d436
+f6565325a6374755a5633326c63496166397262484f633764416f47416551386b3853494
+c4e4736444f413331544535500a6d3031414a49597737416c5233756f2f524e61432b785
+96450553354736b75414c78786944522f57734c455142436a6b46576d6d4a41576e51554
+474626e594e0a536377523847324a36466e72454374627479733733574156476f6f465a6
+e636d504c50386c784c79626c534244454c79615a762f624173506c4d4f39624435630a4
+a2b4e534261612b6f694c6c31776d4361354d43666c633d0a2d2d2d2d2d454e442050524
+956415445204b45592d2d2d2d2d0a
+pkS: 30820152303d06092a864886f70d01010a3030a00d300b060960864801650304020
+2a11a301806092a864886f70d010108300b0609608648016503040202a20302013003820
+10f003082010a0282010100cb1aed6b6a95f5b1ce013a4cfcab25b94b2e64a23034e4250
+a7eab43c0df3a8c12993af12b111908d4b471bec31d4b6c9ad9cdda90612a2ee903523e6
+de5a224d6b02f09e5c374d0cfe01d8f529c500a78a2f67908fa682b5a2b430c81eaf1af7
+2d7b5e794fc98a3139276879757ce453b526ef9bf6ceb99979b8423b90f4461a22af37aa
+b0cf5733f7597abe44d31c732db68a181c6cbbe607d8c0e52e0655fd9996dc584eca0be8
+7afbcd78a337d17b1dba9e828bbd81e291317144e7ff89f55619709b096cbb9ea474cead
+264c2073fe49740c01f00e109106066983d21e5f83f086e2e823c879cd43cef700d2a352
+a9babd612d03cad02db134b7e225a5f0203010001
+challenge:
+3f5a1c30d13f860622458ce836d8af325378054370fe8a3d771eebd67d4d810d
+nonce: c0fcbbb243d8f5d4f661dbdefca95879b39aeccb77b7db731b59c09688773125
+blind: 04d00c700128b4b201b4bec4f05d942bc903d49c26568b5956e0827590d2e4b43
+570105ae492f655d41a3d68f1cc6a9a2895c36fd45c88239257f2e6cee5bd88e7d870f35
+67069d78f8b85947c7ab123b16c9f3b76d856112802dd0fefa800a9c3807fbb5d949481b
+4f7a21da0269f17611b93dfa7197e87ef9c1ef9c2fd0f86119917cdf01284038435f2df3
+f8ae2935ae0ef5440b3b4ac12fed83a03bc494abaa87241d624d2dcb0c6a64422eb63dbf
+ba0193161648e5b2afbdf3140901840c7d08a0e2953320fffa09641500122ba81c5907e7
+ebd4d2384221ddb99439c2465138b98348b58a5f89b4e05b70856a270e1f5308512e368c
+fe6dfe4cf3759ed
+salt: 4daf07bc96a829736ce6386a4d3ed988192ea4f0acb3ed715dca2ae688c16ad346
+ee5e2b3dd26eb2868639a778e3bc5d
+token_request: 0002ca832fffabdd44e2cd54e5e24d74519d297608aec9ab88e26b732
+adcb382781e7e2657c8b94751b9fa6b2ed02cec383f8cd04e9627d5b62a7f1b7ea16b81e
+46f35637cca49f8990d5359f8a7dcac1ba58fb685d4b32a67621d368cc112197d4f84ee5
+241c359299cb5fc41182bd65bba112f35a4073d1231290447fb884888ba84eb5b4602534
+787aa1e167bc1ddcceb7fb5ad43e2b242fd4b4939349897cfb911cf0f3785847edaeaca6
+350c16cb05b7882ec076a3adde7c361f54d6eb67ec239aeafe8a4816b29e4c6aa8bf2873
+ba36ec6e2b9596aa508b5e34543a469286be2404f1f481f6a274a2afb429d62377f7ab6d
+e56379d2c42f7205e3bf1c74d3159
+token_response: 6e7d5334765bea44ea43b81ae8f41334fdac47b3dfaaeb2c3b99f42a
+67d8239592ac4fa129a938e139bf052d85804bdaa90f7f54fdfa34d6efeaea0ccc15a500
+fb2987b534d0558e8d32df68b3533f6cbc953dabcfff2ef6b6af336c1128f607f0796190
+6a2fed919691340e751a8e2173e674569f7e4beb7ad0ee5c65ce82ad477d3e44b3755bcd
+0f168ab85ce662d3f87c5634be036382d6ad4ab870ab975e8bffd0b95bcf457dc83337ff
+ea85b7c77d44e5cb4bddc5aecfc958cc822cc53ded3da699af86bfad3054fe49da8eeb55
+162e444a3b4d438f9e3cbadd50cba56b4f3f0718a65e7d8dfc40762cdb9962edc731f6a7
+ec8641cbf98a0ec9cdf8b7f6
+token: 0002c0fcbbb243d8f5d4f661dbdefca95879b39aeccb77b7db731b59c09688773
+125ad76ab53adc2ca44e4eaae3d71b9bf3fc9332122faeef07cb70d9e04da68c6a7ca572
+f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd27080d1f816364e5d
+4d516d2f3e80366e56edc1de4ba0d7aed2675c15156d774b311778091bf5f2aea9926156
+2289459a41c5739dec6dc42447744fe07c53c9d090f053263d019255cdfc27739132bd68
+21ad49f1a98db6873319d04c04703d74a8fe1d0806b2a25b46246c5bb2ff927463b03152
+589068389df89494c6d82f3b92be773a9fe6bc1fed9cbf26bdfbae1ff369f20d0267cdd2
+0f3bcba30f8b0c0e9d9a1a39a40156b0614030d5099aa36f085347681aef502f3d081b36
+cd79f7ea14df1ca9694320fc44ccbc7c5d90aeedc915af3ac11a3baf562d38c8213e39f6
+731fa5e701697d0bfbfcfc83b447945b351115a20770370226b52a19df939f3080e
+~~~
